@@ -1,5 +1,6 @@
 @echo off
-REM Atalho para iniciar o Central de Compras em modo dev
-cd /d "%~dp0"
-start "" http://localhost:5173
-pnpm dev
+REM Abre o Central de Compras (versão PWA no GitHub Pages)
+start "" https://pedrocampisi.github.io/central-compras-pbqph/
+
+REM Para desenvolvimento local, execute: pnpm dev
+REM e acesse http://localhost:5173
