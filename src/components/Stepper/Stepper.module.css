@@ -1,0 +1,42 @@
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.step {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.step strong {
+  font-size: 13px;
+  display: block;
+  color: var(--text);
+}
+.step span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.active {
+  border-color: var(--navy);
+  background: rgba(29, 79, 124, 0.06);
+}
+.active .num { background: var(--navy); }
+.done .num { background: var(--green); }

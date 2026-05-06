@@ -1,0 +1,44 @@
+/* Design tokens — single source of truth para cores, espaçamentos e elevações.
+   Migrado direto do legacy CentralCompras-PBQPH.html (linhas 17-57). */
+
+:root {
+  --navy: #1d4f7c;
+  --navy-dark: #0d2b4a;
+  --navy-mid: #2467a0;
+  --navy-light: #3a88c8;
+  --amber: #f5a623;
+  --amber-dark: #d48b0f;
+  --sidebar-bg: #f7fafe;
+  --bg: #eef3f8;
+  --surface: #ffffff;
+  --border: #c5d3df;
+  --border-light: #e0e9f2;
+  --text: #0d2137;
+  --text-mid: #2a4c6a;
+  --text-muted: #6082a0;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --warn-border: #fde68a;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(13, 43, 74, 0.08);
+
+  /* Aliases legados (referenciados em código que será migrado gradualmente) */
+  --muted: #6082a0;
+  --muted-strong: #2a4c6a;
+  --surface-alt: #eef3f8;
+  --accent: #1d4f7c;
+  --accent-soft: rgba(29, 79, 124, 0.08);
+  --accent-strong: #0d2b4a;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --neutral-soft: #eef3f8;
+  --border-strong: #c5d3df;
+}

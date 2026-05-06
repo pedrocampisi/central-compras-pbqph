@@ -1,0 +1,172 @@
+/* ── Items table ──────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.itemsTable thead th {
+  background: var(--surface-alt);
+  padding: 7px 6px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.itemsTable tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+.itemsTable tbody tr:last-child { border-bottom: none; }
+.itemsTable tbody tr:hover { background: rgba(29, 79, 124, 0.02); }
+
+.itemsTable td {
+  padding: 4px 4px;
+  vertical-align: middle;
+}
+
+.cellInput {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.12s, background 0.12s;
+  box-sizing: border-box;
+}
+.cellInput:hover { border-color: var(--border); background: var(--surface); }
+.cellInput:focus { border-color: var(--navy); background: var(--surface); box-shadow: 0 0 0 2px rgba(29,79,124,0.1); }
+.cellInput[type="number"] { text-align: right; -moz-appearance: textfield; }
+.cellInput[type="number"]::-webkit-outer-spin-button,
+.cellInput[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.cellSelect {
+  width: 100%;
+  padding: 4px 4px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.12s;
+  box-sizing: border-box;
+}
+.cellSelect:hover { border-color: var(--border); background: var(--surface); }
+.cellSelect:focus { border-color: var(--navy); background: var(--surface); }
+
+.removeBtn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+  padding: 0;
+}
+.removeBtn:hover { background: #fee2e2; color: #dc2626; }
+
+.itemsActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ── Totals panel ──────────────────────────────────────────────────────────── */
+
+.totalsPanel {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.totalsGrid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 20px;
+  align-items: center;
+  min-width: 320px;
+  font-size: 13px;
+}
+
+.totalsGrid span { text-align: right; }
+.totalsGrid span:nth-child(odd) { text-align: left; color: var(--text-mid); }
+
+.totalNeg { color: var(--danger, #dc2626) !important; }
+
+.totalsDivider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.totalsLabel {
+  text-align: left;
+  color: var(--text-mid);
+  font-size: 13px;
+}
+
+.totalsInput {
+  width: 100px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  text-align: right;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.totalsInput::-webkit-outer-spin-button,
+.totalsInput::-webkit-inner-spin-button { -webkit-appearance: none; }
+.totalsInput:focus { border-color: var(--navy); box-shadow: 0 0 0 2px rgba(29,79,124,0.1); }
+
+.totalsGeralLabel {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--navy) !important;
+  text-align: left !important;
+}
+
+.totalsGeralValue {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--navy) !important;
+  text-align: right !important;
+}
+
+/* ── Footer actions ────────────────────────────────────────────────────────── */
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
