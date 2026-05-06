@@ -13,6 +13,7 @@ import { ObraDrawer } from './ObraDrawer';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Obra } from '../../domain/types';
 import styles from './ObrasPage.module.css';
+import { deleteObraDirHandle } from '../../services/storage/handles';
 
 export function ObrasPage() {
   const data = useDataStore((s) => s.data);
@@ -54,6 +55,7 @@ export function ObrasPage() {
   function handleDelete(o: Obra) {
     if (!window.confirm(`Excluir "${o.nome}"? Esta ação não pode ser desfeita.`)) return;
     removeObra(o.id);
+    void deleteObraDirHandle(o.id); // limpa handle persistido (idempotente)
     showToast('Obra excluída.', 'success');
   }
 

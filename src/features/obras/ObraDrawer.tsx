@@ -13,6 +13,12 @@ import { useUiStore } from '../../stores/useUiStore';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Obra } from '../../domain/types';
+import {
+  saveObraDirHandle,
+  getObraDirHandle,
+  deleteObraDirHandle,
+} from '../../services/storage/handles';
+import { verifyHandlePermission } from '../../services/storage/permissions';
 
 interface Props {
   open: boolean;
@@ -38,11 +44,17 @@ function emptyObra(): Obra {
 
 export function ObraDrawer({ open, obra, onClose }: Props) {
   const [form, setForm] = useState<Obra>(() => obra ?? emptyObra());
+  const [handleConnected, setHandleConnected] = useState(false);
   const upsertObra = useDataStore((s) => s.upsertObra);
   const showToast = useUiStore((s) => s.showToast);
 
   useEffect(() => {
-    if (open) setForm(obra ?? emptyObra());
+    if (open) {
+      const next = obra ?? emptyObra();
+      setForm(next);
+      // Verifica se já existe handle persistido para esta obra
+      void getObraDirHandle(next.id).then((h) => setHandleConnected(!!h));
+    }
   }, [open, obra]);
 
   function set<K extends keyof Obra>(key: K, value: Obra[K]) {
@@ -55,18 +67,36 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
 
   async function handlePickPasta() {
     if (!('showDirectoryPicker' in window)) {
-      showToast('Seleção de pasta não é suportada neste navegador.', 'warning');
+      showToast(
+        'Seleção de pasta não é suportada neste navegador. Use Edge ou Chrome.',
+        'warning',
+      );
       return;
     }
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      // Garante permissão de escrita já no momento da seleção
+      const granted = await verifyHandlePermission(dirHandle, true);
+      if (!granted) {
+        showToast('Permissão de escrita negada para esta pasta.', 'warning');
+        return;
+      }
+      await saveObraDirHandle(form.id, dirHandle);
       set('pasta_oc_path', dirHandle.name);
-      showToast(`Pasta "${dirHandle.name}" selecionada.`, 'success');
+      setHandleConnected(true);
+      showToast(`Pasta "${dirHandle.name}" conectada.`, 'success');
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
         showToast('Não foi possível selecionar a pasta.', 'warning');
       }
     }
+  }
+
+  async function handleDisconnectPasta() {
+    await deleteObraDirHandle(form.id);
+    set('pasta_oc_path', '');
+    setHandleConnected(false);
+    showToast('Pasta desconectada. PDFs serão baixados pelo navegador.', 'info');
   }
 
   function handleSave() {
@@ -170,23 +200,34 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
             flex: 1,
             padding: '7px 10px',
             borderRadius: 7,
-            border: '1px solid var(--border)',
-            background: 'var(--surface-alt)',
+            border: handleConnected ? '1px solid var(--green)' : '1px solid var(--border)',
+            background: handleConnected ? 'var(--green-bg)' : 'var(--surface-alt)',
             fontSize: 12,
             color: form.pasta_oc_path ? 'var(--text)' : 'var(--text-muted)',
             fontFamily: 'monospace',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
           }}>
+            {handleConnected && <span style={{ color: 'var(--green)', fontWeight: 700 }}>✓</span>}
             {form.pasta_oc_path || 'Nenhuma pasta selecionada'}
           </div>
           <Button variant="outline" size="sm" onClick={handlePickPasta}>
-            📂 Selecionar
+            📂 {handleConnected ? 'Trocar' : 'Selecionar'}
           </Button>
+          {handleConnected && (
+            <Button variant="ghost" size="sm" onClick={() => void handleDisconnectPasta()}>
+              ✕
+            </Button>
+          )}
         </div>
         <p style={{ gridColumn: '1 / -1', fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
-          PDFs das OCs desta obra serão salvos automaticamente nesta pasta.
+          {handleConnected
+            ? 'PDFs desta obra serão salvos nesta pasta. Se a pasta estiver no OneDrive, sincroniza para a nuvem automaticamente.'
+            : 'Selecione a pasta da obra (ex: OneDrive\\…\\JARDIM IPANEMA II\\notas\\Ordem de Compra). PDFs serão salvos lá automaticamente.'}
         </p>
       </FieldGroup>
 
