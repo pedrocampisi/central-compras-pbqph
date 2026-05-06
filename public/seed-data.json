@@ -1024,7 +1024,29 @@
       "atualizado_em": "2026-04-30T23:57:19Z"
     }
   ],
-  "obras": [],
+  "obras": [
+    {
+      "id": "obra-jardim-ipanema-ii",
+      "nome": "Jardim Ipanema II",
+      "cei": "CNO 900235686460",
+      "endereco": {
+        "logradouro": "Rua Bianor Alves de Andrade",
+        "numero": "321",
+        "complemento": "Lote 008A, Quadra 73",
+        "bairro": "Jardim Ipanema",
+        "cidade": "Uberlândia",
+        "uf": "MG",
+        "cep": "38.406-174"
+      },
+      "telefone": "(34) 99979-1010",
+      "responsavel": "Rodrigo Campisi",
+      "observacoes": "NF pode precisar sair em nome do proprietário Rodrigo Campisi, CPF 006.170.216-19. CNO da obra: 900235686460.",
+      "ativa": true,
+      "pasta_oc_path": "",
+      "criado_em": "2026-05-06T00:00:00.000Z",
+      "atualizado_em": "2026-05-06T00:00:00.000Z"
+    }
+  ],
   "ecrs": [
     {
       "id": 1,
