@@ -5,7 +5,10 @@
  */
 
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// IMPORTANTE: usar /es (ESM) — o entry default ('jspdf-autotable') resolve
+// para CommonJS, e a interop falha no bundle minificado de produção
+// com erro "(0, Et.default) is not a function".
+import autoTable from 'jspdf-autotable/es';
 import type { Data, Emitente, Endereco, OrdemCompra } from '../../domain/types';
 import { computeItemTotal, computeOcTotals } from '../../domain/compute';
 import { formatBrl, formatDate } from '../../domain/format';
