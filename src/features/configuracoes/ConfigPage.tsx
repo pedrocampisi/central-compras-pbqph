@@ -157,6 +157,12 @@ export function ConfigPage() {
             placeholder="sk-or-…"
             value={cfg.openrouter_api_key}
             onChange={(e) => updateConfig({ openrouter_api_key: e.target.value })}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore="true"
           />
           <Button variant="ghost" size="sm" onClick={() => setShowApiKey((v) => !v)}>
             {showApiKey ? '🙈' : '👁'}
@@ -167,7 +173,8 @@ export function ConfigPage() {
           <a href="https://openrouter.ai" target="_blank" rel="noreferrer" style={{ color: 'var(--navy)' }}>
             OpenRouter
           </a>{' '}
-          para importação de pedidos via IA. Armazenada apenas no JSON local.
+          para importação de pedidos via IA. <strong>Armazenada em texto puro</strong> no JSON local —
+          trate o arquivo (e seus backups) como dado sensível.
         </p>
       </FieldGroup>
 
@@ -242,6 +249,30 @@ export function ConfigPage() {
 
       {/* ── Backups ───────────────────────────────────────────────────────── */}
       <FieldGroup title="Pasta de Backups Automáticos">
+        {!cfg.pasta_backups && (
+          <div
+            role="alert"
+            style={{
+              gridColumn: '1 / -1',
+              padding: '8px 12px',
+              borderRadius: 7,
+              border: '1px solid var(--amber)',
+              background: 'rgba(255, 193, 7, 0.12)',
+              color: 'var(--navy-dark)',
+              fontSize: 12,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>⚠️</span>
+            <span>
+              Nenhuma pasta de backups selecionada. Os backups rotativos estão{' '}
+              <strong>desativados</strong> — escolha uma pasta abaixo para ativá-los.
+            </span>
+          </div>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, gridColumn: '1 / -1' }}>
           <div
             style={{

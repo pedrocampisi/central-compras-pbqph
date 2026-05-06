@@ -4,10 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
 // GitHub Pages serves from a subpath: /central-compras-pbqph/
-// In dev (localhost) the base is '/'.
-const base = process.env['GITHUB_ACTIONS'] ? '/central-compras-pbqph/' : '/';
+// Em dev (localhost) o base é '/'. Em produção (qualquer build), aplicamos o
+// subpath do GH Pages — antes dependíamos da env GITHUB_ACTIONS, que era fácil
+// de esquecer no build manual e gerava tela branca em produção.
+// Para gerar build com base '/' (auto-host raiz), use VITE_BASE_PATH=/.
+const PROD_BASE = process.env['VITE_BASE_PATH'] ?? '/central-compras-pbqph/';
 
-export default defineConfig({
+export default defineConfig(({ command }) => {
+  const base = command === 'build' ? PROD_BASE : '/';
+  return {
   base,
   plugins: [
     react(),
@@ -67,4 +72,5 @@ export default defineConfig({
     // Increase warning limit — pdf.worker is inherently large
     chunkSizeWarningLimit: 700,
   },
+  };
 });

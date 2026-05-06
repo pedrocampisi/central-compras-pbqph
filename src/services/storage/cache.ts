@@ -7,7 +7,10 @@
 import type { Data } from '../../domain/types';
 import { nowIso } from '../../domain/format';
 
-const CACHE_KEY = 'central-compras-cache-v1';
+// v2 (2026-05-06): seed-data.json passou a embarcar 33 fornecedores reais (antes
+// só 1). Bump da versão invalida caches antigos para que o usuário receba o
+// seed atualizado automaticamente. Caches futuros continuam compatíveis.
+const CACHE_KEY = 'central-compras-cache-v2';
 const UI_KEY = 'central-compras-ui-v1';
 
 export interface CacheEntry {
@@ -64,5 +67,20 @@ export function clearCache(): void {
     localStorage.removeItem(CACHE_KEY);
   } catch {
     /* ignore */
+  }
+}
+
+/**
+ * Remove caches de versões antigas (após bump do CACHE_KEY).
+ * Idempotente: ignora chaves inexistentes. Chamar uma vez no boot.
+ */
+export function purgeLegacyCaches(): void {
+  const legacy = ['central-compras-cache-v1'];
+  for (const key of legacy) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
   }
 }

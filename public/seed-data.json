@@ -75,7 +75,953 @@
         17
       ],
       "observacoes": "Fornecedor histórico de madeira e estacas.",
-      "ativo": true
+      "ativo": true,
+      "criado_em": "2026-04-29T00:00:00.000Z",
+      "atualizado_em": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "forn-abr-gesso",
+      "razao_social": "ABR Gesso",
+      "nome_fantasia": "ABR Gesso",
+      "cnpj": "54.354.670/0001-35",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DO CARPINTEIRO",
+        "numero": "1166",
+        "complemento": "",
+        "bairro": "PLANALTO",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38413-177"
+      },
+      "telefones": [
+        "(34) 3212-3885",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        5
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-acm-madeiras",
+      "razao_social": "ACM Madeiras",
+      "nome_fantasia": "ACM Madeiras",
+      "cnpj": "",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "",
+        "uf": "",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJ nao extraido automaticamente do PDF.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-arcelormittal-brasil",
+      "razao_social": "ArcelorMittal Brasil",
+      "nome_fantasia": "ArcelorMittal Brasil",
+      "cnpj": "17.469.701/0003-39",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Av Paulo Roberto C. Santos",
+        "numero": "1431",
+        "complemento": "Lt.A",
+        "bairro": "Presidente Roosevelt",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "(34) 3293-1500",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-dourada",
+      "razao_social": "Areia Dourada",
+      "nome_fantasia": "Areia Dourada",
+      "cnpj": "02.304.480/0001-00",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-rio-manso",
+      "razao_social": "Areia Rio Manso",
+      "nome_fantasia": "Areia Rio Manso",
+      "cnpj": "15.452.995/0001-07",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-volta-prata",
+      "razao_social": "Areia Volta Prata",
+      "nome_fantasia": "Areia Volta Prata",
+      "cnpj": "02.240.196/0001-17",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-bell-aco",
+      "razao_social": "Bell Aco",
+      "nome_fantasia": "Bell Aco",
+      "cnpj": "09.076.689/0001-02",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV. FARROUPILHA",
+        "numero": "320",
+        "complemento": "",
+        "bairro": "N. S. DAS GRACAS",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-302"
+      },
+      "telefones": [
+        "(34) 3222-8080",
+        ""
+      ],
+      "email": "notas.fiscais@bellaco.com.br",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-carvalho-montagens",
+      "razao_social": "Carvalho Montagens",
+      "nome_fantasia": "Carvalho Montagens",
+      "cnpj": "33.818.498/0001-53",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA ORTIZIO BORGES",
+        "numero": "1858",
+        "complemento": "",
+        "bairro": "SANTA MONICA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-164"
+      },
+      "telefones": [
+        "(34) 3225-4299",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ceramica-cruzeiro",
+      "razao_social": "Ceramica Cruzeiro",
+      "nome_fantasia": "Ceramica Cruzeiro",
+      "cnpj": "18.941.864/0001-73",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA DAS PALMEIRAS",
+        "numero": "420",
+        "complemento": "",
+        "bairro": "SAO SEBASTIAO",
+        "cidade": "Araguari",
+        "uf": "MG",
+        "cep": "38443-112"
+      },
+      "telefones": [
+        "(34) 3241-0240",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ceramica-solar",
+      "razao_social": "Ceramica Solar",
+      "nome_fantasia": "Ceramica Solar",
+      "cnpj": "18.592.147/0001-83",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-cervantes-cimentos",
+      "razao_social": "Cervantes Cimentos",
+      "nome_fantasia": "Cervantes Cimentos",
+      "cnpj": "18.001.080/0001-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA PAULO FRONTIN",
+        "numero": "100",
+        "complemento": "",
+        "bairro": "CUSTODIO",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38405-210"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-cnc-metal-mecanica",
+      "razao_social": "CNC Metal Mecanica",
+      "nome_fantasia": "CNC Metal Mecanica",
+      "cnpj": "56.005.711/0001-03",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Valdi Borges de Castilho",
+        "numero": "200",
+        "complemento": "",
+        "bairro": "Distrito Industrial",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-341"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "financeiro.cncindustria@outlook.com",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        16
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Item identificado: cuba/calha.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-comarco-araguari",
+      "razao_social": "Comarco Araguari",
+      "nome_fantasia": "Comarco Araguari",
+      "cnpj": "16.832.826/0005-80",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4,
+        7,
+        8,
+        10,
+        12,
+        16,
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJ adicional identificado: 16.832.826/0006-61.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-comercial-mineira",
+      "razao_social": "Comercial Mineira",
+      "nome_fantasia": "Comercial Mineira",
+      "cnpj": "00.065.928/0001-54",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Erico Verissimo",
+        "numero": "1611",
+        "complemento": "",
+        "bairro": "Santa Monica",
+        "cidade": "Belo Horizonte",
+        "uf": "MG",
+        "cep": "31520-395"
+      },
+      "telefones": [
+        "(31) 3451-4673",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-draga-martins",
+      "razao_social": "Draga Martins",
+      "nome_fantasia": "Draga Martins",
+      "cnpj": "50.383.487/0001-07",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Piaui",
+        "numero": "2630",
+        "complemento": "",
+        "bairro": "Custodio Pereira",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38405-244"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "areiadavi@hotmail.com",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletrica-cidade",
+      "razao_social": "Eletrica Cidade",
+      "nome_fantasia": "Eletrica Cidade",
+      "cnpj": "01.722.901/0001-50",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletrica-triangulo",
+      "razao_social": "Eletrica Triangulo",
+      "nome_fantasia": "Eletrica Triangulo",
+      "cnpj": "04.142.904/0003-74",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletromac",
+      "razao_social": "Eletromac",
+      "nome_fantasia": "Eletromac",
+      "cnpj": "21.770.011/0002-01",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-euripedes-pedras",
+      "razao_social": "Euripedes Pedras",
+      "nome_fantasia": "Euripedes Pedras",
+      "cnpj": "18.773.904/0001-15",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DAS ESMERALDAS",
+        "numero": "333",
+        "complemento": "",
+        "bairro": "Dona Zulmira",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38415-012"
+      },
+      "telefones": [
+        "(34) 3216-8515",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        15
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Itens identificados: granito, travertino e pedras.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-gerdau-acos",
+      "razao_social": "Gerdau Acos",
+      "nome_fantasia": "Gerdau Acos",
+      "cnpj": "07.358.761/0238-86",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "",
+        "uf": "",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-imperio-tintas",
+      "razao_social": "Imperio Tintas",
+      "nome_fantasia": "Imperio Tintas",
+      "cnpj": "66.209.362/0053-26",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        14
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Razao legal nas NFs: Beija Flor Comercio de Tintas.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-jp-madeiras",
+      "razao_social": "JP Madeiras",
+      "nome_fantasia": "JP Madeiras",
+      "cnpj": "07.010.818/0002-15",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV JOAO NAVES DE AVILA",
+        "numero": "6930",
+        "complemento": "",
+        "bairro": "SANTA LUZIA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-703"
+      },
+      "telefones": [
+        "(34) 3232-5900",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-lxt-eletricos",
+      "razao_social": "LXT Eletricos",
+      "nome_fantasia": "LXT Eletricos",
+      "cnpj": "31.808.127/0001-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DA MOOCA",
+        "numero": "2958",
+        "complemento": "",
+        "bairro": "MOOCA",
+        "cidade": "Sao Paulo",
+        "uf": "SP",
+        "cep": "03165-000"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-madeireira-2000",
+      "razao_social": "Madeireira 2000",
+      "nome_fantasia": "Madeireira 2000",
+      "cnpj": "01.678.241/0001-57",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-portas-prontas",
+      "razao_social": "Portas Prontas",
+      "nome_fantasia": "Portas Prontas",
+      "cnpj": "61.462.649/0001-19",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV BRASIL ANEXO COMERCIO 02",
+        "numero": ".",
+        "complemento": "",
+        "bairro": "BRASIL",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38400-718"
+      },
+      "telefones": [
+        "(34) 3224-4411",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        11
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ralo-store",
+      "razao_social": "Ralo Store",
+      "nome_fantasia": "Ralo Store",
+      "cnpj": "53.820.893/0001-88",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Avenida Nicomedes Alves dos Santos",
+        "numero": "7208",
+        "complemento": "SALA 12",
+        "bairro": "Shopping Park",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38425-377"
+      },
+      "telefones": [
+        "(34) 98422-8585",
+        ""
+      ],
+      "email": "financeiro@caetanodistribuidora.com.br",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-solar-shopping",
+      "razao_social": "Solar Shopping",
+      "nome_fantasia": "Solar Shopping",
+      "cnpj": "03.705.561/0002-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Avenida Joao Naves de Avila",
+        "numero": "6480",
+        "complemento": "",
+        "bairro": "Santa Luzia",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-703"
+      },
+      "telefones": [
+        "(34) 3224-6766",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Item identificado nas NFs: grade/fundo com tampa.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ubertubos-hidraulica",
+      "razao_social": "Ubertubos Hidraulica",
+      "nome_fantasia": "Ubertubos Hidraulica",
+      "cnpj": "21.588.520/0001-37",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12,
+        20
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Itens hidrossanitarios e itens associados a gas foram identificados nas NFs.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-veda7-impermeabilizantes",
+      "razao_social": "Veda7 Impermeabilizantes",
+      "nome_fantasia": "Veda7 Impermeabilizantes",
+      "cnpj": "24.940.992/0004-48",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        18
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-vmaxxy-tintas",
+      "razao_social": "Vmaxxy Tintas",
+      "nome_fantasia": "Vmaxxy Tintas",
+      "cnpj": "23.538.503/0002-00",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA ALIPIO ABRAO",
+        "numero": "1750",
+        "complemento": "",
+        "bairro": "GRANADA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38410-539"
+      },
+      "telefones": [
+        "(34) 3214-6010",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        14
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-volta-grande-materiais",
+      "razao_social": "Volta Grande Materiais",
+      "nome_fantasia": "Volta Grande Materiais",
+      "cnpj": "68.538.297/0001-87",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6,
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Fornecedor de materiais de construcao; itens nao ficaram legiveis no texto extraido, classificado pelo historico das NFs.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-zapi-distribuidora",
+      "razao_social": "Zapi Distribuidora",
+      "nome_fantasia": "Zapi Distribuidora",
+      "cnpj": "71.222.889/0001-08",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA CEARA",
+        "numero": "1652",
+        "complemento": "",
+        "bairro": "UMUARAMA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-018"
+      },
+      "telefones": [
+        "(34) 3232-8990",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        5,
+        7,
+        14,
+        18
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJs adicionais identificados: 71.222.889/0002-80, 71.222.889/0005-23.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
     }
   ],
   "obras": [],
