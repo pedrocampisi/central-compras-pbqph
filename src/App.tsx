@@ -3,7 +3,7 @@
  * Inicializa os dados ao montar (cache → file handle → seed).
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './App.module.css';
 
 // Stores
@@ -102,8 +102,8 @@ export default function App() {
   const conflictRef = useRef<ConflictState>({
     open: false, remoteTs: '', knownTs: '', pendingSave: null,
   });
-  const [, forceRender] = useUiStore((s) => [s.toasts, s.showToast]);
-
+  const [, setConflictTick] = useState(0);
+  const forceRender = useCallback(() => setConflictTick((n) => n + 1), []);
   // Hooks transversais
   useAutoSave();
   useDirtyGuard();
@@ -135,7 +135,7 @@ export default function App() {
       // 3. Se não tem nada, carrega seed público
       if (!cached) {
         try {
-          const resp = await fetch('/seed-data.json');
+          const resp = await fetch(`${import.meta.env.BASE_URL}seed-data.json`);
           const raw = (await resp.json()) as unknown;
           const migrated = runMigrations(raw);
           const seedData = normalizeData(migrated);
@@ -172,7 +172,7 @@ export default function App() {
         knownTs: result.knownTs,
         pendingSave: handleSave,
       };
-      forceRender;
+      forceRender();
     } else if (result.reason === 'download') {
       setData(result.data, result.lastSavedAt);
       clearDirty(result.lastSavedAt);
