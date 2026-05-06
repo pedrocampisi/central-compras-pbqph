@@ -1,6 +1,7 @@
 /**
  * Aba Dashboard — resumo de OCs recentes e indicadores.
- * TODO Fase 7: migrar conteúdo completo de renderDashboard().
+ * Cards: total de OCs, emitidas, rascunhos, volume, fornecedores ativos, obras ativas.
+ * Listas: últimas 8 OCs e top 5 fornecedores por valor total.
  */
 
 import styles from './DashboardPage.module.css';

@@ -12,7 +12,7 @@ import { useUiStore, type TabId } from './stores/useUiStore';
 import { useFileHandleStore } from './stores/useFileHandleStore';
 
 // Services
-import { loadCache } from './services/storage/cache';
+import { loadCache, purgeLegacyCaches } from './services/storage/cache';
 import {
   connectFile,
   saveData,
@@ -112,6 +112,9 @@ export default function App() {
 
   useEffect(() => {
     void (async () => {
+      // 0. Limpa caches de versões antigas (idempotente)
+      purgeLegacyCaches();
+
       // 1. Tenta cache localStorage
       const cached = loadCache();
       if (cached) {
@@ -236,7 +239,13 @@ export default function App() {
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           <div className={styles.logoWrap}>
-            <img src="/brazao1.png" alt="Campisi" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <img
+              src={`${import.meta.env.BASE_URL}brazao1.png`}
+              alt="Campisi"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
           </div>
           <div>
             <div className={styles.brandName}>COMPRAS</div>

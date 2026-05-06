@@ -322,18 +322,43 @@ export function NovaOcPage() {
 
   // ── Save ────────────────────────────────────────────────────────────────────
 
+  /**
+   * Re-checa se o número da OC ainda está livre antes de gravar.
+   * Mitiga (parcialmente) o caso de duas abas/dispositivos terem incrementado
+   * o mesmo `ultimo_numero_oc` antes do save explícito. Sem mutex de servidor
+   * isto não é à prova de tudo, mas evita a colisão mais comum.
+   */
+  const ensureUniqueNumero = useCallback(
+    (oc: OrdemCompra): OrdemCompra => {
+      if (!data) return oc;
+      const conflict = data.ordens_compra.some(
+        (x) => x.id !== oc.id && x.numero === oc.numero,
+      );
+      if (!conflict) return oc;
+      const sameYear = data.ordens_compra
+        .map((x) => x.sequencial)
+        .filter((n) => Number.isFinite(n));
+      const nextSeq = (sameYear.length ? Math.max(...sameYear) : 0) + 1;
+      const numero = `${oc.ano}/${String(nextSeq).padStart(3, '0')}`;
+      showToast(`Número ${oc.numero} já estava em uso. Reatribuído para ${numero}.`, 'warning');
+      return { ...oc, sequencial: nextSeq, numero };
+    },
+    [data, showToast],
+  );
+
   const handleSaveDraft = useCallback(() => {
     if (!ocEditing || !data) return;
     if (!ocEditing.fornecedor_id) { showToast('Selecione um fornecedor.', 'warning'); return; }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
-    updateOrdemCompra({ ...ocEditing, status: 'rascunho', atualizado_em: nowIso() });
+    const safe = ensureUniqueNumero(ocEditing);
+    updateOrdemCompra({ ...safe, status: 'rascunho', atualizado_em: nowIso() });
     markDirty();
     stopEditing();
-    showToast(`Rascunho ${ocEditing.numero} salvo.`, 'success');
+    showToast(`Rascunho ${safe.numero} salvo.`, 'success');
     setTab('historico');
-  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab]);
+  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab, ensureUniqueNumero]);
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
@@ -343,7 +368,8 @@ export function NovaOcPage() {
 
     setSavingPdf(true);
     try {
-      const emitida: OrdemCompra = { ...ocEditing, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
+      const safe = ensureUniqueNumero(ocEditing);
+      const emitida: OrdemCompra = { ...safe, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
       const blob = generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(emitida, fornNome);
@@ -359,7 +385,7 @@ export function NovaOcPage() {
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab]);
+  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab, ensureUniqueNumero]);
 
   const handleCancelar = useCallback(() => {
     if (ocEditing && ocEditing.itens.length > 0) {

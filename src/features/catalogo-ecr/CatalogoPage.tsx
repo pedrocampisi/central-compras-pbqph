@@ -1,6 +1,7 @@
 /**
  * Aba Catálogo ECR — exibe todos os 20 ECRs com conteúdo rico.
- * TODO Fase 7: implementação completa de renderCatalogo().
+ * Card por ECR (collapsible) com objetivo, escopo, normas, documentos
+ * obrigatórios, critérios de recebimento, ensaios e materiais.
  */
 
 import { useState } from 'react';
