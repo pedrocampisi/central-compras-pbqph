@@ -1,0 +1,3328 @@
+{
+  "version": 1,
+  "app_name": "Central de Compras PBQP-H V1 - Campisi",
+  "shared_file_name": "central-compras-data.json",
+  "seeded_at": "2026-04-29T00:00:00.000Z",
+  "last_saved": "2026-04-30T23:57:19Z",
+  "config": {
+    "emitente": {
+      "razao_social": "CAMPISI ENGENHARIA LTDA",
+      "nome_fantasia": "CAMPISI ENGENHARIA",
+      "cnpj": "33.705.987/0001-07",
+      "ie": "",
+      "endereco": {
+        "logradouro": "R LEANDRO JOSE DE OLIVEIRA",
+        "numero": "524",
+        "complemento": "",
+        "bairro": "VIGILATO PEREIRA",
+        "cidade": "Uberlândia",
+        "uf": "MG",
+        "cep": "38.408-632"
+      },
+      "telefones": [
+        "(34) 9886-5000",
+        ""
+      ],
+      "email_envio_nf": "rodrigo@campisi.com.br"
+    },
+    "endereco_cobranca": {
+      "logradouro": "R LEANDRO JOSE DE OLIVEIRA",
+      "numero": "524",
+      "complemento": "",
+      "bairro": "VIGILATO PEREIRA",
+      "cidade": "Uberlândia",
+      "uf": "MG",
+      "cep": "38.408-632"
+    },
+    "ultimo_numero_oc": 1,
+    "ano_corrente": 2026,
+    "condicoes_pagamento": [
+      "À vista",
+      "ANTECIPADO",
+      "7 DDL NF",
+      "15 DDL NF",
+      "21 DDL NF",
+      "30 DDL NF"
+    ],
+    "texto_condicoes_contratacao": "1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.\n2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.\n3) Informar que a CAMPISI ENGENHARIA LTDA é consumidora final, quando aplicável.\n4) É proibida a negociação de títulos com terceiros sem autorização prévia.\n5) Constar o número desta Ordem de Compra e o nome da obra/CNO no documento fiscal.\n6) Quando a NF precisar ser emitida em nome do proprietário, emitir para RODRIGO CAMPISI, CPF 006.170.216-19, conforme orientação da obra.\n7) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL.",
+    "texto_envio_nf": "FAVOR ENVIAR O XML E PDF DA NF / CONHECIMENTO ELETRÔNICO E BOLETOS PARA:",
+    "texto_qualidade": "CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR - ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO"
+  },
+  "fornecedores": [
+    {
+      "id": "forn-abr-gesso",
+      "razao_social": "ABR Gesso",
+      "nome_fantasia": "ABR Gesso",
+      "cnpj": "54.354.670/0001-35",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DO CARPINTEIRO",
+        "numero": "1166",
+        "complemento": "",
+        "bairro": "PLANALTO",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38413-177"
+      },
+      "telefones": [
+        "(34) 3212-3885",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        5
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-acm-madeiras",
+      "razao_social": "ACM Madeiras",
+      "nome_fantasia": "ACM Madeiras",
+      "cnpj": "",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "",
+        "uf": "",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJ nao extraido automaticamente do PDF.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-arcelormittal-brasil",
+      "razao_social": "ArcelorMittal Brasil",
+      "nome_fantasia": "ArcelorMittal Brasil",
+      "cnpj": "17.469.701/0003-39",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Av Paulo Roberto C. Santos",
+        "numero": "1431",
+        "complemento": "Lt.A",
+        "bairro": "Presidente Roosevelt",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "(34) 3293-1500",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-dourada",
+      "razao_social": "Areia Dourada",
+      "nome_fantasia": "Areia Dourada",
+      "cnpj": "02.304.480/0001-00",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-rio-manso",
+      "razao_social": "Areia Rio Manso",
+      "nome_fantasia": "Areia Rio Manso",
+      "cnpj": "15.452.995/0001-07",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-areia-volta-prata",
+      "razao_social": "Areia Volta Prata",
+      "nome_fantasia": "Areia Volta Prata",
+      "cnpj": "02.240.196/0001-17",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-bell-aco",
+      "razao_social": "Bell Aco",
+      "nome_fantasia": "Bell Aco",
+      "cnpj": "09.076.689/0001-02",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV. FARROUPILHA",
+        "numero": "320",
+        "complemento": "",
+        "bairro": "N. S. DAS GRACAS",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-302"
+      },
+      "telefones": [
+        "(34) 3222-8080",
+        ""
+      ],
+      "email": "notas.fiscais@bellaco.com.br",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-carvalho-montagens",
+      "razao_social": "Carvalho Montagens",
+      "nome_fantasia": "Carvalho Montagens",
+      "cnpj": "33.818.498/0001-53",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA ORTIZIO BORGES",
+        "numero": "1858",
+        "complemento": "",
+        "bairro": "SANTA MONICA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-164"
+      },
+      "telefones": [
+        "(34) 3225-4299",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ceramica-cruzeiro",
+      "razao_social": "Ceramica Cruzeiro",
+      "nome_fantasia": "Ceramica Cruzeiro",
+      "cnpj": "18.941.864/0001-73",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA DAS PALMEIRAS",
+        "numero": "420",
+        "complemento": "",
+        "bairro": "SAO SEBASTIAO",
+        "cidade": "Araguari",
+        "uf": "MG",
+        "cep": "38443-112"
+      },
+      "telefones": [
+        "(34) 3241-0240",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ceramica-solar",
+      "razao_social": "Ceramica Solar",
+      "nome_fantasia": "Ceramica Solar",
+      "cnpj": "18.592.147/0001-83",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-cervantes-cimentos",
+      "razao_social": "Cervantes Cimentos",
+      "nome_fantasia": "Cervantes Cimentos",
+      "cnpj": "18.001.080/0001-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA PAULO FRONTIN",
+        "numero": "100",
+        "complemento": "",
+        "bairro": "CUSTODIO",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38405-210"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-cnc-metal-mecanica",
+      "razao_social": "CNC Metal Mecanica",
+      "nome_fantasia": "CNC Metal Mecanica",
+      "cnpj": "56.005.711/0001-03",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Valdi Borges de Castilho",
+        "numero": "200",
+        "complemento": "",
+        "bairro": "Distrito Industrial",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-341"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "financeiro.cncindustria@outlook.com",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        16
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Item identificado: cuba/calha.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-comarco-araguari",
+      "razao_social": "Comarco Araguari",
+      "nome_fantasia": "Comarco Araguari",
+      "cnpj": "16.832.826/0005-80",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        4,
+        7,
+        8,
+        10,
+        12,
+        16,
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJ adicional identificado: 16.832.826/0006-61.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-comercial-mineira",
+      "razao_social": "Comercial Mineira",
+      "nome_fantasia": "Comercial Mineira",
+      "cnpj": "00.065.928/0001-54",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Erico Verissimo",
+        "numero": "1611",
+        "complemento": "",
+        "bairro": "Santa Monica",
+        "cidade": "Belo Horizonte",
+        "uf": "MG",
+        "cep": "31520-395"
+      },
+      "telefones": [
+        "(31) 3451-4673",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-draga-martins",
+      "razao_social": "Draga Martins",
+      "nome_fantasia": "Draga Martins",
+      "cnpj": "50.383.487/0001-07",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Rua Piaui",
+        "numero": "2630",
+        "complemento": "",
+        "bairro": "Custodio Pereira",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38405-244"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "areiadavi@hotmail.com",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletrica-cidade",
+      "razao_social": "Eletrica Cidade",
+      "nome_fantasia": "Eletrica Cidade",
+      "cnpj": "01.722.901/0001-50",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletrica-triangulo",
+      "razao_social": "Eletrica Triangulo",
+      "nome_fantasia": "Eletrica Triangulo",
+      "cnpj": "04.142.904/0003-74",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-eletromac",
+      "razao_social": "Eletromac",
+      "nome_fantasia": "Eletromac",
+      "cnpj": "21.770.011/0002-01",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-euripedes-pedras",
+      "razao_social": "Euripedes Pedras",
+      "nome_fantasia": "Euripedes Pedras",
+      "cnpj": "18.773.904/0001-15",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DAS ESMERALDAS",
+        "numero": "333",
+        "complemento": "",
+        "bairro": "Dona Zulmira",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38415-012"
+      },
+      "telefones": [
+        "(34) 3216-8515",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        15
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Itens identificados: granito, travertino e pedras.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-gerdau-acos",
+      "razao_social": "Gerdau Acos",
+      "nome_fantasia": "Gerdau Acos",
+      "cnpj": "07.358.761/0238-86",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "",
+        "uf": "",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        1
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-imperio-tintas",
+      "razao_social": "Imperio Tintas",
+      "nome_fantasia": "Imperio Tintas",
+      "cnpj": "66.209.362/0053-26",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        14
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Razao legal nas NFs: Beija Flor Comercio de Tintas.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-jp-madeiras",
+      "razao_social": "JP Madeiras",
+      "nome_fantasia": "JP Madeiras",
+      "cnpj": "07.010.818/0002-15",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV JOAO NAVES DE AVILA",
+        "numero": "6930",
+        "complemento": "",
+        "bairro": "SANTA LUZIA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-703"
+      },
+      "telefones": [
+        "(34) 3232-5900",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-lxt-eletricos",
+      "razao_social": "LXT Eletricos",
+      "nome_fantasia": "LXT Eletricos",
+      "cnpj": "31.808.127/0001-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA DA MOOCA",
+        "numero": "2958",
+        "complemento": "",
+        "bairro": "MOOCA",
+        "cidade": "Sao Paulo",
+        "uf": "SP",
+        "cep": "03165-000"
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        13
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-madeireira-2000",
+      "razao_social": "Madeireira 2000",
+      "nome_fantasia": "Madeireira 2000",
+      "cnpj": "01.678.241/0001-57",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-madeireira-silveira",
+      "razao_social": "MADEIREIRA SILVEIRA",
+      "nome_fantasia": "Madeireira Silveira",
+      "cnpj": "10.372.478/0001-04",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "Santa Edwiges",
+        "cidade": "Ituiutaba",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Fornecedor histórico de madeira e estacas.",
+      "ativo": true,
+      "criado_em": "2026-04-29T00:00:00.000Z",
+      "atualizado_em": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "forn-portas-prontas",
+      "razao_social": "Portas Prontas",
+      "nome_fantasia": "Portas Prontas",
+      "cnpj": "61.462.649/0001-19",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AV BRASIL ANEXO COMERCIO 02",
+        "numero": ".",
+        "complemento": "",
+        "bairro": "BRASIL",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38400-718"
+      },
+      "telefones": [
+        "(34) 3224-4411",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        11
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ralo-store",
+      "razao_social": "Ralo Store",
+      "nome_fantasia": "Ralo Store",
+      "cnpj": "53.820.893/0001-88",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Avenida Nicomedes Alves dos Santos",
+        "numero": "7208",
+        "complemento": "SALA 12",
+        "bairro": "Shopping Park",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38425-377"
+      },
+      "telefones": [
+        "(34) 98422-8585",
+        ""
+      ],
+      "email": "financeiro@caetanodistribuidora.com.br",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-solar-shopping",
+      "razao_social": "Solar Shopping",
+      "nome_fantasia": "Solar Shopping",
+      "cnpj": "03.705.561/0002-65",
+      "ie": "",
+      "endereco": {
+        "logradouro": "Avenida Joao Naves de Avila",
+        "numero": "6480",
+        "complemento": "",
+        "bairro": "Santa Luzia",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38408-703"
+      },
+      "telefones": [
+        "(34) 3224-6766",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Item identificado nas NFs: grade/fundo com tampa.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-ubertubos-hidraulica",
+      "razao_social": "Ubertubos Hidraulica",
+      "nome_fantasia": "Ubertubos Hidraulica",
+      "cnpj": "21.588.520/0001-37",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        12,
+        20
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Itens hidrossanitarios e itens associados a gas foram identificados nas NFs.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-veda7-impermeabilizantes",
+      "razao_social": "Veda7 Impermeabilizantes",
+      "nome_fantasia": "Veda7 Impermeabilizantes",
+      "cnpj": "24.940.992/0004-48",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        18
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-vmaxxy-tintas",
+      "razao_social": "Vmaxxy Tintas",
+      "nome_fantasia": "Vmaxxy Tintas",
+      "cnpj": "23.538.503/0002-00",
+      "ie": "",
+      "endereco": {
+        "logradouro": "AVENIDA ALIPIO ABRAO",
+        "numero": "1750",
+        "complemento": "",
+        "bairro": "GRANADA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38410-539"
+      },
+      "telefones": [
+        "(34) 3214-6010",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        14
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-volta-grande-materiais",
+      "razao_social": "Volta Grande Materiais",
+      "nome_fantasia": "Volta Grande Materiais",
+      "cnpj": "68.538.297/0001-87",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        6,
+        19
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. Fornecedor de materiais de construcao; itens nao ficaram legiveis no texto extraido, classificado pelo historico das NFs.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    },
+    {
+      "id": "forn-zapi-distribuidora",
+      "razao_social": "Zapi Distribuidora",
+      "nome_fantasia": "Zapi Distribuidora",
+      "cnpj": "71.222.889/0001-08",
+      "ie": "",
+      "endereco": {
+        "logradouro": "RUA CEARA",
+        "numero": "1652",
+        "complemento": "",
+        "bairro": "UMUARAMA",
+        "cidade": "Uberlandia",
+        "uf": "MG",
+        "cep": "38402-018"
+      },
+      "telefones": [
+        "(34) 3232-8990",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        5,
+        7,
+        14,
+        18
+      ],
+      "observacoes": "Incluido a partir das NFs de material da pasta notas e recibos - Yuri Alphaville 1. Servicos e locacoes foram ignorados. CNPJs adicionais identificados: 71.222.889/0002-80, 71.222.889/0005-23.",
+      "ativo": true,
+      "criado_em": "2026-04-30T23:57:19Z",
+      "atualizado_em": "2026-04-30T23:57:19Z"
+    }
+  ],
+  "obras": [
+    {
+      "id": "obra-jardim-ipanema-ii",
+      "nome": "Jardim Ipanema II",
+      "cei": "CNO 900235686460",
+      "endereco": {
+        "logradouro": "Rua Bianor Alves de Andrade",
+        "numero": "321",
+        "complemento": "Lote 008A, Quadra 73",
+        "bairro": "Jardim Ipanema",
+        "cidade": "Uberlândia",
+        "uf": "MG",
+        "cep": "38.406-174"
+      },
+      "telefone": "(34) 99979-1010",
+      "responsavel": "Rodrigo Campisi",
+      "observacoes": "NF pode precisar sair em nome do proprietário Rodrigo Campisi, CPF 006.170.216-19. CNO da obra: 900235686460.",
+      "ativa": true,
+      "criado_em": "2026-04-30T17:55:25.223132+00:00",
+      "atualizado_em": "2026-04-30T17:55:55.335951+00:00"
+    }
+  ],
+  "ecrs": [
+    {
+      "id": 1,
+      "codigo": "ECR 01",
+      "nome": "Barras e treliças de Aço",
+      "categoria": "Estrutural",
+      "normas": [
+        {
+          "codigo": "NBR 7480",
+          "titulo": "Aço destinado a armaduras para estruturas de concreto armado;"
+        },
+        {
+          "codigo": "NBR 7481",
+          "titulo": "Tela de aço soldada - Armadura para concreto;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho"
+        }
+      ],
+      "unidades_padrao": [
+        "kg",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de Resistência do aço, por lote.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: diâmetro e comprimento do aço (mm);",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do aço: conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Categoria/classificação do aço: conforme projeto",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: O aço deve ser entregue limpo, livre de corrosão/ferrugem excessiva na superfície.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar tipo do material e categoria, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: Verificar o diâmetro e o comprimento das barras/telas, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Identificação: Verificar identificação em cada peça com o pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-aco-ca50-6",
+          "descricao": "Aço CA-50 Ø6,3mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-8",
+          "descricao": "Aço CA-50 Ø8,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-10",
+          "descricao": "Aço CA-50 Ø10,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-12",
+          "descricao": "Aço CA-50 Ø12,5mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-16",
+          "descricao": "Aço CA-50 Ø16,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca60-5",
+          "descricao": "Aço CA-60 Ø5,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-tela-q92",
+          "descricao": "Tela soldada Q-92",
+          "unidade_padrao": "m²"
+        },
+        {
+          "id": "mat-trelica-tg8",
+          "descricao": "Treliça TG-8",
+          "unidade_padrao": "m"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de Resistência do aço, por lote."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nOs materiais devem ser separados e identificados por tipo e diâmetro;\nArmazenamento sem contato direto com o solo;\nManusear cuidadosamente o material para evitar acidentes; O transporte pode ser feito manual ou mecânico;\nAs sobras ou cortes de barras que não serão utilizados devem ser reunidos em local para descarte, devidamente identificado;\nIdentificar: por tipo e diâmetro."
+    },
+    {
+      "id": 2,
+      "codigo": "ECR 02",
+      "nome": "Madeira e Compensado",
+      "categoria": "Madeira",
+      "normas": [
+        {
+          "codigo": "NBR 9193",
+          "titulo": "Pallets de madeira serrada;"
+        },
+        {
+          "codigo": "NBR 11700",
+          "titulo": "Madeira Serrada de Coníferas Provenientes de Reflorestamento para Uso Geral;"
+        },
+        {
+          "codigo": "NBR 15696",
+          "titulo": "Formas e Escoramento Para Estruturas de Concreto"
+        },
+        {
+          "codigo": "NBR ISO 1096 - Madeira compensada",
+          "titulo": ""
+        }
+      ],
+      "unidades_padrao": [
+        "m",
+        "un",
+        "m²",
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Guia de Controle Ambiental (GCA) - exceto compensado;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "IEF - para Eucalipto (caso houver)",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "No caso da inexistência das licenças, solicitar CDL – Certificado de Dispensa de Licença",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão:",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada caminhão será considerado um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: As peças de madeira não devem ter a presença de nós soltos, partes com podridão, presença de furos decorrentes de insetos, fendas, quebras, falta de homogeneidade e arqueamento. Inspecionar visualmente, durante a descarga do caminhão, o acabamento superficial da chapa.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar tipo e classificação das peças, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: Verificar as dimensões das peças, conforme pedido de compras.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-caibro-5x6",
+          "descricao": "Caibro 5x6cm (Estaca/Pontalete) - 1m",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-caibro-5x6-3m",
+          "descricao": "Caibro 5x6cm - 3m",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-tabua-pinus",
+          "descricao": "Tábua de Pinus 2,5x30cm",
+          "unidade_padrao": "m"
+        },
+        {
+          "id": "mat-sarrafo-25x5",
+          "descricao": "Sarrafo 2,5x5cm",
+          "unidade_padrao": "m"
+        },
+        {
+          "id": "mat-compensado-12mm",
+          "descricao": "Compensado plastificado 12mm (2,20x1,10m)",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-compensado-18mm",
+          "descricao": "Compensado plastificado 18mm (2,20x1,10m)",
+          "unidade_padrao": "un"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Guia de Controle Ambiental (GCA) - exceto compensado;",
+        "IEF - para Eucalipto (caso houver)",
+        "No caso da inexistência das licenças, solicitar CDL – Certificado de Dispensa de Licença"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nAs peças de madeira devem ser posicionadas de maneira a evitar seu empenamento e ser armazenadas, preferencialmente em local coberto e ventilado para evitar a umidade;\nO manuseio pode ser manual ou com meio de transporte, conforme a quantidade a ser transportada.\nIdentificar: por tipo"
+    },
+    {
+      "id": 3,
+      "codigo": "ECR 03",
+      "nome": "Concreto Usinado",
+      "categoria": "Estrutural",
+      "normas": [
+        {
+          "codigo": "NBR 7212",
+          "titulo": "Execução de Concreto Dosado em Central - Especificação;"
+        },
+        {
+          "codigo": "NBR 8953",
+          "titulo": "Concreto para fins estruturais;"
+        },
+        {
+          "codigo": "NBR 12655",
+          "titulo": "Preparo, Controle e Recebimento do Concreto - Procedimento;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais – Desempenho"
+        }
+      ],
+      "unidades_padrao": [
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Carta traço por resistência e especificações, conforme projeto.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Volume (mᶟ);",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Slump ou flow;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Fator a/c;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Resistencia (FCK);",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Realizar a cada caminhão.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Com a chegada de cada caminhão na obra, antes da descarga verificar se todos os itens da NF do concreto estão conforme o pedido de compra, a hora da saída e hora da chegada na obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Validade: O tempo entre dosagem do concreto (usina) e final de aplicação não deve ultrapassar 2h 30min.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Trabalhabilidade: Antes da descarga de cada caminhão, é preciso realizar o ensaio de slump test.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra. O concreto deverá ser recebido pelo mestre de obras e/ou responsável pelo setor de planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-concreto-fck20",
+          "descricao": "Concreto Usinado fck 20 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck25",
+          "descricao": "Concreto Usinado fck 25 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck30",
+          "descricao": "Concreto Usinado fck 30 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck35",
+          "descricao": "Concreto Usinado fck 35 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Carta traço por resistência e especificações, conforme projeto."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO transporte pode ocorrer em carrinho de mão ou mecânico, de modo que o concreto não sofra vibrações excessivas;\nEmbora não haja armazenamento de concreto na obra, reservar um local de pouco importância estrutural para aproveitamento do concreto;\nPara os ensaios de resistência exigidos em projeto, identificar os corpos de prova conforme Controle Tecnológico;"
+    },
+    {
+      "id": 4,
+      "codigo": "ECR 04",
+      "nome": "Bloco de Concreto e Cerâmico",
+      "categoria": "Alvenaria",
+      "normas": [
+        {
+          "codigo": "NBR 15270",
+          "titulo": "Componentes cerâmicos para alvenaria de vedação;"
+        },
+        {
+          "codigo": "NBR 6136",
+          "titulo": "Blocos vazados de concreto simples para alvenaria;"
+        },
+        {
+          "codigo": "NBR -",
+          "titulo": "15961-2 - Alvenaria estrutural - Blocos de concreto"
+        }
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de absorção de água do bloco (desejável);",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência do bloco de concreto;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de prisma, e graute do bloco de concreto;",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Os blocos não devem apresentar trincas ou fissuras, quebras, lascas ou pequenas imperfeições que prejudiquem sua utilização.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: Verificar as dimensões das peças, conforme pedido de compras. Rejeitar o lote caso sejam encontradas 6 peças defeituosas em uma amostra de 20 peças, o limite aceitável é de ±3mm.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-bloco-conc-14",
+          "descricao": "Bloco de concreto estrutural 14x19x39cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-conc-19",
+          "descricao": "Bloco de concreto estrutural 19x19x39cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-cer-9",
+          "descricao": "Bloco cerâmico de vedação 9x19x19cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-cer-14",
+          "descricao": "Bloco cerâmico de vedação 14x19x29cm",
+          "unidade_padrao": "un"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de absorção de água do bloco (desejável);",
+        "Certificado de resistência do bloco de concreto;",
+        "Certificado de prisma, e graute do bloco de concreto;"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou mecânico, cuidando para que não ocorram pancadas ou quedas que provoquem rachaduras ou quebra do material;\nO material deverá ser armazenado em local mais próximo do seu uso em pilhas de até 1,80m de altura;\nIdentificar: Por tipo e dimensão"
+    },
+    {
+      "id": 5,
+      "codigo": "ECR 05",
+      "nome": "Cal, Gesso Corrido e Aditivo",
+      "categoria": "Argamassa",
+      "normas": [
+        {
+          "codigo": "NBR 11578",
+          "titulo": "Cimento Portland composto - Especificação;"
+        },
+        {
+          "codigo": "NBR 5733",
+          "titulo": "Cimento de alta resistência inicial;"
+        },
+        {
+          "codigo": "NBR 7175",
+          "titulo": "Cal hidratada para argamassas - Requisitos;"
+        },
+        {
+          "codigo": "NBR 13207",
+          "titulo": "Gesso para construção civil – Requisitos;"
+        },
+        {
+          "codigo": "NBR 11768",
+          "titulo": "Aditivos químicos para concreto de cimento Portland – Requisitos;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Norma de Desempenho;"
+        },
+        {
+          "codigo": "NBR 14725",
+          "titulo": "4 – Informações sobre segurança, saúde e meio ambiente"
+        }
+      ],
+      "unidades_padrao": [
+        "sc",
+        "kg",
+        "L"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto quando aplicável.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: As embalagens devem estar fechadas e sem sinais de exposição à umidade. Sacos que estiverem rasgados, molhados ou danificados deverão ser devolvidos.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar tipo e a classe do material, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Validade: Verificar a validade do material na embalagem.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-cal-ch3",
+          "descricao": "Cal Hidratada CH-III - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-gesso",
+          "descricao": "Gesso Corrido - saco 40kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-aditivo-plast",
+          "descricao": "Aditivo plastificante",
+          "unidade_padrao": "L"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou com carrinho evitando que os sacos se rasguem ou galões/tambores perfurem;\nO estoque deve ser controlado de maneira garantir que os produtos mais velhos sejam usados antes dos mais novos;\nO armazenamento deve ser em local protegido, apropriado para evitar ação da água ou umidade, sobre estrado de madeira (pontaletes e tábuas ou compensados) afastado do solo e das paredes, com distância de pelo menos 10 cm;\nAs pilhas devem ser de, no máximo: 12 sacos de cal e 10 sacos para cimento;\nIdentificar: por tipo de material e data de vencimento do lote."
+    },
+    {
+      "id": 6,
+      "codigo": "ECR 06",
+      "nome": "Areia e Brita",
+      "categoria": "Agregado",
+      "normas": [
+        {
+          "codigo": "NBR 7211",
+          "titulo": "Agregados para concreto – Especificação"
+        }
+      ],
+      "unidades_padrao": [
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Licença para extração de minerais",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto quando aplicável.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Deve se observar a cor, existência de impurezas, matérias orgânicas ou qualquer outra contaminação.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Inspecionar visualmente (pequena porção), no recebimento do material na obra, sua granulometria.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Quando solicitado pelo setor de planejamento da obra cubicar o caminhão recebido para conferir a quantidade, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-areia-fina",
+          "descricao": "Areia fina lavada",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-areia-media",
+          "descricao": "Areia média lavada",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-0",
+          "descricao": "Brita 0",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-1",
+          "descricao": "Brita 1",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-2",
+          "descricao": "Brita 2",
+          "unidade_padrao": "m³"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Licença para extração de minerais"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nEstocar em baias, separados de outros agregados, evitando-se, assim espalhamento, desperdício e contaminação do material.\nO manuseio deve ser prático para evitar desperdícios através de carrinhos, padiolas ou similares;\nIdentificar: por tipo"
+    },
+    {
+      "id": 7,
+      "codigo": "ECR 07",
+      "nome": "Argamassa colante",
+      "categoria": "Argamassa",
+      "normas": [
+        {
+          "codigo": "NBR 14081",
+          "titulo": "Argamassa colante industrializada para assentamento de placas cerâmicas."
+        },
+        {
+          "codigo": "NBR 14725",
+          "titulo": "4 – Informações sobre segurança, saúde e meio ambiente."
+        }
+      ],
+      "unidades_padrao": [
+        "sc"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto: tipo e classificação do material",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar o estado de conservação dos sacos e se a argamassa não está empedrada. Sacos rasgados, furados, molhados, manchados por impregnação de produtos estranhos ou desconhecidos deverão ser rejeitados",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar tipo e classificação do material.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Validade: Verificar o prazo de validade na sacaria.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-aci-int",
+          "descricao": "Argamassa colante AC-I (interno) - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-acii-ext",
+          "descricao": "Argamassa colante AC-II (externo) - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-aciii-porc",
+          "descricao": "Argamassa colante AC-III (porcelanato) - saco 20kg",
+          "unidade_padrao": "sc"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou com carrinho evitando que os sacos se rasguem;\nO estoque deve ser controlado de maneira garantir que os sacos mais velhos sejam usados antes dos sacos mais novos;\nO armazenamento deve ser em local protegido, apropriado para evitar ação da água ou umidade, sobre estrado de madeira (pontaletes e tábuas ou compensados) afastado do solo e das paredes, com distância de pelo menos 10 cm;\nAs pilhas devem ser de, no máximo, 20 sacos de argamassa;\nIdentificar: por tipo e data de vencimento"
+    },
+    {
+      "id": 8,
+      "codigo": "ECR 08",
+      "nome": "Revestimento de Parede e Piso",
+      "categoria": "Revestimento",
+      "normas": [
+        {
+          "codigo": "NBR 13753",
+          "titulo": "Revestimento de piso interno ou externo com placas cerâmicas e com utilização de argamassa colante;"
+        },
+        {
+          "codigo": "NBR 15463",
+          "titulo": "Placas cerâmicas para revestimento - Porcelanato;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações Habitacionais - Desempenho."
+        }
+      ],
+      "unidades_padrao": [
+        "m²",
+        "cx"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de estabilidade e a segurança estrutural para cargas permanentes e acidentais;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de deslocamentos-limites permanentes e cargas acidentais em geral;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência do produto;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de ensaio á cargas verticais concentradas nos pisos;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de avaliação da reação do fogo da face inferior do sistema de piso;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de ensaio de acordo com a ABNT NBR 13818 na condição projetada de uso (molhada ou seca);",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência a umidade do sistema de pisos de áreas molhadas e molháveis;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência ao ataque químico dos sistemas de pisos;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de desgaste por abrasão da camada de piso de acordo com a NBR 7686, 8810, 13818 e 14833-1",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões das peças.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Resistência a abrasão: (PEI), quando aplicável",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: definido pelo fornecedor.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar se não estão com as caixas rasgadas, e se não existe peças quebradas. Peças com defeitos tais como: saliências, bolhas cantos e lados lascados, rachaduras, manchas, riscos, falta de vidrado, devem ser recusadas.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar o tipo e a tonalidade das peças. Caso tenha peças de tonalidades diferentes deverão ser armazenadas separadamente para uso em unidades diferentes, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: Verificar as dimensões das peças. Tirar amostra de aproximadamente 4 caixas e abrir para conferencia de dimensão dos lados, espessura, esquadro, empeno e tonalidade.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de estabilidade e a segurança estrutural para cargas permanentes e acidentais;",
+        "Certificado de deslocamentos-limites permanentes e cargas acidentais em geral;",
+        "Certificado de resistência do produto;",
+        "Certificado de ensaio á cargas verticais concentradas nos pisos;",
+        "Certificado de avaliação da reação do fogo da face inferior do sistema de piso;",
+        "Certificado de ensaio de acordo com a ABNT NBR 13818 na condição projetada de uso (molhada ou seca);",
+        "Certificado de resistência a umidade do sistema de pisos de áreas molhadas e molháveis;",
+        "Certificado de resistência ao ataque químico dos sistemas de pisos;",
+        "Certificado de desgaste por abrasão da camada de piso de acordo com a NBR 7686, 8810, 13818 e 14833-1"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou com carrinho, realizado com cuidado para evitar danos ao material;\nO local de armazenamento deve ser protegido da umidade, o material deve ser colocado sobre estrados de madeira, caixas empilhadas com altura máxima de 1,0 m, empilhar conforme orientações do fabricante, quando aplicável;\nIdentificar: por tipo e lote."
+    },
+    {
+      "id": 9,
+      "codigo": "ECR 09",
+      "nome": "Esquadrias, Janelas e Guarda-Corpos",
+      "categoria": "Esquadria",
+      "normas": [
+        {
+          "codigo": "NBR 13756",
+          "titulo": "Esquadrias de Alumínio;"
+        },
+        {
+          "codigo": "NBR 10821",
+          "titulo": "Esquadria para edificações;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais – Desempenho"
+        },
+        {
+          "codigo": "NBR 14718",
+          "titulo": "Guarda corpo para edificações"
+        }
+      ],
+      "unidades_padrao": [
+        "un",
+        "m²",
+        "m"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de atendimento a NBR 10821 (Atendimento ao item 10.1 Part. 4 ABNT NBR 15575)",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar visualmente a integridade das embalagens de proteção e das esquadrias e janelas (livres de manchas, arranhões, corrosão, acabamento dos componentes ou qualquer outro tipo de avarias).",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: Conferir dimensões, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de atendimento a NBR 10821 (Atendimento ao item 10.1 Part. 4 ABNT NBR 15575)"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou por meio de transporte mecânico, de acordo com a quantidade, de forma segura cuidando para não ocorram choques ou quedas que provoquem danos ao material;\nO armazenamento das esquadrias deve ser em local coberto, na posição vertical, justapostas sobre peças de madeira sem contato com o solo;\nNão empilhar o material e nem estocar outro tipo de material sobre as esquadrias.\nIdentificar: por tipo e dimensões."
+    },
+    {
+      "id": 10,
+      "codigo": "ECR 10",
+      "nome": "Telhas",
+      "categoria": "Cobertura",
+      "normas": [
+        {
+          "codigo": "NBR 13858",
+          "titulo": "Telhas de concreto;"
+        },
+        {
+          "codigo": "NBR 7196",
+          "titulo": "Telhas de fibrocimento - Execução de coberturas e fechamentos laterais - Procedimento."
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        }
+      ],
+      "unidades_padrao": [
+        "un",
+        "m²"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de resistência a ação de granizo;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência ao fogo;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de estanqueidade do produto;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado do produto para o atendimento da NBR ISO 105-A02",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar durante o descarregamento a ocorrência de trincas, quebras e deformações.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações/Dimensão: Verificar o tamanho, tipo e a uniformidade da cor das peças.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de resistência a ação de granizo;",
+        "Certificado de resistência ao fogo;",
+        "Certificado de estanqueidade do produto;",
+        "Certificado do produto para o atendimento da NBR ISO 105-A02"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou com carrinho, realizado com cuidado para evitar danos ao material;\nArmazenamento sem contato direto com o solo, utilizar calços/sarrafos de madeira;\nO local de estocagem deverá ser seco, ventilado e, preferencialmente, coberto;\nArmazenar na vertical, porém, nem sempre isso é possível, devido ao próprio comprimento da telha avaliar risco de tombamento, evitar grande quantidade nas pilhas;\nÉ aconselhável que a pilha tenha a quantidade de telhas igual ao lote fornecido pela fábrica, caso haja necessidade de uma pilha em cima da outra, colocar novamente calços de madeira.\nIdentificar: por tipo e dimensão."
+    },
+    {
+      "id": 11,
+      "codigo": "ECR 11",
+      "nome": "Portas",
+      "categoria": "Esquadria",
+      "normas": [
+        {
+          "codigo": "NBR 15930-2",
+          "titulo": "Portas de madeira para edificações;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais – Desempenho"
+        }
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Ensaio de resistência a ações transmitidas por portas internas e externas - fechamento brusco. Solicitar laudo de avaliação de atendimento a NBR 15930-2 - Portas de madeira para edificações. / 1 - Solicitar laudo de avaliação de atendimento a NBR 15930-2 - Portas de madeira para edificações. 2 - Solicitar ensaio de desempenho acústico para atender a NBR 15575",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade: unidade",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões: altura, largura e espessura",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lado de abertura: direito ou esquerdo",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação: cor e acabamento.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar se as peças não apresentam nenhum tipo de dano.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações/Dimensão/Lado de abertura: Conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Ensaio de resistência a ações transmitidas por portas internas e externas - fechamento brusco. Solicitar laudo de avaliação de atendimento a NBR 15930-2 - Portas de madeira para edificações. / 1 - Solicitar laudo de avaliação de atendimento a NBR 15930-2 - Portas de madeira para edificações. 2 - Solicitar ensaio de desempenho acústico para atender a NBR 15575"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nArmazenar em local coberto e ventilado para evitar umidade;\nColocar as portas na horizontal ou na vertical, mas sem peso em cima, a fim de conservar todo o material do empeno, separar com pontalete sempre que possível.\nManusear de forma segura, evitar pancadas ou quedas que possam danificar as peças.\nIdentificar: por tipo e dimensões"
+    },
+    {
+      "id": 12,
+      "codigo": "ECR 12",
+      "nome": "Materiais Hidrossanitários",
+      "categoria": "Hidráulica",
+      "normas": [
+        {
+          "codigo": "NBR 5648",
+          "titulo": "Tubos e conexões de PVC-U com junta soldável para sistemas prediais de água fria - Requisitos;"
+        },
+        {
+          "codigo": "NBR 5688",
+          "titulo": "Sistemas Prediais de Água Pluvial, Esgoto Sanitário e Ventilação;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        }
+      ],
+      "unidades_padrao": [
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado de ensaio do material - NBR 15575 - Edificações habitacionais - Desempenho.",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Materiais: Tubulação aparente",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Ensaio de corpo mole e corpo duro",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Materiais: Prumadas de esgoto sanitário e ventilação que estiverem aparentes em alvenaria ou no interior de shafts",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Atender a ISO 1182",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Material: Para tubulações prediais (Esgoto, Águas Pluviais)",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "As tubulações devem ser ensaiadas conforme prescrito nas ABNT NBR 5626, ABNT NBR 7198 e ABNT NBR 8160",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação, conforme projeto.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar visualmente, durante a descarga, se existe defeitos como furos, deformações, rasgos e identificação adequada. Verificar se nas tubulações consta impresso identificação do fabricante, do diâmetro.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se as especificações estão conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado de ensaio do material - NBR 15575 - Edificações habitacionais - Desempenho.",
+        "Materiais: Tubulação aparente",
+        "Ensaio de corpo mole e corpo duro",
+        "Materiais: Prumadas de esgoto sanitário e ventilação que estiverem aparentes em alvenaria ou no interior de shafts",
+        "Atender a ISO 1182",
+        "Material: Para tubulações prediais (Esgoto, Águas Pluviais)",
+        "As tubulações devem ser ensaiadas conforme prescrito nas ABNT NBR 5626, ABNT NBR 7198 e ABNT NBR 8160"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual de forma segura cuidando para não ocorram choques ou impactos que provoquem danos ao material;\nO armazenamento das conexões deve ser feito em prateleiras, separado por tipo e dimensões para facilitar sua localização, conferência e entrega para o serviço. Na ausência de prateleiras, deverão ser guardados em sacos isolados dos demais materiais da obra;\nIdentificar por tipo e Dimensão;\nOs tubos deverão ser armazenados em estaleiros divididos por boxes e coberto, identificar por tipo e diâmetro"
+    },
+    {
+      "id": 13,
+      "codigo": "ECR 13",
+      "nome": "Materiais Elétricos",
+      "categoria": "Elétrica",
+      "normas": [
+        {
+          "codigo": "NBR 5410",
+          "titulo": "Instalações elétricas de baixa tensão;"
+        },
+        {
+          "codigo": "NBR 5471",
+          "titulo": "Condutores elétricos;"
+        },
+        {
+          "codigo": "NBR 7312",
+          "titulo": "Rolos de fios e cabos elétricos - Características dimensionais;"
+        },
+        {
+          "codigo": "NBR 15465",
+          "titulo": "Sistemas de eletrodutos plásticos para instalações elétricas de baixa tensão;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        }
+      ],
+      "unidades_padrao": [
+        "m",
+        "un",
+        "rl"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado do fabricante - NBR 15575 - Edificações habitacionais - Desempenho.",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Materiais que necessitam de certificados – MATERIAIS COMPULSÓRIOS",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Adaptadores de Plugs e tomadas",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Cabo de Potência",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Disjuntores",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações do produto, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões/Bitola, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Obs: Conduites, rolos de fios, cabos elétricos, placas, lâmpadas",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar visualmente, durante a descarga, se existe quebras, embalagem violada, ausência de peças do conjunto e identificação adequada.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se a marca do fabricante, as quantidades, cores, bitolas e os tipos estão conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado do fabricante - NBR 15575 - Edificações habitacionais - Desempenho.",
+        "Materiais que necessitam de certificados – MATERIAIS COMPULSÓRIOS",
+        "Adaptadores de Plugs e tomadas",
+        "Cabo de Potência",
+        "Disjuntores"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de forma segura cuidando para que os materiais não tenham contato com superfícies cortantes e abrasivas;\nAs tubulações deverão ser estocadas em feixes, de acordo com os diâmetros;\nFios, cabos e disjuntores deverão ser estocados em locais fechados e secos para evitar exposição a intempéries;\nIdentificar: por tipo."
+    },
+    {
+      "id": 14,
+      "codigo": "ECR 14",
+      "nome": "Tinta, Textura e Selador",
+      "categoria": "Acabamento",
+      "normas": [
+        {
+          "codigo": "NBR 11702",
+          "titulo": "Tintas para construção civil - Tintas para edificações não industriais - Classificação;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        },
+        {
+          "codigo": "NBR 14725",
+          "titulo": "4 – Informações sobre segurança, saúde e meio ambiente."
+        }
+      ],
+      "unidades_padrao": [
+        "L",
+        "gl",
+        "bd"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Certificado do fabricante;",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Cor.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar o estado de conservação das embalagens (amassadas e perfuradas). Separar para e verificar se o produto está dentro da validade.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se a marca, tipo e cor estão conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Certificado do fabricante;",
+        "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de manual ou mecânico, evitando avarias ao material;\nA estocagem do material deve ser feita de acordo com orientações do fabricante;\nO local de estocagem deve ser coberto, isento de umidade e protegido de intempéries;\nAssegurar que as embalagens originais permaneçam intactas e que os materiais mais velhos sejam utilizados antes dos recém-entregues, atentando para que não ultrapasse a data de validade do produto.\nIdentificar: por tipo e data de validade."
+    },
+    {
+      "id": 15,
+      "codigo": "ECR 15",
+      "nome": "Bancada, Peitoril e Soleira",
+      "categoria": "Acabamento",
+      "normas": [
+        {
+          "codigo": "NBR15844",
+          "titulo": "Rochas para revestimento - Requisitos para granitos;"
+        }
+      ],
+      "unidades_padrao": [
+        "m",
+        "m²",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Não aplicável",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões e espessura;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Cor.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar a existência de lascamentos ou fissuras nas peças, se o polimento está perfeito e nas faces solicitadas quando aplicável, e o acabamento das bordas.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se o tipo do produto e a cor estão conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade/Dimensões: Conferir se a quantidade e as dimensões entregues estão conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Não aplicável"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de manual ou mecânico, evitando avarias ao produto e contato com materiais abrasivos e corrosivos;\nEm caso de soleiras e peitoris devem ser posicionadas na horizontal em fileiras sobre pontaletes e colocadas pela face não polida;\nEm caso de bancadas e pias devem ser apoiadas sobre pontalete uma a uma;\nO material deve estocado em locais cobertos e fechados;\nO material deve ser separado por tipo, cor e dimensões;\nO empilhamento deve ser sobre sarrafos ou caibros de madeira;"
+    },
+    {
+      "id": 16,
+      "codigo": "ECR 16",
+      "nome": "Louças e Metais Sanitários",
+      "categoria": "Hidráulica",
+      "normas": [
+        {
+          "codigo": "NBR 15097",
+          "titulo": "Especificações dos aparelhos sanitários fabricados em material cerâmico;"
+        },
+        {
+          "codigo": "NBR 10281",
+          "titulo": "Torneiras - Requisitos e métodos de ensaio;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais – Desempenho"
+        }
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Metais sanitários e Peças de utilização",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Certificado de resistência mecânica dos esforços em atendimento com a ABNT NBR 10281, 11535, 11778, 11815, 12483, 13713, 14011, 14162, 14390, 14534, 14580, 14877, 14878, 15097 Parte 1 e 2, 15206, 15267, 15423, 15491, 15704 parte 1, 15705 e 15857",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "Bacias sanitárias",
+          "periodicidade": "",
+          "observacao": ""
+        },
+        {
+          "nome": "ABNT NBR 15097-1.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Inspecionar visualmente, durante a descarga, o acabamento das peças, a presença de furos, riscos, bolhas, pequenas fissuras, desprendimento da camada de cromação, de esmalte, juntas ou rebarbas que possam machucar o usuário ou o instalador, inspecionar a integridade das embalagens. Verificar se as peças estão completas com todos os seus componentes;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se a marca e tipo estão conforme pedido de compra;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Metais sanitários e Peças de utilização",
+        "Certificado de resistência mecânica dos esforços em atendimento com a ABNT NBR 10281, 11535, 11778, 11815, 12483, 13713, 14011, 14162, 14390, 14534, 14580, 14877, 14878, 15097 Parte 1 e 2, 15206, 15267, 15423, 15491, 15704 parte 1, 15705 e 15857",
+        "Bacias sanitárias",
+        "ABNT NBR 15097-1."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de manual ou mecânico, evitando avarias ao produto e contato com materiais abrasivos e corrosivos;\nTodas as partes, onde os aparelhos são apoiados para estoque, devem ser protegidas com papel ou plástico para evitar o contato direto com os apoios, quando não for possível, posicionar ripas de madeira entre as peças. Ou conforme orientações do fabricante;\nO empilhamento máximo deve seguir:\nAparelhos sanitários: Pilhas de até 3 peças;\nTanques: Pilhas de até 3 peças;\nPias: Pilhas de até 2 peças, na horizontal;\nCubas: Pilhas de até 2 peças, na horizontal;\nEmpilhamento sobre sarrafos ou caibros de madeira em local coberto;\nIdentificar: por tipo."
+    },
+    {
+      "id": 17,
+      "codigo": "ECR 17",
+      "nome": "Estrutura Metálica e madeira para telhado",
+      "categoria": "Cobertura",
+      "normas": [
+        {
+          "codigo": "NBR 14762",
+          "titulo": "Dimensionamento de estruturas de aço constituídas por perfis formados a frio;"
+        },
+        {
+          "codigo": "NBR 6355",
+          "titulo": "Perfis estruturais de aço formados a frio;"
+        },
+        {
+          "codigo": "NBR 11700",
+          "titulo": "Madeira Serrada de Coníferas Provenientes de Reflorestamento para Uso Geral;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        }
+      ],
+      "unidades_padrao": [
+        "kg",
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Guia de Controle Ambiental (GCA) - exceto compensado;",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensão: conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal deve ser comunicado ao setor de compras. Rejeitar a mercadoria somente com autorização do engenheiro responsável ou comprador.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Guia de Controle Ambiental (GCA) - exceto compensado;"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nManusear cuidadosamente o material, transporte pode ser feito manual ou mecânico;\nArmazenamento sem contato direto com o solo;\nIdentificar: por tipo e dimensão"
+    },
+    {
+      "id": 18,
+      "codigo": "ECR 18",
+      "nome": "Impermeabilizante",
+      "categoria": "Acabamento",
+      "normas": [
+        {
+          "codigo": "NBR 11905",
+          "titulo": "Argamassa polimérica industrializada para impermeabilização;"
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Edificações habitacionais - Desempenho."
+        },
+        {
+          "codigo": "NBR 14725",
+          "titulo": "4 – Informações sobre segurança, saúde e meio ambiente"
+        }
+      ],
+      "unidades_padrao": [
+        "kg",
+        "L",
+        "gl",
+        "bd"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar visualmente se não tem embalagem danificada, e se o produto está dentro da validade.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de manual ou mecânico, evitando avarias ao material;\nA estocagem do material deve ser feita de acordo com orientações do fabricante;\nO local de estocagem deve ser coberto, isento de umidade e protegido de intempéries;\nAssegurar que as embalagens originais permaneçam intactas e que os materiais mais velhos sejam utilizados antes dos recém-entregues, atentando para que não ultrapasse a data de validade do produto.\nIdentificar: por tipo e data de validade."
+    },
+    {
+      "id": 19,
+      "codigo": "ECR 19",
+      "nome": "Cimento",
+      "categoria": "Argamassa",
+      "normas": [
+        {
+          "codigo": "NBR 11578",
+          "titulo": "Cimento Portland composto – Especificação."
+        },
+        {
+          "codigo": "NBR 5733",
+          "titulo": "Cimento de alta resistência inicial."
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Norma de Desempenho."
+        },
+        {
+          "codigo": "NBR 14725",
+          "titulo": "4 – Informações sobre segurança, saúde e meio ambiente"
+        }
+      ],
+      "unidades_padrao": [
+        "sc",
+        "kg"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações.",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação do produto, conforme projeto quando for aplicável.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: As embalagens devem estar fechadas e sem sinais de exposição à umidade. Sacos que estiverem rasgados, molhados ou danificados deverão ser devolvidos.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar tipo e a classe do material, conforme pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Validade: Verificar a validade do material na embalagem.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras. Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [
+        {
+          "id": "mat-cim-cpii-50",
+          "descricao": "Cimento Portland CP II-E-32 - saco 50kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-cim-cpiii-50",
+          "descricao": "Cimento Portland CP III-40 - saco 50kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-cim-cpv-50",
+          "descricao": "Cimento Portland CP V-ARI - saco 50kg",
+          "unidade_padrao": "sc"
+        }
+      ],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "FISPQ – Constando Identificação, Identificação do perigo, Composição e informações sobre os ingredientes, Medidas de primeiros socorros, Medidas de combate a incêndio, Medidas de controle para derramamento ou vazamento, manuseio e armazenamento, controle de exposição e proteção individual, propriedades físicas e químicas, estabilidade e reatividades, informações toxicológica, informações ecológicas, considerações sobre destinação final, informações sobre transporte, informações sobre regulamentações e outras informações."
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio pode ser manual ou com carrinho evitando que os sacos se rasguem ou galões/tambores perfurem;\nO estoque deve ser controlado de maneira garantir que os produtos mais velhos sejam usados antes dos mais novos;\nO armazenamento deve ser em local protegido, apropriado para evitar ação da água ou umidade, sobre estrado de madeira (pontaletes e tábuas ou compensados) afastado do solo e das paredes, com distância de pelo menos 10 cm;\nAs pilhas devem ser de, no máximo: 10 sacos para cimento;\nIdentificar: por tipo de material e data de vencimento do lote."
+    },
+    {
+      "id": 20,
+      "codigo": "ECR 20",
+      "nome": "Dispositivo de Gás",
+      "categoria": "Hidráulica",
+      "normas": [
+        {
+          "codigo": "NBR 5020",
+          "titulo": "Tubos de cobre sem costura para uso geral - Requisitos."
+        },
+        {
+          "codigo": "NBR 11720",
+          "titulo": "Conexões para união de tubos de cobre por soldagem ou brasagem capilar - Requisitos”."
+        },
+        {
+          "codigo": "NBR 15575",
+          "titulo": "Norma de Desempenho"
+        }
+      ],
+      "unidades_padrao": [
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        {
+          "nome": "Não aplicável",
+          "periodicidade": "",
+          "observacao": ""
+        }
+      ],
+      "criterios_recebimento": [
+        {
+          "criterio": "Quantidade;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Dimensões, conforme projeto;",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificação, conforme projeto.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Lote: cada entrega será considerada um lote para inspeção.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Aspecto geral: Verificar visualmente, durante a descarga, se existe quebras, embalagem violada, ausência de peças do conjunto e identificação adequada.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Especificações: Verificar se a marca do fabricante, as quantidades, cores, bitolas e os tipos estão de acordo com o pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Quantidade: Conferir se a quantidade entregue está de acordo com pedido de compra.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        },
+        {
+          "criterio": "Atenção: Qualquer divergência entre material entregue, pedido de compra e nota fiscal deve ser comunicado ao setor de compras. Rejeitar a mercadoria somente com autorização do engenheiro responsável ou comprador.",
+          "tolerancia": "",
+          "metodo": "",
+          "registro": ""
+        }
+      ],
+      "materiais": [],
+      "objetivo": "",
+      "escopo": "",
+      "ensaios": [],
+      "amostragem": "",
+      "registros": [
+        "Não aplicável"
+      ],
+      "responsabilidades": "",
+      "observacoes": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO:\nO manuseio deve ser de forma segura cuidando para que os materiais não tenham contato com superfícies cortantes e abrasivas;\nAs tubulações deverão ser estocadas em feixes, de acordo com os diâmetros em locais fechados e secos para evitar extravios e exposição a intempéries;\nIdentificar: por tipo."
+    }
+  ],
+  "ordens_compra": [
+    {
+      "id": "oc-1ipet9g-molsccxj",
+      "numero": "OC-001/2026",
+      "sequencial": 1,
+      "ano": 2026,
+      "data": "2026-04-30",
+      "status": "emitida",
+      "fornecedor_id": "forn-madeireira-silveira",
+      "obra_id": "obra-jardim-ipanema-ii",
+      "condicao_pagamento": "À vista",
+      "itens": [
+        {
+          "id": "item-zdae2l9-molseyzn",
+          "ecr_id": 10,
+          "material_id": "",
+          "descricao": "edeeeeee",
+          "observacao": "ee",
+          "quantidade": 0.05,
+          "unidade": "m",
+          "preco_unit": 20,
+          "ipi_pct": 0,
+          "desc_pct": 0,
+          "prazo_entrega": "2026-05-30"
+        }
+      ],
+      "frete": 0,
+      "outras_despesas": 0,
+      "desconto_material": 0,
+      "observacoes": "",
+      "criado_em": "2026-04-30T17:56:21.751Z",
+      "atualizado_em": "2026-04-30T17:59:08.156Z",
+      "pdf_gerado_em": "2026-04-30T17:59:08.155Z"
+    }
+  ]
+}

@@ -1,0 +1,2789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Compras PBQP-H — Campisi</title>
+  <link rel="icon" href="data:,">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+  <script>
+    // pdf.js worker (carregado sob demanda na função de extração)
+    window.__PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379';
+  </script>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
+:root {
+  --navy: #1D4F7C;
+  --navy-dark: #0D2B4A;
+  --navy-mid: #2467A0;
+  --navy-light: #3A88C8;
+  --amber: #F5A623;
+  --amber-dark: #d48b0f;
+  --sidebar-bg: #F7FAFE;
+  --bg: #EEF3F8;
+  --surface: #FFFFFF;
+  --border: #C5D3DF;
+  --border-light: #E0E9F2;
+  --text: #0D2137;
+  --text-mid: #2A4C6A;
+  --text-muted: #6082A0;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --warn-border: #fde68a;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(13,43,74,0.08);
+  /* backward-compat aliases used in JS-generated inline styles */
+  --muted: #6082A0;
+  --muted-strong: #2A4C6A;
+  --surface-alt: #EEF3F8;
+  --accent: #1D4F7C;
+  --accent-soft: rgba(29,79,124,0.08);
+  --accent-strong: #0D2B4A;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fffbeb;
+  --neutral-soft: #EEF3F8;
+  --border-strong: #C5D3DF;
+  font-family: 'Barlow', 'Segoe UI', Arial, sans-serif;
+}
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
+body { line-height: 1.45; }
+button, input, select, textarea { font-family: inherit; }
+button { cursor: pointer; border: 1px solid transparent; border-radius: var(--radius); transition: filter 0.15s, background 0.15s; }
+button:hover { filter: brightness(1.07); }
+a { color: var(--navy-mid); }
+.hidden { display: none !important; }
+/* Layout */
+.app-layout { display: flex; height: 100vh; overflow: hidden; }
+/* Sidebar */
+.sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar-bg); border-right: 1px solid #C5D5E8; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.sidebar-brand { padding: 18px 16px 14px; border-bottom: 1px solid #D5E3F0; display: flex; align-items: center; gap: 10px; }
+.logo-wrap { width: 40px; height: 40px; border-radius: 8px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(29,79,124,0.08); border: 1px solid rgba(29,79,124,0.15); }
+.logo-wrap img { width: 32px; height: 32px; object-fit: contain; }
+.brand-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; color: var(--navy); letter-spacing: 0.3px; line-height: 1; }
+.brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--navy-mid); text-transform: uppercase; margin-top: 3px; }
+.sidebar-pbqph-badge { margin: 10px 14px; background: rgba(29,79,124,0.08); border: 1px solid rgba(29,79,124,0.18); border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; gap: 7px; }
+.pbqph-dot { width: 7px; height: 7px; background: var(--navy); border-radius: 50%; flex-shrink: 0; }
+.pbqph-label { font-size: 9px; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; text-transform: uppercase; }
+.nav-section-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 14px 18px 5px; }
+#tabsNav { flex: 1; overflow-y: auto; padding-bottom: 8px; }
+.tab-btn { display: flex; align-items: center; gap: 9px; padding: 9px 14px; width: 100%; background: transparent; border: none; border-left: 3px solid transparent; color: var(--text-mid); font-size: 13px; font-weight: 400; text-align: left; cursor: pointer; transition: all 0.15s; border-radius: 0; }
+.tab-btn:hover { background: rgba(29,79,124,0.05); color: var(--navy); filter: none; }
+.tab-btn.active { border-left-color: var(--amber); background: rgba(29,79,124,0.08); color: var(--navy); font-weight: 600; }
+.tab-btn .badge { margin-left: auto; background: var(--amber); color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+.tab-btn:not(.active) .badge { background: rgba(29,79,124,0.12); color: var(--navy); }
+.tab-btn svg { flex-shrink: 0; opacity: 0.75; }
+.tab-btn.active svg { opacity: 1; }
+/* Sidebar footer */
+.sidebar-footer { padding: 12px 14px; border-top: 1px solid #D5E3F0; }
+.sf-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.sf-label { font-size: 11px; color: var(--text-muted); }
+.sf-value { font-size: 11px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+.sf-actions { display: flex; gap: 6px; margin-top: 10px; }
+.sf-actions-2 { display: flex; gap: 6px; margin-top: 5px; }
+.storage-warning { margin: 6px 0 0; padding: 7px 9px; border-radius: 6px; background: var(--warn-bg); color: #92400E; font-size: 10px; line-height: 1.4; }
+.dirty-indicator { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.dirty-indicator.is-dirty { background: var(--warn); animation: pulse 1.6s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+/* Main wrapper */
+.main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.topbar-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.topbar-left { flex: 1; min-width: 0; }
+.topbar-context { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); }
+.topbar-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: var(--navy); letter-spacing: 0.3px; line-height: 1.1; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.topbar-sync-chip { display: flex; align-items: center; gap: 6px; background: var(--green-bg); border: 1px solid #86EFAC; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--green); }
+.chip-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+.main-content { flex: 1; overflow-y: auto; padding: 20px 24px 32px; display: flex; flex-direction: column; gap: 16px; }
+/* Banner */
+.banner { background: var(--warn-bg); border: 1px solid var(--warn-border); border-left: 4px solid var(--amber); color: #92400E; padding: 11px 14px; border-radius: 8px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.banner button { padding: 5px 12px; font-size: 12px; }
+/* Buttons */
+.btn-primary { background: var(--amber); color: var(--navy-dark); border-color: var(--amber); padding: 8px 16px; font-weight: 700; font-size: 13px; }
+.btn-primary:hover { background: var(--amber-dark); filter: none; }
+.btn-navy { background: var(--navy); color: #fff; border-color: var(--navy); padding: 6px 12px; font-weight: 700; font-size: 12px; }
+.btn-navy:hover { background: var(--navy-dark); filter: none; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 8px 14px; font-weight: 500; font-size: 13px; }
+.btn-secondary:hover { background: var(--bg); filter: none; }
+.btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); padding: 5px 11px; font-weight: 600; font-size: 12px; }
+.btn-outline:hover { background: rgba(29,79,124,0.06); filter: none; }
+.btn-success { background: var(--green); color: #fff; border-color: var(--green); padding: 8px 16px; font-weight: 700; font-size: 13px; }
+.btn-success:hover { filter: brightness(1.1); }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #FCA5A5; padding: 7px 12px; font-weight: 600; font-size: 12px; }
+.btn-danger:hover { filter: brightness(0.97); }
+.btn-ghost { background: transparent; color: var(--navy-mid); border: none; padding: 6px 10px; font-weight: 600; font-size: 12px; }
+.btn-ghost:hover { background: rgba(29,79,124,0.07); filter: none; }
+.btn-ghost-sm { flex: 1; padding: 5px 0; font-size: 10px; font-weight: 600; background: transparent; color: var(--text-mid); border: 1px solid var(--border); border-radius: 6px; text-align: center; }
+.btn-ghost-sm:hover { background: rgba(29,79,124,0.05); filter: none; }
+/* Sections */
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; box-shadow: var(--shadow); }
+.section h2 { margin: 0 0 4px; font-size: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; color: var(--navy); }
+.section .section-sub { color: var(--text-muted); font-size: 13px; margin: 0 0 16px; }
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.section-header > div { min-width: 0; }
+.section-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+/* Dashboard */
+.summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.summary-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow); }
+.summary-tile small { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.summary-value { font-size: 28px; line-height: 1.1; font-weight: 800; color: var(--navy); font-family: 'Barlow Condensed', sans-serif; }
+.summary-meta { color: var(--text-mid); font-size: 12px; }
+.dash-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+.dash-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.dash-card h3 { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.dash-list { display: grid; gap: 8px; }
+.dash-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+.dash-item .meta { color: var(--text-muted); font-size: 11px; }
+/* Tables */
+table.data { width: 100%; border-collapse: collapse; background: var(--surface); }
+table.data thead th { background: var(--bg); text-align: left; padding: 10px; font-size: 11px; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--border); font-weight: 700; position: sticky; top: 0; }
+table.data tbody td { padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 13px; vertical-align: middle; }
+table.data tbody tr:hover { background: #f5f9fd; }
+table.data .row-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+table.data .row-actions button { padding: 5px 9px; font-size: 11px; border-radius: 6px; }
+.empty-state { padding: 32px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 8px; background: var(--bg); }
+.empty-state strong { display: block; color: var(--text); margin-bottom: 4px; font-size: 15px; }
+/* Pills */
+.pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.pill.rascunho { background: rgba(29,79,124,0.08); color: var(--text-mid); }
+.pill.emitida { background: rgba(29,79,124,0.12); color: var(--navy); }
+.pill.entregue { background: var(--green-bg); color: var(--green); }
+.pill.cancelada { background: var(--red-bg); color: var(--red); }
+.pill.warning { background: var(--warn-bg); color: var(--warn); }
+/* Forms */
+.field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field.wide { grid-column: 1 / -1; }
+.field.span-2 { grid-column: span 2; }
+.field label { font-size: 11px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select, .field textarea { width: 100%; padding: 9px 11px; border: 1.5px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 13px; transition: border-color 0.15s; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--navy); }
+.field textarea { resize: vertical; min-height: 70px; }
+.field .hint { font-size: 11px; color: var(--text-muted); }
+.field-group { margin-bottom: 20px; }
+.field-group h3 { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.checkbox-row { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px; flex-wrap: wrap; }
+/* OC Stepper */
+.oc-stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.oc-step { padding: 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
+.oc-step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--border); color: white; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+.oc-step.active { border-color: var(--navy); background: rgba(29,79,124,0.06); }
+.oc-step.active .num { background: var(--navy); }
+.oc-step.done .num { background: var(--green); }
+.oc-step strong { font-size: 13px; display: block; }
+.oc-step span { font-size: 11px; color: var(--text-muted); }
+/* Items table */
+.items-table { width: 100%; border-collapse: collapse; }
+.items-table th { background: var(--bg); padding: 7px; font-size: 11px; text-align: left; color: var(--text-mid); text-transform: uppercase; border-bottom: 2px solid var(--border); font-weight: 700; }
+.items-table td { padding: 5px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.items-table input, .items-table select { padding: 6px 8px; font-size: 12px; border: 1.5px solid var(--border); border-radius: 5px; width: 100%; background: white; }
+.items-table input:focus, .items-table select:focus { outline: none; border-color: var(--navy); }
+.items-table .item-num { width: 32px; text-align: center; color: var(--text-muted); font-weight: 700; }
+.items-table .col-desc { min-width: 220px; }
+.items-table .col-obs { min-width: 140px; }
+.items-table .col-qty, .items-table .col-un, .items-table .col-ipi, .items-table .col-desc-pct { width: 70px; }
+.items-table .col-price, .items-table .col-total { width: 110px; }
+.items-table .col-total input { background: var(--green-bg); font-weight: 700; }
+.items-table .col-prazo { width: 130px; }
+.items-table .col-actions { width: 40px; }
+.items-table .col-actions button { padding: 4px 6px; font-size: 11px; }
+.items-table tfoot td { padding: 8px; background: var(--bg); font-weight: 700; font-size: 13px; }
+/* Totals */
+.totals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+.totals-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.totals-card h3 { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+.total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+.total-row.grand { border-top: 2px solid var(--navy); margin-top: 8px; padding-top: 12px; font-size: 16px; font-weight: 700; color: var(--navy); }
+/* Catalogo */
+.ecr-card { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: var(--surface); overflow: hidden; }
+.ecr-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; background: var(--bg); }
+.ecr-head:hover { background: rgba(29,79,124,0.05); }
+.ecr-head .ecr-title { display: flex; gap: 10px; align-items: center; }
+.ecr-head .ecr-code { font-weight: 800; color: var(--navy); font-size: 13px; font-family: 'Barlow Condensed', sans-serif; }
+.ecr-head .ecr-name { font-weight: 600; }
+.ecr-head .meta { font-size: 11px; color: var(--text-muted); }
+.ecr-body { padding: 14px; border-top: 1px solid var(--border); }
+.ecr-body .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.ecr-body .specs > div { background: var(--bg); padding: 10px; border-radius: 6px; }
+.ecr-body .specs h4 { margin: 0 0 6px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+.ecr-body .specs ul { margin: 0; padding-left: 18px; font-size: 12px; }
+.ecr-body .add-mat-row { display: flex; gap: 6px; align-items: end; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.ecr-body .add-mat-row .field { flex: 1; }
+/* Drawer */
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(13,43,74,0.45); z-index: 90; }
+.drawer { position: fixed; top: 0; right: 0; height: 100vh; width: min(680px, 100vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.12); z-index: 100; display: flex; flex-direction: column; }
+.drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.drawer-header h2 { margin: 0; font-size: 17px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; color: var(--navy); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+.drawer-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.close-x { background: transparent; border: none; font-size: 22px; padding: 4px 10px; color: var(--text-muted); }
+.close-x:hover { background: var(--bg); filter: none; color: var(--text); }
+/* Autocomplete */
+.ac-wrap { position: relative; }
+.ac-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1.5px solid var(--border); border-radius: 6px; max-height: 220px; overflow-y: auto; z-index: 50; box-shadow: var(--shadow); margin-top: 2px; }
+.ac-item { padding: 7px 10px; cursor: pointer; font-size: 12px; border-bottom: 1px solid var(--border-light); }
+.ac-item:hover, .ac-item.active { background: rgba(29,79,124,0.07); color: var(--navy); }
+.ac-item small { display: block; color: var(--text-muted); font-size: 10px; }
+/* Filters */
+.filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border-light); }
+.filter-bar input, .filter-bar select { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; background: white; }
+.filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--navy); }
+/* Toast */
+.toast { position: fixed; bottom: 22px; left: 236px; padding: 12px 16px; border-radius: 8px; background: var(--navy-dark); color: white; box-shadow: var(--shadow); font-size: 13px; max-width: 360px; z-index: 200; }
+.toast.success { background: var(--green); }
+.toast.warning { background: var(--warn); }
+.toast.error { background: var(--red); }
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { width: 56px; }
+  .brand-name, .brand-sub, .pbqph-label, .nav-section-label,
+  .tab-btn span, .sidebar-footer .sf-label, .sidebar-footer .sf-value,
+  .sidebar-footer .sf-actions, .sidebar-footer .sf-actions-2,
+  .sidebar-pbqph-badge { display: none; }
+  .tab-btn { padding: 10px; justify-content: center; }
+  .logo-wrap { margin: 0 auto; }
+  .sidebar-brand { justify-content: center; }
+  .toast { left: 72px; }
+}
+@media (max-width: 1080px) {
+  .dash-grid { grid-template-columns: 1fr; }
+  .totals-grid { grid-template-columns: 1fr; }
+  .ecr-body .specs { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .main-content { padding: 12px 14px 24px; }
+  .items-table { font-size: 11px; }
+  .items-table input, .items-table select { font-size: 11px; }
+}
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-wrap">
+          <img src="design_handoff_central_compras/assets/brazao1.png" alt="Campisi" onerror="this.style.display='none'">
+        </div>
+        <div>
+          <div class="brand-name">CAMPISI</div>
+          <div class="brand-sub">Engenharia</div>
+        </div>
+      </div>
+
+      <div class="sidebar-pbqph-badge">
+        <span class="pbqph-dot"></span>
+        <span class="pbqph-label">PBQP-H Ativo</span>
+      </div>
+
+      <nav id="tabsNav">
+        <div class="nav-section-label">Principal</div>
+        <button class="tab-btn active" data-tab="dashboard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Painel</span>
+        </button>
+        <button class="tab-btn" data-tab="nova-oc">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Nova OC</span>
+        </button>
+        <button class="tab-btn" data-tab="historico">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          <span>Histórico</span>
+          <span class="badge" id="badge-historico">0</span>
+        </button>
+        <button class="tab-btn" data-tab="fornecedores">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span>Fornecedores</span>
+          <span class="badge" id="badge-fornecedores">0</span>
+        </button>
+        <button class="tab-btn" data-tab="obras">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span>Obras</span>
+          <span class="badge" id="badge-obras">0</span>
+        </button>
+        <div class="nav-section-label">Sistema</div>
+        <button class="tab-btn" data-tab="catalogo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span>Catálogo ECR</span>
+        </button>
+        <button class="tab-btn" data-tab="config">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span>Configurações</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sf-row">
+          <span class="dirty-indicator" id="dirtyDot"></span>
+          <span class="sf-label">Arquivo:</span>
+          <span class="sf-value" id="sourceName">—</span>
+        </div>
+        <div class="sf-row">
+          <span class="sf-label">Sinc.:</span>
+          <span class="sf-value" id="lastSaved">—</span>
+        </div>
+        <p class="storage-warning hidden" id="storageWarning">Cópia local. Conecte ao JSON para sincronizar.</p>
+        <div class="sf-actions">
+          <button class="btn-navy" id="saveBtn">↑ Salvar</button>
+          <button class="btn-outline" id="connectBtn">Conectar</button>
+        </div>
+        <div class="sf-actions-2">
+          <button class="btn-ghost-sm" id="reloadBtn">Recarregar</button>
+          <button class="btn-ghost-sm" id="exportBtn">Backup</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+
+      <header class="topbar-bar">
+        <div class="topbar-left">
+          <div class="topbar-context">Campisi Engenharia / PBQP-H</div>
+          <div class="topbar-title" id="topbarTitle">Painel</div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-sync-chip"><span class="chip-dot"></span> SGQ Ativo</div>
+        </div>
+      </header>
+
+      <main class="main-content">
+
+        <!-- BANNER de configuração -->
+        <div class="banner hidden" id="configBanner">
+          <strong>⚠️ Preencha os dados do emitente (Campisi) na aba Configurações antes de emitir a primeira OC.</strong>
+          <button class="btn-secondary" id="goConfig">Abrir Configurações</button>
+        </div>
+
+    <!-- DASHBOARD -->
+    <section class="section" id="tab-dashboard">
+      <div class="section-header">
+        <div>
+          <h2>Painel</h2>
+          <p class="section-sub">Resumo das compras emitidas e atalhos rápidos.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-primary" id="quickNewOC">+ Nova OC</button>
+        </div>
+      </div>
+      <div class="summary-strip" id="summaryStrip"></div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <h3>Últimas OCs</h3>
+          <div class="dash-list" id="dashLastOcs"></div>
+        </div>
+        <div class="dash-card">
+          <h3>Top fornecedores (valor)</h3>
+          <div class="dash-list" id="dashTopFornecedores"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOVA OC -->
+    <section class="section hidden" id="tab-nova-oc">
+      <div class="section-header">
+        <div>
+          <h2 id="ocTitle">Nova Ordem de Compra</h2>
+          <p class="section-sub" id="ocSubtitle">Selecione fornecedor e obra. Os dados são preenchidos automaticamente.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-secondary" id="ocCancel">Cancelar</button>
+          <button class="btn-secondary" id="ocSaveDraft">Salvar rascunho</button>
+          <button class="btn-success" id="ocSaveAndPdf">Salvar e gerar PDF</button>
+        </div>
+      </div>
+
+      <div class="oc-stepper">
+        <div class="oc-step active"><div class="num">1</div><div><strong>Identificação</strong><span>Fornecedor, obra e pagamento</span></div></div>
+        <div class="oc-step"><div class="num">2</div><div><strong>Itens</strong><span>Produtos da OC</span></div></div>
+        <div class="oc-step"><div class="num">3</div><div><strong>Totais e revisão</strong><span>Frete, descontos e PDF</span></div></div>
+      </div>
+
+      <!-- Passo 1 -->
+      <div class="field-group">
+        <h3>1. Identificação</h3>
+        <div class="field-grid">
+          <div class="field">
+            <label>Nº da Ordem de Compra</label>
+            <input type="text" id="ocNumero" readonly>
+            <div class="hint">Sequencial automático (define ao gerar PDF).</div>
+          </div>
+          <div class="field">
+            <label>Data de emissão</label>
+            <input type="date" id="ocData">
+          </div>
+          <div class="field">
+            <label>Fornecedor *</label>
+            <select id="ocFornecedor"></select>
+          </div>
+          <div class="field">
+            <label>Emitente (Faturamento) *</label>
+            <select id="ocEmitente"></select>
+          </div>
+          <div class="field">
+            <label>Obra *</label>
+            <select id="ocObra"></select>
+          </div>
+          <div class="field">
+            <label>Condição de pagamento</label>
+            <select id="ocPagamento"></select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="ocStatus">
+              <option value="rascunho">Rascunho</option>
+              <option value="emitida">Emitida</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 2: Itens -->
+      <div class="field-group">
+        <h3>2. Itens da OC</h3>
+        <div style="overflow-x: auto;">
+          <table class="items-table" id="itemsTable">
+            <thead>
+              <tr>
+                <th class="item-num">#</th>
+                <th class="col-desc">Descrição do produto</th>
+                <th class="col-obs">Observação</th>
+                <th class="col-qty">Qtd</th>
+                <th class="col-un">Un</th>
+                <th class="col-price">Preço unit.</th>
+                <th class="col-ipi">IPI %</th>
+                <th class="col-desc-pct">Desc %</th>
+                <th class="col-total">Total</th>
+                <th class="col-prazo">Prazo entrega</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody id="itemsTbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <button class="btn-secondary" id="addItemBtn">+ Adicionar item</button>
+          <button class="btn-secondary" id="importPedidoBtn" title="Anexar pedido/orçamento (PDF ou imagem) e extrair itens com IA">📎 Importar pedido</button>
+          <input type="file" id="importPedidoFile" accept="application/pdf,image/*" style="display:none">
+          <select id="ecrFilterAdd" style="padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px;">
+            <option value="">Filtrar por ECR (opcional)</option>
+          </select>
+          <span style="font-size: 11px; color: var(--muted);">Atalho: <kbd>Ctrl+Enter</kbd> nova linha</span>
+        </div>
+      </div>
+
+      <!-- Passo 3: Totais -->
+      <div class="field-group">
+        <h3>3. Totais, observações e revisão</h3>
+        <div class="totals-grid">
+          <div class="totals-card">
+            <h3>Ajustes</h3>
+            <div class="field-grid">
+              <div class="field">
+                <label>(+) Frete (R$)</label>
+                <input type="number" step="0.01" id="ocFrete" value="0">
+              </div>
+              <div class="field">
+                <label>(+) Outras despesas (R$)</label>
+                <input type="number" step="0.01" id="ocOutras" value="0">
+              </div>
+              <div class="field">
+                <label>(-) Desconto material (R$)</label>
+                <input type="number" step="0.01" id="ocDescMat" value="0">
+              </div>
+            </div>
+            <div class="field" style="margin-top: 12px;">
+              <label>Observações</label>
+              <textarea id="ocObs" rows="3" placeholder="Observações livres que serão impressas no PDF."></textarea>
+            </div>
+          </div>
+          <div class="totals-card">
+            <h3>Resumo</h3>
+            <div class="total-row"><span>Sub-Total</span><strong id="totSub">R$ 0,00</strong></div>
+            <div class="total-row"><span>(-) Desconto itens</span><strong id="totDesc">R$ 0,00</strong></div>
+            <div class="total-row"><span>(+) IPI</span><strong id="totIpi">R$ 0,00</strong></div>
+            <div class="total-row"><span>(+) Frete</span><strong id="totFrete">R$ 0,00</strong></div>
+            <div class="total-row"><span>(+) Outras despesas</span><strong id="totOutras">R$ 0,00</strong></div>
+            <div class="total-row"><span>(-) Desc material</span><strong id="totDescMat">R$ 0,00</strong></div>
+            <div class="total-row grand"><span>TOTAL GERAL</span><strong id="totGeral">R$ 0,00</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section class="section hidden" id="tab-historico">
+      <div class="section-header">
+        <div>
+          <h2>Histórico de Ordens de Compra</h2>
+          <p class="section-sub">Todas as OCs emitidas, com filtros e ações rápidas.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-primary" id="histNewOC">+ Nova OC</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="search" id="histSearch" placeholder="Buscar nº, fornecedor, obra...">
+        <select id="histStatus">
+          <option value="">Todos os status</option>
+          <option value="rascunho">Rascunho</option>
+          <option value="emitida">Emitida</option>
+          <option value="entregue">Entregue</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+        <select id="histFornecedor"><option value="">Todos os fornecedores</option></select>
+        <select id="histObra"><option value="">Todas as obras</option></select>
+      </div>
+      <div id="histTableWrap"></div>
+    </section>
+
+    <!-- FORNECEDORES -->
+    <section class="section hidden" id="tab-fornecedores">
+      <div class="section-header">
+        <div>
+          <h2>Fornecedores</h2>
+          <p class="section-sub">Cadastro reutilizável: o fornecedor selecionado preenche automaticamente os dados na OC.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-primary" id="newFornecedorBtn">+ Novo fornecedor</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="search" id="fornSearch" placeholder="Buscar razão, CNPJ, cidade...">
+        <select id="fornEcrFilter"><option value="">Todos os ECRs</option></select>
+      </div>
+      <div id="fornTableWrap"></div>
+    </section>
+
+    <!-- OBRAS -->
+    <section class="section hidden" id="tab-obras">
+      <div class="section-header">
+        <div>
+          <h2>Obras</h2>
+          <p class="section-sub">Cadastro de obras com endereço de entrega e CEI. Ao selecionar a obra na OC, todos os campos são preenchidos.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-primary" id="newObraBtn">+ Nova obra</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="search" id="obraSearch" placeholder="Buscar nome, CEI, cidade...">
+      </div>
+      <div id="obraTableWrap"></div>
+    </section>
+
+    <!-- CATÁLOGO -->
+    <section class="section hidden" id="tab-catalogo">
+      <div class="section-header">
+        <div>
+          <h2>Catálogo de Materiais por ECR</h2>
+          <p class="section-sub">Os 20 ECRs do SGQ com normas, critérios de recebimento e materiais padronizados. Adicione produtos para autocomplete na OC.</p>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="search" id="catalogoSearch" placeholder="Buscar ECR ou material...">
+      </div>
+      <div id="ecrList"></div>
+    </section>
+
+    <!-- CONFIG -->
+    <section class="section hidden" id="tab-config">
+      <div class="section-header">
+        <div>
+          <h2>Configurações</h2>
+          <p class="section-sub">Emitentes de faturamento, textos fixos e numeração das OCs.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn-primary" id="saveConfigBtn">Salvar configurações</button>
+        </div>
+      </div>
+      <div class="field-group" id="emitentesSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0">Emitentes de Faturamento</h3>
+          <button class="btn-secondary" id="newEmitente">+ Novo Emitente</button>
+        </div>
+        <div id="emitentesList"></div>
+        <p class="hint" style="margin-top:8px;">O primeiro emitente é o padrão. Na Nova OC você escolhe qual usar.</p>
+      </div>
+      <div class="field-group">
+        <h3>Endereço de Cobrança</h3>
+        <div class="field-grid">
+          <div class="field span-2"><label>Logradouro</label><input data-cfg="endereco_cobranca.logradouro"></div>
+          <div class="field"><label>Número</label><input data-cfg="endereco_cobranca.numero"></div>
+          <div class="field"><label>Bairro</label><input data-cfg="endereco_cobranca.bairro"></div>
+          <div class="field"><label>Cidade</label><input data-cfg="endereco_cobranca.cidade"></div>
+          <div class="field"><label>UF</label><input data-cfg="endereco_cobranca.uf" maxlength="2"></div>
+          <div class="field"><label>CEP</label><input data-cfg="endereco_cobranca.cep"></div>
+        </div>
+      </div>
+      <div class="field-group">
+        <h3>Numeração e textos</h3>
+        <div class="field-grid">
+          <div class="field"><label>Último número OC emitido</label><input type="number" data-cfg="ultimo_numero_oc"><div class="hint">Próxima OC = N + 1</div></div>
+          <div class="field"><label>Ano corrente</label><input type="number" data-cfg="ano_corrente"></div>
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Linha de envio de NF</label>
+          <input data-cfg="texto_envio_nf">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Texto de Política da Qualidade (cabeçalho da seção)</label>
+          <input data-cfg="texto_qualidade">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Condições de Contratação (impresso no PDF)</label>
+          <textarea rows="8" data-cfg="texto_condicoes_contratacao"></textarea>
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Condições de pagamento disponíveis (uma por linha)</label>
+          <textarea rows="6" data-cfg="condicoes_pagamento_lines"></textarea>
+        </div>
+      </div>
+      <div class="field-group">
+        <h3>Integrações &amp; Backups</h3>
+        <div class="field">
+          <label>OpenRouter API Key (extração de pedidos com IA)</label>
+          <input type="password" data-cfg="openrouter_api_key" placeholder="sk-or-v1-..." autocomplete="off">
+          <div class="hint">Usada por "Importar pedido" na Nova OC. Modelo: Claude Haiku 4.5. A chave fica salva apenas neste JSON local.</div>
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Pasta de backups automáticos</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="backupDirDisplay" data-cfg="pasta_backups" placeholder="(nenhuma — sem backup automático)" style="flex:1">
+            <button class="btn-secondary" id="selectBackupDirBtn" type="button">Selecionar pasta…</button>
+            <button class="btn-ghost" id="clearBackupDirBtn" type="button" title="Desativar">✕</button>
+          </div>
+          <div class="hint">A cada Salvar, grava um snapshot timestampado nesta pasta. Mantém os últimos 10.</div>
+        </div>
+      </div>
+    </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- DRAWER -->
+  <div class="drawer-backdrop hidden" id="drawerBackdrop"></div>
+  <aside class="drawer hidden" id="drawer">
+    <div class="drawer-header">
+      <h2 id="drawerTitle">Editar</h2>
+      <button class="close-x" data-close-drawer>&times;</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-footer" id="drawerFooter"></div>
+  </aside>
+
+  <!-- TOAST -->
+  <div class="toast hidden" id="toast"></div>
+
+  <input type="file" id="jsonFileInput" accept=".json,application/json" class="hidden">
+
+  <!-- SEED EMBUTIDO (fallback offline) -->
+  <script id="seed-data" type="application/json">{"version":1,"app_name":"Central de Compras PBQP-H V1 - Campisi","shared_file_name":"central-compras-data.json","seeded_at":"2026-04-29T00:00:00.000Z","last_saved":"","config":{"emitente":{"razao_social":"","nome_fantasia":"","cnpj":"","ie":"","endereco":{"logradouro":"","numero":"","complemento":"","bairro":"","cidade":"Uberlândia","uf":"MG","cep":""},"telefones":["",""],"email_envio_nf":""},"endereco_cobranca":{"logradouro":"","numero":"","complemento":"","bairro":"","cidade":"Uberlândia","uf":"MG","cep":""},"ultimo_numero_oc":0,"ano_corrente":2026,"condicoes_pagamento":["À vista","ANTECIPADO","7 DDL NF","15 DDL NF","21 DDL NF","30 DDL NF"],"texto_condicoes_contratacao":"1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.\n2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.\n3) Informar que a CONRAD DUARTE é consumidora final (alíquota ICMS cheia).\n4) É proibido a negociação de títulos com terceiros sem autorização prévia.\n5) Constar o número desta Ordem de Compra e o nome da obra/CEI no documento fiscal.\n6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF NA ENTREGA DO MATERIAL.","texto_envio_nf":"FAVOR ENVIAR O XML E PDF DA NF / CONHECIMENTO ELETRÔNICO E BOLETOS PARA:","texto_qualidade":"CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR – ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO"},"fornecedores":[{"id":"forn-madeireira-silveira","razao_social":"MADEIREIRA SILVEIRA","nome_fantasia":"Madeireira Silveira","cnpj":"10.372.478/0001-04","ie":"","endereco":{"logradouro":"","numero":"","complemento":"","bairro":"Santa Edwiges","cidade":"Ituiutaba","uf":"MG","cep":""},"telefones":["",""],"email":"","contato_responsavel":"","ecrs_atende":[2,17],"observacoes":"Fornecedor histórico de madeira e estacas.","ativo":true}],"obras":[],"ecrs":[{"id":1,"codigo":"ECR 01","nome":"Barras e treliças de Aço","categoria":"Estrutural","normas":["NBR 7480","NBR 7481","NBR 15575"],"unidades_padrao":["kg","un"],"documentos_obrigatorios":["Certificado de Resistência por lote"],"criterios_recebimento":["Lote: cada entrega é considerada um lote","Aspecto: limpeza, ausência de corrosão excessiva","Verificação de diâmetro, comprimento e identificação nas peças"],"materiais":[{"id":"mat-aco-ca50-6","descricao":"Aço CA-50 Ø6,3mm","unidade_padrao":"kg"},{"id":"mat-aco-ca50-8","descricao":"Aço CA-50 Ø8,0mm","unidade_padrao":"kg"},{"id":"mat-aco-ca50-10","descricao":"Aço CA-50 Ø10,0mm","unidade_padrao":"kg"},{"id":"mat-aco-ca50-12","descricao":"Aço CA-50 Ø12,5mm","unidade_padrao":"kg"},{"id":"mat-aco-ca50-16","descricao":"Aço CA-50 Ø16,0mm","unidade_padrao":"kg"},{"id":"mat-aco-ca60-5","descricao":"Aço CA-60 Ø5,0mm","unidade_padrao":"kg"},{"id":"mat-tela-q92","descricao":"Tela soldada Q-92","unidade_padrao":"m²"},{"id":"mat-trelica-tg8","descricao":"Treliça TG-8","unidade_padrao":"m"}]},{"id":2,"codigo":"ECR 02","nome":"Madeira e Compensado","categoria":"Madeira","normas":["NBR 7190","NBR 14807","NBR 15575"],"unidades_padrao":["m","un","m²","m³"],"documentos_obrigatorios":["DOF (Documento de Origem Florestal) ou nota de origem"],"criterios_recebimento":["Aspecto: ausência de fungos, rachaduras excessivas, empenamentos","Conferência de bitola e comprimento conforme pedido","Identificação de espécie e procedência"],"materiais":[{"id":"mat-caibro-5x6","descricao":"Caibro 5x6cm (Estaca/Pontalete) - 1m","unidade_padrao":"un"},{"id":"mat-caibro-5x6-3m","descricao":"Caibro 5x6cm - 3m","unidade_padrao":"un"},{"id":"mat-tabua-pinus","descricao":"Tábua de Pinus 2,5x30cm","unidade_padrao":"m"},{"id":"mat-sarrafo-25x5","descricao":"Sarrafo 2,5x5cm","unidade_padrao":"m"},{"id":"mat-compensado-12mm","descricao":"Compensado plastificado 12mm (2,20x1,10m)","unidade_padrao":"un"},{"id":"mat-compensado-18mm","descricao":"Compensado plastificado 18mm (2,20x1,10m)","unidade_padrao":"un"}]},{"id":3,"codigo":"ECR 03","nome":"Concreto Usinado","categoria":"Estrutural","normas":["NBR 7212","NBR 8953","NBR 12655","NBR 15575"],"unidades_padrao":["m³"],"documentos_obrigatorios":["Carta-traço por resistência e especificações"],"criterios_recebimento":["Inspeção a cada caminhão","Tempo máximo dosagem-aplicação: 2h30min","Ensaio de slump test antes da descarga","Verificação do volume entregue"],"materiais":[{"id":"mat-concreto-fck20","descricao":"Concreto Usinado fck 20 MPa - Slump 10±2","unidade_padrao":"m³"},{"id":"mat-concreto-fck25","descricao":"Concreto Usinado fck 25 MPa - Slump 10±2","unidade_padrao":"m³"},{"id":"mat-concreto-fck30","descricao":"Concreto Usinado fck 30 MPa - Slump 10±2","unidade_padrao":"m³"},{"id":"mat-concreto-fck35","descricao":"Concreto Usinado fck 35 MPa - Slump 10±2","unidade_padrao":"m³"}]},{"id":4,"codigo":"ECR 04","nome":"Bloco de Concreto e Cerâmico","categoria":"Alvenaria","normas":["NBR 6136","NBR 15270","NBR 15575"],"unidades_padrao":["un"],"documentos_obrigatorios":["Certificado de conformidade do fabricante"],"criterios_recebimento":["Aspecto: integridade das peças, ausência de trincas","Conferência de dimensões nominais","Identificação do lote e fabricante"],"materiais":[{"id":"mat-bloco-conc-14","descricao":"Bloco de concreto estrutural 14x19x39cm","unidade_padrao":"un"},{"id":"mat-bloco-conc-19","descricao":"Bloco de concreto estrutural 19x19x39cm","unidade_padrao":"un"},{"id":"mat-bloco-cer-9","descricao":"Bloco cerâmico de vedação 9x19x19cm","unidade_padrao":"un"},{"id":"mat-bloco-cer-14","descricao":"Bloco cerâmico de vedação 14x19x29cm","unidade_padrao":"un"}]},{"id":5,"codigo":"ECR 05","nome":"Cal, Gesso Corrido e Aditivo","categoria":"Argamassa","normas":["NBR 7175","NBR 13207","NBR 11768"],"unidades_padrao":["sc","kg","L"],"documentos_obrigatorios":["FISPQ","Ficha técnica"],"criterios_recebimento":["Embalagens íntegras, sem sinais de umidade","Conferência da validade","Identificação do tipo/classe"],"materiais":[{"id":"mat-cal-ch3","descricao":"Cal Hidratada CH-III - saco 20kg","unidade_padrao":"sc"},{"id":"mat-gesso","descricao":"Gesso Corrido - saco 40kg","unidade_padrao":"sc"},{"id":"mat-aditivo-plast","descricao":"Aditivo plastificante","unidade_padrao":"L"}]},{"id":6,"codigo":"ECR 06","nome":"Areia e Brita","categoria":"Agregado","normas":["NBR 7211","NBR NM 248","NBR 15575"],"unidades_padrao":["m³"],"documentos_obrigatorios":["Nota fiscal com origem do material"],"criterios_recebimento":["Aspecto: ausência de impurezas, matéria orgânica, torrões de argila","Granulometria conforme especificação","Conferência do volume entregue"],"materiais":[{"id":"mat-areia-fina","descricao":"Areia fina lavada","unidade_padrao":"m³"},{"id":"mat-areia-media","descricao":"Areia média lavada","unidade_padrao":"m³"},{"id":"mat-brita-0","descricao":"Brita 0","unidade_padrao":"m³"},{"id":"mat-brita-1","descricao":"Brita 1","unidade_padrao":"m³"},{"id":"mat-brita-2","descricao":"Brita 2","unidade_padrao":"m³"}]},{"id":7,"codigo":"ECR 07","nome":"Argamassa colante","categoria":"Argamassa","normas":["NBR 14081","NBR 15575"],"unidades_padrao":["sc"],"documentos_obrigatorios":["Ficha técnica do produto"],"criterios_recebimento":["Embalagens íntegras, sem sinais de umidade","Conferência da validade","Tipo (AC-I, AC-II, AC-III) conforme especificação"],"materiais":[{"id":"mat-aci-int","descricao":"Argamassa colante AC-I (interno) - saco 20kg","unidade_padrao":"sc"},{"id":"mat-acii-ext","descricao":"Argamassa colante AC-II (externo) - saco 20kg","unidade_padrao":"sc"},{"id":"mat-aciii-porc","descricao":"Argamassa colante AC-III (porcelanato) - saco 20kg","unidade_padrao":"sc"}]},{"id":8,"codigo":"ECR 08","nome":"Revestimento de Parede e Piso","categoria":"Revestimento","normas":["NBR 13818","NBR 15463","NBR 15575"],"unidades_padrao":["m²","cx"],"documentos_obrigatorios":["Certificado do fabricante","Ficha técnica com PEI/absorção"],"criterios_recebimento":["Conferência de tonalidade e lote (todas as caixas mesmo lote)","Aspecto: ausência de trincas e empenamentos","Quantidade conforme pedido + 5% de margem"],"materiais":[]},{"id":9,"codigo":"ECR 09","nome":"Esquadrias, Janelas e Guarda-Corpos","categoria":"Esquadria","normas":["NBR 10821","NBR 14718","NBR 15575"],"unidades_padrao":["un","m²","m"],"documentos_obrigatorios":["Memorial descritivo","Ensaio de estanqueidade quando aplicável"],"criterios_recebimento":["Conferência de medidas conforme projeto","Aspecto: pintura/anodização sem falhas","Acessórios completos (puxadores, fechos, roldanas)"],"materiais":[]},{"id":10,"codigo":"ECR 10","nome":"Telhas","categoria":"Cobertura","normas":["NBR 7196","NBR 15310","NBR 15575"],"unidades_padrao":["un","m²"],"documentos_obrigatorios":["Certificado do fabricante"],"criterios_recebimento":["Aspecto: ausência de trincas, deformações e quebras","Conferência do tipo e dimensões","Mesmo lote/tonalidade no caso de telhas cerâmicas"],"materiais":[]},{"id":11,"codigo":"ECR 11","nome":"Portas","categoria":"Esquadria","normas":["NBR 15930","NBR 8054","NBR 15575"],"unidades_padrao":["un"],"documentos_obrigatorios":["Ficha técnica do fabricante"],"criterios_recebimento":["Conferência de dimensões conforme projeto","Aspecto: acabamento sem falhas, sem empenamento","Acessórios completos (dobradiças, fechaduras quando incluídas)"],"materiais":[]},{"id":12,"codigo":"ECR 12","nome":"Materiais Hidrossanitários","categoria":"Hidráulica","normas":["NBR 5648","NBR 5688","NBR 5626","NBR 7198","NBR 8160","NBR 15575"],"unidades_padrao":["m","un"],"documentos_obrigatorios":["Certificado de ensaio NBR 15575"],"criterios_recebimento":["Aspecto: ausência de furos, deformações, rasgos","Conferência de identificação (fabricante, diâmetro)","Vedação das extremidades quando aplicável"],"materiais":[]},{"id":13,"codigo":"ECR 13","nome":"Materiais Elétricos","categoria":"Elétrica","normas":["NBR 5410","NBR NM 247","NBR 6148","NBR 15575"],"unidades_padrao":["m","un","rl"],"documentos_obrigatorios":["Certificado INMETRO quando aplicável"],"criterios_recebimento":["Selo INMETRO visível para itens obrigatórios","Conferência de bitola e isolação","Aspecto: embalagens íntegras"],"materiais":[]},{"id":14,"codigo":"ECR 14","nome":"Tinta, Textura e Selador","categoria":"Acabamento","normas":["NBR 11702","NBR 15079","NBR 15575"],"unidades_padrao":["L","gl","bd"],"documentos_obrigatorios":["FISPQ","Ficha técnica"],"criterios_recebimento":["Embalagens lacradas e íntegras","Conferência de cor, tipo e validade","Lote único quando para mesma área"],"materiais":[]},{"id":15,"codigo":"ECR 15","nome":"Bancada, Peitoril e Soleira","categoria":"Acabamento","normas":["NBR 15012","NBR 15575"],"unidades_padrao":["m","m²","un"],"documentos_obrigatorios":["Ficha técnica do fabricante"],"criterios_recebimento":["Conferência de dimensões conforme projeto","Aspecto: sem trincas, manchas ou diferença de tonalidade","Polimento e acabamento de bordas conforme especificado"],"materiais":[]},{"id":16,"codigo":"ECR 16","nome":"Louças e Metais Sanitários","categoria":"Hidráulica","normas":["NBR 15097","NBR 15705","NBR 15575"],"unidades_padrao":["un"],"documentos_obrigatorios":["Certificado de conformidade","Manual do fabricante"],"criterios_recebimento":["Aspecto: sem trincas, manchas ou bolhas no esmalte","Acessórios completos conforme pedido","Conferência de modelo, cor e dimensões"],"materiais":[]},{"id":17,"codigo":"ECR 17","nome":"Estrutura Metálica e madeira para telhado","categoria":"Cobertura","normas":["NBR 8800","NBR 7190","NBR 15575"],"unidades_padrao":["kg","m","un"],"documentos_obrigatorios":["ART/RRT","Memorial descritivo do fabricante"],"criterios_recebimento":["Conferência das peças conforme projeto","Aspecto: pintura/galvanização sem falhas","Identificação das peças para montagem"],"materiais":[]},{"id":18,"codigo":"ECR 18","nome":"Impermeabilizante","categoria":"Acabamento","normas":["NBR 9574","NBR 9575","NBR 15575"],"unidades_padrao":["kg","L","gl","bd"],"documentos_obrigatorios":["FISPQ","Ficha técnica"],"criterios_recebimento":["Embalagens lacradas e íntegras","Conferência de tipo, validade e lote","Compatibilidade com substrato conforme ficha técnica"],"materiais":[]},{"id":19,"codigo":"ECR 19","nome":"Cimento","categoria":"Argamassa","normas":["NBR 11578","NBR 5733","NBR 14725-4","NBR 15575"],"unidades_padrao":["sc","kg"],"documentos_obrigatorios":["FISPQ"],"criterios_recebimento":["Embalagens fechadas, sem sinais de umidade","Verificação de tipo, classe e validade","Rejeição de sacos rasgados ou molhados","Armazenamento: máx. 10 sacos por pilha, protegido de umidade, 10cm do solo"],"materiais":[{"id":"mat-cim-cpii-50","descricao":"Cimento Portland CP II-E-32 - saco 50kg","unidade_padrao":"sc"},{"id":"mat-cim-cpiii-50","descricao":"Cimento Portland CP III-40 - saco 50kg","unidade_padrao":"sc"},{"id":"mat-cim-cpv-50","descricao":"Cimento Portland CP V-ARI - saco 50kg","unidade_padrao":"sc"}]},{"id":20,"codigo":"ECR 20","nome":"Dispositivo de Gás","categoria":"Hidráulica","normas":["NBR 13523","NBR 15526","NBR 15575"],"unidades_padrao":["m","un"],"documentos_obrigatorios":["Selo INMETRO/IGT","Certificado do fabricante"],"criterios_recebimento":["Selo INMETRO/IGT visível","Conferência de diâmetro e classe de pressão","Aspecto: ausência de amassados em tubos e conexões"],"materiais":[]}],"ordens_compra":[]}</script>
+
+  <script>
+  (function(){
+    'use strict';
+
+    // ============================================================
+    // CONSTANTS & DOM
+    // ============================================================
+    const STORAGE = { cache: 'central-compras-cache-v1', ui: 'central-compras-ui-v1' };
+    const HANDLE_DB = 'central-compras-db';
+    const HANDLE_KEY = 'shared-json';
+    const STATUS_OC = ['rascunho','emitida','entregue','cancelada'];
+    const STATUS_LABEL = { rascunho:'Rascunho', emitida:'Emitida', entregue:'Entregue', cancelada:'Cancelada' };
+    const UN_PADRAO = ['un','kg','m','m²','m³','sc','L','gl','bd','cx','rl','pç'];
+
+    const dom = {
+      sourceName: document.getElementById('sourceName'),
+      lastSaved: document.getElementById('lastSaved'),
+      dirtyDot: document.getElementById('dirtyDot'),
+      storageWarning: document.getElementById('storageWarning'),
+      connectBtn: document.getElementById('connectBtn'),
+      saveBtn: document.getElementById('saveBtn'),
+      reloadBtn: document.getElementById('reloadBtn'),
+      exportBtn: document.getElementById('exportBtn'),
+      tabsNav: document.getElementById('tabsNav'),
+      configBanner: document.getElementById('configBanner'),
+      goConfig: document.getElementById('goConfig'),
+      jsonFileInput: document.getElementById('jsonFileInput'),
+      toast: document.getElementById('toast'),
+      drawer: document.getElementById('drawer'),
+      drawerBackdrop: document.getElementById('drawerBackdrop'),
+      drawerTitle: document.getElementById('drawerTitle'),
+      drawerBody: document.getElementById('drawerBody'),
+      drawerFooter: document.getElementById('drawerFooter'),
+      // Dashboard
+      summaryStrip: document.getElementById('summaryStrip'),
+      dashLastOcs: document.getElementById('dashLastOcs'),
+      dashTopFornecedores: document.getElementById('dashTopFornecedores'),
+      // Nova OC
+      ocNumero: document.getElementById('ocNumero'),
+      ocData: document.getElementById('ocData'),
+      ocFornecedor: document.getElementById('ocFornecedor'),
+      ocEmitente: document.getElementById('ocEmitente'),
+      ocObra: document.getElementById('ocObra'),
+      ocPagamento: document.getElementById('ocPagamento'),
+      ocStatus: document.getElementById('ocStatus'),
+      itemsTbody: document.getElementById('itemsTbody'),
+      addItemBtn: document.getElementById('addItemBtn'),
+      ecrFilterAdd: document.getElementById('ecrFilterAdd'),
+      ocFrete: document.getElementById('ocFrete'),
+      ocOutras: document.getElementById('ocOutras'),
+      ocDescMat: document.getElementById('ocDescMat'),
+      ocObs: document.getElementById('ocObs'),
+      ocTitle: document.getElementById('ocTitle'),
+      ocSubtitle: document.getElementById('ocSubtitle'),
+      ocCancel: document.getElementById('ocCancel'),
+      ocSaveDraft: document.getElementById('ocSaveDraft'),
+      ocSaveAndPdf: document.getElementById('ocSaveAndPdf'),
+      totSub: document.getElementById('totSub'),
+      totDesc: document.getElementById('totDesc'),
+      totIpi: document.getElementById('totIpi'),
+      totFrete: document.getElementById('totFrete'),
+      totOutras: document.getElementById('totOutras'),
+      totDescMat: document.getElementById('totDescMat'),
+      totGeral: document.getElementById('totGeral'),
+      // Histórico
+      histSearch: document.getElementById('histSearch'),
+      histStatus: document.getElementById('histStatus'),
+      histFornecedor: document.getElementById('histFornecedor'),
+      histObra: document.getElementById('histObra'),
+      histTableWrap: document.getElementById('histTableWrap'),
+      histNewOC: document.getElementById('histNewOC'),
+      // Fornecedores
+      fornSearch: document.getElementById('fornSearch'),
+      fornEcrFilter: document.getElementById('fornEcrFilter'),
+      fornTableWrap: document.getElementById('fornTableWrap'),
+      newFornecedorBtn: document.getElementById('newFornecedorBtn'),
+      // Obras
+      obraSearch: document.getElementById('obraSearch'),
+      obraTableWrap: document.getElementById('obraTableWrap'),
+      newObraBtn: document.getElementById('newObraBtn'),
+      // Catálogo
+      catalogoSearch: document.getElementById('catalogoSearch'),
+      ecrList: document.getElementById('ecrList'),
+      // Config
+      saveConfigBtn: document.getElementById('saveConfigBtn'),
+      // Dashboard quick
+      quickNewOC: document.getElementById('quickNewOC'),
+      // Badges
+      badgeHist: document.getElementById('badge-historico'),
+      badgeForn: document.getElementById('badge-fornecedores'),
+      badgeObras: document.getElementById('badge-obras'),
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    const state = {
+      data: null,
+      activeTab: 'dashboard',
+      sourceName: 'Base inicial embutida',
+      fileHandle: null,
+      dirty: false,
+      toastTimer: null,
+      autoSaveTimer: null,
+      // OC editor
+      ocEditing: null, // {id, ...} object being edited
+      // Filters
+      histFilter: { search:'', status:'', fornecedor:'', obra:'' },
+      fornFilter: { search:'', ecr:'' },
+      obraFilter: { search:'' },
+      catalogoFilter: { search:'' },
+    };
+
+    // ============================================================
+    // UTIL
+    // ============================================================
+    const escapeHtml = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const deepClone = v => JSON.parse(JSON.stringify(v));
+    const nowIso = () => new Date().toISOString();
+    const todayIso = () => new Date().toISOString().slice(0,10);
+    const uid = (prefix='id') => `${prefix}-${Math.random().toString(36).slice(2,9)}-${Date.now().toString(36)}`;
+    const slug = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+    function slugify(str){
+      return (str||'').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g,'')
+        .replace(/[^a-z0-9\s]/g,'')
+        .trim().replace(/\s+/g,' ').substring(0,30);
+    }
+    const toNumber = v => { const n = Number(String(v||'').replace(',','.')); return isNaN(n) ? 0 : n; };
+    const formatBrl = v => 'R$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+    const formatDate = v => { if(!v) return '—'; const d = new Date(v + (v.length===10 ? 'T12:00:00' : '')); return d.toLocaleDateString('pt-BR'); };
+    const formatTimestamp = v => { if(!v) return 'Nunca salvo'; const d = new Date(v); return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); };
+    function debounce(fn, ms){ let t; return function(...a){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,a), ms); }; }
+    function getPath(obj, path){ return path.split('.').reduce((acc,k)=>{ if(acc==null) return undefined; const idx = /^\d+$/.test(k) ? parseInt(k,10) : k; return acc[idx]; }, obj); }
+    function setPath(obj, path, value){
+      const keys = path.split('.');
+      let cur = obj;
+      for(let i=0; i<keys.length-1; i++){
+        const k = keys[i];
+        const idx = /^\d+$/.test(k) ? parseInt(k,10) : k;
+        if(cur[idx] == null) cur[idx] = /^\d+$/.test(keys[i+1]) ? [] : {};
+        cur = cur[idx];
+      }
+      const last = keys[keys.length-1];
+      const lastIdx = /^\d+$/.test(last) ? parseInt(last,10) : last;
+      cur[lastIdx] = value;
+    }
+
+    // ============================================================
+    // SEED + NORMALIZE
+    // ============================================================
+    function readEmbeddedSeed(){
+      try { return JSON.parse(document.getElementById('seed-data').textContent); }
+      catch(e){ return { config:{}, fornecedores:[], obras:[], ecrs:[], ordens_compra:[] }; }
+    }
+
+    function normalizeData(raw){
+      const seed = readEmbeddedSeed();
+      const safe = raw || {};
+      const cfgRaw = safe.config || {};
+      const cfgSeed = seed.config || {};
+      return {
+        version: safe.version || 1,
+        app_name: safe.app_name || 'Central de Compras PBQP-H V1 - Campisi',
+        shared_file_name: safe.shared_file_name || 'central-compras-data.json',
+        seeded_at: safe.seeded_at || cfgSeed.seeded_at || nowIso(),
+        last_saved: safe.last_saved || '',
+        config: {
+          emitente: Object.assign(deepClone(cfgSeed.emitente||{}), cfgRaw.emitente||{}),
+          emitentes: (()=>{
+            // Use saved array if available; otherwise auto-migrate from legacy config.emitente
+            if(Array.isArray(cfgRaw.emitentes) && cfgRaw.emitentes.length) return cfgRaw.emitentes;
+            if(Array.isArray(cfgSeed.emitentes) && cfgSeed.emitentes.length) return cfgSeed.emitentes;
+            // Auto-migrate: if old config.emitente has a razao_social, promote it
+            const legacyEm = Object.assign(deepClone(cfgSeed.emitente||{}), cfgRaw.emitente||{});
+            if(legacyEm.razao_social){
+              return [Object.assign({ id: 'emit-legacy-01' }, legacyEm)];
+            }
+            return [];
+          })(),
+          endereco_cobranca: Object.assign(deepClone(cfgSeed.endereco_cobranca||{}), cfgRaw.endereco_cobranca||{}),
+          ultimo_numero_oc: Number(cfgRaw.ultimo_numero_oc || 0),
+          ano_corrente: Number(cfgRaw.ano_corrente || cfgSeed.ano_corrente || new Date().getFullYear()),
+          condicoes_pagamento: Array.isArray(cfgRaw.condicoes_pagamento) && cfgRaw.condicoes_pagamento.length ? cfgRaw.condicoes_pagamento : cfgSeed.condicoes_pagamento,
+          texto_condicoes_contratacao: cfgRaw.texto_condicoes_contratacao || cfgSeed.texto_condicoes_contratacao || '',
+          texto_envio_nf: cfgRaw.texto_envio_nf || cfgSeed.texto_envio_nf || '',
+          texto_qualidade: cfgRaw.texto_qualidade || cfgSeed.texto_qualidade || '',
+          openrouter_api_key: cfgRaw.openrouter_api_key || '',
+          pasta_backups: cfgRaw.pasta_backups || ''
+        },
+        fornecedores: Array.isArray(safe.fornecedores) ? safe.fornecedores.map(normalizeFornecedor) : seed.fornecedores.map(normalizeFornecedor),
+        obras: Array.isArray(safe.obras) ? safe.obras.map(normalizeObra) : [],
+        ecrs: Array.isArray(safe.ecrs) ? safe.ecrs.map(normalizeEcr) : seed.ecrs.map(normalizeEcr),
+        ordens_compra: Array.isArray(safe.ordens_compra) ? safe.ordens_compra.map(normalizeOC) : []
+      };
+    }
+
+    function normalizeFornecedor(f){
+      return {
+        id: f.id || uid('forn'),
+        razao_social: f.razao_social || '',
+        nome_fantasia: f.nome_fantasia || '',
+        cnpj: f.cnpj || '',
+        ie: f.ie || '',
+        endereco: Object.assign({ logradouro:'', numero:'', complemento:'', bairro:'', cidade:'', uf:'', cep:'' }, f.endereco||{}),
+        telefones: Array.isArray(f.telefones) ? f.telefones : ['',''],
+        email: f.email || '',
+        contato_responsavel: f.contato_responsavel || '',
+        ecrs_atende: Array.isArray(f.ecrs_atende) ? f.ecrs_atende.map(Number) : [],
+        observacoes: f.observacoes || '',
+        ativo: f.ativo !== false,
+        criado_em: f.criado_em || nowIso(),
+        atualizado_em: f.atualizado_em || nowIso()
+      };
+    }
+    function normalizeObra(o){
+      return {
+        id: o.id || uid('obra'),
+        nome: o.nome || '',
+        cei: o.cei || '',
+        endereco: Object.assign({ logradouro:'', numero:'', complemento:'', bairro:'', cidade:'', uf:'', cep:'' }, o.endereco||{}),
+        telefone: o.telefone || '',
+        responsavel: o.responsavel || '',
+        observacoes: o.observacoes || '',
+        ativa: o.ativa !== false,
+        pasta_oc_path: o.pasta_oc_path || '',
+        criado_em: o.criado_em || nowIso(),
+        atualizado_em: o.atualizado_em || nowIso()
+      };
+    }
+    function normalizeEcr(e){
+      // Aceita normas/documentos/critérios como string (legado) ou objeto (novo modelo rico)
+      const _normaItem = n => (typeof n === 'string') ? { codigo: '', titulo: n } : { codigo: n.codigo||'', titulo: n.titulo||'' };
+      const _docItem = x => (typeof x === 'string') ? { nome: x, periodicidade: '', observacao: '' } : { nome: x.nome||'', periodicidade: x.periodicidade||'', observacao: x.observacao||'' };
+      const _critItem = x => (typeof x === 'string') ? { criterio: x, tolerancia: '', metodo: '', registro: '' } : { criterio: x.criterio||'', tolerancia: x.tolerancia||'', metodo: x.metodo||'', registro: x.registro||'' };
+      const _ensaioItem = x => (typeof x === 'string') ? { nome: x, metodo:'', periodicidade:'', amostragem:'' } : { nome: x.nome||'', metodo: x.metodo||'', periodicidade: x.periodicidade||'', amostragem: x.amostragem||'' };
+      return {
+        id: Number(e.id) || 0,
+        codigo: e.codigo || `ECR ${String(e.id||0).padStart(2,'0')}`,
+        nome: e.nome || '',
+        categoria: e.categoria || '',
+        objetivo: e.objetivo || '',
+        escopo: e.escopo || '',
+        normas: Array.isArray(e.normas) ? e.normas.map(_normaItem) : [],
+        unidades_padrao: Array.isArray(e.unidades_padrao) ? e.unidades_padrao : ['un'],
+        documentos_obrigatorios: Array.isArray(e.documentos_obrigatorios) ? e.documentos_obrigatorios.map(_docItem) : [],
+        criterios_recebimento: Array.isArray(e.criterios_recebimento) ? e.criterios_recebimento.map(_critItem) : [],
+        ensaios: Array.isArray(e.ensaios) ? e.ensaios.map(_ensaioItem) : [],
+        amostragem: e.amostragem || '',
+        registros: Array.isArray(e.registros) ? e.registros.map(r => typeof r === 'string' ? r : (r.nome||'')) : [],
+        responsabilidades: e.responsabilidades || '',
+        observacoes: e.observacoes || '',
+        materiais: Array.isArray(e.materiais) ? e.materiais.map(m => ({ id: m.id||uid('mat'), descricao: m.descricao||'', unidade_padrao: m.unidade_padrao||'un' })) : []
+      };
+    }
+    function normalizeOC(o){
+      return {
+        id: o.id || uid('oc'),
+        numero: o.numero || '',
+        sequencial: Number(o.sequencial || 0),
+        ano: Number(o.ano || new Date().getFullYear()),
+        data: o.data || todayIso(),
+        status: STATUS_OC.includes(o.status) ? o.status : 'rascunho',
+        fornecedor_id: o.fornecedor_id || '',
+        obra_id: o.obra_id || '',
+        condicao_pagamento: o.condicao_pagamento || '',
+        emitente_id: o.emitente_id || '',
+        itens: Array.isArray(o.itens) ? o.itens.map(normalizeItem) : [],
+        frete: Number(o.frete||0),
+        outras_despesas: Number(o.outras_despesas||0),
+        desconto_material: Number(o.desconto_material||0),
+        observacoes: o.observacoes || '',
+        criado_em: o.criado_em || nowIso(),
+        atualizado_em: o.atualizado_em || nowIso(),
+        pdf_gerado_em: o.pdf_gerado_em || ''
+      };
+    }
+    function normalizeItem(it){
+      return {
+        id: it.id || uid('item'),
+        ecr_id: Number(it.ecr_id||0) || null,
+        material_id: it.material_id || '',
+        descricao: it.descricao || '',
+        observacao: it.observacao || '',
+        quantidade: Number(it.quantidade||0),
+        unidade: it.unidade || 'un',
+        preco_unit: Number(it.preco_unit||0),
+        ipi_pct: Number(it.ipi_pct||0),
+        desc_pct: Number(it.desc_pct||0),
+        prazo_entrega: it.prazo_entrega || ''
+      };
+    }
+
+    // ============================================================
+    // STORAGE: cache + IndexedDB handle
+    // ============================================================
+    function loadCache(){
+      try{ const raw = localStorage.getItem(STORAGE.cache); if(!raw) return null; const p = JSON.parse(raw); return (p && p.data) ? p : null; }
+      catch(e){ return null; }
+    }
+    function saveCache(){
+      try{ localStorage.setItem(STORAGE.cache, JSON.stringify({ data: state.data, sourceName: state.sourceName, cachedAt: nowIso() })); }
+      catch(e){ showToast('Não consegui salvar o cache local.', 'warning'); }
+    }
+    function loadUiPrefs(){
+      try{ const raw = localStorage.getItem(STORAGE.ui); if(!raw) return; const p = JSON.parse(raw);
+        if(p.activeTab) state.activeTab = p.activeTab;
+        if(p.histFilter) Object.assign(state.histFilter, p.histFilter);
+      }catch(e){}
+    }
+    function saveUiPrefs(){
+      try{ localStorage.setItem(STORAGE.ui, JSON.stringify({ activeTab: state.activeTab, histFilter: state.histFilter })); }catch(e){}
+    }
+    async function openHandleDb(){
+      if(!('indexedDB' in window)) return null;
+      return new Promise((resolve,reject)=>{
+        const req = indexedDB.open(HANDLE_DB, 1);
+        req.onupgradeneeded = () => { const db = req.result; if(!db.objectStoreNames.contains('handles')) db.createObjectStore('handles'); };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    async function saveStoredHandle(handle){
+      try{ const db = await openHandleDb(); if(!db) return;
+        await new Promise((resolve,reject)=>{ const tx = db.transaction('handles','readwrite'); tx.objectStore('handles').put(handle, HANDLE_KEY); tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error); });
+      }catch(e){}
+    }
+    async function getStoredHandle(){
+      try{ const db = await openHandleDb(); if(!db) return null;
+        return await new Promise((resolve)=>{ const tx = db.transaction('handles','readonly'); const r = tx.objectStore('handles').get(HANDLE_KEY); r.onsuccess=()=>resolve(r.result||null); r.onerror=()=>resolve(null); });
+      }catch(e){ return null; }
+    }
+    async function saveDirHandle(key, handle){
+      try{ const db = await openHandleDb(); if(!db) return;
+        await new Promise((resolve,reject)=>{ const tx = db.transaction('handles','readwrite'); tx.objectStore('handles').put(handle, key); tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error); });
+      }catch(e){}
+    }
+    async function getDirHandle(key){
+      try{ const db = await openHandleDb(); if(!db) return null;
+        return await new Promise((resolve)=>{ const tx = db.transaction('handles','readonly'); const r = tx.objectStore('handles').get(key); r.onsuccess=()=>resolve(r.result||null); r.onerror=()=>resolve(null); });
+      }catch(e){ return null; }
+    }
+    async function verifyHandlePermission(handle, write){
+      if(!handle || typeof handle.queryPermission !== 'function') return false;
+      const mode = write ? 'readwrite' : 'read';
+      const cur = await handle.queryPermission({mode});
+      if(cur === 'granted') return true;
+      if(typeof handle.requestPermission !== 'function') return false;
+      return (await handle.requestPermission({mode})) === 'granted';
+    }
+    function applyLoadedData(d, source, handle){
+      state.data = normalizeData(d);
+      state.sourceName = source || 'Base carregada';
+      state.fileHandle = handle || null;
+      state.dirty = false;
+      saveCache();
+      render();
+    }
+    async function loadFromFileHandle(handle){
+      const file = await handle.getFile();
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      applyLoadedData(parsed, file.name || 'central-compras-data.json', handle);
+    }
+    async function connectFile(){
+      if('showOpenFilePicker' in window){
+        try{
+          const [h] = await window.showOpenFilePicker({
+            types: [{ description:'JSON Central de Compras', accept:{'application/json':['.json']}}],
+            multiple: false
+          });
+          if(!h) return;
+          await saveStoredHandle(h);
+          await loadFromFileHandle(h);
+          showToast('Arquivo conectado.', 'success');
+        }catch(err){ if(err && err.name !== 'AbortError') showToast('Não consegui abrir o arquivo.', 'warning'); }
+        return;
+      }
+      dom.jsonFileInput.value = '';
+      dom.jsonFileInput.click();
+    }
+    function downloadBlob(content, filename){
+      const blob = new Blob([content], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+    async function saveData(){
+      // Check de concorrência: se o arquivo no disco foi salvo por OUTRO depois do nosso load,
+      // alerta antes de sobrescrever. Compara last_saved do arquivo vs. snapshot que carregamos.
+      if(state.fileHandle){
+        try{
+          const ok = await verifyHandlePermission(state.fileHandle, true);
+          if(ok){
+            const file = await state.fileHandle.getFile();
+            const remoteText = await file.text();
+            const remote = JSON.parse(remoteText);
+            const remoteTs = remote && remote.last_saved ? remote.last_saved : '';
+            const knownTs = state.lastKnownSavedAt || state.data.last_saved || '';
+            if(remoteTs && knownTs && remoteTs > knownTs){
+              const proceed = confirm(
+                `O arquivo foi modificado por outra sessão em ${new Date(remoteTs).toLocaleString('pt-BR')}.\n` +
+                `Você carregou em ${new Date(knownTs).toLocaleString('pt-BR')}.\n\n` +
+                `Salvar agora vai SOBRESCREVER as alterações remotas. Continuar?`
+              );
+              if(!proceed){ showToast('Salvamento cancelado. Use Recarregar para puxar a versão remota.', 'warning'); return; }
+            }
+          }
+        }catch(e){ /* leitura falhou — segue para gravação normal */ }
+      }
+
+      const snap = deepClone(state.data);
+      snap.last_saved = nowIso();
+      const payload = JSON.stringify(snap, null, 2);
+
+      if(state.fileHandle){
+        try{
+          const ok = await verifyHandlePermission(state.fileHandle, true);
+          if(ok){
+            const w = await state.fileHandle.createWritable();
+            await w.write(payload); await w.close();
+            state.data = normalizeData(snap); state.dirty = false; state.dirtySince = null; state.lastKnownSavedAt = snap.last_saved; saveCache(); render();
+            await writeRotatingBackup(payload).catch(()=>{});
+            showToast('Salvo no arquivo.', 'success'); return;
+          }
+        }catch(e){ showToast('Falha ao salvar direto. Usando fallback.', 'warning'); }
+      }
+      if('showSaveFilePicker' in window){
+        try{
+          const h = await window.showSaveFilePicker({
+            suggestedName: state.data.shared_file_name || 'central-compras-data.json',
+            types:[{ description:'JSON Central de Compras', accept:{'application/json':['.json']}}]
+          });
+          const w = await h.createWritable(); await w.write(payload); await w.close();
+          await saveStoredHandle(h);
+          state.data = normalizeData(snap); state.fileHandle = h; state.sourceName = h.name||'central-compras-data.json'; state.dirty = false; state.dirtySince = null; state.lastKnownSavedAt = snap.last_saved; saveCache(); render();
+          await writeRotatingBackup(payload).catch(()=>{});
+          showToast('Salvo no arquivo escolhido.', 'success'); return;
+        }catch(e){ if(e && e.name!=='AbortError') showToast('Salvando como backup.', 'warning'); }
+      }
+      downloadBlob(payload, state.data.shared_file_name || 'central-compras-data.json');
+      state.data = normalizeData(snap); state.dirty = false; state.dirtySince = null; state.lastKnownSavedAt = snap.last_saved; saveCache(); render();
+      showToast('JSON baixado. Substitua manualmente o arquivo no OneDrive.', 'warning');
+    }
+
+    // Backups rotativos: grava snapshot timestampado em 'dir-backups' (configurável). Mantém últimos 10.
+    async function writeRotatingBackup(payload){
+      const dh = await getDirHandle('dir-backups');
+      if(!dh) return;
+      const ok = await verifyHandlePermission(dh, true);
+      if(!ok) return;
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      const fname = `central-compras-data-${ts}.json`;
+      try{
+        const fh = await dh.getFileHandle(fname, { create: true });
+        const w = await fh.createWritable(); await w.write(payload); await w.close();
+      } catch(e){ return; }
+      // Rotação: lista, ordena, remove os mais antigos além de 10
+      try{
+        const files = [];
+        for await (const entry of dh.values()){
+          if(entry.kind === 'file' && /^central-compras-data-.*\.json$/.test(entry.name)){
+            files.push(entry.name);
+          }
+        }
+        files.sort();
+        const keep = 10;
+        if(files.length > keep){
+          const toDelete = files.slice(0, files.length - keep);
+          for(const name of toDelete){
+            try { await dh.removeEntry(name); } catch(e){}
+          }
+        }
+      } catch(e){}
+    }
+    async function reloadData(){
+      if(state.dirty && !confirm('Há alterações não salvas. Recarregar vai descartar. Continuar?')) return;
+      if(state.fileHandle){
+        try{ const ok = await verifyHandlePermission(state.fileHandle, false); if(!ok){ showToast('Sem permissão de leitura.', 'warning'); return; }
+          await loadFromFileHandle(state.fileHandle); showToast('Recarregado.', 'success'); return;
+        }catch(e){ showToast('Falha ao recarregar.', 'warning'); return; }
+      }
+      showToast('Nenhum arquivo conectado.', 'warning');
+    }
+    function exportBackup(){
+      downloadBlob(JSON.stringify(state.data, null, 2), `backup-${state.data.shared_file_name||'central-compras-data.json'}`);
+      showToast('Backup baixado.', 'success');
+    }
+    function markDirty(){ if(!state.dirty){ state.dirtySince = Date.now(); } state.dirty = true; renderTopbar(); scheduleAutoSave(); }
+    function scheduleAutoSave(){
+      window.clearTimeout(state.autoSaveTimer);
+      state.autoSaveTimer = window.setTimeout(()=>{ saveCache(); }, 800);
+    }
+
+    // ============================================================
+    // TOAST + DRAWER
+    // ============================================================
+    function showToast(msg, tone){
+      window.clearTimeout(state.toastTimer);
+      dom.toast.textContent = msg;
+      dom.toast.className = 'toast ' + (tone||'');
+      dom.toast.classList.remove('hidden');
+      state.toastTimer = window.setTimeout(()=>dom.toast.classList.add('hidden'), 3400);
+    }
+    function openDrawer(title, bodyHtml, footerHtml){
+      dom.drawerTitle.textContent = title;
+      dom.drawerBody.innerHTML = bodyHtml;
+      dom.drawerFooter.innerHTML = footerHtml || '';
+      dom.drawer.classList.remove('hidden');
+      dom.drawerBackdrop.classList.remove('hidden');
+    }
+    function closeDrawer(){ dom.drawer.classList.add('hidden'); dom.drawerBackdrop.classList.add('hidden'); }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    function switchTab(name){
+      state.activeTab = name;
+      saveUiPrefs();
+      const _ttEl = document.getElementById('topbarTitle');
+      if(_ttEl){ const _TT={'dashboard':'Painel','nova-oc':'Nova OC','historico':'Histórico de OCs','fornecedores':'Fornecedores','obras':'Obras','catalogo':'Catálogo ECR','config':'Configurações'}; _ttEl.textContent = _TT[name]||name; }
+      ['dashboard','nova-oc','historico','fornecedores','obras','catalogo','config'].forEach(t=>{
+        document.getElementById('tab-'+t).classList.toggle('hidden', t !== name);
+      });
+      dom.tabsNav.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab === name));
+      // Render relevant tab on activation
+      switch(name){
+        case 'dashboard': renderDashboard(); break;
+        case 'nova-oc': renderNovaOC(); break;
+        case 'historico': renderHistorico(); break;
+        case 'fornecedores': renderFornecedores(); break;
+        case 'obras': renderObras(); break;
+        case 'catalogo': renderCatalogo(); break;
+        case 'config': renderConfig(); break;
+      }
+    }
+
+    // ============================================================
+    // RENDER: TOPBAR
+    // ============================================================
+    function renderTopbar(){
+      dom.sourceName.textContent = state.sourceName || '—';
+      dom.lastSaved.textContent = formatTimestamp(state.data?.last_saved || '');
+      dom.dirtyDot.classList.toggle('is-dirty', state.dirty);
+      dom.storageWarning.classList.toggle('hidden', !!state.fileHandle);
+      // Badges
+      dom.badgeHist.textContent = (state.data?.ordens_compra||[]).length;
+      dom.badgeForn.textContent = (state.data?.fornecedores||[]).length;
+      dom.badgeObras.textContent = (state.data?.obras||[]).length;
+      // Banner config — checa lista canônica de emitentes (não o legado)
+      const ems = state.data?.config?.emitentes || [];
+      const principal = ems[0];
+      const incompleto = !principal || !principal.razao_social || (principal.tipo === 'PF' ? !principal.cpf : !principal.cnpj);
+      dom.configBanner.classList.toggle('hidden', !incompleto);
+      // Tooltip do "dirtyDot" mostrando há quanto tempo está sem salvar
+      if(state.dirty){
+        const since = state.dirtySince ? Math.round((Date.now() - state.dirtySince)/60000) : 0;
+        dom.dirtyDot.title = since > 0 ? `Não salvo há ${since} min — clique em Salvar (Ctrl+S)` : 'Alterações não salvas — clique em Salvar (Ctrl+S)';
+      } else {
+        dom.dirtyDot.title = '';
+      }
+    }
+
+    // ============================================================
+    // RENDER: DASHBOARD
+    // ============================================================
+    function renderDashboard(){
+      const d = state.data;
+      const ocs = d.ordens_compra || [];
+      const fornecedores = d.fornecedores || [];
+      const now = new Date();
+      const mesAtual = ocs.filter(o => { const dt = new Date(o.data); return dt.getFullYear()===now.getFullYear() && dt.getMonth()===now.getMonth() && o.status !== 'cancelada'; });
+      const ano = ocs.filter(o => { const dt = new Date(o.data); return dt.getFullYear()===now.getFullYear() && o.status !== 'cancelada'; });
+      const totalMes = mesAtual.reduce((s,o)=>s + computeOcTotals(o).total_geral, 0);
+      const totalAno = ano.reduce((s,o)=>s + computeOcTotals(o).total_geral, 0);
+      const rascunhos = ocs.filter(o => o.status === 'rascunho').length;
+      const emitidas = ocs.filter(o => o.status === 'emitida').length;
+      dom.summaryStrip.innerHTML = `
+        <div class="summary-tile"><small>OCs no mês</small><div class="summary-value">${mesAtual.length}</div><div class="summary-meta">${formatBrl(totalMes)}</div></div>
+        <div class="summary-tile"><small>OCs no ano</small><div class="summary-value">${ano.length}</div><div class="summary-meta">${formatBrl(totalAno)}</div></div>
+        <div class="summary-tile"><small>Rascunhos</small><div class="summary-value">${rascunhos}</div><div class="summary-meta">aguardando emissão</div></div>
+        <div class="summary-tile"><small>Emitidas</small><div class="summary-value">${emitidas}</div><div class="summary-meta">aguardando entrega</div></div>
+        <div class="summary-tile"><small>Fornecedores</small><div class="summary-value">${fornecedores.length}</div><div class="summary-meta">cadastrados</div></div>
+        <div class="summary-tile"><small>Próximo nº OC</small><div class="summary-value">${String((d.config.ultimo_numero_oc||0)+1).padStart(3,'0')}/${d.config.ano_corrente}</div><div class="summary-meta">automático</div></div>
+      `;
+      const ultimas = [...ocs].sort((a,b)=>(b.criado_em||'').localeCompare(a.criado_em||'')).slice(0,8);
+      dom.dashLastOcs.innerHTML = ultimas.length ? ultimas.map(o => {
+        const f = fornecedores.find(x=>x.id===o.fornecedor_id);
+        const tot = computeOcTotals(o).total_geral;
+        return `<div class="dash-item"><div><strong>${escapeHtml(o.numero||'(sem nº)')}</strong> <span class="pill ${o.status}">${STATUS_LABEL[o.status]}</span><div class="meta">${escapeHtml(f?.razao_social||'—')} · ${formatDate(o.data)}</div></div><strong>${formatBrl(tot)}</strong></div>`;
+      }).join('') : `<div class="empty-state"><strong>Nenhuma OC ainda</strong>Gere a primeira em "Nova OC".</div>`;
+      const totaisPorForn = {};
+      ocs.filter(o=>o.status!=='cancelada').forEach(o=>{
+        if(!totaisPorForn[o.fornecedor_id]) totaisPorForn[o.fornecedor_id] = 0;
+        totaisPorForn[o.fornecedor_id] += computeOcTotals(o).total_geral;
+      });
+      const top = Object.entries(totaisPorForn).sort((a,b)=>b[1]-a[1]).slice(0,8);
+      dom.dashTopFornecedores.innerHTML = top.length ? top.map(([fid,total])=>{
+        const f = fornecedores.find(x=>x.id===fid);
+        return `<div class="dash-item"><div><strong>${escapeHtml(f?.razao_social||'(removido)')}</strong><div class="meta">${escapeHtml(f?.cnpj||'')}</div></div><strong>${formatBrl(total)}</strong></div>`;
+      }).join('') : `<div class="empty-state"><strong>Sem dados</strong>Emita OCs para ver o ranking.</div>`;
+    }
+
+    // ============================================================
+    // OC: COMPUTE TOTALS
+    // ============================================================
+    function computeItemTotal(it){
+      const base = (Number(it.quantidade)||0) * (Number(it.preco_unit)||0);
+      const desc = base * (Number(it.desc_pct)||0)/100;
+      const ipi = (base - desc) * (Number(it.ipi_pct)||0)/100;
+      return base - desc + ipi;
+    }
+    function computeOcTotals(o){
+      let subtotal = 0, descTotal = 0, ipiTotal = 0;
+      (o.itens||[]).forEach(it=>{
+        const base = (Number(it.quantidade)||0) * (Number(it.preco_unit)||0);
+        const desc = base * (Number(it.desc_pct)||0)/100;
+        const ipi = (base - desc) * (Number(it.ipi_pct)||0)/100;
+        subtotal += base;
+        descTotal += desc;
+        ipiTotal += ipi;
+      });
+      const frete = Number(o.frete||0);
+      const outras = Number(o.outras_despesas||0);
+      const descMat = Number(o.desconto_material||0);
+      const total_geral = subtotal - descTotal + ipiTotal + frete + outras - descMat;
+      return { subtotal, desc_total: descTotal, ipi_total: ipiTotal, frete, outras, desc_mat: descMat, total_geral };
+    }
+
+    // ============================================================
+    // RENDER: NOVA OC (editor)
+    // ============================================================
+    function startNewOC(){
+      const d = state.data;
+      const proximo = (d.config.ultimo_numero_oc||0) + 1;
+      const ano = d.config.ano_corrente || new Date().getFullYear();
+      state.ocEditing = normalizeOC({
+        id: uid('oc'),
+        numero: '', // só seta ao gerar PDF
+        sequencial: proximo,
+        ano,
+        data: todayIso(),
+        status: 'rascunho',
+        fornecedor_id: d.fornecedores[0]?.id || '',
+        obra_id: d.obras[0]?.id || '',
+        condicao_pagamento: d.config.condicoes_pagamento[0] || '',
+        itens: [],
+        frete: 0, outras_despesas: 0, desconto_material: 0,
+        observacoes: ''
+      });
+      switchTab('nova-oc');
+    }
+    function editOC(id){
+      const o = state.data.ordens_compra.find(x=>x.id===id);
+      if(!o){ showToast('OC não encontrada.','warning'); return; }
+      state.ocEditing = deepClone(o);
+      switchTab('nova-oc');
+    }
+    function duplicateOC(id){
+      const o = state.data.ordens_compra.find(x=>x.id===id);
+      if(!o) return;
+      const dup = deepClone(o);
+      dup.id = uid('oc');
+      dup.numero = '';
+      dup.sequencial = (state.data.config.ultimo_numero_oc||0) + 1;
+      dup.ano = state.data.config.ano_corrente || new Date().getFullYear();
+      dup.status = 'rascunho';
+      dup.data = todayIso();
+      dup.criado_em = nowIso();
+      dup.atualizado_em = nowIso();
+      dup.pdf_gerado_em = '';
+      dup.itens = dup.itens.map(it => ({...it, id: uid('item')}));
+      state.ocEditing = dup;
+      switchTab('nova-oc');
+      showToast('OC duplicada — ajuste e gere novo PDF.','success');
+    }
+
+    function renderNovaOC(){
+      if(!state.ocEditing) startNewOC();
+      const o = state.ocEditing;
+      const d = state.data;
+      // Numeração
+      const numLabel = o.numero || `OC-${String(o.sequencial).padStart(3,'0')}/${o.ano} (provisório)`;
+      dom.ocNumero.value = numLabel;
+      dom.ocData.value = o.data;
+      // Fornecedores
+      dom.ocFornecedor.innerHTML = `<option value="">— selecione —</option>` + d.fornecedores.map(f => `<option value="${f.id}" ${f.id===o.fornecedor_id?'selected':''}>${escapeHtml(f.razao_social)}${f.cnpj?' · '+escapeHtml(f.cnpj):''}</option>`).join('');
+      // Emitentes
+      const emitentes = d.config.emitentes || [];
+      dom.ocEmitente.innerHTML = emitentes.length
+        ? emitentes.map(em => `<option value="${em.id}" ${em.id===o.emitente_id?'selected':''}>${escapeHtml(em.razao_social||'Sem nome')}${em.cnpj?' · '+escapeHtml(em.cnpj):''}</option>`).join('')
+        : `<option value="">— configure emitentes em Configurações —</option>`;
+      if(!o.emitente_id && emitentes.length) { o.emitente_id = emitentes[0].id; dom.ocEmitente.value = emitentes[0].id; }
+      // Obras
+      dom.ocObra.innerHTML = `<option value="">— selecione —</option>` + d.obras.map(ob => `<option value="${ob.id}" ${ob.id===o.obra_id?'selected':''}>${escapeHtml(ob.nome)}${ob.cei?' · CEI '+escapeHtml(ob.cei):''}</option>`).join('');
+      // Pagamento
+      dom.ocPagamento.innerHTML = (d.config.condicoes_pagamento||[]).map(c => `<option value="${escapeHtml(c)}" ${c===o.condicao_pagamento?'selected':''}>${escapeHtml(c)}</option>`).join('');
+      // Status
+      dom.ocStatus.value = o.status;
+      // ECR filter add
+      dom.ecrFilterAdd.innerHTML = `<option value="">Filtrar por ECR (opcional)</option>` + d.ecrs.map(e=>`<option value="${e.id}">${escapeHtml(e.codigo)} – ${escapeHtml(e.nome)}</option>`).join('');
+      // Items
+      renderItems();
+      // Totais
+      dom.ocFrete.value = o.frete;
+      dom.ocOutras.value = o.outras_despesas;
+      dom.ocDescMat.value = o.desconto_material;
+      dom.ocObs.value = o.observacoes;
+      renderTotals();
+      // Title
+      const f = d.fornecedores.find(x=>x.id===o.fornecedor_id);
+      dom.ocTitle.textContent = (o.numero ? `OC ${o.numero}` : 'Nova Ordem de Compra') + (f?` — ${f.razao_social}`:'');
+      dom.ocSubtitle.textContent = o.id && d.ordens_compra.find(x=>x.id===o.id) ? 'Editando OC existente. Ajuste e salve para sincronizar.' : 'Selecione fornecedor e obra. Os dados são preenchidos automaticamente.';
+    }
+
+    function renderItems(){
+      const o = state.ocEditing;
+      const d = state.data;
+      const ecrFilter = dom.ecrFilterAdd.value ? Number(dom.ecrFilterAdd.value) : null;
+      dom.itemsTbody.innerHTML = (o.itens||[]).map((it, idx) => {
+        const tot = computeItemTotal(it);
+        const ecr = it.ecr_id ? d.ecrs.find(e=>e.id===it.ecr_id) : null;
+        const matOpts = (ecr ? ecr.materiais : []);
+        const dataListId = `mat-list-${it.id}`;
+        return `
+          <tr data-item-id="${it.id}">
+            <td class="item-num">${idx+1}</td>
+            <td class="col-desc">
+              <select data-it-field="ecr_id" data-id="${it.id}" style="margin-bottom:3px;">
+                <option value="">— ECR —</option>
+                ${d.ecrs.map(e=>`<option value="${e.id}" ${e.id===it.ecr_id?'selected':''}>${escapeHtml(e.codigo)}</option>`).join('')}
+              </select>
+              <input list="${dataListId}" data-it-field="descricao" data-id="${it.id}" value="${escapeHtml(it.descricao)}" placeholder="Descrição do produto">
+              <datalist id="${dataListId}">${matOpts.map(m=>`<option value="${escapeHtml(m.descricao)}" data-un="${escapeHtml(m.unidade_padrao)}">`).join('')}</datalist>
+            </td>
+            <td class="col-obs"><input data-it-field="observacao" data-id="${it.id}" value="${escapeHtml(it.observacao)}" placeholder="Obs."></td>
+            <td class="col-qty"><input type="number" step="0.01" data-it-field="quantidade" data-id="${it.id}" value="${it.quantidade||''}"></td>
+            <td class="col-un">
+              <select data-it-field="unidade" data-id="${it.id}">
+                ${UN_PADRAO.map(u=>`<option value="${u}" ${u===it.unidade?'selected':''}>${u}</option>`).join('')}
+              </select>
+            </td>
+            <td class="col-price"><input type="number" step="0.01" data-it-field="preco_unit" data-id="${it.id}" value="${it.preco_unit||''}"></td>
+            <td class="col-ipi"><input type="number" step="0.01" data-it-field="ipi_pct" data-id="${it.id}" value="${it.ipi_pct||0}"></td>
+            <td class="col-desc-pct"><input type="number" step="0.01" data-it-field="desc_pct" data-id="${it.id}" value="${it.desc_pct||0}"></td>
+            <td class="col-total"><input type="text" readonly value="${formatBrl(tot)}"></td>
+            <td class="col-prazo"><input type="date" data-it-field="prazo_entrega" data-id="${it.id}" value="${escapeHtml(it.prazo_entrega||'')}"></td>
+            <td class="col-actions"><button class="btn-danger" data-remove-item="${it.id}" title="Remover">×</button></td>
+          </tr>`;
+      }).join('') || `<tr><td colspan="11" style="text-align:center; padding: 20px; color: var(--muted);">Nenhum item. Clique em "+ Adicionar item".</td></tr>`;
+    }
+
+    function renderTotals(){
+      const o = state.ocEditing;
+      const t = computeOcTotals(o);
+      dom.totSub.textContent = formatBrl(t.subtotal);
+      dom.totDesc.textContent = formatBrl(t.desc_total);
+      dom.totIpi.textContent = formatBrl(t.ipi_total);
+      dom.totFrete.textContent = formatBrl(t.frete);
+      dom.totOutras.textContent = formatBrl(t.outras);
+      dom.totDescMat.textContent = formatBrl(t.desc_mat);
+      dom.totGeral.textContent = formatBrl(t.total_geral);
+    }
+
+    // OC field handlers
+    function ocFieldChange(field, value){
+      const o = state.ocEditing;
+      if(!o) return;
+      o[field] = value;
+      o.atualizado_em = nowIso();
+      markDirty();
+    }
+    function itemFieldChange(itemId, field, value){
+      const o = state.ocEditing;
+      const it = o.itens.find(x=>x.id===itemId);
+      if(!it) return;
+      if(['quantidade','preco_unit','ipi_pct','desc_pct'].includes(field)){
+        it[field] = toNumber(value);
+      } else if(field === 'ecr_id'){
+        it.ecr_id = value ? Number(value) : null;
+        it.material_id = '';
+      } else {
+        it[field] = value;
+      }
+      if(field === 'descricao' && it.ecr_id){
+        const ecr = state.data.ecrs.find(e=>e.id===it.ecr_id);
+        const mat = ecr?.materiais.find(m=>m.descricao === value);
+        if(mat){ it.material_id = mat.id; it.unidade = mat.unidade_padrao || it.unidade; }
+      }
+      o.atualizado_em = nowIso();
+      markDirty();
+      if(field === 'ecr_id'){
+        // Full re-render needed: datalist options change
+        renderItems(); renderTotals();
+      } else {
+        // Update only the total cell for this row (no focus loss)
+        const tot = computeItemTotal(it);
+        const row = dom.itemsTbody.querySelector(`tr[data-item-id="${itemId}"]`);
+        if(row){
+          const totalInput = row.querySelector('.col-total input');
+          if(totalInput) totalInput.value = formatBrl(tot);
+          // If descricao matched a material, update unit select in-place
+          if(field === 'descricao' && it.ecr_id){
+            const unSel = row.querySelector('[data-it-field="unidade"]');
+            if(unSel) unSel.value = it.unidade;
+          }
+        }
+        renderTotals();
+      }
+    }
+    function addItem(){
+      const o = state.ocEditing;
+      const ecrPre = dom.ecrFilterAdd.value ? Number(dom.ecrFilterAdd.value) : null;
+      o.itens.push(normalizeItem({ id: uid('item'), ecr_id: ecrPre, unidade: 'un' }));
+      markDirty();
+      renderItems(); renderTotals();
+    }
+    function removeItem(id){
+      const o = state.ocEditing;
+      o.itens = o.itens.filter(it=>it.id!==id);
+      markDirty();
+      renderItems(); renderTotals();
+    }
+    function saveOcDraft(silent){
+      const o = state.ocEditing;
+      if(!o) return;
+      // Sync from inputs first (already in place via change handlers)
+      o.frete = toNumber(dom.ocFrete.value);
+      o.outras_despesas = toNumber(dom.ocOutras.value);
+      o.desconto_material = toNumber(dom.ocDescMat.value);
+      o.observacoes = dom.ocObs.value;
+      o.data = dom.ocData.value || todayIso();
+      o.fornecedor_id = dom.ocFornecedor.value;
+      o.obra_id = dom.ocObra.value;
+      o.condicao_pagamento = dom.ocPagamento.value;
+      o.status = dom.ocStatus.value;
+      o.atualizado_em = nowIso();
+      // Upsert
+      const idx = state.data.ordens_compra.findIndex(x=>x.id===o.id);
+      if(idx >= 0) state.data.ordens_compra[idx] = deepClone(o);
+      else state.data.ordens_compra.push(deepClone(o));
+      markDirty();
+      saveCache();
+      if(!silent) showToast('Rascunho salvo.', 'success');
+      renderTopbar();
+    }
+
+    async function saveOcAndGeneratePdf(){
+      const o = state.ocEditing;
+      if(!o) return;
+      // Validate
+      if(!o.fornecedor_id){ showToast('Selecione um fornecedor.', 'warning'); return; }
+      if(!o.obra_id){ showToast('Selecione uma obra.', 'warning'); return; }
+      if(!o.itens.length){ showToast('Adicione pelo menos um item.', 'warning'); return; }
+      const _ems = state.data.config.emitentes || [];
+      const e = (state.ocEditing.emitente_id && _ems.find(x=>x.id===state.ocEditing.emitente_id)) || _ems[0] || state.data.config.emitente;
+      const docOk = e.tipo === 'PF' ? !!e.cpf : !!e.cnpj;
+      if(!e || !e.razao_social || !docOk){ showToast('Configure pelo menos um emitente em Configurações.', 'warning'); switchTab('config'); return; }
+      // Assign sequential if not yet — com auto-reset de ano e rollback em caso de falha de gravação
+      let _numAlocado = false, _prevSeq = 0, _prevAno = 0, _prevStatus = o.status;
+      if(!o.numero){
+        const currentYear = new Date().getFullYear();
+        _prevSeq = state.data.config.ultimo_numero_oc || 0;
+        _prevAno = state.data.config.ano_corrente || currentYear;
+        if(_prevAno !== currentYear){
+          state.data.config.ano_corrente = currentYear;
+          state.data.config.ultimo_numero_oc = 0;
+          showToast(`Ano virou — numeração resetada para OC-001/${currentYear}.`, 'success');
+        }
+        const seq = (state.data.config.ultimo_numero_oc||0) + 1;
+        o.sequencial = seq;
+        o.ano = state.data.config.ano_corrente;
+        o.numero = `OC-${String(seq).padStart(3,'0')}/${o.ano}`;
+        state.data.config.ultimo_numero_oc = seq;
+        _numAlocado = true;
+      }
+      if(o.status === 'rascunho') o.status = 'emitida';
+      o.pdf_gerado_em = nowIso();
+      saveOcDraft(true);
+      try{
+        await saveData();
+      } catch(err){
+        // Rollback numeração se gravação falhou
+        if(_numAlocado){
+          state.data.config.ultimo_numero_oc = _prevSeq;
+          state.data.config.ano_corrente = _prevAno;
+          o.numero = ''; o.sequencial = 0;
+        }
+        o.status = _prevStatus;
+        o.pdf_gerado_em = '';
+        showToast('Falha ao gravar JSON — numeração revertida.', 'error');
+        return;
+      }
+      const pdfBlob = generatePdfBlob(o);
+      // 1) Normal download to user's downloads folder
+      const dlUrl = URL.createObjectURL(pdfBlob);
+      const dlA = document.createElement('a');
+      const fornSlug = slugify((state.data.fornecedores.find(x=>x.id===o.fornecedor_id)||{}).razao_social||'oc');
+      const totGeral = computeOcTotals(o).total_geral;
+      const valorStr = totGeral.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const pdfName = `${fornSlug} ${o.data} ${valorStr} ocr.pdf`;
+      dlA.href = dlUrl; dlA.download = pdfName; document.body.appendChild(dlA); dlA.click(); dlA.remove();
+      URL.revokeObjectURL(dlUrl);
+      // 2) Save to obra folder if configured
+      const obra = state.data.obras.find(x=>x.id===o.obra_id);
+      if(obra && obra.pasta_oc_path){
+        try{
+          const dh = await getDirHandle('dir-' + obra.id);
+          if(dh){
+            const ok = await verifyHandlePermission(dh, true);
+            if(ok){
+              const fh = await dh.getFileHandle(pdfName, { create: true });
+              const w = await fh.createWritable();
+              await w.write(pdfBlob); await w.close();
+              showToast(`OC ${o.numero} salva e PDF gerado (+ cópia em "${obra.pasta_oc_path}").`, 'success');
+            } else {
+              showToast(`OC ${o.numero} salva e PDF gerado. (Sem permissão para gravar na pasta da obra.)`, 'warning');
+            }
+          } else {
+            showToast(`OC ${o.numero} salva e PDF gerado. (Pasta da obra não encontrada — re-selecione nas Obras.)`, 'warning');
+          }
+        } catch(err){
+          showToast(`OC ${o.numero} salva e PDF gerado. (Falha ao gravar cópia: ${err.message})`, 'warning');
+        }
+      } else {
+        showToast(`OC ${o.numero} salva e PDF gerado.`, 'success');
+      }
+    }
+
+    // ============================================================
+    // PDF GENERATION (jsPDF + autoTable)
+    // ============================================================
+    function generatePdfBlob(o){
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'mm', format:'a4' });
+      const d = state.data;
+      const _emitentes = d.config.emitentes || [];
+      const e = (o.emitente_id && _emitentes.find(x=>x.id===o.emitente_id)) || _emitentes[0] || d.config.emitente;
+      const cob = d.config.endereco_cobranca;
+      const f = d.fornecedores.find(x=>x.id===o.fornecedor_id) || {};
+      const ob = d.obras.find(x=>x.id===o.obra_id) || {};
+      const totals = computeOcTotals(o);
+
+      const pw = doc.internal.pageSize.getWidth();
+      const margin = 10;
+      let y = 12;
+
+      // Header
+      doc.setFont('helvetica','bold'); doc.setFontSize(14);
+      doc.text('ORDEM DE COMPRA', pw/2, y, { align:'center' });
+      doc.setFontSize(9); doc.setFont('helvetica','normal');
+      doc.text('Cód. 01', margin, y);
+      doc.text(`Nº O.C.: ${o.numero}`, pw - margin, y, { align:'right' });
+      y += 6;
+
+      // Box: Faturamento + Pagamento
+      doc.setDrawColor(180); doc.setLineWidth(0.2);
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      drawBox(doc, margin, y, pw - 2*margin, 32);
+      doc.text('DADOS PARA FATURAMENTO', margin+2, y+4);
+      doc.setFont('helvetica','normal');
+      doc.text(`Razão Social: ${e.razao_social||''}`, margin+2, y+8);
+      doc.text(e.tipo==='PF' ? `CPF: ${e.cpf||''}` : `CNPJ: ${e.cnpj||''}`, margin+2, y+12);
+      doc.text(e.tipo==='PF' ? '' : `IE: ${e.ie||''}`, margin+70, y+12);
+      doc.text(`Endereço: ${addrLine(e.endereco)}`, margin+2, y+16);
+      doc.text(`Bairro: ${e.endereco?.bairro||''}`, margin+2, y+20);
+      doc.text(`Cidade: ${e.endereco?.cidade||''}`, margin+70, y+20);
+      doc.text(`UF: ${e.endereco?.uf||''}`, margin+120, y+20);
+      doc.text(`CEP: ${e.endereco?.cep||''}`, margin+140, y+20);
+      doc.text(`E-mail: ${e.email_envio_nf||''}`, margin+2, y+24);
+      doc.text(`Telefone: ${(e.telefones&&e.telefones[0])||''}`, margin+2, y+28);
+      doc.text(`Celular: ${(e.telefones&&e.telefones[1])||''}`, margin+70, y+28);
+      doc.text(`Data: ${formatDate(o.data)}`, margin+120, y+28);
+      y += 34;
+
+      // Pagamento
+      doc.setFont('helvetica','bold');
+      drawBox(doc, margin, y, pw - 2*margin, 7);
+      doc.text(`CONDIÇÃO DE PAGAMENTO: ${o.condicao_pagamento||'—'}`, margin+2, y+5);
+      y += 9;
+
+      // Fornecedor
+      doc.setFont('helvetica','bold');
+      drawBox(doc, margin, y, pw - 2*margin, 26);
+      doc.text('FORNECEDOR', margin+2, y+4);
+      doc.setFont('helvetica','normal');
+      doc.text(`Razão Social: ${f.razao_social||''}`, margin+2, y+8);
+      doc.text(`CNPJ: ${f.cnpj||''}`, margin+2, y+12);
+      doc.text(`IE: ${f.ie||''}`, margin+70, y+12);
+      doc.text(`Endereço: ${addrLine(f.endereco)}`, margin+2, y+16);
+      doc.text(`Bairro: ${f.endereco?.bairro||''}`, margin+2, y+20);
+      doc.text(`Cidade: ${f.endereco?.cidade||''}`, margin+70, y+20);
+      doc.text(`UF: ${f.endereco?.uf||''}`, margin+120, y+20);
+      doc.text(`CEP: ${f.endereco?.cep||''}`, margin+140, y+20);
+      doc.text(`Telefone: ${(f.telefones&&f.telefones[0])||''}`, margin+2, y+24);
+      doc.text(`E-mail: ${f.email||''}`, margin+70, y+24);
+      y += 28;
+
+      // Entrega + Cobrança lado a lado
+      const halfW = (pw - 2*margin - 2)/2;
+      doc.setFont('helvetica','bold');
+      drawBox(doc, margin, y, halfW, 26);
+      doc.text('ENTREGA DO MATERIAL', margin+2, y+4);
+      doc.setFont('helvetica','normal');
+      doc.text(`Obra: ${ob.nome||''}`, margin+2, y+8);
+      doc.text(`CEI: ${ob.cei||''}`, margin+2, y+12);
+      doc.text(`End.: ${addrLine(ob.endereco)}`, margin+2, y+16);
+      doc.text(`${ob.endereco?.bairro||''} · ${ob.endereco?.cidade||''}/${ob.endereco?.uf||''} · CEP ${ob.endereco?.cep||''}`, margin+2, y+20);
+      doc.text(`Telefone: ${ob.telefone||''}`, margin+2, y+24);
+
+      doc.setFont('helvetica','bold');
+      drawBox(doc, margin+halfW+2, y, halfW, 26);
+      doc.text('ENDEREÇO DE COBRANÇA', margin+halfW+4, y+4);
+      doc.setFont('helvetica','normal');
+      doc.text(`End.: ${addrLine(cob)}`, margin+halfW+4, y+8);
+      doc.text(`Bairro: ${cob.bairro||''}`, margin+halfW+4, y+12);
+      doc.text(`Cidade: ${cob.cidade||''} · UF ${cob.uf||''}`, margin+halfW+4, y+16);
+      doc.text(`CEP: ${cob.cep||''}`, margin+halfW+4, y+20);
+      y += 28;
+
+      // Linha NF
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      drawBox(doc, margin, y, pw - 2*margin, 6);
+      doc.text(`${d.config.texto_envio_nf||''} ${e.email_envio_nf||''}`, margin+2, y+4);
+      y += 8;
+
+      // Tabela de itens
+      const itens = (o.itens||[]);
+      const head = [['Item','Descrição','Obs.','Qtd','Un','Preço Unit','IPI%','Desc%','Total','Prazo']];
+      const body = itens.map((it,i)=>{
+        const tot = computeItemTotal(it);
+        return [
+          String(i+1),
+          it.descricao||'',
+          it.observacao||'',
+          (Number(it.quantidade)||0).toLocaleString('pt-BR'),
+          it.unidade||'',
+          formatBrl(it.preco_unit),
+          (Number(it.ipi_pct)||0)+'%',
+          (Number(it.desc_pct)||0)+'%',
+          formatBrl(tot),
+          it.prazo_entrega ? formatDate(it.prazo_entrega) : '—'
+        ];
+      });
+      doc.autoTable({
+        head, body, startY: y,
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 7.5, cellPadding: 1.5 },
+        headStyles: { fillColor: [11, 105, 183], textColor: 255, fontStyle: 'bold', halign: 'center' },
+        columnStyles: {
+          0: { cellWidth: 8, halign: 'center' },
+          1: { cellWidth: 60 },
+          2: { cellWidth: 26 },
+          3: { cellWidth: 12, halign: 'right' },
+          4: { cellWidth: 9, halign: 'center' },
+          5: { cellWidth: 19, halign: 'right' },
+          6: { cellWidth: 10, halign: 'right' },
+          7: { cellWidth: 10, halign: 'right' },
+          8: { cellWidth: 22, halign: 'right' },
+          9: { cellWidth: 14, halign: 'center' }
+        }
+      });
+      y = doc.lastAutoTable.finalY + 3;
+
+      // Totalizadores
+      const colW = 50, valW = 30;
+      const totX = pw - margin - (colW + valW);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      const lines = [
+        ['SUB-TOTAL', formatBrl(totals.subtotal)],
+        ['(-) DESCONTO', formatBrl(totals.desc_total)],
+        ['(+) IPI', formatBrl(totals.ipi_total)],
+        ['(+) FRETE', formatBrl(totals.frete)],
+        ['(+) OUTRAS DESPESAS', formatBrl(totals.outras)],
+        ['(-) DESC MATERIAL', formatBrl(totals.desc_mat)]
+      ];
+      lines.forEach(([k,v])=>{
+        doc.text(k, totX, y);
+        doc.text(v, totX+colW+valW, y, { align:'right' });
+        y += 4;
+      });
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      doc.setDrawColor(11,105,183); doc.setLineWidth(0.4);
+      doc.line(totX, y-1, totX+colW+valW, y-1);
+      doc.setTextColor(11,105,183);
+      doc.text('TOTAL GERAL', totX, y+4);
+      doc.text(formatBrl(totals.total_geral), totX+colW+valW, y+4, { align:'right' });
+      doc.setTextColor(0,0,0);
+      y += 8;
+
+      // Qualidade
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      drawBox(doc, margin, y, pw - 2*margin, 7);
+      doc.text(d.config.texto_qualidade || 'CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR', margin+2, y+5);
+      y += 9;
+
+      // Observações
+      if(o.observacoes){
+        doc.setFont('helvetica','bold'); doc.text('OBSERVAÇÕES:', margin, y); y += 4;
+        doc.setFont('helvetica','normal');
+        const obsLines = doc.splitTextToSize(o.observacoes, pw - 2*margin);
+        doc.text(obsLines, margin, y);
+        y += obsLines.length * 4 + 2;
+      }
+
+      // Condições de contratação
+      doc.setFont('helvetica','bold'); doc.text('CONDIÇÕES DE CONTRATAÇÃO:', margin, y); y += 4;
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+      const cond = doc.splitTextToSize(d.config.texto_condicoes_contratacao||'', pw - 2*margin);
+      doc.text(cond, margin, y);
+      y += cond.length * 3.4 + 4;
+
+      // Assinaturas
+      const sigY = Math.max(y, doc.internal.pageSize.getHeight() - 25);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      doc.line(margin+5, sigY, margin+70, sigY);
+      doc.text('CARIMBO DE RECEBIMENTO DO MATERIAL', margin+5, sigY+4);
+      doc.line(pw-margin-70, sigY, pw-margin-5, sigY);
+      doc.text('AUTORIZAÇÃO / CAMPISI', pw-margin-65, sigY+4);
+
+      // Rodapé
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      doc.text('ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF NA ENTREGA DO MATERIAL', pw/2, doc.internal.pageSize.getHeight() - 5, { align:'center' });
+
+      return doc.output('blob');
+    }
+    async function generatePdf(o){
+      const blob = generatePdfBlob(o);
+      const d = state.data;
+      const f = d.fornecedores.find(x=>x.id===o.fornecedor_id) || {};
+      const fornSlug = slugify(f.razao_social||'oc');
+      const totGeral = computeOcTotals(o).total_geral;
+      const valorStr = totGeral.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const filename = `${fornSlug} ${o.data} ${valorStr} ocr.pdf`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      // Também grava cópia na pasta da obra (mesmo comportamento do "Salvar e gerar PDF")
+      const obra = d.obras.find(x=>x.id===o.obra_id);
+      if(obra && obra.pasta_oc_path){
+        try{
+          const dh = await getDirHandle('dir-' + obra.id);
+          if(dh){
+            const ok = await verifyHandlePermission(dh, true);
+            if(ok){
+              const fh = await dh.getFileHandle(filename, { create:true });
+              const w = await fh.createWritable(); await w.write(blob); await w.close();
+              showToast(`PDF regerado e copiado para "${obra.pasta_oc_path}".`, 'success');
+              return;
+            }
+          }
+          showToast('PDF regerado (sem permissão para copiar na pasta da obra).', 'warning');
+        } catch(err){
+          showToast(`PDF regerado (falha ao copiar: ${err.message}).`, 'warning');
+        }
+      } else {
+        showToast('PDF regerado.', 'success');
+      }
+    }
+    function drawBox(doc, x, y, w, h){ doc.setDrawColor(180); doc.rect(x, y, w, h); }
+    function addrLine(addr){
+      if(!addr) return '';
+      const parts = [addr.logradouro, addr.numero, addr.complemento].filter(Boolean);
+      return parts.join(', ');
+    }
+
+    // ============================================================
+    // RENDER: HISTÓRICO
+    // ============================================================
+    function renderHistorico(){
+      const d = state.data;
+      // Filter dropdowns
+      dom.histFornecedor.innerHTML = `<option value="">Todos os fornecedores</option>` + d.fornecedores.map(f=>`<option value="${f.id}" ${f.id===state.histFilter.fornecedor?'selected':''}>${escapeHtml(f.razao_social)}</option>`).join('');
+      dom.histObra.innerHTML = `<option value="">Todas as obras</option>` + d.obras.map(o=>`<option value="${o.id}" ${o.id===state.histFilter.obra?'selected':''}>${escapeHtml(o.nome)}</option>`).join('');
+      dom.histStatus.value = state.histFilter.status;
+      dom.histSearch.value = state.histFilter.search;
+      // Filter
+      const q = state.histFilter.search.toLowerCase().trim();
+      const filtered = (d.ordens_compra||[]).filter(o=>{
+        if(state.histFilter.status && o.status !== state.histFilter.status) return false;
+        if(state.histFilter.fornecedor && o.fornecedor_id !== state.histFilter.fornecedor) return false;
+        if(state.histFilter.obra && o.obra_id !== state.histFilter.obra) return false;
+        if(q){
+          const f = d.fornecedores.find(x=>x.id===o.fornecedor_id);
+          const ob = d.obras.find(x=>x.id===o.obra_id);
+          const blob = `${o.numero} ${f?.razao_social||''} ${ob?.nome||''} ${o.observacoes||''}`.toLowerCase();
+          if(!blob.includes(q)) return false;
+        }
+        return true;
+      }).sort((a,b)=>(b.criado_em||'').localeCompare(a.criado_em||''));
+
+      if(!filtered.length){
+        dom.histTableWrap.innerHTML = `<div class="empty-state"><strong>Nenhuma OC encontrada</strong>Ajuste os filtros ou clique em "+ Nova OC".</div>`;
+        return;
+      }
+      const rows = filtered.map(o=>{
+        const f = d.fornecedores.find(x=>x.id===o.fornecedor_id);
+        const ob = d.obras.find(x=>x.id===o.obra_id);
+        const tot = computeOcTotals(o).total_geral;
+        return `<tr>
+          <td><strong>${escapeHtml(o.numero||'(rascunho)')}</strong></td>
+          <td>${formatDate(o.data)}</td>
+          <td><span class="pill ${o.status}">${STATUS_LABEL[o.status]}</span></td>
+          <td>${escapeHtml(f?.razao_social||'—')}</td>
+          <td>${escapeHtml(ob?.nome||'—')}</td>
+          <td style="text-align:right;"><strong>${formatBrl(tot)}</strong></td>
+          <td>${escapeHtml(o.condicao_pagamento||'—')}</td>
+          <td>
+            <div class="row-actions">
+              <button class="btn-secondary" data-edit-oc="${o.id}">Editar</button>
+              <button class="btn-secondary" data-pdf-oc="${o.id}">PDF</button>
+              <button class="btn-secondary" data-dup-oc="${o.id}">Duplicar</button>
+              <button class="btn-danger" data-del-oc="${o.id}">Excluir</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+      dom.histTableWrap.innerHTML = `<div style="overflow-x:auto;"><table class="data">
+        <thead><tr><th>Nº OC</th><th>Data</th><th>Status</th><th>Fornecedor</th><th>Obra</th><th style="text-align:right;">Total</th><th>Pagamento</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+    }
+
+    // ============================================================
+    // RENDER: FORNECEDORES
+    // ============================================================
+    function renderFornecedores(){
+      const d = state.data;
+      dom.fornEcrFilter.innerHTML = `<option value="">Todos os ECRs</option>` + d.ecrs.map(e=>`<option value="${e.id}" ${state.fornFilter.ecr==String(e.id)?'selected':''}>${escapeHtml(e.codigo)} – ${escapeHtml(e.nome)}</option>`).join('');
+      dom.fornSearch.value = state.fornFilter.search;
+      const q = state.fornFilter.search.toLowerCase().trim();
+      const ecrFilter = state.fornFilter.ecr ? Number(state.fornFilter.ecr) : null;
+      const list = (d.fornecedores||[]).filter(f=>{
+        if(q){ const blob = `${f.razao_social} ${f.cnpj} ${f.endereco?.cidade||''} ${f.nome_fantasia||''}`.toLowerCase(); if(!blob.includes(q)) return false; }
+        if(ecrFilter && !f.ecrs_atende.includes(ecrFilter)) return false;
+        return true;
+      }).sort((a,b)=>a.razao_social.localeCompare(b.razao_social));
+      if(!list.length){
+        dom.fornTableWrap.innerHTML = `<div class="empty-state"><strong>Nenhum fornecedor</strong>Clique em "+ Novo fornecedor" para começar.</div>`;
+        return;
+      }
+      const rows = list.map(f => {
+        const ecrTags = f.ecrs_atende.map(id=>{ const e = d.ecrs.find(x=>x.id===id); return e ? `<span class="pill emitida">${escapeHtml(e.codigo)}</span>` : ''; }).join(' ');
+        return `<tr>
+          <td><strong>${escapeHtml(f.razao_social)}</strong>${f.nome_fantasia?`<div style="color:var(--muted);font-size:11px">${escapeHtml(f.nome_fantasia)}</div>`:''}</td>
+          <td>${escapeHtml(f.cnpj||'—')}</td>
+          <td>${escapeHtml(f.endereco?.cidade||'')}/${escapeHtml(f.endereco?.uf||'')}</td>
+          <td>${escapeHtml((f.telefones&&f.telefones[0])||'—')}</td>
+          <td>${ecrTags||'<span style="color:var(--muted);font-size:11px">—</span>'}</td>
+          <td><div class="row-actions"><button class="btn-secondary" data-edit-forn="${f.id}">Editar</button><button class="btn-danger" data-del-forn="${f.id}">Excluir</button></div></td>
+        </tr>`;
+      }).join('');
+      dom.fornTableWrap.innerHTML = `<div style="overflow-x:auto;"><table class="data"><thead><tr><th>Razão Social</th><th>CNPJ</th><th>Cidade/UF</th><th>Telefone</th><th>ECRs atende</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function openFornecedorDrawer(id){
+      const d = state.data;
+      const f = id ? d.fornecedores.find(x=>x.id===id) : normalizeFornecedor({});
+      const isNew = !id;
+      const ecrCheckboxes = d.ecrs.map(e=>`<label class="checkbox-row"><input type="checkbox" data-forn-ecr value="${e.id}" ${f.ecrs_atende.includes(e.id)?'checked':''}>${escapeHtml(e.codigo)} – ${escapeHtml(e.nome)}</label>`).join('');
+      const body = `
+        <div class="field-group"><h3>Identificação</h3><div class="field-grid">
+          <div class="field span-2"><label>Razão Social *</label><input id="frmFornRazao" value="${escapeHtml(f.razao_social)}"></div>
+          <div class="field"><label>Nome Fantasia</label><input id="frmFornFant" value="${escapeHtml(f.nome_fantasia)}"></div>
+          <div class="field"><label>CNPJ</label><input id="frmFornCnpj" value="${escapeHtml(f.cnpj)}"></div>
+          <div class="field"><label>IE</label><input id="frmFornIe" value="${escapeHtml(f.ie)}"></div>
+        </div></div>
+        <div class="field-group"><h3>Endereço</h3><div class="field-grid">
+          <div class="field span-2"><label>Logradouro</label><input id="frmFornLog" value="${escapeHtml(f.endereco.logradouro)}"></div>
+          <div class="field"><label>Número</label><input id="frmFornNum" value="${escapeHtml(f.endereco.numero)}"></div>
+          <div class="field"><label>Complemento</label><input id="frmFornComp" value="${escapeHtml(f.endereco.complemento)}"></div>
+          <div class="field"><label>Bairro</label><input id="frmFornBairro" value="${escapeHtml(f.endereco.bairro)}"></div>
+          <div class="field"><label>Cidade</label><input id="frmFornCid" value="${escapeHtml(f.endereco.cidade)}"></div>
+          <div class="field"><label>UF</label><input id="frmFornUf" maxlength="2" value="${escapeHtml(f.endereco.uf)}"></div>
+          <div class="field"><label>CEP</label><input id="frmFornCep" value="${escapeHtml(f.endereco.cep)}"></div>
+        </div></div>
+        <div class="field-group"><h3>Contato</h3><div class="field-grid">
+          <div class="field"><label>Telefone</label><input id="frmFornTel0" value="${escapeHtml(f.telefones[0]||'')}"></div>
+          <div class="field"><label>Celular</label><input id="frmFornTel1" value="${escapeHtml(f.telefones[1]||'')}"></div>
+          <div class="field"><label>E-mail</label><input id="frmFornEmail" value="${escapeHtml(f.email)}"></div>
+          <div class="field"><label>Contato responsável</label><input id="frmFornContato" value="${escapeHtml(f.contato_responsavel)}"></div>
+        </div></div>
+        <div class="field-group"><h3>ECRs que atende</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;max-height:200px;overflow-y:auto;padding:8px;background:var(--surface-alt);border-radius:6px;">${ecrCheckboxes}</div></div>
+        <div class="field-group"><div class="field"><label>Observações</label><textarea id="frmFornObs" rows="3">${escapeHtml(f.observacoes)}</textarea></div></div>
+      `;
+      const footer = `
+        ${!isNew?`<button class="btn-danger" id="frmFornDel">Excluir</button>`:''}
+        <button class="btn-secondary" id="frmFornCancel">Cancelar</button>
+        <button class="btn-primary" id="frmFornSave">${isNew?'Criar fornecedor':'Salvar alterações'}</button>
+      `;
+      openDrawer(isNew ? 'Novo Fornecedor' : `Editar — ${f.razao_social}`, body, footer);
+      document.getElementById('frmFornCancel').onclick = closeDrawer;
+      document.getElementById('frmFornSave').onclick = ()=>{
+        const obj = {
+          id: f.id,
+          razao_social: document.getElementById('frmFornRazao').value.trim(),
+          nome_fantasia: document.getElementById('frmFornFant').value.trim(),
+          cnpj: document.getElementById('frmFornCnpj').value.trim(),
+          ie: document.getElementById('frmFornIe').value.trim(),
+          endereco: {
+            logradouro: document.getElementById('frmFornLog').value.trim(),
+            numero: document.getElementById('frmFornNum').value.trim(),
+            complemento: document.getElementById('frmFornComp').value.trim(),
+            bairro: document.getElementById('frmFornBairro').value.trim(),
+            cidade: document.getElementById('frmFornCid').value.trim(),
+            uf: document.getElementById('frmFornUf').value.trim().toUpperCase(),
+            cep: document.getElementById('frmFornCep').value.trim()
+          },
+          telefones: [document.getElementById('frmFornTel0').value.trim(), document.getElementById('frmFornTel1').value.trim()],
+          email: document.getElementById('frmFornEmail').value.trim(),
+          contato_responsavel: document.getElementById('frmFornContato').value.trim(),
+          ecrs_atende: Array.from(document.querySelectorAll('[data-forn-ecr]:checked')).map(x=>Number(x.value)),
+          observacoes: document.getElementById('frmFornObs').value,
+          ativo: true,
+          atualizado_em: nowIso(),
+          criado_em: f.criado_em || nowIso()
+        };
+        if(!obj.razao_social){ showToast('Informe a razão social.','warning'); return; }
+        const arr = state.data.fornecedores;
+        const idx = arr.findIndex(x=>x.id===obj.id);
+        if(idx>=0) arr[idx] = obj; else arr.push(obj);
+        markDirty(); closeDrawer(); renderFornecedores(); renderTopbar();
+        showToast(isNew?'Fornecedor criado.':'Fornecedor atualizado.','success');
+      };
+      const delBtn = document.getElementById('frmFornDel');
+      if(delBtn) delBtn.onclick = ()=>{
+        if(!confirm('Excluir este fornecedor?')) return;
+        state.data.fornecedores = state.data.fornecedores.filter(x=>x.id!==f.id);
+        markDirty(); closeDrawer(); renderFornecedores(); renderTopbar();
+        showToast('Fornecedor excluído.','success');
+      };
+    }
+
+    // ============================================================
+    // RENDER: OBRAS
+    // ============================================================
+    function renderObras(){
+      const d = state.data;
+      dom.obraSearch.value = state.obraFilter.search;
+      const q = state.obraFilter.search.toLowerCase().trim();
+      const list = (d.obras||[]).filter(o=>{
+        if(q){ const blob = `${o.nome} ${o.cei} ${o.endereco?.cidade||''}`.toLowerCase(); if(!blob.includes(q)) return false; }
+        return true;
+      }).sort((a,b)=>a.nome.localeCompare(b.nome));
+      if(!list.length){
+        dom.obraTableWrap.innerHTML = `<div class="empty-state"><strong>Nenhuma obra</strong>Clique em "+ Nova obra" para começar.</div>`;
+        return;
+      }
+      const rows = list.map(o => `<tr>
+        <td><strong>${escapeHtml(o.nome)}</strong></td>
+        <td>${escapeHtml(o.cei||'—')}</td>
+        <td>${escapeHtml(o.endereco?.cidade||'')}/${escapeHtml(o.endereco?.uf||'')}</td>
+        <td>${escapeHtml(o.telefone||'—')}</td>
+        <td>${escapeHtml(o.responsavel||'—')}</td>
+        <td><div class="row-actions"><button class="btn-secondary" data-edit-obra="${o.id}">Editar</button><button class="btn-danger" data-del-obra="${o.id}">Excluir</button></div></td>
+      </tr>`).join('');
+      dom.obraTableWrap.innerHTML = `<div style="overflow-x:auto;"><table class="data"><thead><tr><th>Nome</th><th>CEI</th><th>Cidade/UF</th><th>Telefone</th><th>Responsável</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function openObraDrawer(id){
+      const d = state.data;
+      const o = id ? d.obras.find(x=>x.id===id) : normalizeObra({});
+      const isNew = !id;
+      const body = `
+        <div class="field-group"><h3>Identificação</h3><div class="field-grid">
+          <div class="field span-2"><label>Nome da obra *</label><input id="frmObraNome" value="${escapeHtml(o.nome)}"></div>
+          <div class="field"><label>CEI</label><input id="frmObraCei" value="${escapeHtml(o.cei)}"></div>
+          <div class="field"><label>Telefone</label><input id="frmObraTel" value="${escapeHtml(o.telefone)}"></div>
+          <div class="field"><label>Responsável</label><input id="frmObraResp" value="${escapeHtml(o.responsavel)}"></div>
+        </div></div>
+        <div class="field-group"><h3>Endereço de entrega</h3><div class="field-grid">
+          <div class="field span-2"><label>Logradouro</label><input id="frmObraLog" value="${escapeHtml(o.endereco.logradouro)}"></div>
+          <div class="field"><label>Número</label><input id="frmObraNum" value="${escapeHtml(o.endereco.numero)}"></div>
+          <div class="field"><label>Complemento</label><input id="frmObraComp" value="${escapeHtml(o.endereco.complemento)}"></div>
+          <div class="field"><label>Bairro</label><input id="frmObraBairro" value="${escapeHtml(o.endereco.bairro)}"></div>
+          <div class="field"><label>Cidade</label><input id="frmObraCid" value="${escapeHtml(o.endereco.cidade)}"></div>
+          <div class="field"><label>UF</label><input id="frmObraUf" maxlength="2" value="${escapeHtml(o.endereco.uf)}"></div>
+          <div class="field"><label>CEP</label><input id="frmObraCep" value="${escapeHtml(o.endereco.cep)}"></div>
+        </div></div>
+        <div class="field-group"><div class="field"><label>Observações</label><textarea id="frmObraObs" rows="3">${escapeHtml(o.observacoes)}</textarea></div></div>
+        <div class="field-group">
+          <h3>Pasta para salvar OC (opcional)</h3>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+            <input type="text" id="pastaOcDisplay" placeholder="Ex: C:\\Users\\Pedro Paulo\\OneDrive\\obras\\Jardim Ipanema II\\Ordem de Compra"
+              value="${escapeHtml(o.pasta_oc_path||'')}"
+              style="flex:1;font-size:12px;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;">
+            <button class="btn-secondary" id="selectPastaOcBtn" type="button" title="Selecionar pasta via navegador (Chrome/Edge)">📁 Selecionar pasta</button>
+            <button class="btn-danger" id="clearPastaOcBtn" type="button">Remover</button>
+          </div>
+          <div class="hint">Cole o caminho completo da pasta acima, ou use "Selecionar pasta" (Chrome/Edge). Ao gerar PDF, uma cópia será salva aqui com nome: <em>fornecedor AAAA-MM-DD valor ocr.pdf</em></div>
+        </div>
+      `;
+      const footer = `
+        ${!isNew?`<button class="btn-danger" id="frmObraDel">Excluir</button>`:''}
+        <button class="btn-secondary" id="frmObraCancel">Cancelar</button>
+        <button class="btn-primary" id="frmObraSave">${isNew?'Criar obra':'Salvar alterações'}</button>
+      `;
+      openDrawer(isNew?'Nova Obra':`Editar — ${o.nome}`, body, footer);
+      let _selectedDirHandle = null;
+      const selectBtn = document.getElementById('selectPastaOcBtn');
+      const clearBtn = document.getElementById('clearPastaOcBtn');
+      const pastaInput = document.getElementById('pastaOcDisplay');
+      if(selectBtn) selectBtn.onclick = async ()=>{
+        if(!('showDirectoryPicker' in window)){ showToast('Seu navegador não suporta seleção de pasta. Use Chrome ou Edge.','warning'); return; }
+        try{
+          const dh = await window.showDirectoryPicker({ mode: 'readwrite' });
+          _selectedDirHandle = dh;
+          // Append the picked folder name to whatever path is already typed (or just set it)
+          const current = pastaInput ? pastaInput.value.trim() : '';
+          if(pastaInput) pastaInput.value = current ? current : dh.name;
+        }catch(err){ if(err && err.name!=='AbortError') showToast('Falha ao selecionar pasta.','warning'); }
+      };
+      if(clearBtn) clearBtn.onclick = ()=>{
+        _selectedDirHandle = null;
+        if(pastaInput) pastaInput.value = '';
+      };
+      document.getElementById('frmObraCancel').onclick = closeDrawer;
+      document.getElementById('frmObraSave').onclick = async ()=>{
+        const obj = {
+          id: o.id,
+          nome: document.getElementById('frmObraNome').value.trim(),
+          cei: document.getElementById('frmObraCei').value.trim(),
+          telefone: document.getElementById('frmObraTel').value.trim(),
+          responsavel: document.getElementById('frmObraResp').value.trim(),
+          endereco: {
+            logradouro: document.getElementById('frmObraLog').value.trim(),
+            numero: document.getElementById('frmObraNum').value.trim(),
+            complemento: document.getElementById('frmObraComp').value.trim(),
+            bairro: document.getElementById('frmObraBairro').value.trim(),
+            cidade: document.getElementById('frmObraCid').value.trim(),
+            uf: document.getElementById('frmObraUf').value.trim().toUpperCase(),
+            cep: document.getElementById('frmObraCep').value.trim()
+          },
+          observacoes: document.getElementById('frmObraObs').value,
+          ativa: true,
+          pasta_oc_path: (document.getElementById('pastaOcDisplay')||{}).value?.trim() || '',
+          atualizado_em: nowIso(),
+          criado_em: o.criado_em || nowIso()
+        };
+        if(!obj.nome){ showToast('Informe o nome da obra.','warning'); return; }
+        const arr = state.data.obras;
+        const idx = arr.findIndex(x=>x.id===obj.id);
+        if(_selectedDirHandle){
+          await saveDirHandle('dir-' + obj.id, _selectedDirHandle);
+        } else if(!_selectedDirPath && o.pasta_oc_path){
+          // path was cleared - nothing to delete from IDB but path is now ''
+        }
+        if(idx>=0) arr[idx] = obj; else arr.push(obj);
+        markDirty(); closeDrawer(); renderObras(); renderTopbar();
+        showToast(isNew?'Obra criada.':'Obra atualizada.','success');
+      };
+      const delBtn = document.getElementById('frmObraDel');
+      if(delBtn) delBtn.onclick = ()=>{
+        if(!confirm('Excluir esta obra?')) return;
+        state.data.obras = state.data.obras.filter(x=>x.id!==o.id);
+        markDirty(); closeDrawer(); renderObras(); renderTopbar();
+        showToast('Obra excluída.','success');
+      };
+    }
+
+    // ============================================================
+    // RENDER: CATÁLOGO ECR
+    // ============================================================
+    function renderCatalogo(){
+      const d = state.data;
+      const q = state.catalogoFilter.search.toLowerCase().trim();
+      dom.catalogoSearch.value = state.catalogoFilter.search;
+      const list = d.ecrs.filter(e=>{
+        if(!q) return true;
+        if(`${e.codigo} ${e.nome} ${e.categoria}`.toLowerCase().includes(q)) return true;
+        return e.materiais.some(m => m.descricao.toLowerCase().includes(q));
+      });
+      dom.ecrList.innerHTML = list.map(e=>{
+        const _normaTxt = n => typeof n === 'string' ? n : `<strong>${escapeHtml(n.codigo||'')}</strong>${n.codigo && n.titulo ? ' — ' : ''}${escapeHtml(n.titulo||'')}`;
+        const _docTxt = x => typeof x === 'string' ? escapeHtml(x) : `${escapeHtml(x.nome||'')}${x.periodicidade?` <span class="meta">(${escapeHtml(x.periodicidade)})</span>`:''}${x.observacao?`<div class="meta">${escapeHtml(x.observacao)}</div>`:''}`;
+        const _critTxt = x => {
+          if(typeof x === 'string') return escapeHtml(x);
+          const extras = [];
+          if(x.tolerancia) extras.push(`tolerância: ${escapeHtml(x.tolerancia)}`);
+          if(x.metodo) extras.push(`método: ${escapeHtml(x.metodo)}`);
+          if(x.registro) extras.push(`registro: ${escapeHtml(x.registro)}`);
+          return `${escapeHtml(x.criterio||'')}${extras.length?`<div class="meta">${extras.join(' · ')}</div>`:''}`;
+        };
+        const _ensaioTxt = x => {
+          if(typeof x === 'string') return escapeHtml(x);
+          const extras = [x.metodo, x.periodicidade, x.amostragem].filter(Boolean).map(escapeHtml);
+          return `<strong>${escapeHtml(x.nome||'')}</strong>${extras.length?`<div class="meta">${extras.join(' · ')}</div>`:''}`;
+        };
+        return `<div class="ecr-card" data-ecr-id="${e.id}">
+          <div class="ecr-head" data-toggle-ecr="${e.id}">
+            <div class="ecr-title">
+              <span class="ecr-code">${escapeHtml(e.codigo)}</span>
+              <span class="ecr-name">${escapeHtml(e.nome)}</span>
+              <span class="meta">${escapeHtml(e.categoria)}</span>
+            </div>
+            <div class="meta">${e.materiais.length} materiais · ${e.normas.length} normas · ${e.criterios_recebimento.length} critérios</div>
+          </div>
+          <div class="ecr-body hidden">
+            ${e.objetivo ? `<div style="margin-bottom:10px"><h4>Objetivo</h4><p style="font-size:12px;line-height:1.5">${escapeHtml(e.objetivo)}</p></div>` : ''}
+            ${e.escopo ? `<div style="margin-bottom:10px"><h4>Escopo / Aplicação</h4><p style="font-size:12px;line-height:1.5">${escapeHtml(e.escopo)}</p></div>` : ''}
+            <div class="specs">
+              <div><h4>Normas ABNT</h4><ul>${e.normas.map(n=>`<li>${_normaTxt(n)}</li>`).join('')||'<li>—</li>'}</ul></div>
+              <div><h4>Unidades padrão</h4><div>${e.unidades_padrao.map(u=>`<span class="pill rascunho" style="margin-right:4px">${escapeHtml(u)}</span>`).join('')}</div></div>
+              <div><h4>Documentos obrigatórios</h4><ul>${e.documentos_obrigatorios.map(x=>`<li>${_docTxt(x)}</li>`).join('')||'<li>—</li>'}</ul></div>
+              <div><h4>Critérios de recebimento</h4><ul>${e.criterios_recebimento.map(x=>`<li>${_critTxt(x)}</li>`).join('')||'<li>—</li>'}</ul></div>
+              ${e.ensaios && e.ensaios.length ? `<div><h4>Ensaios</h4><ul>${e.ensaios.map(x=>`<li>${_ensaioTxt(x)}</li>`).join('')}</ul></div>` : ''}
+              ${e.amostragem ? `<div><h4>Amostragem</h4><p style="font-size:12px;line-height:1.5">${escapeHtml(e.amostragem)}</p></div>` : ''}
+              ${e.registros && e.registros.length ? `<div><h4>Registros</h4><ul>${e.registros.map(r=>`<li>${escapeHtml(typeof r === 'string' ? r : r.nome||'')}</li>`).join('')}</ul></div>` : ''}
+              ${e.responsabilidades ? `<div><h4>Responsabilidades</h4><p style="font-size:12px;line-height:1.5">${escapeHtml(e.responsabilidades)}</p></div>` : ''}
+              ${e.observacoes ? `<div style="grid-column:1/-1"><h4>Observações</h4><p style="font-size:12px;line-height:1.5;white-space:pre-line">${escapeHtml(e.observacoes)}</p></div>` : ''}
+            </div>
+            <h4 style="margin:10px 0 6px;font-size:12px;color:var(--muted-strong);text-transform:uppercase;">Materiais cadastrados</h4>
+            <table class="data" style="margin-bottom:10px"><thead><tr><th>Descrição</th><th style="width:80px">Un</th><th style="width:80px"></th></tr></thead><tbody>
+              ${e.materiais.length ? e.materiais.map(m=>`<tr>
+                <td><input data-mat-edit="${m.id}" data-ecr="${e.id}" data-field="descricao" value="${escapeHtml(m.descricao)}" style="width:100%;padding:5px;border:1px solid transparent;border-radius:4px"></td>
+                <td><select data-mat-edit="${m.id}" data-ecr="${e.id}" data-field="unidade_padrao" style="padding:5px;border:1px solid transparent;border-radius:4px;width:100%">${UN_PADRAO.map(u=>`<option value="${u}" ${u===m.unidade_padrao?'selected':''}>${u}</option>`).join('')}</select></td>
+                <td><button class="btn-danger" data-mat-del="${m.id}" data-ecr="${e.id}">Excluir</button></td>
+              </tr>`).join('') : `<tr><td colspan="3" style="text-align:center;padding:14px;color:var(--muted)">Nenhum material cadastrado.</td></tr>`}
+            </tbody></table>
+            <div class="add-mat-row">
+              <div class="field"><label>Nova descrição</label><input id="newMatDesc-${e.id}" placeholder="ex: Aço CA-50 Ø8mm"></div>
+              <div class="field" style="max-width:120px"><label>Unidade</label><select id="newMatUn-${e.id}">${UN_PADRAO.map(u=>`<option value="${u}" ${e.unidades_padrao[0]===u?'selected':''}>${u}</option>`).join('')}</select></div>
+              <button class="btn-primary" data-add-mat="${e.id}">+ Adicionar</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('') || `<div class="empty-state"><strong>Nada encontrado</strong>Limpe a busca para ver todos os ECRs.</div>`;
+    }
+
+    // ============================================================
+    // RENDER: CONFIG
+    // ============================================================
+    function renderConfig(){
+      const cfg = state.data.config;
+      document.querySelectorAll('[data-cfg]').forEach(el=>{
+        const path = el.getAttribute('data-cfg');
+        if(path === 'condicoes_pagamento_lines'){
+          el.value = (cfg.condicoes_pagamento||[]).join('\n');
+          return;
+        }
+        const v = getPath(cfg, path);
+        el.value = v == null ? '' : v;
+      });
+      renderEmitentesListConfig();
+    }
+    function renderEmitentesListConfig(){
+      const list = document.getElementById('emitentesList');
+      if(!list) return;
+      const ems = state.data.config.emitentes || [];
+      if(!ems.length){
+        list.innerHTML = '<div class="empty-state"><strong>Nenhum emitente cadastrado</strong>Clique em "+ Novo Emitente" para adicionar.</div>';
+      } else {
+        list.innerHTML = ems.map((em,i)=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:7px;margin-bottom:8px;background:var(--surface);">
+            <div>
+              <strong style="font-size:13px;">${escapeHtml(em.razao_social||'Sem nome')}</strong>
+              ${i===0?'<span class="pill emitida" style="margin-left:6px">Padrão</span>':''}
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${em.tipo==='PF'?'CPF':'CNPJ'}: ${escapeHtml((em.tipo==='PF'?em.cpf:em.cnpj)||'—')} · ${escapeHtml(em.endereco?.cidade||'')} ${escapeHtml(em.endereco?.uf||'')}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              ${i>0?`<button class="btn-ghost" data-em-up="${em.id}" title="Mover para cima">↑</button>`:''}
+              <button class="btn-secondary" data-em-edit="${em.id}">Editar</button>
+              <button class="btn-danger" data-em-del="${em.id}">Excluir</button>
+            </div>
+          </div>`).join('');
+      }
+    }
+    function openEmitentDrawer(id){
+      const isNew = !id;
+      const em = isNew ? { id: uid('emit'), tipo:'PJ', razao_social:'', nome_fantasia:'', cnpj:'', cpf:'', ie:'', email_envio_nf:'', telefones:['',''], endereco:{ logradouro:'',numero:'',complemento:'',bairro:'',cidade:'',uf:'',cep:'' } }
+        : deepClone((state.data.config.emitentes||[]).find(x=>x.id===id) || {});
+      if(!em.id) em.id = uid('emit');
+      if(!em.tipo) em.tipo = em.cpf ? 'PF' : 'PJ';
+      if(!Array.isArray(em.telefones)) em.telefones=['',''];
+      if(!em.endereco) em.endereco={ logradouro:'',numero:'',complemento:'',bairro:'',cidade:'',uf:'',cep:'' };
+      const isPF = em.tipo === 'PF';
+      const body = `
+        <div class="field-group"><h3>Identificação</h3>
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-mid)">Tipo:</label>
+            <label class="checkbox-row" style="cursor:pointer;"><input type="radio" name="emTipo" value="PJ" ${!isPF?'checked':''} id="emTipoPJ"> Pessoa Jurídica (CNPJ)</label>
+            <label class="checkbox-row" style="cursor:pointer;"><input type="radio" name="emTipo" value="PF" ${isPF?'checked':''} id="emTipoPF"> Pessoa Física (CPF)</label>
+          </div>
+          <div class="field-grid">
+          <div class="field span-2"><label id="emRazaoLabel">${isPF?'Nome Completo *':'Razão Social *'}</label><input id="emRazao" value="${escapeHtml(em.razao_social)}"></div>
+          <div class="field" id="emCnpjField" ${isPF?'style="display:none"':''}>
+            <label>CNPJ *</label><input id="emCnpj" value="${escapeHtml(em.cnpj||'')}">
+          </div>
+          <div class="field" id="emCpfField" ${!isPF?'style="display:none"':''}>
+            <label>CPF *</label><input id="emCpf" value="${escapeHtml(em.cpf||'')}">
+          </div>
+          <div class="field" id="emIeField" ${isPF?'style="display:none"':''}>
+            <label>IE</label><input id="emIe" value="${escapeHtml(em.ie||'')}">
+          </div>
+          <div class="field"><label>E-mail NF</label><input type="email" id="emEmail" value="${escapeHtml(em.email_envio_nf)}"></div>
+          <div class="field"><label>Telefone</label><input id="emTel0" value="${escapeHtml(em.telefones[0]||'')}"></div>
+          <div class="field"><label>Celular</label><input id="emTel1" value="${escapeHtml(em.telefones[1]||'')}"></div>
+        </div></div>
+        <div class="field-group"><h3>Endereço</h3><div class="field-grid">
+          <div class="field span-2"><label>Logradouro</label><input id="emLog" value="${escapeHtml(em.endereco.logradouro)}"></div>
+          <div class="field"><label>Número</label><input id="emNum" value="${escapeHtml(em.endereco.numero)}"></div>
+          <div class="field"><label>Bairro</label><input id="emBairro" value="${escapeHtml(em.endereco.bairro)}"></div>
+          <div class="field"><label>Cidade</label><input id="emCid" value="${escapeHtml(em.endereco.cidade)}"></div>
+          <div class="field"><label>UF</label><input id="emUf" maxlength="2" value="${escapeHtml(em.endereco.uf)}"></div>
+          <div class="field"><label>CEP</label><input id="emCep" value="${escapeHtml(em.endereco.cep)}"></div>
+        </div></div>`;
+      const footer = `
+        ${!isNew?`<button class="btn-danger" id="emDel">Excluir</button>`:''}
+        <button class="btn-secondary" id="emCancel">Cancelar</button>
+        <button class="btn-primary" id="emSave">${isNew?'Criar emitente':'Salvar'}</button>`;
+      openDrawer(isNew?'Novo Emitente':`Editar Emitente — ${em.razao_social||''}`, body, footer);
+      // PF/PJ toggle
+      document.querySelectorAll('input[name="emTipo"]').forEach(radio => {
+        radio.addEventListener('change', ()=>{
+          const pf = document.getElementById('emTipoPF').checked;
+          document.getElementById('emCnpjField').style.display = pf ? 'none' : '';
+          document.getElementById('emCpfField').style.display = pf ? '' : 'none';
+          document.getElementById('emIeField').style.display = pf ? 'none' : '';
+          document.getElementById('emRazaoLabel').textContent = pf ? 'Nome Completo *' : 'Razão Social *';
+        });
+      });
+      document.getElementById('emCancel').onclick = closeDrawer;
+      document.getElementById('emSave').onclick = ()=>{
+        const isPFnow = document.getElementById('emTipoPF').checked;
+        const cnpjVal = document.getElementById('emCnpj').value.trim();
+        const cpfVal = document.getElementById('emCpf').value.trim();
+        const docVal = isPFnow ? cpfVal : cnpjVal;
+        const obj = {
+          id: em.id,
+          tipo: isPFnow ? 'PF' : 'PJ',
+          razao_social: document.getElementById('emRazao').value.trim(),
+          cnpj: isPFnow ? '' : cnpjVal,
+          cpf: isPFnow ? cpfVal : '',
+          ie: isPFnow ? '' : document.getElementById('emIe').value.trim(),
+          email_envio_nf: document.getElementById('emEmail').value.trim(),
+          telefones: [document.getElementById('emTel0').value.trim(), document.getElementById('emTel1').value.trim()],
+          endereco: {
+            logradouro: document.getElementById('emLog').value.trim(),
+            numero: document.getElementById('emNum').value.trim(),
+            complemento: '',
+            bairro: document.getElementById('emBairro').value.trim(),
+            cidade: document.getElementById('emCid').value.trim(),
+            uf: document.getElementById('emUf').value.trim().toUpperCase(),
+            cep: document.getElementById('emCep').value.trim()
+          }
+        };
+        if(!obj.razao_social || !docVal){ showToast(`Nome e ${isPFnow?'CPF':'CNPJ'} são obrigatórios.`,'warning'); return; }
+        if(!state.data.config.emitentes) state.data.config.emitentes = [];
+        const arr = state.data.config.emitentes;
+        const idx = arr.findIndex(x=>x.id===obj.id);
+        if(idx>=0) arr[idx]=obj; else arr.push(obj);
+        markDirty(); closeDrawer(); renderEmitentesListConfig(); renderTopbar();
+        showToast(isNew?'Emitente criado.':'Emitente atualizado.','success');
+      };
+      const delBtn = document.getElementById('emDel');
+      if(delBtn) delBtn.onclick = ()=>{
+        if(!confirm('Excluir este emitente?')) return;
+        state.data.config.emitentes = (state.data.config.emitentes||[]).filter(x=>x.id!==em.id);
+        markDirty(); closeDrawer(); renderEmitentesListConfig();
+        showToast('Emitente excluído.','success');
+      };
+    }
+    function saveConfig(){
+      const cfg = state.data.config;
+      document.querySelectorAll('[data-cfg]').forEach(el=>{
+        const path = el.getAttribute('data-cfg');
+        if(path === 'condicoes_pagamento_lines'){
+          cfg.condicoes_pagamento = el.value.split('\n').map(s=>s.trim()).filter(Boolean);
+          return;
+        }
+        let value = el.value;
+        if(el.type === 'number') value = Number(value)||0;
+        setPath(cfg, path, value);
+      });
+      markDirty();
+      renderTopbar();
+      showToast('Configurações atualizadas. Clique em "Salvar" no topo para gravar no JSON.', 'success');
+    }
+
+    // ============================================================
+    // RENDER: MAIN
+    // ============================================================
+    function render(){
+      renderTopbar();
+      // Render only active tab to be efficient
+      switch(state.activeTab){
+        case 'dashboard': renderDashboard(); break;
+        case 'nova-oc': renderNovaOC(); break;
+        case 'historico': renderHistorico(); break;
+        case 'fornecedores': renderFornecedores(); break;
+        case 'obras': renderObras(); break;
+        case 'catalogo': renderCatalogo(); break;
+        case 'config': renderConfig(); break;
+      }
+    }
+
+    // ============================================================
+    // IMPORTAR PEDIDO (PDF/IMG) → IA → ITENS
+    // ============================================================
+    async function fileToImagesBase64(file){
+      // Retorna lista de data URLs JPEG (uma por página de PDF, ou 1 para imagem)
+      if(file.type.startsWith('image/')){
+        const dataUrl = await new Promise((res, rej)=>{
+          const r = new FileReader(); r.onload = ()=>res(r.result); r.onerror = rej; r.readAsDataURL(file);
+        });
+        return [dataUrl];
+      }
+      if(file.type === 'application/pdf' || /\.pdf$/i.test(file.name)){
+        const pdfjsLib = await import(`${window.__PDFJS_CDN}/pdf.min.mjs`);
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `${window.__PDFJS_CDN}/pdf.worker.min.mjs`;
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        const max = Math.min(pdf.numPages, 5); // limita a 5 páginas para custo razoável
+        const out = [];
+        for(let p=1; p<=max; p++){
+          const page = await pdf.getPage(p);
+          const viewport = page.getViewport({ scale: 1.6 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width; canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          out.push(canvas.toDataURL('image/jpeg', 0.75));
+        }
+        return out;
+      }
+      throw new Error('Formato não suportado. Use PDF ou imagem.');
+    }
+
+    async function callOpenRouterExtract(imagesDataUrls){
+      const apiKey = state.data.config.openrouter_api_key;
+      if(!apiKey) throw new Error('OpenRouter API key não configurada.');
+      const ecrsList = (state.data.ecrs||[]).map(e=>`${e.id}: ${e.codigo} — ${e.nome}`).join('\n');
+      const promptText = `Você é um extrator de dados de pedidos/orçamentos de obra. Analise a(s) imagem(ns) e extraia TODAS as linhas de itens em JSON estrito.
+
+Formato OBRIGATÓRIO (apenas JSON, sem markdown, sem texto antes/depois):
+{"itens":[{"descricao":"texto da linha do item","unidade":"un|kg|m|m²|m³|sc|L|gl|bd|cx|rl|pç|barra|peca|br3mt","quantidade":number,"preco_unit":number,"ipi_pct":number,"desc_pct":number,"ecr_id":number_or_null}]}
+
+Regras:
+- Use ponto como separador decimal (ex: 22.50, não 22,50).
+- "quantidade" e "preco_unit" são números (não strings).
+- "ipi_pct" e "desc_pct" são percentuais (0 se ausente).
+- "ecr_id" é o id numérico do ECR mais provável dado a descrição. Use null se incerto. ECRs disponíveis:
+${ecrsList}
+- "unidade" deve ser uma das unidades padrão. Mapeie variações ("BARRA"→"barra","PECA"→"peca","BR3MT"→"br3mt","UN"→"un").
+- Ignore totais, subtotais, cabeçalhos, dados do cliente/fornecedor/loja.
+- Se a imagem não contiver itens reconhecíveis, retorne {"itens":[]}.`;
+
+      const content = [{ type:'text', text: promptText }];
+      for(const url of imagesDataUrls){
+        content.push({ type:'image_url', image_url:{ url } });
+      }
+      const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method:'POST',
+        headers:{
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type':'application/json',
+          'HTTP-Referer': location.origin || 'https://central-compras.local',
+          'X-Title':'Central de Compras PBQP-H'
+        },
+        body: JSON.stringify({
+          model:'anthropic/claude-haiku-4.5',
+          messages:[{ role:'user', content }],
+          temperature: 0,
+          max_tokens: 4000
+        })
+      });
+      if(!resp.ok){
+        const txt = await resp.text();
+        throw new Error(`OpenRouter ${resp.status}: ${txt.slice(0,200)}`);
+      }
+      const data = await resp.json();
+      const raw = data?.choices?.[0]?.message?.content || '';
+      const start = raw.indexOf('{'); const end = raw.lastIndexOf('}');
+      if(start < 0 || end < 0) throw new Error('Resposta da IA sem JSON.');
+      const parsed = JSON.parse(raw.slice(start, end+1));
+      return Array.isArray(parsed.itens) ? parsed.itens : [];
+    }
+
+    async function importPedidoFromFile(file){
+      const o = state.ocEditing;
+      if(!o) return;
+      const oldLabel = (()=>{ const b = document.getElementById('importPedidoBtn'); return b ? b.textContent : ''; })();
+      const setBtn = (txt, dis)=>{ const b = document.getElementById('importPedidoBtn'); if(b){ b.textContent = txt; b.disabled = !!dis; } };
+      try{
+        setBtn('⏳ Convertendo arquivo…', true);
+        const images = await fileToImagesBase64(file);
+        if(!images.length) throw new Error('Não consegui ler o arquivo.');
+        setBtn(`🤖 Extraindo (${images.length} pág)…`, true);
+        const itens = await callOpenRouterExtract(images);
+        if(!itens.length){ showToast('A IA não encontrou itens neste arquivo.', 'warning'); setBtn(oldLabel||'📎 Importar pedido', false); return; }
+        // Mapeia para a estrutura interna de Item, garantindo defaults
+        const _normUn = u => {
+          const v = String(u||'').toLowerCase().trim();
+          const norm = v.replace(/[^a-z0-9²³ç]/gi,'');
+          const map = {barra:'barra',peca:'peca',pç:'pç',pc:'pç',br3mt:'br3mt',un:'un',kg:'kg',m:'m',m2:'m²','m²':'m²',m3:'m³','m³':'m³',sc:'sc',l:'L',gl:'gl',bd:'bd',cx:'cx',rl:'rl'};
+          return map[norm] || (UN_PADRAO.includes(v) ? v : 'un');
+        };
+        const novos = itens.map(it => normalizeItem({
+          ecr_id: (it.ecr_id != null && Number(it.ecr_id)) || null,
+          descricao: String(it.descricao||'').trim(),
+          quantidade: Number(it.quantidade)||0,
+          unidade: _normUn(it.unidade),
+          preco_unit: Number(it.preco_unit)||0,
+          ipi_pct: Number(it.ipi_pct)||0,
+          desc_pct: Number(it.desc_pct)||0
+        }));
+        // Se o usuário tem uma linha vazia recém-criada, substitui; senão, adiciona ao final
+        if(o.itens.length === 1 && !o.itens[0].descricao && !o.itens[0].quantidade && !o.itens[0].preco_unit){
+          o.itens = novos;
+        } else {
+          o.itens.push(...novos);
+        }
+        markDirty();
+        renderItems();
+        renderTotals();
+        showToast(`${novos.length} item(ns) importado(s) — confira preços, ECR e unidades.`, 'success');
+      } catch(err){
+        showToast(`Falha na importação: ${err.message}`, 'error');
+      } finally {
+        setBtn(oldLabel||'📎 Importar pedido', false);
+      }
+    }
+
+    // ============================================================
+    // EVENT BINDINGS
+    // ============================================================
+    function bindEvents(){
+      // Topbar
+      dom.connectBtn.addEventListener('click', connectFile);
+      dom.saveBtn.addEventListener('click', saveData);
+      dom.reloadBtn.addEventListener('click', reloadData);
+      dom.exportBtn.addEventListener('click', exportBackup);
+      dom.goConfig.addEventListener('click', ()=>switchTab('config'));
+      dom.jsonFileInput.addEventListener('change', async (ev)=>{
+        const f = ev.target.files?.[0]; if(!f) return;
+        try{ const txt = await f.text(); applyLoadedData(JSON.parse(txt), f.name, null); showToast('JSON importado (modo leitura).', 'success'); }
+        catch(e){ showToast('Falha ao ler JSON.','error'); }
+      });
+      // Tabs
+      dom.tabsNav.addEventListener('click', e => {
+        const btn = e.target.closest('.tab-btn');
+        if(btn) switchTab(btn.dataset.tab);
+      });
+      // Drawer
+      dom.drawerBackdrop.addEventListener('click', closeDrawer);
+      dom.drawer.addEventListener('click', e=>{ if(e.target.matches('[data-close-drawer]')) closeDrawer(); });
+
+      // Dashboard
+      dom.quickNewOC.addEventListener('click', ()=>{ state.ocEditing = null; switchTab('nova-oc'); });
+      dom.histNewOC.addEventListener('click', ()=>{ state.ocEditing = null; switchTab('nova-oc'); });
+
+      // Nova OC bindings
+      dom.ocCancel.addEventListener('click', ()=>{ if(state.dirty && !confirm('Descartar alterações desta OC?')) return; state.ocEditing = null; switchTab('historico'); });
+      dom.ocSaveDraft.addEventListener('click', ()=>saveOcDraft(false));
+      dom.ocSaveAndPdf.addEventListener('click', saveOcAndGeneratePdf);
+      dom.addItemBtn.addEventListener('click', addItem);
+      dom.ecrFilterAdd.addEventListener('change', renderItems);
+      ['ocFornecedor','ocEmitente','ocObra','ocPagamento','ocStatus','ocData'].forEach(k=>{
+        dom[k].addEventListener('change', ()=>{
+          const o = state.ocEditing; if(!o) return;
+          if(k==='ocFornecedor') o.fornecedor_id = dom.ocFornecedor.value;
+          else if(k==='ocEmitente') o.emitente_id = dom.ocEmitente.value;
+          else if(k==='ocObra') o.obra_id = dom.ocObra.value;
+          else if(k==='ocPagamento') o.condicao_pagamento = dom.ocPagamento.value;
+          else if(k==='ocStatus') o.status = dom.ocStatus.value;
+          else if(k==='ocData') o.data = dom.ocData.value;
+          markDirty(); renderTopbar();
+        });
+      });
+      ['ocFrete','ocOutras','ocDescMat'].forEach(k=>{
+        dom[k].addEventListener('input', ()=>{
+          const o = state.ocEditing; if(!o) return;
+          if(k==='ocFrete') o.frete = toNumber(dom.ocFrete.value);
+          else if(k==='ocOutras') o.outras_despesas = toNumber(dom.ocOutras.value);
+          else if(k==='ocDescMat') o.desconto_material = toNumber(dom.ocDescMat.value);
+          markDirty(); renderTotals();
+        });
+      });
+      dom.ocObs.addEventListener('input', ()=>{ const o = state.ocEditing; if(o){ o.observacoes = dom.ocObs.value; markDirty(); }});
+      // Items table delegation
+      dom.itemsTbody.addEventListener('input', e=>{
+        const t = e.target;
+        const field = t.getAttribute('data-it-field');
+        if(field){ const id = t.getAttribute('data-id'); itemFieldChange(id, field, t.value); }
+      });
+      dom.itemsTbody.addEventListener('change', e=>{
+        const t = e.target;
+        const field = t.getAttribute('data-it-field');
+        if(field && (t.tagName==='SELECT' || t.type==='date')){ const id = t.getAttribute('data-id'); itemFieldChange(id, field, t.value); }
+      });
+      dom.itemsTbody.addEventListener('click', e=>{
+        const rm = e.target.closest('[data-remove-item]');
+        if(rm) removeItem(rm.getAttribute('data-remove-item'));
+      });
+      dom.itemsTbody.addEventListener('keydown', e=>{
+        if(e.ctrlKey && e.key === 'Enter'){ e.preventDefault(); addItem(); }
+      });
+
+      // Histórico
+      dom.histSearch.addEventListener('input', debounce(()=>{ state.histFilter.search = dom.histSearch.value; renderHistorico(); }, 200));
+      dom.histStatus.addEventListener('change', ()=>{ state.histFilter.status = dom.histStatus.value; renderHistorico(); });
+      dom.histFornecedor.addEventListener('change', ()=>{ state.histFilter.fornecedor = dom.histFornecedor.value; renderHistorico(); });
+      dom.histObra.addEventListener('change', ()=>{ state.histFilter.obra = dom.histObra.value; renderHistorico(); });
+      dom.histTableWrap.addEventListener('click', e=>{
+        const editBtn = e.target.closest('[data-edit-oc]'); if(editBtn){ editOC(editBtn.getAttribute('data-edit-oc')); return; }
+        const pdfBtn = e.target.closest('[data-pdf-oc]'); if(pdfBtn){ const o = state.data.ordens_compra.find(x=>x.id===pdfBtn.getAttribute('data-pdf-oc')); if(o){ if(!o.numero){ showToast('Esta OC ainda é rascunho. Abra para emitir.','warning'); return; } generatePdf(o); } return; }
+        const dupBtn = e.target.closest('[data-dup-oc]'); if(dupBtn){ duplicateOC(dupBtn.getAttribute('data-dup-oc')); return; }
+        const delBtn = e.target.closest('[data-del-oc]'); if(delBtn){
+          if(!confirm('Excluir esta OC? Esta ação não pode ser desfeita.')) return;
+          state.data.ordens_compra = state.data.ordens_compra.filter(x=>x.id !== delBtn.getAttribute('data-del-oc'));
+          markDirty(); renderHistorico(); renderTopbar();
+          showToast('OC excluída.','success');
+        }
+      });
+
+      // Fornecedores
+      dom.newFornecedorBtn.addEventListener('click', ()=>openFornecedorDrawer(null));
+      dom.fornSearch.addEventListener('input', debounce(()=>{ state.fornFilter.search = dom.fornSearch.value; renderFornecedores(); }, 200));
+      dom.fornEcrFilter.addEventListener('change', ()=>{ state.fornFilter.ecr = dom.fornEcrFilter.value; renderFornecedores(); });
+      dom.fornTableWrap.addEventListener('click', e=>{
+        const ed = e.target.closest('[data-edit-forn]'); if(ed){ openFornecedorDrawer(ed.getAttribute('data-edit-forn')); return; }
+        const dl = e.target.closest('[data-del-forn]'); if(dl){
+          if(!confirm('Excluir este fornecedor?')) return;
+          state.data.fornecedores = state.data.fornecedores.filter(x=>x.id !== dl.getAttribute('data-del-forn'));
+          markDirty(); renderFornecedores(); renderTopbar();
+          showToast('Fornecedor excluído.','success');
+        }
+      });
+
+      // Obras
+      dom.newObraBtn.addEventListener('click', ()=>openObraDrawer(null));
+      dom.obraSearch.addEventListener('input', debounce(()=>{ state.obraFilter.search = dom.obraSearch.value; renderObras(); }, 200));
+      dom.obraTableWrap.addEventListener('click', e=>{
+        const ed = e.target.closest('[data-edit-obra]'); if(ed){ openObraDrawer(ed.getAttribute('data-edit-obra')); return; }
+        const dl = e.target.closest('[data-del-obra]'); if(dl){
+          if(!confirm('Excluir esta obra?')) return;
+          state.data.obras = state.data.obras.filter(x=>x.id !== dl.getAttribute('data-del-obra'));
+          markDirty(); renderObras(); renderTopbar();
+          showToast('Obra excluída.','success');
+        }
+      });
+
+      // Catálogo
+      dom.catalogoSearch.addEventListener('input', debounce(()=>{ state.catalogoFilter.search = dom.catalogoSearch.value; renderCatalogo(); }, 200));
+      dom.ecrList.addEventListener('click', e=>{
+        const head = e.target.closest('[data-toggle-ecr]');
+        if(head){
+          const card = head.closest('.ecr-card');
+          card.querySelector('.ecr-body').classList.toggle('hidden');
+          return;
+        }
+        const addMat = e.target.closest('[data-add-mat]');
+        if(addMat){
+          const ecrId = Number(addMat.getAttribute('data-add-mat'));
+          const ecr = state.data.ecrs.find(x=>x.id===ecrId); if(!ecr) return;
+          const desc = document.getElementById(`newMatDesc-${ecrId}`).value.trim();
+          const un = document.getElementById(`newMatUn-${ecrId}`).value;
+          if(!desc){ showToast('Descrição vazia.','warning'); return; }
+          ecr.materiais.push({ id: uid('mat'), descricao: desc, unidade_padrao: un });
+          markDirty(); renderCatalogo();
+          showToast('Material adicionado.','success');
+          // reabre o card
+          setTimeout(()=>{ const c = document.querySelector(`[data-ecr-id="${ecrId}"] .ecr-body`); if(c) c.classList.remove('hidden'); }, 0);
+          return;
+        }
+        const delMat = e.target.closest('[data-mat-del]');
+        if(delMat){
+          if(!confirm('Excluir este material?')) return;
+          const ecrId = Number(delMat.getAttribute('data-ecr'));
+          const matId = delMat.getAttribute('data-mat-del');
+          const ecr = state.data.ecrs.find(x=>x.id===ecrId); if(!ecr) return;
+          ecr.materiais = ecr.materiais.filter(m=>m.id!==matId);
+          markDirty(); renderCatalogo();
+          setTimeout(()=>{ const c = document.querySelector(`[data-ecr-id="${ecrId}"] .ecr-body`); if(c) c.classList.remove('hidden'); }, 0);
+        }
+      });
+      dom.ecrList.addEventListener('change', e=>{
+        const inp = e.target.closest('[data-mat-edit]');
+        if(inp){
+          const matId = inp.getAttribute('data-mat-edit');
+          const ecrId = Number(inp.getAttribute('data-ecr'));
+          const field = inp.getAttribute('data-field');
+          const ecr = state.data.ecrs.find(x=>x.id===ecrId);
+          const mat = ecr?.materiais.find(m=>m.id===matId);
+          if(mat){ mat[field] = inp.value; markDirty(); }
+        }
+      });
+
+      // Config save
+      document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+      document.getElementById('newEmitente').addEventListener('click', ()=>openEmitentDrawer(null));
+      // Pasta de backups (config)
+      const _selBkp = document.getElementById('selectBackupDirBtn');
+      if(_selBkp) _selBkp.addEventListener('click', async ()=>{
+        if(!('showDirectoryPicker' in window)){ showToast('Seu navegador não suporta seleção de pasta.', 'warning'); return; }
+        try{
+          const dh = await window.showDirectoryPicker({ id:'backups-picker', mode:'readwrite' });
+          await saveDirHandle('dir-backups', dh);
+          state.data.config.pasta_backups = dh.name;
+          document.getElementById('backupDirDisplay').value = dh.name;
+          markDirty();
+          showToast(`Pasta de backups configurada: ${dh.name}`, 'success');
+        } catch(e){ if(e && e.name !== 'AbortError') showToast('Falha ao selecionar pasta.', 'warning'); }
+      });
+      const _clearBkp = document.getElementById('clearBackupDirBtn');
+      if(_clearBkp) _clearBkp.addEventListener('click', async ()=>{
+        try{ const db = await openHandleDb(); if(db){
+          await new Promise((resolve)=>{ const tx = db.transaction('handles','readwrite'); tx.objectStore('handles').delete('dir-backups'); tx.oncomplete=resolve; tx.onerror=resolve; });
+        }}catch(e){}
+        state.data.config.pasta_backups = '';
+        document.getElementById('backupDirDisplay').value = '';
+        markDirty();
+        showToast('Backups automáticos desativados.', 'success');
+      });
+      // Importar pedido (Nova OC) — extração via IA
+      const _impBtn = document.getElementById('importPedidoBtn');
+      const _impFile = document.getElementById('importPedidoFile');
+      if(_impBtn && _impFile){
+        _impBtn.addEventListener('click', ()=>{
+          if(!state.ocEditing){ showToast('Inicie uma Nova OC antes de importar.', 'warning'); return; }
+          if(!state.data.config.openrouter_api_key){
+            showToast('Configure sua OpenRouter API Key em Configurações.', 'warning');
+            switchTab('config'); return;
+          }
+          _impFile.value = ''; _impFile.click();
+        });
+        _impFile.addEventListener('change', async (ev)=>{
+          const file = ev.target.files?.[0]; if(!file) return;
+          await importPedidoFromFile(file);
+        });
+      }
+      document.getElementById('emitentesList').addEventListener('click', e=>{
+        const ed = e.target.closest('[data-em-edit]'); if(ed){ openEmitentDrawer(ed.getAttribute('data-em-edit')); return; }
+        const dl = e.target.closest('[data-em-del]'); if(dl){
+          if(!confirm('Excluir este emitente?')) return;
+          state.data.config.emitentes = (state.data.config.emitentes||[]).filter(x=>x.id!==dl.getAttribute('data-em-del'));
+          markDirty(); renderEmitentesListConfig(); showToast('Emitente excluído.','success'); return;
+        }
+        const up = e.target.closest('[data-em-up]'); if(up){
+          const arr = state.data.config.emitentes||[]; const i = arr.findIndex(x=>x.id===up.getAttribute('data-em-up'));
+          if(i>0){ [arr[i-1],arr[i]]=[arr[i],arr[i-1]]; markDirty(); renderEmitentesListConfig(); }
+        }
+      });
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', e=>{
+        if((e.ctrlKey||e.metaKey) && e.key === 's'){ e.preventDefault(); saveData(); }
+        if((e.ctrlKey||e.metaKey) && e.key === 'n' && state.activeTab !== 'nova-oc'){ e.preventDefault(); state.ocEditing = null; switchTab('nova-oc'); }
+        if(e.key === 'Escape' && !dom.drawer.classList.contains('hidden')){ closeDrawer(); }
+      });
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init(){
+      loadUiPrefs();
+      const cached = loadCache();
+      if(cached){
+        state.data = normalizeData(cached.data);
+        state.sourceName = cached.sourceName || 'Cache local';
+      } else {
+        state.data = normalizeData(readEmbeddedSeed());
+        state.sourceName = 'Base inicial embutida';
+      }
+      bindEvents();
+      // Try reconnect handle
+      const stored = await getStoredHandle();
+      if(stored){
+        try{
+          const ok = await verifyHandlePermission(stored, false);
+          if(ok){ await loadFromFileHandle(stored); }
+          else { showToast('Para sincronizar, clique em "Conectar arquivo".', 'warning'); render(); }
+        }catch(e){ render(); }
+      } else {
+        render();
+      }
+      switchTab(state.activeTab);
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

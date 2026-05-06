@@ -1,0 +1,771 @@
+{
+  "version": 1,
+  "app_name": "Central de Compras PBQP-H V1 - Campisi",
+  "shared_file_name": "central-compras-data.json",
+  "seeded_at": "2026-04-29T00:00:00.000Z",
+  "last_saved": "",
+  "config": {
+    "emitente": {
+      "razao_social": "",
+      "nome_fantasia": "",
+      "cnpj": "",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "",
+        "cidade": "Uberlândia",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email_envio_nf": ""
+    },
+    "endereco_cobranca": {
+      "logradouro": "",
+      "numero": "",
+      "complemento": "",
+      "bairro": "",
+      "cidade": "Uberlândia",
+      "uf": "MG",
+      "cep": ""
+    },
+    "ultimo_numero_oc": 0,
+    "ano_corrente": 2026,
+    "condicoes_pagamento": [
+      "À vista",
+      "ANTECIPADO",
+      "7 DDL NF",
+      "15 DDL NF",
+      "21 DDL NF",
+      "30 DDL NF"
+    ],
+    "texto_condicoes_contratacao": "1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.\n2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.\n3) Informar que a CONRAD DUARTE é consumidora final (alíquota ICMS cheia).\n4) É proibido a negociação de títulos com terceiros sem autorização prévia.\n5) Constar o número desta Ordem de Compra e o nome da obra/CEI no documento fiscal.\n6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF NA ENTREGA DO MATERIAL.",
+    "texto_envio_nf": "FAVOR ENVIAR O XML E PDF DA NF / CONHECIMENTO ELETRÔNICO E BOLETOS PARA:",
+    "texto_qualidade": "CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR – ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO"
+  },
+  "fornecedores": [
+    {
+      "id": "forn-madeireira-silveira",
+      "razao_social": "MADEIREIRA SILVEIRA",
+      "nome_fantasia": "Madeireira Silveira",
+      "cnpj": "10.372.478/0001-04",
+      "ie": "",
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "complemento": "",
+        "bairro": "Santa Edwiges",
+        "cidade": "Ituiutaba",
+        "uf": "MG",
+        "cep": ""
+      },
+      "telefones": [
+        "",
+        ""
+      ],
+      "email": "",
+      "contato_responsavel": "",
+      "ecrs_atende": [
+        2,
+        17
+      ],
+      "observacoes": "Fornecedor histórico de madeira e estacas.",
+      "ativo": true
+    }
+  ],
+  "obras": [],
+  "ecrs": [
+    {
+      "id": 1,
+      "codigo": "ECR 01",
+      "nome": "Barras e treliças de Aço",
+      "categoria": "Estrutural",
+      "normas": [
+        "NBR 7480",
+        "NBR 7481",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "kg",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado de Resistência por lote"
+      ],
+      "criterios_recebimento": [
+        "Lote: cada entrega é considerada um lote",
+        "Aspecto: limpeza, ausência de corrosão excessiva",
+        "Verificação de diâmetro, comprimento e identificação nas peças"
+      ],
+      "materiais": [
+        {
+          "id": "mat-aco-ca50-6",
+          "descricao": "Aço CA-50 Ø6,3mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-8",
+          "descricao": "Aço CA-50 Ø8,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-10",
+          "descricao": "Aço CA-50 Ø10,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-12",
+          "descricao": "Aço CA-50 Ø12,5mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca50-16",
+          "descricao": "Aço CA-50 Ø16,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-aco-ca60-5",
+          "descricao": "Aço CA-60 Ø5,0mm",
+          "unidade_padrao": "kg"
+        },
+        {
+          "id": "mat-tela-q92",
+          "descricao": "Tela soldada Q-92",
+          "unidade_padrao": "m²"
+        },
+        {
+          "id": "mat-trelica-tg8",
+          "descricao": "Treliça TG-8",
+          "unidade_padrao": "m"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "codigo": "ECR 02",
+      "nome": "Madeira e Compensado",
+      "categoria": "Madeira",
+      "normas": [
+        "NBR 7190",
+        "NBR 14807",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m",
+        "un",
+        "m²",
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        "DOF (Documento de Origem Florestal) ou nota de origem"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: ausência de fungos, rachaduras excessivas, empenamentos",
+        "Conferência de bitola e comprimento conforme pedido",
+        "Identificação de espécie e procedência"
+      ],
+      "materiais": [
+        {
+          "id": "mat-caibro-5x6",
+          "descricao": "Caibro 5x6cm (Estaca/Pontalete) - 1m",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-caibro-5x6-3m",
+          "descricao": "Caibro 5x6cm - 3m",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-tabua-pinus",
+          "descricao": "Tábua de Pinus 2,5x30cm",
+          "unidade_padrao": "m"
+        },
+        {
+          "id": "mat-sarrafo-25x5",
+          "descricao": "Sarrafo 2,5x5cm",
+          "unidade_padrao": "m"
+        },
+        {
+          "id": "mat-compensado-12mm",
+          "descricao": "Compensado plastificado 12mm (2,20x1,10m)",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-compensado-18mm",
+          "descricao": "Compensado plastificado 18mm (2,20x1,10m)",
+          "unidade_padrao": "un"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "codigo": "ECR 03",
+      "nome": "Concreto Usinado",
+      "categoria": "Estrutural",
+      "normas": [
+        "NBR 7212",
+        "NBR 8953",
+        "NBR 12655",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        "Carta-traço por resistência e especificações"
+      ],
+      "criterios_recebimento": [
+        "Inspeção a cada caminhão",
+        "Tempo máximo dosagem-aplicação: 2h30min",
+        "Ensaio de slump test antes da descarga",
+        "Verificação do volume entregue"
+      ],
+      "materiais": [
+        {
+          "id": "mat-concreto-fck20",
+          "descricao": "Concreto Usinado fck 20 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck25",
+          "descricao": "Concreto Usinado fck 25 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck30",
+          "descricao": "Concreto Usinado fck 30 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-concreto-fck35",
+          "descricao": "Concreto Usinado fck 35 MPa - Slump 10±2",
+          "unidade_padrao": "m³"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "codigo": "ECR 04",
+      "nome": "Bloco de Concreto e Cerâmico",
+      "categoria": "Alvenaria",
+      "normas": [
+        "NBR 6136",
+        "NBR 15270",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado de conformidade do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: integridade das peças, ausência de trincas",
+        "Conferência de dimensões nominais",
+        "Identificação do lote e fabricante"
+      ],
+      "materiais": [
+        {
+          "id": "mat-bloco-conc-14",
+          "descricao": "Bloco de concreto estrutural 14x19x39cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-conc-19",
+          "descricao": "Bloco de concreto estrutural 19x19x39cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-cer-9",
+          "descricao": "Bloco cerâmico de vedação 9x19x19cm",
+          "unidade_padrao": "un"
+        },
+        {
+          "id": "mat-bloco-cer-14",
+          "descricao": "Bloco cerâmico de vedação 14x19x29cm",
+          "unidade_padrao": "un"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "codigo": "ECR 05",
+      "nome": "Cal, Gesso Corrido e Aditivo",
+      "categoria": "Argamassa",
+      "normas": [
+        "NBR 7175",
+        "NBR 13207",
+        "NBR 11768"
+      ],
+      "unidades_padrao": [
+        "sc",
+        "kg",
+        "L"
+      ],
+      "documentos_obrigatorios": [
+        "FISPQ",
+        "Ficha técnica"
+      ],
+      "criterios_recebimento": [
+        "Embalagens íntegras, sem sinais de umidade",
+        "Conferência da validade",
+        "Identificação do tipo/classe"
+      ],
+      "materiais": [
+        {
+          "id": "mat-cal-ch3",
+          "descricao": "Cal Hidratada CH-III - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-gesso",
+          "descricao": "Gesso Corrido - saco 40kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-aditivo-plast",
+          "descricao": "Aditivo plastificante",
+          "unidade_padrao": "L"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "codigo": "ECR 06",
+      "nome": "Areia e Brita",
+      "categoria": "Agregado",
+      "normas": [
+        "NBR 7211",
+        "NBR NM 248",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m³"
+      ],
+      "documentos_obrigatorios": [
+        "Nota fiscal com origem do material"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: ausência de impurezas, matéria orgânica, torrões de argila",
+        "Granulometria conforme especificação",
+        "Conferência do volume entregue"
+      ],
+      "materiais": [
+        {
+          "id": "mat-areia-fina",
+          "descricao": "Areia fina lavada",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-areia-media",
+          "descricao": "Areia média lavada",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-0",
+          "descricao": "Brita 0",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-1",
+          "descricao": "Brita 1",
+          "unidade_padrao": "m³"
+        },
+        {
+          "id": "mat-brita-2",
+          "descricao": "Brita 2",
+          "unidade_padrao": "m³"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "codigo": "ECR 07",
+      "nome": "Argamassa colante",
+      "categoria": "Argamassa",
+      "normas": [
+        "NBR 14081",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "sc"
+      ],
+      "documentos_obrigatorios": [
+        "Ficha técnica do produto"
+      ],
+      "criterios_recebimento": [
+        "Embalagens íntegras, sem sinais de umidade",
+        "Conferência da validade",
+        "Tipo (AC-I, AC-II, AC-III) conforme especificação"
+      ],
+      "materiais": [
+        {
+          "id": "mat-aci-int",
+          "descricao": "Argamassa colante AC-I (interno) - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-acii-ext",
+          "descricao": "Argamassa colante AC-II (externo) - saco 20kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-aciii-porc",
+          "descricao": "Argamassa colante AC-III (porcelanato) - saco 20kg",
+          "unidade_padrao": "sc"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "codigo": "ECR 08",
+      "nome": "Revestimento de Parede e Piso",
+      "categoria": "Revestimento",
+      "normas": [
+        "NBR 13818",
+        "NBR 15463",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m²",
+        "cx"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado do fabricante",
+        "Ficha técnica com PEI/absorção"
+      ],
+      "criterios_recebimento": [
+        "Conferência de tonalidade e lote (todas as caixas mesmo lote)",
+        "Aspecto: ausência de trincas e empenamentos",
+        "Quantidade conforme pedido + 5% de margem"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 9,
+      "codigo": "ECR 09",
+      "nome": "Esquadrias, Janelas e Guarda-Corpos",
+      "categoria": "Esquadria",
+      "normas": [
+        "NBR 10821",
+        "NBR 14718",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "un",
+        "m²",
+        "m"
+      ],
+      "documentos_obrigatorios": [
+        "Memorial descritivo",
+        "Ensaio de estanqueidade quando aplicável"
+      ],
+      "criterios_recebimento": [
+        "Conferência de medidas conforme projeto",
+        "Aspecto: pintura/anodização sem falhas",
+        "Acessórios completos (puxadores, fechos, roldanas)"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 10,
+      "codigo": "ECR 10",
+      "nome": "Telhas",
+      "categoria": "Cobertura",
+      "normas": [
+        "NBR 7196",
+        "NBR 15310",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "un",
+        "m²"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: ausência de trincas, deformações e quebras",
+        "Conferência do tipo e dimensões",
+        "Mesmo lote/tonalidade no caso de telhas cerâmicas"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 11,
+      "codigo": "ECR 11",
+      "nome": "Portas",
+      "categoria": "Esquadria",
+      "normas": [
+        "NBR 15930",
+        "NBR 8054",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Ficha técnica do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Conferência de dimensões conforme projeto",
+        "Aspecto: acabamento sem falhas, sem empenamento",
+        "Acessórios completos (dobradiças, fechaduras quando incluídas)"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 12,
+      "codigo": "ECR 12",
+      "nome": "Materiais Hidrossanitários",
+      "categoria": "Hidráulica",
+      "normas": [
+        "NBR 5648",
+        "NBR 5688",
+        "NBR 5626",
+        "NBR 7198",
+        "NBR 8160",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado de ensaio NBR 15575"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: ausência de furos, deformações, rasgos",
+        "Conferência de identificação (fabricante, diâmetro)",
+        "Vedação das extremidades quando aplicável"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 13,
+      "codigo": "ECR 13",
+      "nome": "Materiais Elétricos",
+      "categoria": "Elétrica",
+      "normas": [
+        "NBR 5410",
+        "NBR NM 247",
+        "NBR 6148",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m",
+        "un",
+        "rl"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado INMETRO quando aplicável"
+      ],
+      "criterios_recebimento": [
+        "Selo INMETRO visível para itens obrigatórios",
+        "Conferência de bitola e isolação",
+        "Aspecto: embalagens íntegras"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 14,
+      "codigo": "ECR 14",
+      "nome": "Tinta, Textura e Selador",
+      "categoria": "Acabamento",
+      "normas": [
+        "NBR 11702",
+        "NBR 15079",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "L",
+        "gl",
+        "bd"
+      ],
+      "documentos_obrigatorios": [
+        "FISPQ",
+        "Ficha técnica"
+      ],
+      "criterios_recebimento": [
+        "Embalagens lacradas e íntegras",
+        "Conferência de cor, tipo e validade",
+        "Lote único quando para mesma área"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 15,
+      "codigo": "ECR 15",
+      "nome": "Bancada, Peitoril e Soleira",
+      "categoria": "Acabamento",
+      "normas": [
+        "NBR 15012",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m",
+        "m²",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Ficha técnica do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Conferência de dimensões conforme projeto",
+        "Aspecto: sem trincas, manchas ou diferença de tonalidade",
+        "Polimento e acabamento de bordas conforme especificado"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 16,
+      "codigo": "ECR 16",
+      "nome": "Louças e Metais Sanitários",
+      "categoria": "Hidráulica",
+      "normas": [
+        "NBR 15097",
+        "NBR 15705",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Certificado de conformidade",
+        "Manual do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Aspecto: sem trincas, manchas ou bolhas no esmalte",
+        "Acessórios completos conforme pedido",
+        "Conferência de modelo, cor e dimensões"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 17,
+      "codigo": "ECR 17",
+      "nome": "Estrutura Metálica e madeira para telhado",
+      "categoria": "Cobertura",
+      "normas": [
+        "NBR 8800",
+        "NBR 7190",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "kg",
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "ART/RRT",
+        "Memorial descritivo do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Conferência das peças conforme projeto",
+        "Aspecto: pintura/galvanização sem falhas",
+        "Identificação das peças para montagem"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 18,
+      "codigo": "ECR 18",
+      "nome": "Impermeabilizante",
+      "categoria": "Acabamento",
+      "normas": [
+        "NBR 9574",
+        "NBR 9575",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "kg",
+        "L",
+        "gl",
+        "bd"
+      ],
+      "documentos_obrigatorios": [
+        "FISPQ",
+        "Ficha técnica"
+      ],
+      "criterios_recebimento": [
+        "Embalagens lacradas e íntegras",
+        "Conferência de tipo, validade e lote",
+        "Compatibilidade com substrato conforme ficha técnica"
+      ],
+      "materiais": []
+    },
+    {
+      "id": 19,
+      "codigo": "ECR 19",
+      "nome": "Cimento",
+      "categoria": "Argamassa",
+      "normas": [
+        "NBR 11578",
+        "NBR 5733",
+        "NBR 14725-4",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "sc",
+        "kg"
+      ],
+      "documentos_obrigatorios": [
+        "FISPQ"
+      ],
+      "criterios_recebimento": [
+        "Embalagens fechadas, sem sinais de umidade",
+        "Verificação de tipo, classe e validade",
+        "Rejeição de sacos rasgados ou molhados",
+        "Armazenamento: máx. 10 sacos por pilha, protegido de umidade, 10cm do solo"
+      ],
+      "materiais": [
+        {
+          "id": "mat-cim-cpii-50",
+          "descricao": "Cimento Portland CP II-E-32 - saco 50kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-cim-cpiii-50",
+          "descricao": "Cimento Portland CP III-40 - saco 50kg",
+          "unidade_padrao": "sc"
+        },
+        {
+          "id": "mat-cim-cpv-50",
+          "descricao": "Cimento Portland CP V-ARI - saco 50kg",
+          "unidade_padrao": "sc"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "codigo": "ECR 20",
+      "nome": "Dispositivo de Gás",
+      "categoria": "Hidráulica",
+      "normas": [
+        "NBR 13523",
+        "NBR 15526",
+        "NBR 15575"
+      ],
+      "unidades_padrao": [
+        "m",
+        "un"
+      ],
+      "documentos_obrigatorios": [
+        "Selo INMETRO/IGT",
+        "Certificado do fabricante"
+      ],
+      "criterios_recebimento": [
+        "Selo INMETRO/IGT visível",
+        "Conferência de diâmetro e classe de pressão",
+        "Aspecto: ausência de amassados em tubos e conexões"
+      ],
+      "materiais": []
+    }
+  ],
+  "ordens_compra": []
+}

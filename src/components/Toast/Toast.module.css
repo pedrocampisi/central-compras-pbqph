@@ -1,0 +1,35 @@
+.container {
+  position: fixed;
+  bottom: 22px;
+  left: 236px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+  pointer-events: none;
+}
+.toast {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--navy-dark);
+  color: white;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  max-width: 360px;
+  cursor: pointer;
+  pointer-events: all;
+  animation: slideIn 0.2s ease;
+}
+.success { background: var(--green); }
+.warning { background: var(--warn); }
+.error   { background: var(--red); }
+.info    { background: var(--navy-dark); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .container { left: 72px; }
+}

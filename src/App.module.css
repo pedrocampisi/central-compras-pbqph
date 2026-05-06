@@ -1,0 +1,220 @@
+/* Layout raiz */
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid #c5d5e8;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+.brand {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid #d5e3f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logoWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 79, 124, 0.08);
+  border: 1px solid rgba(29, 79, 124, 0.15);
+}
+.logoWrap img { width: 32px; height: 32px; object-fit: contain; }
+.brandName {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--navy);
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+.brandSub {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--navy-mid);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.pbqphBadge {
+  margin: 10px 14px;
+  background: rgba(29, 79, 124, 0.08);
+  border: 1px solid rgba(29, 79, 124, 0.18);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.pbqphDot { width: 7px; height: 7px; background: var(--navy); border-radius: 50%; flex-shrink: 0; }
+.pbqphLabel { font-size: 9px; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; text-transform: uppercase; }
+.navLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 18px 5px;
+}
+
+/* Nav */
+#tabsNav { flex: 1; overflow-y: auto; padding-bottom: 8px; }
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  color: var(--text-mid);
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 0;
+  font-family: inherit;
+}
+.tabBtn:hover { background: rgba(29, 79, 124, 0.05); color: var(--navy); }
+.tabBtn.active {
+  border-left-color: var(--amber);
+  background: rgba(29, 79, 124, 0.08);
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* Footer */
+.sidebarFooter { padding: 12px 14px; border-top: 1px solid #d5e3f0; }
+.sfRow { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.sfLabel { font-size: 11px; color: var(--text-muted); }
+.sfValue { font-size: 11px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+.sfActions { display: flex; gap: 6px; margin-top: 5px; }
+.btnGhostSm {
+  flex: 1;
+  padding: 5px 0;
+  font-size: 10px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btnGhostSm:hover { background: rgba(29, 79, 124, 0.05); }
+
+/* Dirty indicator */
+.dirtyDot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.dirtyDot.isDirty { background: var(--warn); animation: pulse 1.6s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* ── Main wrapper ────────────────────────────────────────────────────────── */
+.mainWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.topbarContext {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.topbarTitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--navy);
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+.topbarRight { display: flex; align-items: center; gap: 8px; }
+.syncChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-bg);
+  border: 1px solid #86efac;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chipDot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Banner */
+.banner {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-left: 4px solid var(--amber);
+  color: #92400e;
+  padding: 11px 14px;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { width: 56px; }
+  .brandName, .brandSub, .pbqphLabel, .navLabel,
+  .tabBtn span:last-child, .sfLabel, .sfValue, .sfActions,
+  .pbqphBadge { display: none; }
+  .tabBtn { padding: 10px; justify-content: center; }
+  .logoWrap { margin: 0 auto; }
+}

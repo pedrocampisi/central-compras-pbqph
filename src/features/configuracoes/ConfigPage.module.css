@@ -1,0 +1,93 @@
+/* ── Emitentes ──────────────────────────────────────────────────────────────── */
+
+.emitentesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.emitenteCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.emitenteInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.emitenteTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.principalBadge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: rgba(29, 79, 124, 0.1);
+  border: 1px solid rgba(29, 79, 124, 0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.emitenteSub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emitenteActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Condições de pagamento ─────────────────────────────────────────────────── */
+
+.condicaoChip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface-alt);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.chipRemove {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.12s, color 0.12s;
+}
+.chipRemove:hover {
+  background: var(--danger-bg, #fee2e2);
+  color: var(--danger, #dc2626);
+}
