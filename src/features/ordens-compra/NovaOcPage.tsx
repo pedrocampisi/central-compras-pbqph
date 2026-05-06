@@ -20,6 +20,8 @@ import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcP
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
 import { fileToImagesBase64 } from '../../services/ai/pdfToImages';
 import { extractItemsFromImages } from '../../services/ai/extractItems';
+import { getObraDirHandle } from '../../services/storage/handles';
+import { verifyHandlePermission } from '../../services/storage/permissions';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 
@@ -373,12 +375,37 @@ export function NovaOcPage() {
       const blob = generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(emitida, fornNome);
-      const obraHandle = undefined; // TODO: store dir handle for obra in IndexedDB
-      await savePdfToFile(blob, filename, obraHandle);
+
+      // Tenta resolver o handle persistido para a pasta desta obra.
+      // Se não houver, ou se o navegador revogou a permissão, cai em download.
+      let obraHandle: FileSystemDirectoryHandle | undefined;
+      const stored = await getObraDirHandle(emitida.obra_id);
+      if (stored) {
+        const ok = await verifyHandlePermission(stored, true);
+        if (ok) {
+          obraHandle = stored;
+        } else {
+          showToast(
+            'Permissão da pasta da obra foi revogada. PDF será baixado pelo navegador. Reconecte em Obras.',
+            'warning',
+          );
+        }
+      }
+
+      const result = await savePdfToFile(blob, filename, obraHandle);
       updateOrdemCompra(emitida);
       markDirty();
       stopEditing();
-      showToast(`OC ${emitida.numero} emitida e PDF gerado.`, 'success');
+      if (result === 'saved') {
+        showToast(`OC ${emitida.numero} emitida. PDF salvo na pasta da obra.`, 'success');
+      } else {
+        showToast(
+          obraHandle
+            ? `OC ${emitida.numero} emitida. Falha ao salvar na pasta — PDF baixado pelo navegador.`
+            : `OC ${emitida.numero} emitida. PDF baixado (configure pasta da obra para salvar automaticamente).`,
+          obraHandle ? 'warning' : 'info',
+        );
+      }
       setTab('historico');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');

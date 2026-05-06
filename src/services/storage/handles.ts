@@ -43,6 +43,17 @@ async function dbGet<T>(key: string): Promise<T | null> {
   });
 }
 
+async function dbDelete(key: string): Promise<void> {
+  const db = await openDb();
+  if (!db) return;
+  await new Promise<void>((resolve) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
 export async function saveFileHandle(handle: FileSystemFileHandle): Promise<void> {
   try {
     await dbPut(FILE_KEY, handle);
@@ -78,6 +89,35 @@ export async function getHandleByKey<T extends FileSystemHandle>(
   } catch {
     return null;
   }
+}
+
+export async function deleteHandleByKey(key: string): Promise<void> {
+  try {
+    await dbDelete(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+// ── Helpers específicos para pasta de OCs por obra ─────────────────────────────
+
+const obraDirHandleKey = (obraId: string): string => `obra-dir:${obraId}`;
+
+export async function saveObraDirHandle(
+  obraId: string,
+  handle: FileSystemDirectoryHandle,
+): Promise<void> {
+  await saveHandleByKey(obraDirHandleKey(obraId), handle);
+}
+
+export async function getObraDirHandle(
+  obraId: string,
+): Promise<FileSystemDirectoryHandle | null> {
+  return await getHandleByKey<FileSystemDirectoryHandle>(obraDirHandleKey(obraId));
+}
+
+export async function deleteObraDirHandle(obraId: string): Promise<void> {
+  await deleteHandleByKey(obraDirHandleKey(obraId));
 }
 
 export { FILE_KEY };
