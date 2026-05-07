@@ -359,7 +359,7 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
     doc.addPage();
     y = margin;
   }
-  const sigY = Math.min(Math.max(y + 8, ph - 31), contentBottomY - signatureHeight);
+  const sigY = Math.min(y + 8, contentBottomY - signatureHeight);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.line(margin + 5, sigY, margin + 70, sigY);
