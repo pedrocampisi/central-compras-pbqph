@@ -37,14 +37,65 @@ function emitenteIE(e: Partial<Emitente> | undefined): string {
   return `IE: ${e.ie ?? ''}`;
 }
 
+const LOGO_PATH = `${import.meta.env.BASE_URL}brazao1.png`;
+let logoDataUrlPromise: Promise<string | null> | null = null;
+
+const DEFAULT_CONDICOES_CONTRATACAO = [
+  '1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.',
+  '2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.',
+  '3) Informar que o emitente desta OC é consumidor final, quando aplicável.',
+  '4) É proibida a negociação de títulos com terceiros sem autorização prévia.',
+  '5) Constar o número desta Ordem de Compra e o nome da obra/CNO no documento fiscal.',
+  '6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL.',
+].join('\n');
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(reader.error ?? new Error('Falha ao carregar logo.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function loadCampisiLogo(): Promise<string | null> {
+  if (typeof fetch !== 'function' || typeof FileReader === 'undefined') return null;
+
+  logoDataUrlPromise ??= fetch(LOGO_PATH)
+    .then((response) => (response.ok ? response.blob() : null))
+    .then((blob) => (blob ? blobToDataUrl(blob) : null))
+    .catch(() => null);
+
+  return logoDataUrlPromise;
+}
+
+function normalizeCondicoesContratacao(texto: string | undefined): string {
+  const base = texto?.trim() ? texto : DEFAULT_CONDICOES_CONTRATACAO;
+  return base
+    .replace(
+      /Informar que a CONRAD DUARTE é consumidora final \(alíquota ICMS cheia\)\./gi,
+      'Informar que o emitente desta OC é consumidor final, quando aplicável.',
+    )
+    .replace(
+      /É proibido a negociação de títulos com terceiros sem autorização prévia\./gi,
+      'É proibida a negociação de títulos com terceiros sem autorização prévia.',
+    )
+    .replace(/obra\/CEI/gi, 'obra/CNO')
+    .replace(
+      /ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF/gi,
+      'ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF',
+    );
+}
+
 // ── Geração principal ─────────────────────────────────────────────────────────
 
 /**
  * Gera o PDF de uma OC e retorna um Blob.
  * Recebe `oc` (a OC) e `data` (o estado completo com config, fornecedores, obras).
  */
-export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
+export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Blob> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' }) as JsPDFWithAutoTable;
+  const logoDataUrl = await loadCampisiLogo();
 
   // Resolução de emitente, fornecedor e obra
   const emitentes = data.config.emitentes ?? [];
@@ -59,18 +110,57 @@ export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
   const totals = computeOcTotals(oc);
 
   const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
   const margin = 10;
+  const footerLineY = ph - 15;
+  const footerTextY = ph - 7;
+  const contentBottomY = footerLineY - 4;
   let y = 12;
 
+  function ensureSpace(requiredHeight: number): void {
+    if (y + requiredHeight <= contentBottomY) return;
+    doc.addPage();
+    y = margin;
+  }
+
+  function drawFooter(): void {
+    doc.setDrawColor(215);
+    doc.setLineWidth(0.2);
+    doc.line(margin, footerLineY, pw - margin, footerLineY);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.8);
+    doc.setTextColor(70);
+    doc.text(
+      'ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL',
+      pw / 2,
+      footerTextY,
+      { align: 'center' },
+    );
+    doc.setTextColor(0, 0, 0);
+  }
+
   // ── Header ─────────────────────────────────────────────────────────────────
+  if (logoDataUrl) {
+    try {
+      doc.addImage(logoDataUrl, 'PNG', margin, 6, 14, 14);
+    } catch {
+      /* logo é decorativa; se falhar, o PDF continua sendo gerado */
+    }
+  }
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('ORDEM DE COMPRA', pw / 2, y, { align: 'center' });
+  doc.text('ORDEM DE COMPRA', pw / 2, y + 1, { align: 'center' });
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('Cód. 01', margin, y);
+  doc.text('CAMPISI ENGENHARIA', margin + 18, y - 1);
+  doc.setFontSize(7);
+  doc.text('Cód. 01', margin + 18, y + 3);
+  doc.setFontSize(9);
   doc.text(`Nº O.C.: ${oc.numero}`, pw - margin, y, { align: 'right' });
-  y += 6;
+  doc.setDrawColor(11, 105, 183);
+  doc.setLineWidth(0.4);
+  doc.line(margin, y + 8, pw - margin, y + 8);
+  y += 13;
 
   // ── Dados para Faturamento ─────────────────────────────────────────────────
   doc.setDrawColor(180);
@@ -176,23 +266,24 @@ export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
     head,
     body,
     startY: y,
-    margin: { left: margin, right: margin },
+    margin: { left: margin, right: margin, bottom: ph - contentBottomY },
     styles: { fontSize: 7.5, cellPadding: 1.5 },
     headStyles: { fillColor: [11, 105, 183], textColor: 255, fontStyle: 'bold', halign: 'center' },
     columnStyles: {
-      0: { cellWidth: 8, halign: 'center' },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 26 },
+      0: { cellWidth: 9, halign: 'center' },
+      1: { cellWidth: 56 },
+      2: { cellWidth: 24 },
       3: { cellWidth: 12, halign: 'right' },
       4: { cellWidth: 9, halign: 'center' },
       5: { cellWidth: 19, halign: 'right' },
       6: { cellWidth: 10, halign: 'right' },
       7: { cellWidth: 10, halign: 'right' },
       8: { cellWidth: 22, halign: 'right' },
-      9: { cellWidth: 14, halign: 'center' },
+      9: { cellWidth: 19, halign: 'center' },
     },
   });
   y = doc.lastAutoTable.finalY + 3;
+  ensureSpace(34);
 
   // ── Totalizadores ──────────────────────────────────────────────────────────
   const colW = 50;
@@ -223,6 +314,7 @@ export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
   doc.text(formatBrl(totals.total_geral), totX + colW + valW, y + 4, { align: 'right' });
   doc.setTextColor(0, 0, 0);
   y += 8;
+  ensureSpace(16);
 
   // ── Qualidade ──────────────────────────────────────────────────────────────
   doc.setFontSize(8);
@@ -237,30 +329,37 @@ export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
 
   // ── Observações ────────────────────────────────────────────────────────────
   if (oc.observacoes) {
+    const obsLines = doc.splitTextToSize(oc.observacoes, pw - 2 * margin) as string[];
+    ensureSpace(6 + obsLines.length * 4);
     doc.setFont('helvetica', 'bold');
     doc.text('OBSERVAÇÕES:', margin, y);
     y += 4;
     doc.setFont('helvetica', 'normal');
-    const obsLines = doc.splitTextToSize(oc.observacoes, pw - 2 * margin) as string[];
     doc.text(obsLines, margin, y);
     y += obsLines.length * 4 + 2;
   }
 
   // ── Condições de contratação ───────────────────────────────────────────────
+  const cond = doc.splitTextToSize(
+    normalizeCondicoesContratacao(data.config.texto_condicoes_contratacao),
+    pw - 2 * margin,
+  ) as string[];
+  ensureSpace(8 + cond.length * 3.4);
   doc.setFont('helvetica', 'bold');
   doc.text('CONDIÇÕES DE CONTRATAÇÃO:', margin, y);
   y += 4;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  const cond = doc.splitTextToSize(
-    data.config.texto_condicoes_contratacao ?? '',
-    pw - 2 * margin,
-  ) as string[];
   doc.text(cond, margin, y);
   y += cond.length * 3.4 + 4;
 
   // ── Assinaturas ────────────────────────────────────────────────────────────
-  const sigY = Math.max(y, doc.internal.pageSize.getHeight() - 25);
+  const signatureHeight = 12;
+  if (y + signatureHeight > contentBottomY) {
+    doc.addPage();
+    y = margin;
+  }
+  const sigY = Math.min(Math.max(y + 8, ph - 31), contentBottomY - signatureHeight);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.line(margin + 5, sigY, margin + 70, sigY);
@@ -269,14 +368,10 @@ export function generateOcPdfBlob(oc: OrdemCompra, data: Data): Blob {
   doc.text('AUTORIZAÇÃO / CAMPISI', pw - margin - 65, sigY + 4);
 
   // ── Rodapé ─────────────────────────────────────────────────────────────────
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
-  doc.text(
-    'ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF NA ENTREGA DO MATERIAL',
-    pw / 2,
-    doc.internal.pageSize.getHeight() - 5,
-    { align: 'center' },
-  );
+  for (let page = 1; page <= doc.getNumberOfPages(); page += 1) {
+    doc.setPage(page);
+    drawFooter();
+  }
 
   return doc.output('blob');
 }

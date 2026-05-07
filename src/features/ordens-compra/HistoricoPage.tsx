@@ -79,7 +79,7 @@ export function HistoricoPage() {
 
   async function handleRegenPdf(oc: OrdemCompra) {
     try {
-      const blob = generateOcPdfBlob(oc, data!);
+      const blob = await generateOcPdfBlob(oc, data!);
       const fornNome = data!.fornecedores.find((f) => f.id === oc.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);

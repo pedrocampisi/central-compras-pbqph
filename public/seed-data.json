@@ -44,7 +44,7 @@
       "21 DDL NF",
       "30 DDL NF"
     ],
-    "texto_condicoes_contratacao": "1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.\n2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.\n3) Informar que a CONRAD DUARTE é consumidora final (alíquota ICMS cheia).\n4) É proibido a negociação de títulos com terceiros sem autorização prévia.\n5) Constar o número desta Ordem de Compra e o nome da obra/CEI no documento fiscal.\n6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE A NF NA ENTREGA DO MATERIAL.",
+    "texto_condicoes_contratacao": "1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.\n2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.\n3) Informar que o emitente desta OC é consumidor final, quando aplicável.\n4) É proibida a negociação de títulos com terceiros sem autorização prévia.\n5) Constar o número desta Ordem de Compra e o nome da obra/CNO no documento fiscal.\n6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL.",
     "texto_envio_nf": "FAVOR ENVIAR O XML E PDF DA NF / CONHECIMENTO ELETRÔNICO E BOLETOS PARA:",
     "texto_qualidade": "CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR – ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO"
   },
