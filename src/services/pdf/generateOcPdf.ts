@@ -325,7 +325,7 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
     margin + 2,
     y + 5,
   );
-  y += 9;
+  y += 12;
 
   // ── Observações ────────────────────────────────────────────────────────────
   if (oc.observacoes) {
@@ -359,7 +359,12 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
     doc.addPage();
     y = margin;
   }
-  const sigY = Math.min(y + 8, contentBottomY - signatureHeight);
+  // Posição preferida: 20mm acima da linha do rodapé (perto do fim da página).
+  // Nunca acima do conteúdo (y+8) nem além da zona segura (contentBottomY-12).
+  const sigY = Math.min(
+    Math.max(y + 8, footerLineY - 20),
+    contentBottomY - signatureHeight,
+  );
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.line(margin + 5, sigY, margin + 70, sigY);
