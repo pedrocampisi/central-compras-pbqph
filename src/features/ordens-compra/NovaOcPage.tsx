@@ -372,7 +372,7 @@ export function NovaOcPage() {
     try {
       const safe = ensureUniqueNumero(ocEditing);
       const emitida: OrdemCompra = { ...safe, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
-      const blob = generateOcPdfBlob(emitida, data);
+      const blob = await generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(emitida, fornNome);
 
