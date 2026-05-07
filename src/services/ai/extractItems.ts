@@ -12,7 +12,21 @@ import { callOpenRouter } from './openRouterClient';
 // ── Prompt ────────────────────────────────────────────────────────────────────
 
 function buildPrompt(ecrs: Ecr[]): string {
-  const ecrsList = ecrs.map((e) => `${e.id}: ${e.codigo} — ${e.nome}`).join('\n');
+  // Para cada ECR, enviamos id/codigo/nome + alguns materiais típicos (se houver)
+  // para que a IA tenha contexto suficiente para mapear itens novos.
+  // Com ~20 ECRs e até 5 materiais cada, o overhead é ~1k tokens — vale o ganho
+  // em precisão da classificação.
+  const ecrsList = ecrs
+    .map((e) => {
+      const sample = e.materiais
+        .map((m) => m.descricao)
+        .filter(Boolean)
+        .slice(0, 5)
+        .join('; ');
+      const tail = sample ? ` [ex: ${sample}]` : '';
+      return `${e.id}: ${e.codigo} — ${e.nome}${tail}`;
+    })
+    .join('\n');
 
   return `Você é um extrator de dados de pedidos/orçamentos de obra. Analise a(s) imagem(ns) e extraia TODAS as linhas de itens em JSON estrito.
 
@@ -35,13 +49,46 @@ Se não bater, está errado — você confundiu bruto com líquido. Corrija.
 
 Caso só haja UMA coluna de preço (sem coluna de desconto explícita): preco_unit = esse preço, desc_pct = 0.
 
+═══ CLASSIFICAÇÃO DE ECR ═══
+"ecr_id" é o ID numérico (campo antes do ":") do ECR mais apropriado para o item.
+
+Use o NOME e os EXEMPLOS de materiais de cada ECR como guia. Match por semântica
+da DESCRIÇÃO do item, não por palavra exata.
+
+Heurísticas (não é regra fixa, é só direção):
+- Tubos / conexões / registros / caixas d'água / hidra / sifão / ralo / válvula → ECR de Hidrossanitário
+- Fios / cabos / disjuntor / interruptor / tomada / lâmpada / eletroduto / quadro → ECR de Elétrico
+- Tinta / textura / massa corrida / selador / verniz → ECR de Tinta/Textura/Selador
+- Telha / cumeeira / fibrocimento → ECR de Telhas
+- Bloco / tijolo → ECR de Bloco
+- Areia / brita / pedrisco → ECR de Areia e Brita
+- Cimento (Portland, CP II, CP III) → ECR de Cimento
+- Aço / vergalhão / treliça / barra de aço → ECR de Barras e treliças de Aço
+- Cal / gesso / aditivo → ECR de Cal/Gesso/Aditivo
+- Madeira / caibro / tábua / compensado / sarrafo → ECR de Madeira
+- Concreto usinado / FCK → ECR de Concreto Usinado
+- Argamassa AC-I / AC-II / AC-III / colante → ECR de Argamassa colante
+- Cerâmica / porcelanato / azulejo / piso / revestimento → ECR de Revestimento
+- Janela / esquadria / guarda-corpo / vidro → ECR de Esquadrias
+- Porta / batente / fechadura → ECR de Portas
+- Vaso sanitário / pia / cuba / louça / metal sanitário → ECR de Louças e Metais
+- Bancada / peitoril / soleira → ECR de Bancada
+- Manta asfáltica / impermeabilizante → ECR de Impermeabilizante
+- Mangueira de gás / regulador / dispositivo de gás → ECR de Dispositivo de Gás
+- Estrutura metálica para telhado / madeiramento de telhado → ECR de Estrutura Metálica e madeira para telhado
+
+PREFIRA escolher um ECR provável a devolver null. Só use null se realmente não
+houver nenhum match razoável (ex: "frete", "mão de obra", "serviço" — itens
+não-físicos).
+
+ECRs DISPONÍVEIS:
+${ecrsList}
+
 ═══ DEMAIS REGRAS ═══
 - Use ponto como separador decimal (ex: 22.50, não 22,50).
 - "quantidade" e "preco_unit" são números (não strings).
 - "ipi_pct" e "desc_pct" são percentuais (0 se ausente).
 - "observacao": código do produto / SKU se disponível na coluna "Item" ou "Cód." (ex: "2660"). Caso contrário, "".
-- "ecr_id" é o id numérico do ECR mais provável dado a descrição. Use null se incerto. ECRs disponíveis:
-${ecrsList}
 - "unidade" deve ser uma das unidades padrão. Mapeie:
   • UN, UNID, UND, PEÇA, PC, PÇ → "un" ou "pç"
   • KG → "kg"
