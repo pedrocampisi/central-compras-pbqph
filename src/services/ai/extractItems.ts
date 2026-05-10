@@ -164,7 +164,11 @@ export async function extractItemsFromImages(
     content.push({ type: 'image_url', image_url: { url } });
   }
 
-  const raw = await callOpenRouter(apiKey, [{ role: 'user', content }]);
+  // Tokens dinâmicos: ~15 itens/página × ~80 tokens/item = 1200 tokens/página.
+  // Mínimo 800 (pedido pequeno), máximo 4000 (pedido enorme com muitas páginas).
+  const maxTokens = Math.max(800, Math.min(imagesDataUrls.length * 1200, 4000));
+
+  const raw = await callOpenRouter(apiKey, [{ role: 'user', content }], maxTokens);
 
   // Extrai o bloco JSON da resposta (a IA pode adicionar texto antes/depois)
   const start = raw.indexOf('{');
