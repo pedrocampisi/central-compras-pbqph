@@ -6,7 +6,6 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const MODEL = 'anthropic/claude-haiku-4.5';
-const MAX_TOKENS = 4000;
 
 export interface OpenRouterMessage {
   role: 'user' | 'assistant' | 'system';
@@ -31,6 +30,7 @@ export interface OpenRouterResponse {
 export async function callOpenRouter(
   apiKey: string,
   messages: OpenRouterMessage[],
+  maxTokens = 1200,
 ): Promise<string> {
   const resp = await fetch(OPENROUTER_URL, {
     method: 'POST',
@@ -44,7 +44,7 @@ export async function callOpenRouter(
       model: MODEL,
       messages,
       temperature: 0,
-      max_tokens: MAX_TOKENS,
+      max_tokens: maxTokens,
     }),
   });
 
