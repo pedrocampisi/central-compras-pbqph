@@ -38,6 +38,7 @@ import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
 import { FornecedoresPage } from './features/fornecedores/FornecedoresPage';
 import { ObrasPage } from './features/obras/ObrasPage';
+import { PrestadoresPage } from './features/prestadores-servico/PrestadoresPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
 
@@ -55,10 +56,11 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'historico', label: 'Histórico', icon: '↺' },
   { id: 'fornecedores', label: 'Fornecedores', icon: '👥' },
   { id: 'obras', label: 'Obras', icon: '🏗' },
+  { id: 'prestadores', label: 'Prestadores', icon: '🔧' },
+  { id: 'catalogo', label: 'Catálogo ECR', icon: '📋' },
 ];
 
 const NAV_SISTEMA: NavItem[] = [
-  { id: 'catalogo', label: 'Catálogo ECR', icon: '📋' },
   { id: 'config', label: 'Configurações', icon: '⚙' },
 ];
 
@@ -68,6 +70,7 @@ const TAB_TITLES: Record<TabId, string> = {
   historico: 'Histórico de OCs',
   fornecedores: 'Fornecedores',
   obras: 'Obras',
+  prestadores: 'Prestadores de Serviço',
   catalogo: 'Catálogo ECR',
   config: 'Configurações',
 };
@@ -359,6 +362,7 @@ export default function App() {
           {activeTab === 'historico'     && <HistoricoPage />}
           {activeTab === 'fornecedores'  && <FornecedoresPage />}
           {activeTab === 'obras'         && <ObrasPage />}
+          {activeTab === 'prestadores'   && <PrestadoresPage />}
           {activeTab === 'catalogo'      && <CatalogoPage />}
           {activeTab === 'config'        && <ConfigPage />}
         </main>
