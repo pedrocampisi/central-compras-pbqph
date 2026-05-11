@@ -1,0 +1,278 @@
+/* ── Tabs internas do PrestadorDrawer ─────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  padding-bottom: 0;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text-mid);
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.14s;
+  margin-bottom: -1px;
+}
+
+.tabBtn:hover {
+  color: var(--navy);
+  background: rgba(29, 79, 124, 0.05);
+}
+
+.tabActive {
+  color: var(--navy);
+  border-bottom-color: var(--navy);
+  font-weight: 600;
+}
+
+.tabCount {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 9px;
+  font-weight: 600;
+}
+
+/* ── Painel de avaliações ─────────────────────────────────────────────────── */
+.avaliacoesPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emptyAval {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-mid);
+}
+
+.avalList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.avalCard {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+}
+
+.avalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avalObra {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.avalCriterios {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--border);
+}
+
+.avalCrit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.avalCritLabel {
+  color: var(--text-mid);
+}
+
+.avalFooter {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+  color: var(--text-mid);
+}
+
+.avalObs {
+  margin-top: 6px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text);
+  background: var(--surface-alt);
+  padding: 8px 10px;
+  border-radius: 6px;
+  border-left: 3px solid var(--navy);
+}
+
+/* ── Badges de status ──────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.badgeOk {
+  background: rgba(34, 167, 93, 0.12);
+  color: var(--green);
+  border-color: rgba(34, 167, 93, 0.3);
+}
+
+.badgeNc {
+  background: rgba(207, 65, 56, 0.12);
+  color: var(--red);
+  border-color: rgba(207, 65, 56, 0.3);
+}
+
+.badgeMuted {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+/* ── NovaAvaliacaoDrawer ──────────────────────────────────────────────────── */
+.avalIdent {
+  background: linear-gradient(180deg, rgba(29, 79, 124, 0.06), rgba(29, 79, 124, 0.02));
+  border: 1px solid rgba(29, 79, 124, 0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.avalIdentLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.avalIdentName {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-top: 2px;
+}
+
+.avalIdentCat {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+/* ── Picker CONFORME/NÃO CONFORME ─────────────────────────────────────────── */
+.criterioRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.criterioLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.criterioLabel strong {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.criterioHint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.criterioButtons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.critBtn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.14s;
+}
+
+.critBtn:hover {
+  background: var(--surface-alt);
+}
+
+.critOk:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.critNc:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.critActiveOk {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.critActiveOk:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+.critActiveNc {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.critActiveNc:hover {
+  background: var(--red);
+  color: #fff;
+}

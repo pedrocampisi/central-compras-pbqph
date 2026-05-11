@@ -14,6 +14,7 @@ export type TabId =
   | 'historico'
   | 'fornecedores'
   | 'obras'
+  | 'prestadores'
   | 'catalogo'
   | 'config';
 
@@ -41,6 +42,11 @@ export interface ObraFilter {
   search: string;
 }
 
+export interface PrestadorFilter {
+  search: string;
+  categoria: string;
+}
+
 export interface CatalogoFilter {
   search: string;
 }
@@ -52,6 +58,7 @@ interface UiState {
   histFilter: HistFilter;
   fornFilter: FornFilter;
   obraFilter: ObraFilter;
+  prestadorFilter: PrestadorFilter;
   catalogoFilter: CatalogoFilter;
   toasts: Toast[];
 
@@ -60,6 +67,7 @@ interface UiState {
   setHistFilter: (partial: Partial<HistFilter>) => void;
   setFornFilter: (partial: Partial<FornFilter>) => void;
   setObraFilter: (partial: Partial<ObraFilter>) => void;
+  setPrestadorFilter: (partial: Partial<PrestadorFilter>) => void;
   setCatalogoFilter: (partial: Partial<CatalogoFilter>) => void;
   showToast: (message: string, tone?: ToastTone) => void;
   dismissToast: (id: string) => void;
@@ -72,6 +80,7 @@ export const useUiStore = create<UiState>((set) => ({
   histFilter: { search: '', status: '', fornecedor: '', obra: '' },
   fornFilter: { search: '', ecr: '' },
   obraFilter: { search: '' },
+  prestadorFilter: { search: '', categoria: '' },
   catalogoFilter: { search: '' },
   toasts: [],
 
@@ -89,6 +98,10 @@ export const useUiStore = create<UiState>((set) => ({
 
   setObraFilter(partial) {
     set((s) => ({ obraFilter: { ...s.obraFilter, ...partial } }));
+  },
+
+  setPrestadorFilter(partial) {
+    set((s) => ({ prestadorFilter: { ...s.prestadorFilter, ...partial } }));
   },
 
   setCatalogoFilter(partial) {

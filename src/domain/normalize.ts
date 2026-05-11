@@ -5,6 +5,7 @@
  */
 
 import type {
+  AvaliacaoPrestador,
   Data,
   Ecr,
   Emitente,
@@ -12,8 +13,10 @@ import type {
   Item,
   Obra,
   OrdemCompra,
+  PrestadorServico,
 } from './types';
 import {
+  AvaliacaoPrestadorSchema,
   DataSchema,
   EcrSchema,
   EmitenteSchema,
@@ -21,10 +24,12 @@ import {
   ItemSchema,
   ObraSchema,
   OrdemCompraSchema,
+  PrestadorServicoSchema,
 } from './schemas/data.schema';
 import { uid } from './id';
 import { nowIso, todayIso } from './format';
-import { STATUS_OC } from './constants';
+import { STATUS_CRITERIO, STATUS_OC, TIPOS_PRESTADOR } from './constants';
+import type { StatusCriterio, TipoPrestador } from './constants';
 
 // ── Helpers internos ─────────────────────────────────────────────────────────
 
@@ -249,6 +254,57 @@ export function normalizeEmitente(e: unknown): Emitente {
   return EmitenteSchema.parse(raw);
 }
 
+function normalizeStatusCriterio(v: unknown): StatusCriterio {
+  const s = String(v ?? '').toUpperCase();
+  return STATUS_CRITERIO.includes(s as 'CONFORME' | 'NAO_CONFORME')
+    ? (s as 'CONFORME' | 'NAO_CONFORME')
+    : null;
+}
+
+export function normalizePrestador(p: unknown): PrestadorServico {
+  const o = (p as Record<string, unknown>) ?? {};
+  const tel = asArr<unknown>(o['telefones']);
+  const tipoRaw = String(o['tipo'] ?? 'PJ').toUpperCase();
+  const tipo: TipoPrestador = (TIPOS_PRESTADOR as readonly string[]).includes(tipoRaw)
+    ? (tipoRaw as TipoPrestador)
+    : 'PJ';
+  const raw = {
+    id: String(o['id'] ?? uid('prest')),
+    razao_social: String(o['razao_social'] ?? ''),
+    nome_fantasia: String(o['nome_fantasia'] ?? ''),
+    tipo,
+    cnpj_cpf: String(o['cnpj_cpf'] ?? ''),
+    categoria_servico: String(o['categoria_servico'] ?? ''),
+    endereco: normalizeEndereco(o['endereco']),
+    telefones: [String(tel[0] ?? ''), String(tel[1] ?? '')] as [string, string],
+    email: String(o['email'] ?? ''),
+    contato_responsavel: String(o['contato_responsavel'] ?? ''),
+    observacoes: String(o['observacoes'] ?? ''),
+    ativo: o['ativo'] !== false,
+    criado_em: String(o['criado_em'] ?? nowIso()),
+    atualizado_em: String(o['atualizado_em'] ?? nowIso()),
+  };
+  return PrestadorServicoSchema.parse(raw);
+}
+
+export function normalizeAvaliacao(a: unknown): AvaliacaoPrestador {
+  const o = (a as Record<string, unknown>) ?? {};
+  const raw = {
+    id: String(o['id'] ?? uid('aval')),
+    prestador_id: String(o['prestador_id'] ?? ''),
+    obra_id: String(o['obra_id'] ?? ''),
+    data_avaliacao: String(o['data_avaliacao'] ?? todayIso()),
+    responsavel: String(o['responsavel'] ?? ''),
+    atendeu_prazo: normalizeStatusCriterio(o['atendeu_prazo']),
+    usou_epi: normalizeStatusCriterio(o['usou_epi']),
+    conforme_pes: normalizeStatusCriterio(o['conforme_pes']),
+    observacoes: String(o['observacoes'] ?? ''),
+    criado_em: String(o['criado_em'] ?? nowIso()),
+    atualizado_em: String(o['atualizado_em'] ?? nowIso()),
+  };
+  return AvaliacaoPrestadorSchema.parse(raw);
+}
+
 /**
  * Normaliza o objeto raiz do JSON.
  * Assume que as migrações de schema já foram aplicadas (runMigrations).
@@ -285,5 +341,7 @@ export function normalizeData(raw: unknown): Data {
     obras: asArr(safe['obras']).map(normalizeObra),
     ecrs: asArr(safe['ecrs']).map(normalizeEcr),
     ordens_compra: asArr(safe['ordens_compra']).map(normalizeOC),
+    prestadores_servico: asArr(safe['prestadores_servico']).map(normalizePrestador),
+    avaliacoes_prestadores: asArr(safe['avaliacoes_prestadores']).map(normalizeAvaliacao),
   });
 }

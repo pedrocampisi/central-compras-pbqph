@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { STATUS_OC, TIPOS_EMITENTE } from '../constants';
+import { STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO } from '../constants';
 
 // ── Endereço ────────────────────────────────────────────────────────────────
 export const EnderecoSchema = z.object({
@@ -168,6 +168,47 @@ export const OrdemCompraSchema = z.object({
   pdf_gerado_em: z.string().default(''),
 });
 
+// ── Prestador de Serviço ──────────────────────────────────────────────────
+export const PrestadorServicoSchema = z.object({
+  id: z.string(),
+  razao_social: z.string().default(''),
+  nome_fantasia: z.string().default(''),
+  tipo: z.enum(TIPOS_PRESTADOR).default('PJ'),
+  cnpj_cpf: z.string().default(''),
+  categoria_servico: z.string().default(''),
+  endereco: EnderecoSchema.default({
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: '',
+  }),
+  telefones: z.tuple([z.string().default(''), z.string().default('')]).default(['', '']),
+  email: z.string().default(''),
+  contato_responsavel: z.string().default(''),
+  observacoes: z.string().default(''),
+  ativo: z.boolean().default(true),
+  criado_em: z.string().default(''),
+  atualizado_em: z.string().default(''),
+});
+
+// ── Avaliação de Prestador ────────────────────────────────────────────────
+export const AvaliacaoPrestadorSchema = z.object({
+  id: z.string(),
+  prestador_id: z.string().default(''),
+  obra_id: z.string().default(''),
+  data_avaliacao: z.string().default(''),
+  responsavel: z.string().default(''),
+  atendeu_prazo: z.enum(STATUS_CRITERIO).nullable().default(null),
+  usou_epi: z.enum(STATUS_CRITERIO).nullable().default(null),
+  conforme_pes: z.enum(STATUS_CRITERIO).nullable().default(null),
+  observacoes: z.string().default(''),
+  criado_em: z.string().default(''),
+  atualizado_em: z.string().default(''),
+});
+
 // ── Config ─────────────────────────────────────────────────────────────────
 export const ConfigSchema = z.object({
   emitente: z.record(z.string(), z.unknown()).optional(),
@@ -193,7 +234,7 @@ export const ConfigSchema = z.object({
 
 // ── Data raiz ──────────────────────────────────────────────────────────────
 export const DataSchema = z.object({
-  schema_version: z.number().default(3),
+  schema_version: z.number().default(4),
   version: z.number().default(1),
   app_name: z.string().default('Central de Compras PBQP-H V2 - Campisi'),
   shared_file_name: z.string().default('central-compras-data.json'),
@@ -204,6 +245,8 @@ export const DataSchema = z.object({
   obras: z.array(ObraSchema).default([]),
   ecrs: z.array(EcrSchema).default([]),
   ordens_compra: z.array(OrdemCompraSchema).default([]),
+  prestadores_servico: z.array(PrestadorServicoSchema).default([]),
+  avaliacoes_prestadores: z.array(AvaliacaoPrestadorSchema).default([]),
 });
 
 export type DataParsed = z.infer<typeof DataSchema>;

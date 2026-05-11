@@ -4,7 +4,15 @@
  */
 
 import { create } from 'zustand';
-import type { Data, OrdemCompra, Fornecedor, Obra, Config } from '../domain/types';
+import type {
+  AvaliacaoPrestador,
+  Config,
+  Data,
+  Fornecedor,
+  Obra,
+  OrdemCompra,
+  PrestadorServico,
+} from '../domain/types';
 
 interface DataState {
   data: Data | null;
@@ -22,6 +30,10 @@ interface DataState {
   removeFornecedor: (id: string) => void;
   upsertObra: (o: Obra) => void;
   removeObra: (id: string) => void;
+  upsertPrestador: (p: PrestadorServico) => void;
+  removePrestador: (id: string) => void;
+  upsertAvaliacao: (a: AvaliacaoPrestador) => void;
+  removeAvaliacao: (id: string) => void;
   updateConfig: (partial: Partial<Config>) => void;
 }
 
@@ -113,6 +125,53 @@ export const useDataStore = create<DataState>((set, get) => ({
     if (!data) return;
     set({
       data: { ...data, obras: data.obras.filter((x) => x.id !== id) },
+      dirty: true,
+      dirtySince: get().dirtySince ?? Date.now(),
+    });
+  },
+
+  upsertPrestador(p) {
+    const { data } = get();
+    if (!data) return;
+    const idx = data.prestadores_servico.findIndex((x) => x.id === p.id);
+    const prestadores_servico =
+      idx >= 0
+        ? data.prestadores_servico.map((x) => (x.id === p.id ? p : x))
+        : [...data.prestadores_servico, p];
+    set({ data: { ...data, prestadores_servico }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
+  },
+
+  removePrestador(id) {
+    const { data } = get();
+    if (!data) return;
+    // Remove o prestador e todas as avaliações vinculadas a ele.
+    set({
+      data: {
+        ...data,
+        prestadores_servico: data.prestadores_servico.filter((x) => x.id !== id),
+        avaliacoes_prestadores: data.avaliacoes_prestadores.filter((a) => a.prestador_id !== id),
+      },
+      dirty: true,
+      dirtySince: get().dirtySince ?? Date.now(),
+    });
+  },
+
+  upsertAvaliacao(a) {
+    const { data } = get();
+    if (!data) return;
+    const idx = data.avaliacoes_prestadores.findIndex((x) => x.id === a.id);
+    const avaliacoes_prestadores =
+      idx >= 0
+        ? data.avaliacoes_prestadores.map((x) => (x.id === a.id ? a : x))
+        : [...data.avaliacoes_prestadores, a];
+    set({ data: { ...data, avaliacoes_prestadores }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
+  },
+
+  removeAvaliacao(id) {
+    const { data } = get();
+    if (!data) return;
+    set({
+      data: { ...data, avaliacoes_prestadores: data.avaliacoes_prestadores.filter((x) => x.id !== id) },
       dirty: true,
       dirtySince: get().dirtySince ?? Date.now(),
     });
