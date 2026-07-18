@@ -10,9 +10,9 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ObraDrawer } from './ObraDrawer';
+import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Obra } from '../../domain/types';
-import styles from './ObrasPage.module.css';
 import { deleteObraDirHandle } from '../../services/storage/handles';
 import { confirmAsync } from '../../stores/useConfirmStore';
 
@@ -146,26 +146,17 @@ export function ObrasPage() {
       </div>
 
       {/* Filtros */}
-      <div className={styles.filterBar}>
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder="Buscar por nome, CEI, responsável, cidade…"
-          value={search}
-          onChange={(e) => setObraFilter({ search: e.target.value })}
+      <ListToolbar
+        searchValue={search}
+        searchPlaceholder="Buscar por nome, CEI, responsável, cidade…"
+        onSearchChange={(v) => setObraFilter({ search: v })}
+      >
+        <ToggleGroup
+          options={['todas', 'ativas', 'inativas'] as const}
+          value={showAtivas}
+          onChange={(v) => setObraFilter({ status: v })}
         />
-        <div className={styles.toggleGroup}>
-          {(['todas', 'ativas', 'inativas'] as const).map((v) => (
-            <button
-              key={v}
-              className={[styles.toggleBtn, showAtivas === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setObraFilter({ status: v })}
-            >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+      </ListToolbar>
 
       {/* Tabela */}
       {filtered.length === 0 ? (

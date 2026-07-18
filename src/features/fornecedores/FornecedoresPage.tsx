@@ -11,9 +11,9 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { confirmAsync } from '../../stores/useConfirmStore';
+import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
-import styles from './FornecedoresPage.module.css';
 
 export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
@@ -141,26 +141,17 @@ export function FornecedoresPage() {
       </div>
 
       {/* Filtros */}
-      <div className={styles.filterBar}>
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder="Buscar por razão social, CNPJ, e-mail, cidade…"
-          value={search}
-          onChange={(e) => setFornFilter({ search: e.target.value })}
+      <ListToolbar
+        searchValue={search}
+        searchPlaceholder="Buscar por razão social, CNPJ, e-mail, cidade…"
+        onSearchChange={(v) => setFornFilter({ search: v })}
+      >
+        <ToggleGroup
+          options={['todos', 'ativos', 'inativos'] as const}
+          value={showAtivos}
+          onChange={(v) => setFornFilter({ status: v })}
         />
-        <div className={styles.toggleGroup}>
-          {(['todos', 'ativos', 'inativos'] as const).map((v) => (
-            <button
-              key={v}
-              className={[styles.toggleBtn, showAtivos === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setFornFilter({ status: v })}
-            >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+      </ListToolbar>
 
       {/* Tabela */}
       {filtered.length === 0 ? (

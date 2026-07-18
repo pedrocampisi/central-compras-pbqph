@@ -14,10 +14,10 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { PrestadorDrawer } from './PrestadorDrawer';
 import { confirmAsync } from '../../stores/useConfirmStore';
+import { ListToolbar, ToggleGroup, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CATEGORIAS_SERVICO } from '../../domain/constants';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { PrestadorServico } from '../../domain/types';
-import styles from './PrestadoresPage.module.css';
 
 interface IndicadoresPrestador {
   total: number;
@@ -200,16 +200,12 @@ export function PrestadoresPage() {
       </div>
 
       {/* Filtros */}
-      <div className={styles.filterBar}>
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder="Buscar por razão social, CNPJ/CPF, categoria, cidade…"
-          value={prestadorFilter.search}
-          onChange={(e) => setPrestadorFilter({ search: e.target.value })}
-        />
-        <select
-          className={styles.filterSelect}
+      <ListToolbar
+        searchValue={prestadorFilter.search}
+        searchPlaceholder="Buscar por razão social, CNPJ/CPF, categoria, cidade…"
+        onSearchChange={(v) => setPrestadorFilter({ search: v })}
+      >
+        <FilterSelect
           value={prestadorFilter.categoria}
           onChange={(e) => setPrestadorFilter({ categoria: e.target.value })}
         >
@@ -217,19 +213,13 @@ export function PrestadoresPage() {
           {CATEGORIAS_SERVICO.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
-        </select>
-        <div className={styles.toggleGroup}>
-          {(['todos', 'ativos', 'inativos'] as const).map((v) => (
-            <button
-              key={v}
-              className={[styles.toggleBtn, showAtivos === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setPrestadorFilter({ status: v })}
-            >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+        </FilterSelect>
+        <ToggleGroup
+          options={['todos', 'ativos', 'inativos'] as const}
+          value={showAtivos}
+          onChange={(v) => setPrestadorFilter({ status: v })}
+        />
+      </ListToolbar>
 
       {/* Tabela */}
       {filtered.length === 0 ? (

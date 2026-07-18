@@ -19,7 +19,7 @@ import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
 import { confirmAsync } from '../../stores/useConfirmStore';
-import styles from './HistoricoPage.module.css';
+import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -160,16 +160,12 @@ export function HistoricoPage() {
       </div>
 
       {/* Filtros */}
-      <div className={styles.filterBar}>
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder="Buscar por número, fornecedor…"
-          value={histFilter.search}
-          onChange={(e) => setHistFilter({ search: e.target.value })}
-        />
-        <select
-          className={styles.filterSelect}
+      <ListToolbar
+        searchValue={histFilter.search}
+        searchPlaceholder="Buscar por número, fornecedor…"
+        onSearchChange={(v) => setHistFilter({ search: v })}
+      >
+        <FilterSelect
           value={histFilter.status}
           onChange={(e) => setHistFilter({ status: e.target.value as StatusOc | '' })}
         >
@@ -178,9 +174,8 @@ export function HistoricoPage() {
           <option value="emitida">Emitida</option>
           <option value="entregue">Entregue</option>
           <option value="cancelada">Cancelada</option>
-        </select>
-        <select
-          className={styles.filterSelect}
+        </FilterSelect>
+        <FilterSelect
           value={histFilter.fornecedor}
           onChange={(e) => setHistFilter({ fornecedor: e.target.value })}
         >
@@ -188,9 +183,8 @@ export function HistoricoPage() {
           {data.fornecedores.map((f) => (
             <option key={f.id} value={f.id}>{f.razao_social}</option>
           ))}
-        </select>
-        <select
-          className={styles.filterSelect}
+        </FilterSelect>
+        <FilterSelect
           value={histFilter.obra}
           onChange={(e) => setHistFilter({ obra: e.target.value })}
         >
@@ -198,8 +192,8 @@ export function HistoricoPage() {
           {data.obras.map((o) => (
             <option key={o.id} value={o.id}>{o.nome}</option>
           ))}
-        </select>
-      </div>
+        </FilterSelect>
+      </ListToolbar>
 
       {/* Tabela */}
       {ocs.length === 0 ? (
