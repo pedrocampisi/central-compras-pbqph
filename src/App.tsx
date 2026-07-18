@@ -13,6 +13,7 @@ import { useFileHandleStore } from './stores/useFileHandleStore';
 
 // Services
 import { loadCache, purgeLegacyCaches } from './services/storage/cache';
+import { getApiKey, setApiKey } from './services/storage/apiKey';
 import {
   connectFile,
   saveData,
@@ -91,6 +92,7 @@ export default function App() {
   const lastKnownSavedAt = useDataStore((s) => s.lastKnownSavedAt);
   const setData = useDataStore((s) => s.setData);
   const clearDirty = useDataStore((s) => s.clearDirty);
+  const updateConfig = useDataStore((s) => s.updateConfig);
 
   const activeTab = useUiStore((s) => s.activeTab);
   const setTab = useUiStore((s) => s.setActiveTab);
@@ -150,6 +152,18 @@ export default function App() {
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Migração da chave OpenRouter para o dispositivo ─────────────────────────
+  // Chaves antigas viviam no JSON compartilhado (vazavam para OneDrive/backups).
+  // Ao detectar uma, move para o localStorage deste dispositivo e limpa do JSON
+  // (a limpeza marca dirty; o próximo save remove a chave do arquivo).
+
+  useEffect(() => {
+    const legacyKey = data?.config.openrouter_api_key;
+    if (!legacyKey) return;
+    if (!getApiKey()) setApiKey(legacyKey);
+    updateConfig({ openrouter_api_key: '' });
+  }, [data, updateConfig]);
 
   // ── Save ────────────────────────────────────────────────────────────────────
 

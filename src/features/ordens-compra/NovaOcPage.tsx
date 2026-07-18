@@ -22,6 +22,7 @@ import { fileToImagesBase64 } from '../../services/ai/pdfToImages';
 import { extractItemsFromImages } from '../../services/ai/extractItems';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
+import { getApiKey } from '../../services/storage/apiKey';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 
@@ -446,7 +447,8 @@ export function NovaOcPage() {
 
   const handleImportFile = useCallback(async (file: File) => {
     if (!data) return;
-    const apiKey = data.config.openrouter_api_key;
+    // Chave por dispositivo; fallback para o campo legado do JSON (pré-migração).
+    const apiKey = getApiKey() || data.config.openrouter_api_key;
     if (!apiKey) {
       showToast('Configure a chave OpenRouter em Configurações para usar a IA.', 'warning');
       return;

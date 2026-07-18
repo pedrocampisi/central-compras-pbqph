@@ -13,6 +13,7 @@ import { Button } from '../../components/Button/Button';
 import { BACKUP_DIR_KEY } from '../../services/storage/backups';
 import { saveHandleByKey } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
+import { getApiKey, setApiKey } from '../../services/storage/apiKey';
 import type { Emitente } from '../../domain/types';
 import styles from './ConfigPage.module.css';
 
@@ -25,6 +26,8 @@ export function ConfigPage() {
   const [editingEmitente, setEditingEmitente] = useState<Emitente | null>(null);
   const [newCondicao, setNewCondicao] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
+  // Chave da IA é por dispositivo (localStorage), não vai para o JSON compartilhado.
+  const [apiKey, setApiKeyState] = useState(() => getApiKey());
 
   if (!data) return null;
 
@@ -165,8 +168,11 @@ export function ConfigPage() {
             }}
             type={showApiKey ? 'text' : 'password'}
             placeholder="sk-or-…"
-            value={cfg.openrouter_api_key}
-            onChange={(e) => updateConfig({ openrouter_api_key: e.target.value })}
+            value={apiKey}
+            onChange={(e) => {
+              setApiKeyState(e.target.value);
+              setApiKey(e.target.value);
+            }}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
@@ -183,8 +189,9 @@ export function ConfigPage() {
           <a href="https://openrouter.ai" target="_blank" rel="noreferrer" style={{ color: 'var(--navy)' }}>
             OpenRouter
           </a>{' '}
-          para importação de pedidos via IA. <strong>Armazenada em texto puro</strong> no JSON local —
-          trate o arquivo (e seus backups) como dado sensível.
+          para importação de pedidos via IA. Armazenada <strong>apenas neste computador</strong> —
+          não vai para o arquivo compartilhado, OneDrive nem backups. Em outro computador,
+          informe a chave novamente.
         </p>
       </FieldGroup>
 
