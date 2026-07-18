@@ -13,6 +13,7 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { PrestadorDrawer } from './PrestadorDrawer';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import { CATEGORIAS_SERVICO } from '../../domain/constants';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { PrestadorServico } from '../../domain/types';
@@ -89,12 +90,18 @@ export function PrestadoresPage() {
     setDrawerOpen(true);
   }
 
-  function handleDelete(p: PrestadorServico) {
+  async function handleDelete(p: PrestadorServico) {
     const n = indicadores[p.id]?.total ?? 0;
     const msg = n > 0
       ? `Excluir "${p.razao_social}"? Isso também removerá ${n} avaliação(ões) vinculada(s). Esta ação não pode ser desfeita.`
       : `Excluir "${p.razao_social}"? Esta ação não pode ser desfeita.`;
-    if (!window.confirm(msg)) return;
+    const ok = await confirmAsync({
+      title: 'Excluir prestador',
+      message: msg,
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     removePrestador(p.id);
     showToast('Prestador excluído.', 'success');
   }
@@ -249,7 +256,7 @@ export function PrestadoresPage() {
           rowActions={(p) => (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>Abrir</Button>
-              <Button variant="danger" size="sm" onClick={() => handleDelete(p)}>Excluir</Button>
+              <Button variant="danger" size="sm" onClick={() => void handleDelete(p)}>Excluir</Button>
             </div>
           )}
         />

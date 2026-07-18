@@ -23,6 +23,7 @@ import { extractItemsFromImages } from '../../services/ai/extractItems';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
 import { getApiKey } from '../../services/storage/apiKey';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 
@@ -435,9 +436,15 @@ export function NovaOcPage() {
     }
   }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
 
-  const handleCancelar = useCallback(() => {
+  const handleCancelar = useCallback(async () => {
     if (ocEditing && ocEditing.itens.length > 0) {
-      if (!window.confirm('Descartar esta OC? Os dados serão perdidos.')) return;
+      const ok = await confirmAsync({
+        title: 'Descartar OC',
+        message: 'Descartar esta ordem de compra? Os itens preenchidos serão perdidos.',
+        confirmLabel: 'Descartar',
+        tone: 'danger',
+      });
+      if (!ok) return;
     }
     stopEditing();
     setTab('dashboard');
@@ -494,7 +501,7 @@ export function NovaOcPage() {
           <p className="section-sub">OC Nº {ocEditing.numero}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="outline" size="sm" onClick={handleCancelar}>Cancelar</Button>
+          <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
           <Button variant="secondary" size="sm" onClick={handleSaveDraft}>
             💾 Salvar Rascunho
           </Button>
@@ -621,7 +628,7 @@ export function NovaOcPage() {
 
       {/* ── Footer actions ───────────────────────────────────────────────── */}
       <div className={styles.footerActions}>
-        <Button variant="outline" onClick={handleCancelar}>Cancelar</Button>
+        <Button variant="outline" onClick={() => void handleCancelar()}>Cancelar</Button>
         <Button variant="secondary" onClick={handleSaveDraft}>💾 Salvar Rascunho</Button>
         <Button variant="primary" onClick={() => void handleEmitir()} loading={savingPdf}>
           📄 Emitir OC + Gerar PDF

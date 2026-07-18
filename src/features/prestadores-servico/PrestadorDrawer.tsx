@@ -21,6 +21,7 @@ import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import { CATEGORIAS_SERVICO, TIPOS_PRESTADOR } from '../../domain/constants';
 import { NovaAvaliacaoDrawer } from './NovaAvaliacaoDrawer';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import type { AvaliacaoPrestador, PrestadorServico } from '../../domain/types';
 import styles from './PrestadorDrawer.module.css';
 
@@ -120,8 +121,14 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
     setAvaliacaoOpen(true);
   }
 
-  function handleDeleteAvaliacao(a: AvaliacaoPrestador) {
-    if (!window.confirm(`Excluir avaliação de ${formatDateBr(a.data_avaliacao)}?`)) return;
+  async function handleDeleteAvaliacao(a: AvaliacaoPrestador) {
+    const ok = await confirmAsync({
+      title: 'Excluir avaliação',
+      message: `Excluir a avaliação de ${formatDateBr(a.data_avaliacao)}? Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     removeAvaliacao(a.id);
     showToast('Avaliação excluída.', 'success');
   }
@@ -298,7 +305,7 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
                         <Button variant="ghost" size="sm" onClick={() => handleEditAvaliacao(a)}>
                           Editar
                         </Button>
-                        <Button variant="danger" size="sm" onClick={() => handleDeleteAvaliacao(a)}>
+                        <Button variant="danger" size="sm" onClick={() => void handleDeleteAvaliacao(a)}>
                           Excluir
                         </Button>
                       </div>

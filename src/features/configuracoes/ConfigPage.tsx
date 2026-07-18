@@ -14,6 +14,7 @@ import { BACKUP_DIR_KEY } from '../../services/storage/backups';
 import { saveHandleByKey } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
 import { getApiKey, setApiKey } from '../../services/storage/apiKey';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import type { Emitente } from '../../domain/types';
 import styles from './ConfigPage.module.css';
 
@@ -54,12 +55,18 @@ export function ConfigPage() {
     updateConfig({ emitentes });
   }
 
-  function handleDeleteEmitente(id: string) {
+  async function handleDeleteEmitente(id: string) {
     if (cfg.emitentes.length <= 1) {
       showToast('Deve haver ao menos um emitente.', 'warning');
       return;
     }
-    if (!window.confirm('Excluir este emitente?')) return;
+    const ok = await confirmAsync({
+      title: 'Excluir emitente',
+      message: 'Excluir este emitente? OCs antigas emitidas por ele continuam no histórico.',
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     updateConfig({ emitentes: cfg.emitentes.filter((e) => e.id !== id) });
     showToast('Emitente excluído.', 'success');
   }
@@ -140,7 +147,7 @@ export function ConfigPage() {
               <div className={styles.emitenteActions}>
                 <Button variant="ghost" size="sm" onClick={() => openEditEmitente(e)}>Editar</Button>
                 {idx > 0 && (
-                  <Button variant="danger" size="sm" onClick={() => handleDeleteEmitente(e.id)}>Excluir</Button>
+                  <Button variant="danger" size="sm" onClick={() => void handleDeleteEmitente(e.id)}>Excluir</Button>
                 )}
               </div>
             </div>

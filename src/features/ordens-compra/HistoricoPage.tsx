@@ -18,6 +18,7 @@ import { buildPdfFilename } from '../../services/pdf/pdfFilename';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import styles from './HistoricoPage.module.css';
 
 export function HistoricoPage() {
@@ -94,8 +95,14 @@ export function HistoricoPage() {
     showToast(`Status alterado para "${status}".`, 'success');
   }
 
-  function handleDelete(oc: OrdemCompra) {
-    if (!window.confirm(`Excluir OC ${oc.numero}? Esta ação não pode ser desfeita.`)) return;
+  async function handleDelete(oc: OrdemCompra) {
+    const ok = await confirmAsync({
+      title: 'Excluir Ordem de Compra',
+      message: `Excluir a OC ${oc.numero}? Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     removeOrdemCompra(oc.id);
     showToast('OC excluída.', 'success');
   }
@@ -235,7 +242,7 @@ export function HistoricoPage() {
                   Cancelar
                 </Button>
               )}
-              <Button variant="danger" size="sm" onClick={() => handleDelete(o)}>Excluir</Button>
+              <Button variant="danger" size="sm" onClick={() => void handleDelete(o)}>Excluir</Button>
             </div>
           )}
         />

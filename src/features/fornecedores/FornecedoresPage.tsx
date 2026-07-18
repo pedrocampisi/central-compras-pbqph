@@ -10,6 +10,7 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
 import styles from './FornecedoresPage.module.css';
@@ -53,7 +54,7 @@ export function FornecedoresPage() {
     setDrawerOpen(true);
   }
 
-  function handleDelete(f: Fornecedor) {
+  async function handleDelete(f: Fornecedor) {
     // Integridade referencial: OCs do histórico apontam para o fornecedor por id.
     const emUso = data!.ordens_compra.filter((oc) => oc.fornecedor_id === f.id).length;
     if (emUso > 0) {
@@ -63,7 +64,13 @@ export function FornecedoresPage() {
       );
       return;
     }
-    if (!window.confirm(`Excluir "${f.razao_social}"? Esta ação não pode ser desfeita.`)) return;
+    const ok = await confirmAsync({
+      title: 'Excluir fornecedor',
+      message: `Excluir "${f.razao_social}"? Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     removeFornecedor(f.id);
     showToast('Fornecedor excluído.', 'success');
   }
@@ -180,7 +187,7 @@ export function FornecedoresPage() {
           rowActions={(f) => (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button variant="ghost" size="sm" onClick={() => openEdit(f)}>Editar</Button>
-              <Button variant="danger" size="sm" onClick={() => handleDelete(f)}>Excluir</Button>
+              <Button variant="danger" size="sm" onClick={() => void handleDelete(f)}>Excluir</Button>
             </div>
           )}
         />

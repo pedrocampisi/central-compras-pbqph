@@ -14,6 +14,7 @@ import type { Column } from '../../components/DataTable/DataTable';
 import type { Obra } from '../../domain/types';
 import styles from './ObrasPage.module.css';
 import { deleteObraDirHandle } from '../../services/storage/handles';
+import { confirmAsync } from '../../stores/useConfirmStore';
 
 export function ObrasPage() {
   const data = useDataStore((s) => s.data);
@@ -52,7 +53,7 @@ export function ObrasPage() {
     setDrawerOpen(true);
   }
 
-  function handleDelete(o: Obra) {
+  async function handleDelete(o: Obra) {
     // Integridade referencial: OCs e avaliações de prestadores apontam para a obra.
     const emOcs = data!.ordens_compra.filter((oc) => oc.obra_id === o.id).length;
     const emAvals = data!.avaliacoes_prestadores.filter((a) => a.obra_id === o.id).length;
@@ -64,7 +65,13 @@ export function ObrasPage() {
       showToast(`"${o.nome}" é usada em ${refs}. Desative-a em vez de excluir.`, 'warning');
       return;
     }
-    if (!window.confirm(`Excluir "${o.nome}"? Esta ação não pode ser desfeita.`)) return;
+    const ok = await confirmAsync({
+      title: 'Excluir obra',
+      message: `Excluir "${o.nome}"? Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Excluir',
+      tone: 'danger',
+    });
+    if (!ok) return;
     removeObra(o.id);
     void deleteObraDirHandle(o.id); // limpa handle persistido (idempotente)
     showToast('Obra excluída.', 'success');
@@ -184,7 +191,7 @@ export function ObrasPage() {
           rowActions={(o) => (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button variant="ghost" size="sm" onClick={() => openEdit(o)}>Editar</Button>
-              <Button variant="danger" size="sm" onClick={() => handleDelete(o)}>Excluir</Button>
+              <Button variant="danger" size="sm" onClick={() => void handleDelete(o)}>Excluir</Button>
             </div>
           )}
         />

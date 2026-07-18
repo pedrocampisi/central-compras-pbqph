@@ -32,6 +32,8 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 // Components
 import { ToastContainer } from './components/Toast/Toast';
 import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
+import { GlobalConfirmDialog } from './components/ConfirmDialog/GlobalConfirmDialog';
+import { confirmAsync } from './stores/useConfirmStore';
 
 // Feature pages
 import { DashboardPage } from './features/dashboard/DashboardPage';
@@ -208,7 +210,15 @@ export default function App() {
 
   const handleReload = useCallback(async () => {
     if (!fileHandle) { showToast('Nenhum arquivo conectado.', 'warning'); return; }
-    if (dirty && !window.confirm('Há alterações não salvas. Recarregar vai descartá-las. Continuar?')) return;
+    if (dirty) {
+      const ok = await confirmAsync({
+        title: 'Descartar alterações?',
+        message: 'Há alterações não salvas. Recarregar vai descartá-las e puxar a versão do arquivo.',
+        confirmLabel: 'Recarregar',
+        tone: 'danger',
+      });
+      if (!ok) return;
+    }
     try {
       const result = await reloadFromHandle(fileHandle);
       setData(result.data, result.lastSavedAt);
@@ -368,6 +378,7 @@ export default function App() {
 
       {/* ── Global overlays ────────────────────────────────────────── */}
       <ToastContainer />
+      <GlobalConfirmDialog />
 
       <ConfirmDialog
         open={conflict.open}
