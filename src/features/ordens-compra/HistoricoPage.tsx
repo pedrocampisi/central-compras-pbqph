@@ -3,6 +3,7 @@
  * Portado de renderHistorico (CentralCompras-PBQPH.html).
  */
 
+import { useMemo } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -10,11 +11,13 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Pill } from '../../components/Pill/Pill';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
-import { formatBrl, formatDate, nowIso } from '../../domain/format';
+import { Icon } from '../../components/Icon/Icon';
+import { formatBrl, formatDate, nowIso, todayIso } from '../../domain/format';
 import { computeOcTotals } from '../../domain/compute';
 import { uid } from '../../domain/id';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
+import { downloadBlob } from '../../services/storage/download';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
@@ -33,22 +36,34 @@ export function HistoricoPage() {
   const setTab = useUiStore((s) => s.setActiveTab);
   const showToast = useUiStore((s) => s.showToast);
 
+  // ── Lookups e filtros (memoizados — busca deixa de ser O(n×m) por tecla) ──
+  const fornecedorNome = useMemo(
+    () => new Map((data?.fornecedores ?? []).map((f) => [f.id, f.razao_social])),
+    [data],
+  );
+  const obraNome = useMemo(
+    () => new Map((data?.obras ?? []).map((o) => [o.id, o.nome])),
+    [data],
+  );
+
+  const ocs = useMemo(() => {
+    if (!data) return [];
+    let list = [...data.ordens_compra].sort((a, b) => (b.criado_em > a.criado_em ? 1 : -1));
+    if (histFilter.search) {
+      const q = histFilter.search.toLowerCase();
+      list = list.filter(
+        (o) =>
+          o.numero.toLowerCase().includes(q) ||
+          (fornecedorNome.get(o.fornecedor_id) ?? '').toLowerCase().includes(q),
+      );
+    }
+    if (histFilter.status) list = list.filter((o) => o.status === histFilter.status);
+    if (histFilter.fornecedor) list = list.filter((o) => o.fornecedor_id === histFilter.fornecedor);
+    if (histFilter.obra) list = list.filter((o) => o.obra_id === histFilter.obra);
+    return list;
+  }, [data, histFilter, fornecedorNome]);
+
   if (!data) return null;
-
-  // ── Filtros ────────────────────────────────────────────────────────────────
-  let ocs = [...data.ordens_compra].sort((a, b) => (b.criado_em > a.criado_em ? 1 : -1));
-
-  if (histFilter.search) {
-    const q = histFilter.search.toLowerCase();
-    ocs = ocs.filter(
-      (o) =>
-        o.numero.toLowerCase().includes(q) ||
-        (data.fornecedores.find((f) => f.id === o.fornecedor_id)?.razao_social ?? '').toLowerCase().includes(q),
-    );
-  }
-  if (histFilter.status) ocs = ocs.filter((o) => o.status === histFilter.status);
-  if (histFilter.fornecedor) ocs = ocs.filter((o) => o.fornecedor_id === histFilter.fornecedor);
-  if (histFilter.obra) ocs = ocs.filter((o) => o.obra_id === histFilter.obra);
 
   // ── Ações ──────────────────────────────────────────────────────────────────
 
@@ -95,6 +110,25 @@ export function HistoricoPage() {
     showToast(`Status alterado para "${status}".`, 'success');
   }
 
+  /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */
+  function handleExportCsv() {
+    const header = ['Número', 'Data', 'Fornecedor', 'Obra', 'Status', 'Qtd. Itens', 'Total (R$)'];
+    const rows = ocs.map((o) => [
+      o.numero,
+      formatDate(o.data),
+      fornecedorNome.get(o.fornecedor_id) ?? '',
+      obraNome.get(o.obra_id) ?? '',
+      o.status,
+      String(o.itens.length),
+      computeOcTotals(o).total_geral.toFixed(2).replace('.', ','),
+    ]);
+    const escape = (c: string) => `"${c.replace(/"/g, '""')}"`;
+    // BOM + separador ';' → abre direto no Excel brasileiro com acentos corretos.
+    const csv = '\ufeff' + [header, ...rows].map((r) => r.map(escape).join(';')).join('\r\n');
+    downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `historico-ocs-${todayIso()}.csv`);
+    showToast(`${ocs.length} OC(s) exportada(s) para CSV.`, 'success');
+  }
+
   async function handleDelete(oc: OrdemCompra) {
     const ok = await confirmAsync({
       title: 'Excluir Ordem de Compra',
@@ -119,12 +153,12 @@ export function HistoricoPage() {
     {
       key: 'fornecedor',
       label: 'Fornecedor',
-      render: (o) => data.fornecedores.find((f) => f.id === o.fornecedor_id)?.razao_social || '—',
+      render: (o) => fornecedorNome.get(o.fornecedor_id) || '—',
     },
     {
       key: 'obra',
       label: 'Obra',
-      render: (o) => data.obras.find((ob) => ob.id === o.obra_id)?.nome || '—',
+      render: (o) => obraNome.get(o.obra_id) || '—',
     },
     {
       key: 'itens',
@@ -154,9 +188,14 @@ export function HistoricoPage() {
             {ocs.length} de {data.ordens_compra.length} registro(s)
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={() => setTab('nova-oc')}>
-          + Nova OC
-        </Button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
+            <Icon name="download" size={13} /> Exportar CSV
+          </Button>
+          <Button variant="primary" size="sm" onClick={() => setTab('nova-oc')}>
+            + Nova OC
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}

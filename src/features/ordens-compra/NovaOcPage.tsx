@@ -293,6 +293,7 @@ export function NovaOcPage() {
 
   const [importing, setImporting] = useState(false);
   const [savingPdf, setSavingPdf] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
 
@@ -437,6 +438,27 @@ export function NovaOcPage() {
     }
   }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
 
+  /**
+   * Abre o PDF da OC em uma nova aba SEM emitir — para conferência antes
+   * de gerar o documento definitivo. Não altera status nem numeração.
+   */
+  const handlePreviewPdf = useCallback(async () => {
+    if (!ocEditing || !data) return;
+    if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item para visualizar.', 'warning'); return; }
+    setPreviewing(true);
+    try {
+      const blob = await generateOcPdfBlob(ocEditing, data);
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener');
+      // Revoga depois de 1 min — tempo de sobra para a aba carregar o blob.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (err) {
+      showToast(`Erro ao gerar prévia: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    } finally {
+      setPreviewing(false);
+    }
+  }, [ocEditing, data, showToast]);
+
   const handleCancelar = useCallback(async () => {
     if (ocEditing && ocEditing.itens.length > 0) {
       const ok = await confirmAsync({
@@ -503,6 +525,9 @@ export function NovaOcPage() {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
+          <Button variant="ghost" size="sm" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
+            <Icon name="eye" size={13} /> Visualizar
+          </Button>
           <Button variant="secondary" size="sm" onClick={handleSaveDraft}>
             <Icon name="save" size={13} /> Salvar Rascunho
           </Button>
@@ -630,6 +655,9 @@ export function NovaOcPage() {
       {/* ── Footer actions ───────────────────────────────────────────────── */}
       <div className={styles.footerActions}>
         <Button variant="outline" onClick={() => void handleCancelar()}>Cancelar</Button>
+        <Button variant="ghost" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
+          <Icon name="eye" size={13} /> Visualizar PDF
+        </Button>
         <Button variant="secondary" onClick={handleSaveDraft}>
           <Icon name="save" size={13} /> Salvar Rascunho
         </Button>
