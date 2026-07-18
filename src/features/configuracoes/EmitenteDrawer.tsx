@@ -3,10 +3,11 @@
  * Portado de openEmitentDrawer (CentralCompras-PBQPH.html).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
+import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
 import { useUiStore } from '../../stores/useUiStore';
 import { uid } from '../../domain/id';
@@ -35,12 +36,10 @@ function emptyEmitente(): Emitente {
 }
 
 export function EmitenteDrawer({ open, emitente, onClose, onSave }: Props) {
+  // O drawer é montado apenas quando aberto (render condicional na página),
+  // então o estado inicial do form já reflete o emitente correto.
   const [form, setForm] = useState<Emitente>(() => emitente ?? emptyEmitente());
   const showToast = useUiStore((s) => s.showToast);
-
-  useEffect(() => {
-    if (open) setForm(emitente ?? emptyEmitente());
-  }, [open, emitente]);
 
   function set<K extends keyof Emitente>(key: K, value: Emitente[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -163,18 +162,7 @@ export function EmitenteDrawer({ open, emitente, onClose, onSave }: Props) {
       </FieldGroup>
 
       <FieldGroup title="Endereço">
-        <Field
-          label="Logradouro"
-          span2
-          value={form.endereco.logradouro}
-          onChange={(e) => setEndereco('logradouro', e.target.value)}
-        />
-        <Field label="Número" value={form.endereco.numero} onChange={(e) => setEndereco('numero', e.target.value)} />
-        <Field label="Complemento" value={form.endereco.complemento} onChange={(e) => setEndereco('complemento', e.target.value)} />
-        <Field label="Bairro" value={form.endereco.bairro} onChange={(e) => setEndereco('bairro', e.target.value)} />
-        <Field label="Cidade" value={form.endereco.cidade} onChange={(e) => setEndereco('cidade', e.target.value)} />
-        <Field label="UF" value={form.endereco.uf} maxLength={2} placeholder="SP" onChange={(e) => setEndereco('uf', e.target.value.toUpperCase())} />
-        <Field label="CEP" value={form.endereco.cep} placeholder="00000-000" onChange={(e) => setEndereco('cep', e.target.value)} />
+        <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
       </FieldGroup>
     </Drawer>
   );

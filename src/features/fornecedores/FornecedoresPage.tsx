@@ -54,6 +54,15 @@ export function FornecedoresPage() {
   }
 
   function handleDelete(f: Fornecedor) {
+    // Integridade referencial: OCs do histórico apontam para o fornecedor por id.
+    const emUso = data!.ordens_compra.filter((oc) => oc.fornecedor_id === f.id).length;
+    if (emUso > 0) {
+      showToast(
+        `"${f.razao_social}" é usado em ${emUso} OC(s) do histórico. Desative-o em vez de excluir.`,
+        'warning',
+      );
+      return;
+    }
     if (!window.confirm(`Excluir "${f.razao_social}"? Esta ação não pode ser desfeita.`)) return;
     removeFornecedor(f.id);
     showToast('Fornecedor excluído.', 'success');
@@ -177,12 +186,14 @@ export function FornecedoresPage() {
         />
       )}
 
-      {/* Drawer */}
-      <FornecedorDrawer
-        open={drawerOpen}
-        fornecedor={editing}
-        onClose={() => setDrawerOpen(false)}
-      />
+      {/* Drawer — montado só quando aberto, para reiniciar o form a cada abertura */}
+      {drawerOpen && (
+        <FornecedorDrawer
+          open
+          fornecedor={editing}
+          onClose={() => setDrawerOpen(false)}
+        />
+      )}
     </div>
   );
 }

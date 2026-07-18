@@ -8,7 +8,7 @@
  * Cada critério: CONFORME / NÃO CONFORME. Mais campos: data, obra, responsável, observações.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
@@ -90,6 +90,8 @@ function CriterioPicker({ label, hint, value, onChange }: CriterioPickerProps) {
 }
 
 export function NovaAvaliacaoDrawer({ open, prestador, avaliacao, onClose }: Props) {
+  // O drawer é montado apenas quando aberto (render condicional no pai),
+  // então o estado inicial do form já reflete a avaliação correta.
   const [form, setForm] = useState<AvaliacaoPrestador>(() =>
     avaliacao ?? emptyAvaliacao(prestador.id),
   );
@@ -97,12 +99,6 @@ export function NovaAvaliacaoDrawer({ open, prestador, avaliacao, onClose }: Pro
   const upsertAvaliacao = useDataStore((s) => s.upsertAvaliacao);
   const obras = useDataStore((s) => s.data?.obras ?? []);
   const showToast = useUiStore((s) => s.showToast);
-
-  useEffect(() => {
-    if (open) {
-      setForm(avaliacao ?? emptyAvaliacao(prestador.id));
-    }
-  }, [open, avaliacao, prestador.id]);
 
   function set<K extends keyof AvaliacaoPrestador>(key: K, value: AvaliacaoPrestador[K]) {
     setForm((f) => ({ ...f, [key]: value }));

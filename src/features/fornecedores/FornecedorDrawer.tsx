@@ -3,10 +3,11 @@
  * Portado de renderFornecedores / openFornecedorDrawer (CentralCompras-PBQPH.html).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
+import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -40,15 +41,12 @@ function emptyFornecedor(): Fornecedor {
 }
 
 export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
+  // O drawer é montado apenas quando aberto (render condicional na página),
+  // então o estado inicial do form já reflete o fornecedor correto.
   const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
   const upsertFornecedor = useDataStore((s) => s.upsertFornecedor);
   const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
   const showToast = useUiStore((s) => s.showToast);
-
-  // Sincroniza form quando o drawer abre com fornecedor diferente
-  useEffect(() => {
-    if (open) setForm(fornecedor ?? emptyFornecedor());
-  }, [open, fornecedor]);
 
   function set<K extends keyof Fornecedor>(key: K, value: Fornecedor[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -148,45 +146,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
       </FieldGroup>
 
       <FieldGroup title="Endereço">
-        <Field
-          label="Logradouro"
-          span2
-          value={form.endereco.logradouro}
-          onChange={(e) => setEndereco('logradouro', e.target.value)}
-        />
-        <Field
-          label="Número"
-          value={form.endereco.numero}
-          onChange={(e) => setEndereco('numero', e.target.value)}
-        />
-        <Field
-          label="Complemento"
-          value={form.endereco.complemento}
-          onChange={(e) => setEndereco('complemento', e.target.value)}
-        />
-        <Field
-          label="Bairro"
-          value={form.endereco.bairro}
-          onChange={(e) => setEndereco('bairro', e.target.value)}
-        />
-        <Field
-          label="Cidade"
-          value={form.endereco.cidade}
-          onChange={(e) => setEndereco('cidade', e.target.value)}
-        />
-        <Field
-          label="UF"
-          value={form.endereco.uf}
-          maxLength={2}
-          placeholder="SP"
-          onChange={(e) => setEndereco('uf', e.target.value.toUpperCase())}
-        />
-        <Field
-          label="CEP"
-          value={form.endereco.cep}
-          placeholder="00000-000"
-          onChange={(e) => setEndereco('cep', e.target.value)}
-        />
+        <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
       </FieldGroup>
 
       {ecrs.length > 0 && (

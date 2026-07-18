@@ -53,6 +53,17 @@ export function ObrasPage() {
   }
 
   function handleDelete(o: Obra) {
+    // Integridade referencial: OCs e avaliações de prestadores apontam para a obra.
+    const emOcs = data!.ordens_compra.filter((oc) => oc.obra_id === o.id).length;
+    const emAvals = data!.avaliacoes_prestadores.filter((a) => a.obra_id === o.id).length;
+    if (emOcs > 0 || emAvals > 0) {
+      const refs = [
+        emOcs > 0 ? `${emOcs} OC(s)` : '',
+        emAvals > 0 ? `${emAvals} avaliação(ões) de prestador` : '',
+      ].filter(Boolean).join(' e ');
+      showToast(`"${o.nome}" é usada em ${refs}. Desative-a em vez de excluir.`, 'warning');
+      return;
+    }
     if (!window.confirm(`Excluir "${o.nome}"? Esta ação não pode ser desfeita.`)) return;
     removeObra(o.id);
     void deleteObraDirHandle(o.id); // limpa handle persistido (idempotente)
@@ -180,11 +191,13 @@ export function ObrasPage() {
       )}
 
       {/* Drawer */}
-      <ObraDrawer
-        open={drawerOpen}
-        obra={editing}
-        onClose={() => setDrawerOpen(false)}
-      />
+      {drawerOpen && (
+        <ObraDrawer
+          open
+          obra={editing}
+          onClose={() => setDrawerOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@
  * Inicializa os dados ao montar (cache → file handle → seed).
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styles from './App.module.css';
 
 // Stores
@@ -81,7 +81,6 @@ interface ConflictState {
   open: boolean;
   remoteTs: string;
   knownTs: string;
-  pendingSave: (() => Promise<void>) | null;
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -89,7 +88,6 @@ interface ConflictState {
 export default function App() {
   const data = useDataStore((s) => s.data);
   const dirty = useDataStore((s) => s.dirty);
-  const dirtySince = useDataStore((s) => s.dirtySince);
   const lastKnownSavedAt = useDataStore((s) => s.lastKnownSavedAt);
   const setData = useDataStore((s) => s.setData);
   const clearDirty = useDataStore((s) => s.clearDirty);
@@ -102,11 +100,9 @@ export default function App() {
   const sourceName = useFileHandleStore((s) => s.sourceName);
   const setFileHandle = useFileHandleStore((s) => s.setFileHandle);
 
-  const conflictRef = useRef<ConflictState>({
-    open: false, remoteTs: '', knownTs: '', pendingSave: null,
+  const [conflict, setConflict] = useState<ConflictState>({
+    open: false, remoteTs: '', knownTs: '',
   });
-  const [, setConflictTick] = useState(0);
-  const forceRender = useCallback(() => setConflictTick((n) => n + 1), []);
   // Hooks transversais
   useAutoSave();
   useDirtyGuard();
@@ -157,13 +153,14 @@ export default function App() {
 
   // ── Save ────────────────────────────────────────────────────────────────────
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (force = false) => {
     if (!data) return;
     const result = await saveData({
       data,
       fileHandle,
       sourceName,
       lastKnownSavedAt,
+      force,
     });
 
     if (result.ok) {
@@ -172,13 +169,7 @@ export default function App() {
       else clearDirty(result.lastSavedAt);
       showToast('Salvo com sucesso.', 'success');
     } else if (result.reason === 'conflict') {
-      conflictRef.current = {
-        open: true,
-        remoteTs: result.remoteTs,
-        knownTs: result.knownTs,
-        pendingSave: handleSave,
-      };
-      forceRender();
+      setConflict({ open: true, remoteTs: result.remoteTs, knownTs: result.knownTs });
     } else if (result.reason === 'download') {
       setData(result.data, result.lastSavedAt);
       clearDirty(result.lastSavedAt);
@@ -186,7 +177,7 @@ export default function App() {
     } else if (result.reason === 'aborted') {
       showToast('Salvamento cancelado.', 'info');
     }
-  }, [data, fileHandle, sourceName, lastKnownSavedAt, setData, setFileHandle, clearDirty, showToast, forceRender]);
+  }, [data, fileHandle, sourceName, lastKnownSavedAt, setData, setFileHandle, clearDirty, showToast]);
 
   const handleConnect = useCallback(async () => {
     try {
@@ -214,7 +205,7 @@ export default function App() {
   }, [fileHandle, dirty, setData, showToast]);
 
   useKeyboardShortcuts({
-    onSave: handleSave,
+    onSave: () => void handleSave(),
     onNewOC: () => setTab('nova-oc'),
   });
 
@@ -226,13 +217,6 @@ export default function App() {
     !principal ||
     !principal.razao_social ||
     (principal.tipo === 'PF' ? !principal.cpf : !principal.cnpj);
-
-  // ── Dirty indicator ─────────────────────────────────────────────────────────
-
-  const dirtySinceMin = dirtySince ? Math.round((Date.now() - dirtySince) / 60000) : 0;
-  const dirtyTitle = dirtySinceMin > 0
-    ? `Não salvo há ${dirtySinceMin} min...`
-    : 'Alterações não salvas...';
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -291,7 +275,7 @@ export default function App() {
           <div className={styles.sfRow}>
             <span
               className={[styles.dirtyDot, dirty ? styles.isDirty : ''].join(' ')}
-              title={dirty ? dirtyTitle : 'Sem alterações'}
+              title={dirty ? 'Alterações não salvas…' : 'Sem alterações'}
             />
             <span className={styles.sfLabel}>Arquivo:</span>
             <span className={styles.sfValue} title={sourceName}>{sourceName}</span>
@@ -313,7 +297,7 @@ export default function App() {
             <button
               className={styles.btnGhostSm}
               style={{ background: dirty ? 'var(--amber)' : undefined, color: dirty ? 'var(--navy-dark)' : undefined, fontWeight: dirty ? 700 : undefined }}
-              onClick={handleSave}
+              onClick={() => void handleSave()}
             >
               💾 Salvar
             </button>
@@ -336,7 +320,7 @@ export default function App() {
                 {sourceName}
               </div>
             )}
-            <button className="btn-navy" style={{ padding: '7px 14px', fontSize: 12, fontWeight: 700, background: 'var(--navy)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={handleSave}>
+            <button className="btn-navy" style={{ padding: '7px 14px', fontSize: 12, fontWeight: 700, background: 'var(--navy)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={() => void handleSave()}>
               💾 Salvar
             </button>
           </div>
@@ -372,18 +356,18 @@ export default function App() {
       <ToastContainer />
 
       <ConfirmDialog
-        open={conflictRef.current.open}
+        open={conflict.open}
         title="Conflito de edição simultânea"
         message={`O arquivo foi modificado por outra sessão.\n\nSalvar agora vai SOBRESCREVER as alterações remotas. Continuar?`}
         confirmLabel="Sobrescrever"
         cancelLabel="Cancelar"
         tone="danger"
         onConfirm={() => {
-          conflictRef.current.open = false;
-          void conflictRef.current.pendingSave?.();
+          setConflict((c) => ({ ...c, open: false }));
+          void handleSave(true);
         }}
         onCancel={() => {
-          conflictRef.current.open = false;
+          setConflict((c) => ({ ...c, open: false }));
           showToast('Salvamento cancelado. Use Recarregar para puxar a versão remota.', 'warning');
         }}
       />

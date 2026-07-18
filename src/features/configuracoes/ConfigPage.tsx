@@ -10,6 +10,9 @@ import { EmitenteDrawer } from './EmitenteDrawer';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Field } from '../../components/Field/Field';
 import { Button } from '../../components/Button/Button';
+import { BACKUP_DIR_KEY } from '../../services/storage/backups';
+import { saveHandleByKey } from '../../services/storage/handles';
+import { verifyHandlePermission } from '../../services/storage/permissions';
 import type { Emitente } from '../../domain/types';
 import styles from './ConfigPage.module.css';
 
@@ -84,6 +87,13 @@ export function ConfigPage() {
     }
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      const granted = await verifyHandlePermission(dirHandle, true);
+      if (!granted) {
+        showToast('Permissão de escrita negada para esta pasta.', 'warning');
+        return;
+      }
+      // Persiste o handle no IndexedDB — é daqui que writeRotatingBackup lê.
+      await saveHandleByKey(BACKUP_DIR_KEY, dirHandle);
       updateConfig({ pasta_backups: dirHandle.name });
       showToast(`Pasta de backups: "${dirHandle.name}"`, 'success');
     } catch (err) {
@@ -300,13 +310,15 @@ export function ConfigPage() {
         </p>
       </FieldGroup>
 
-      {/* Drawer emitentes */}
-      <EmitenteDrawer
-        open={emitenteDrawerOpen}
-        emitente={editingEmitente}
-        onClose={() => setEmitenteDrawerOpen(false)}
-        onSave={handleSaveEmitente}
-      />
+      {/* Drawer emitentes — montado só quando aberto, para reiniciar o form */}
+      {emitenteDrawerOpen && (
+        <EmitenteDrawer
+          open
+          emitente={editingEmitente}
+          onClose={() => setEmitenteDrawerOpen(false)}
+          onSave={handleSaveEmitente}
+        />
+      )}
     </div>
   );
 }

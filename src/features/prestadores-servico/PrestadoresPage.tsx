@@ -256,11 +256,13 @@ export function PrestadoresPage() {
       )}
 
       {/* Drawer */}
-      <PrestadorDrawer
-        open={drawerOpen}
-        prestador={editing}
-        onClose={() => setDrawerOpen(false)}
-      />
+      {drawerOpen && (
+        <PrestadorDrawer
+          open
+          prestador={editing}
+          onClose={() => setDrawerOpen(false)}
+        />
+      )}
     </div>
   );
 }

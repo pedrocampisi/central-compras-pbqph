@@ -13,6 +13,7 @@ import type { Data, Emitente, Endereco, OrdemCompra } from '../../domain/types';
 import { computeItemTotal, computeOcTotals } from '../../domain/compute';
 import { formatBrl, formatDate } from '../../domain/format';
 import { drawBox, addrLine } from './helpers';
+import { downloadBlob } from '../storage/download';
 
 // ── Types internos ────────────────────────────────────────────────────────────
 
@@ -403,13 +404,6 @@ export async function savePdfToFile(
   }
 
   // Fallback: download via URL object
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, filename);
   return 'downloaded';
 }

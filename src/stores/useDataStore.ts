@@ -1,6 +1,9 @@
 /**
  * Store principal: dados do JSON, estado de sincronização e dirty tracking.
  * Equivale ao objeto `state` legado (campos: data, dirty, dirtySince, lastKnownSavedAt).
+ *
+ * As mutações de coleção (upsert/remove) passam pelos helpers genéricos
+ * `upsertIn`/`removeIn` — toda mutação marca dirty automaticamente.
  */
 
 import { create } from 'zustand';
@@ -13,6 +16,14 @@ import type {
   OrdemCompra,
   PrestadorServico,
 } from '../domain/types';
+
+/** Chaves de Data que são coleções de registros com `id: string`. */
+type CollectionKey =
+  | 'ordens_compra'
+  | 'fornecedores'
+  | 'obras'
+  | 'prestadores_servico'
+  | 'avaliacoes_prestadores';
 
 interface DataState {
   data: Data | null;
@@ -37,153 +48,89 @@ interface DataState {
   updateConfig: (partial: Partial<Config>) => void;
 }
 
-export const useDataStore = create<DataState>((set, get) => ({
-  data: null,
-  dirty: false,
-  dirtySince: null,
-  lastKnownSavedAt: '',
+export const useDataStore = create<DataState>((set, get) => {
+  /** Aplica uma mutação em `data` marcando dirty (preserva dirtySince original). */
+  function commit(data: Data): void {
+    set((s) => ({ data, dirty: true, dirtySince: s.dirtySince ?? Date.now() }));
+  }
 
-  setData(data, lastSavedAt) {
-    set({
-      data,
-      dirty: false,
-      dirtySince: null,
-      lastKnownSavedAt: lastSavedAt ?? data.last_saved ?? '',
-    });
-  },
-
-  markDirty() {
-    set((s) => ({
-      dirty: true,
-      dirtySince: s.dirtySince ?? Date.now(),
-    }));
-  },
-
-  clearDirty(lastSavedAt) {
-    set((s) => ({
-      dirty: false,
-      dirtySince: null,
-      lastKnownSavedAt: lastSavedAt ?? s.lastKnownSavedAt,
-    }));
-  },
-
-  updateOrdemCompra(oc) {
+  /** Insere ou substitui (por id) um registro na coleção indicada. */
+  function upsertIn<K extends CollectionKey>(key: K, item: Data[K][number]): void {
     const { data } = get();
     if (!data) return;
-    const idx = data.ordens_compra.findIndex((x) => x.id === oc.id);
-    const ordens_compra =
-      idx >= 0
-        ? data.ordens_compra.map((x) => (x.id === oc.id ? oc : x))
-        : [...data.ordens_compra, oc];
-    set({ data: { ...data, ordens_compra }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
-  },
+    const list: { id: string }[] = data[key];
+    const exists = list.some((x) => x.id === item.id);
+    const next = exists ? list.map((x) => (x.id === item.id ? item : x)) : [...list, item];
+    commit({ ...data, [key]: next });
+  }
 
-  removeOrdemCompra(id) {
+  /** Remove (por id) um registro da coleção indicada. */
+  function removeIn(key: CollectionKey, id: string): void {
     const { data } = get();
     if (!data) return;
-    set({
-      data: { ...data, ordens_compra: data.ordens_compra.filter((x) => x.id !== id) },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
+    const list: { id: string }[] = data[key];
+    commit({ ...data, [key]: list.filter((x) => x.id !== id) });
+  }
 
-  upsertFornecedor(f) {
-    const { data } = get();
-    if (!data) return;
-    const idx = data.fornecedores.findIndex((x) => x.id === f.id);
-    const fornecedores =
-      idx >= 0
-        ? data.fornecedores.map((x) => (x.id === f.id ? f : x))
-        : [...data.fornecedores, f];
-    set({ data: { ...data, fornecedores }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
-  },
+  return {
+    data: null,
+    dirty: false,
+    dirtySince: null,
+    lastKnownSavedAt: '',
 
-  removeFornecedor(id) {
-    const { data } = get();
-    if (!data) return;
-    set({
-      data: { ...data, fornecedores: data.fornecedores.filter((x) => x.id !== id) },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
+    setData(data, lastSavedAt) {
+      set({
+        data,
+        dirty: false,
+        dirtySince: null,
+        lastKnownSavedAt: lastSavedAt ?? data.last_saved ?? '',
+      });
+    },
 
-  upsertObra(o) {
-    const { data } = get();
-    if (!data) return;
-    const idx = data.obras.findIndex((x) => x.id === o.id);
-    const obras =
-      idx >= 0
-        ? data.obras.map((x) => (x.id === o.id ? o : x))
-        : [...data.obras, o];
-    set({ data: { ...data, obras }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
-  },
+    markDirty() {
+      set((s) => ({
+        dirty: true,
+        dirtySince: s.dirtySince ?? Date.now(),
+      }));
+    },
 
-  removeObra(id) {
-    const { data } = get();
-    if (!data) return;
-    set({
-      data: { ...data, obras: data.obras.filter((x) => x.id !== id) },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
+    clearDirty(lastSavedAt) {
+      set((s) => ({
+        dirty: false,
+        dirtySince: null,
+        lastKnownSavedAt: lastSavedAt ?? s.lastKnownSavedAt,
+      }));
+    },
 
-  upsertPrestador(p) {
-    const { data } = get();
-    if (!data) return;
-    const idx = data.prestadores_servico.findIndex((x) => x.id === p.id);
-    const prestadores_servico =
-      idx >= 0
-        ? data.prestadores_servico.map((x) => (x.id === p.id ? p : x))
-        : [...data.prestadores_servico, p];
-    set({ data: { ...data, prestadores_servico }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
-  },
+    updateOrdemCompra: (oc) => upsertIn('ordens_compra', oc),
+    removeOrdemCompra: (id) => removeIn('ordens_compra', id),
 
-  removePrestador(id) {
-    const { data } = get();
-    if (!data) return;
-    // Remove o prestador e todas as avaliações vinculadas a ele.
-    set({
-      data: {
+    upsertFornecedor: (f) => upsertIn('fornecedores', f),
+    removeFornecedor: (id) => removeIn('fornecedores', id),
+
+    upsertObra: (o) => upsertIn('obras', o),
+    removeObra: (id) => removeIn('obras', id),
+
+    upsertPrestador: (p) => upsertIn('prestadores_servico', p),
+
+    removePrestador(id) {
+      const { data } = get();
+      if (!data) return;
+      // Remove o prestador e todas as avaliações vinculadas a ele.
+      commit({
         ...data,
         prestadores_servico: data.prestadores_servico.filter((x) => x.id !== id),
         avaliacoes_prestadores: data.avaliacoes_prestadores.filter((a) => a.prestador_id !== id),
-      },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
+      });
+    },
 
-  upsertAvaliacao(a) {
-    const { data } = get();
-    if (!data) return;
-    const idx = data.avaliacoes_prestadores.findIndex((x) => x.id === a.id);
-    const avaliacoes_prestadores =
-      idx >= 0
-        ? data.avaliacoes_prestadores.map((x) => (x.id === a.id ? a : x))
-        : [...data.avaliacoes_prestadores, a];
-    set({ data: { ...data, avaliacoes_prestadores }, dirty: true, dirtySince: get().dirtySince ?? Date.now() });
-  },
+    upsertAvaliacao: (a) => upsertIn('avaliacoes_prestadores', a),
+    removeAvaliacao: (id) => removeIn('avaliacoes_prestadores', id),
 
-  removeAvaliacao(id) {
-    const { data } = get();
-    if (!data) return;
-    set({
-      data: { ...data, avaliacoes_prestadores: data.avaliacoes_prestadores.filter((x) => x.id !== id) },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
-
-  updateConfig(partial) {
-    const { data } = get();
-    if (!data) return;
-    set({
-      data: { ...data, config: { ...data.config, ...partial } },
-      dirty: true,
-      dirtySince: get().dirtySince ?? Date.now(),
-    });
-  },
-}));
+    updateConfig(partial) {
+      const { data } = get();
+      if (!data) return;
+      commit({ ...data, config: { ...data.config, ...partial } });
+    },
+  };
+});

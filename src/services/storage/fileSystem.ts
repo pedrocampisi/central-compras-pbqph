@@ -15,6 +15,7 @@ import { verifyHandlePermission } from './permissions';
 import { checkConcurrency } from './concurrency';
 import { writeRotatingBackup } from './backups';
 import { saveCache } from './cache';
+import { downloadBlob } from './download';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -88,37 +89,27 @@ export async function tryRestoreFileHandle(): Promise<FileSystemFileHandle | nul
 
 // ── Save ──────────────────────────────────────────────────────────────────────
 
-function downloadBlob(content: string, filename: string): void {
-  const blob = new Blob([content], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
 export interface SaveOptions {
   data: Data;
   fileHandle: FileSystemFileHandle | null;
   sourceName: string;
   lastKnownSavedAt: string;
+  /** Pula a checagem de concorrência — usado ao confirmar "Sobrescrever" no conflito. */
+  force?: boolean;
 }
 
 /**
  * Pipeline de save:
- * 1. Checa concorrência (se fileHandle existir)
+ * 1. Checa concorrência (se fileHandle existir e force=false)
  * 2. Tenta gravar no handle existente
  * 3. Fallback: showSaveFilePicker
  * 4. Último recurso: download blob
  */
 export async function saveData(opts: SaveOptions): Promise<SaveResult> {
-  const { data, fileHandle, sourceName, lastKnownSavedAt } = opts;
+  const { data, fileHandle, sourceName, lastKnownSavedAt, force = false } = opts;
 
   // 1. Concurrency check
-  if (fileHandle) {
+  if (fileHandle && !force) {
     const { conflict, remoteTs } = await checkConcurrency(fileHandle, lastKnownSavedAt);
     if (conflict) {
       return { ok: false, reason: 'conflict', remoteTs, knownTs: lastKnownSavedAt };

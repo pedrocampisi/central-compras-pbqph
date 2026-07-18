@@ -275,7 +275,6 @@ export function NovaOcPage() {
   const data = useDataStore((s) => s.data);
   const updateConfig = useDataStore((s) => s.updateConfig);
   const updateOrdemCompra = useDataStore((s) => s.updateOrdemCompra);
-  const markDirty = useDataStore((s) => s.markDirty);
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
   const startEditing = useOcEditingStore((s) => s.startEditing);
@@ -297,6 +296,9 @@ export function NovaOcPage() {
   // ── Inicialização ───────────────────────────────────────────────────────────
   // Runs once on mount. If ocEditing already exists (navigated from Histórico),
   // skip creation — the user is editing an existing OC.
+  // O número aqui é apenas uma PRÉVIA: o contador da config só é consolidado
+  // no save (commitNumero). Abrir a aba e cancelar não queima números nem
+  // marca o arquivo como dirty.
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -317,8 +319,6 @@ export function NovaOcPage() {
     startEditing(
       buildNewOc(numero, nextNum, currentYear, defaultEmitente, defaultFornecedor, defaultObra, defaultCondicao),
     );
-
-    updateConfig({ ultimo_numero_oc: nextNum, ano_corrente: currentYear });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -337,15 +337,35 @@ export function NovaOcPage() {
         (x) => x.id !== oc.id && x.numero === oc.numero,
       );
       if (!conflict) return oc;
-      const sameYear = data.ordens_compra
+      const seqsDoAno = data.ordens_compra
+        .filter((x) => x.ano === oc.ano)
         .map((x) => x.sequencial)
         .filter((n) => Number.isFinite(n));
-      const nextSeq = (sameYear.length ? Math.max(...sameYear) : 0) + 1;
+      const nextSeq = (seqsDoAno.length ? Math.max(...seqsDoAno) : 0) + 1;
       const numero = `${oc.ano}/${String(nextSeq).padStart(3, '0')}`;
       showToast(`Número ${oc.numero} já estava em uso. Reatribuído para ${numero}.`, 'warning');
       return { ...oc, sequencial: nextSeq, numero };
     },
     [data, showToast],
+  );
+
+  /**
+   * Consolida o número usado no contador da config — chamado apenas no save.
+   * Só cresce dentro do mesmo ano; na virada de ano, reinicia a partir da OC.
+   * OCs de anos anteriores (edição de rascunho antigo) não mexem no contador.
+   */
+  const commitNumero = useCallback(
+    (oc: OrdemCompra) => {
+      if (!data) return;
+      const { ano_corrente, ultimo_numero_oc } = data.config;
+      if (oc.ano < ano_corrente) return;
+      const base = oc.ano === ano_corrente ? ultimo_numero_oc : 0;
+      updateConfig({
+        ultimo_numero_oc: Math.max(base, oc.sequencial),
+        ano_corrente: oc.ano,
+      });
+    },
+    [data, updateConfig],
   );
 
   const handleSaveDraft = useCallback(() => {
@@ -355,12 +375,12 @@ export function NovaOcPage() {
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
     const safe = ensureUniqueNumero(ocEditing);
+    commitNumero(safe);
     updateOrdemCompra({ ...safe, status: 'rascunho', atualizado_em: nowIso() });
-    markDirty();
     stopEditing();
     showToast(`Rascunho ${safe.numero} salvo.`, 'success');
     setTab('historico');
-  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab, ensureUniqueNumero]);
+  }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
@@ -371,6 +391,7 @@ export function NovaOcPage() {
     setSavingPdf(true);
     try {
       const safe = ensureUniqueNumero(ocEditing);
+      commitNumero(safe);
       const emitida: OrdemCompra = { ...safe, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
       const blob = await generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
@@ -394,7 +415,6 @@ export function NovaOcPage() {
 
       const result = await savePdfToFile(blob, filename, obraHandle);
       updateOrdemCompra(emitida);
-      markDirty();
       stopEditing();
       if (result === 'saved') {
         showToast(`OC ${emitida.numero} emitida. PDF salvo na pasta da obra.`, 'success');
@@ -412,7 +432,7 @@ export function NovaOcPage() {
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, updateOrdemCompra, markDirty, stopEditing, showToast, setTab, ensureUniqueNumero]);
+  }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
 
   const handleCancelar = useCallback(() => {
     if (ocEditing && ocEditing.itens.length > 0) {

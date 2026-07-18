@@ -24,7 +24,6 @@ export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
   const updateOrdemCompra = useDataStore((s) => s.updateOrdemCompra);
   const removeOrdemCompra = useDataStore((s) => s.removeOrdemCompra);
-  const markDirty = useDataStore((s) => s.markDirty);
 
   const startEditing = useOcEditingStore((s) => s.startEditing);
 
@@ -84,7 +83,6 @@ export function HistoricoPage() {
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
       updateOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
-      markDirty();
       showToast('PDF regenerado.', 'success');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
@@ -93,14 +91,12 @@ export function HistoricoPage() {
 
   function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
     updateOrdemCompra({ ...oc, status, atualizado_em: nowIso() });
-    markDirty();
     showToast(`Status alterado para "${status}".`, 'success');
   }
 
   function handleDelete(oc: OrdemCompra) {
     if (!window.confirm(`Excluir OC ${oc.numero}? Esta ação não pode ser desfeita.`)) return;
     removeOrdemCompra(oc.id);
-    markDirty();
     showToast('OC excluída.', 'success');
   }
 
