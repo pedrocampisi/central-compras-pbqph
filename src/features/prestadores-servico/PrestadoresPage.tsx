@@ -32,7 +32,8 @@ export function PrestadoresPage() {
   const prestadorFilter = useUiStore((s) => s.prestadorFilter);
   const setPrestadorFilter = useUiStore((s) => s.setPrestadorFilter);
 
-  const [showAtivos, setShowAtivos] = useState<'todos' | 'ativos' | 'inativos'>('todos');
+  // status também persiste no uiStore, junto com search/categoria.
+  const showAtivos = prestadorFilter.status;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<PrestadorServico | null>(null);
 
@@ -222,7 +223,7 @@ export function PrestadoresPage() {
             <button
               key={v}
               className={[styles.toggleBtn, showAtivos === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setShowAtivos(v)}
+              onClick={() => setPrestadorFilter({ status: v })}
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </button>

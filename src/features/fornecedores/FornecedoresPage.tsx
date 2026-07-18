@@ -19,9 +19,10 @@ export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
   const removeFornecedor = useDataStore((s) => s.removeFornecedor);
   const showToast = useUiStore((s) => s.showToast);
+  // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
+  const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
+  const setFornFilter = useUiStore((s) => s.setFornFilter);
 
-  const [search, setSearch] = useState('');
-  const [showAtivos, setShowAtivos] = useState<'todos' | 'ativos' | 'inativos'>('todos');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Fornecedor | null>(null);
 
@@ -146,14 +147,14 @@ export function FornecedoresPage() {
           type="search"
           placeholder="Buscar por razão social, CNPJ, e-mail, cidade…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setFornFilter({ search: e.target.value })}
         />
         <div className={styles.toggleGroup}>
           {(['todos', 'ativos', 'inativos'] as const).map((v) => (
             <button
               key={v}
               className={[styles.toggleBtn, showAtivos === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setShowAtivos(v)}
+              onClick={() => setFornFilter({ status: v })}
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </button>

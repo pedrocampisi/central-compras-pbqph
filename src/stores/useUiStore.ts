@@ -33,18 +33,24 @@ export interface HistFilter {
   obra: string;
 }
 
+/** Toggle de status usado nas listas de cadastro. */
+export type AtivoFilter = 'todos' | 'ativos' | 'inativos';
+export type AtivaFilter = 'todas' | 'ativas' | 'inativas';
+
 export interface FornFilter {
   search: string;
-  ecr: string;
+  status: AtivoFilter;
 }
 
 export interface ObraFilter {
   search: string;
+  status: AtivaFilter;
 }
 
 export interface PrestadorFilter {
   search: string;
   categoria: string;
+  status: AtivoFilter;
 }
 
 export interface CatalogoFilter {
@@ -78,9 +84,9 @@ let toastSeq = 0;
 export const useUiStore = create<UiState>((set) => ({
   activeTab: 'dashboard',
   histFilter: { search: '', status: '', fornecedor: '', obra: '' },
-  fornFilter: { search: '', ecr: '' },
-  obraFilter: { search: '' },
-  prestadorFilter: { search: '', categoria: '' },
+  fornFilter: { search: '', status: 'todos' },
+  obraFilter: { search: '', status: 'todas' },
+  prestadorFilter: { search: '', categoria: '', status: 'todos' },
   catalogoFilter: { search: '' },
   toasts: [],
 

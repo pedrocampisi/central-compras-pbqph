@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
+import { useUiStore } from '../../stores/useUiStore';
 import type { Ecr } from '../../domain/types';
 import styles from './CatalogoPage.module.css';
 
@@ -129,7 +130,9 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
 
 export function CatalogoPage() {
   const data = useDataStore((s) => s.data);
-  const [search, setSearch] = useState('');
+  // Filtro no uiStore: persiste ao trocar de aba.
+  const search = useUiStore((s) => s.catalogoFilter.search);
+  const setCatalogoFilter = useUiStore((s) => s.setCatalogoFilter);
 
   if (!data) return null;
 
@@ -151,9 +154,10 @@ export function CatalogoPage() {
         </div>
       </div>
       <input
+        type="search"
         placeholder="Buscar ECR..."
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => setCatalogoFilter({ search: e.target.value })}
         style={{ width: '100%', marginBottom: 14, padding: '9px 11px', border: '1.5px solid var(--border)', borderRadius: 7, fontSize: 13 }}
       />
       {ecrs.map((ecr) => (

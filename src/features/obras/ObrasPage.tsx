@@ -21,8 +21,10 @@ export function ObrasPage() {
   const removeObra = useDataStore((s) => s.removeObra);
   const showToast = useUiStore((s) => s.showToast);
 
-  const [search, setSearch] = useState('');
-  const [showAtivas, setShowAtivas] = useState<'todas' | 'ativas' | 'inativas'>('todas');
+  // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
+  const { search, status: showAtivas } = useUiStore((s) => s.obraFilter);
+  const setObraFilter = useUiStore((s) => s.setObraFilter);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Obra | null>(null);
 
@@ -150,14 +152,14 @@ export function ObrasPage() {
           type="search"
           placeholder="Buscar por nome, CEI, responsável, cidade…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setObraFilter({ search: e.target.value })}
         />
         <div className={styles.toggleGroup}>
           {(['todas', 'ativas', 'inativas'] as const).map((v) => (
             <button
               key={v}
               className={[styles.toggleBtn, showAtivas === v ? styles.toggleActive : ''].join(' ')}
-              onClick={() => setShowAtivas(v)}
+              onClick={() => setObraFilter({ status: v })}
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </button>
