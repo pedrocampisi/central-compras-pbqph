@@ -9,6 +9,7 @@ import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
+import { Icon } from '../../components/Icon/Icon';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { uid } from '../../domain/id';
@@ -177,7 +178,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
             {form.pasta_oc_path || 'Nenhuma pasta selecionada'}
           </div>
           <Button variant="outline" size="sm" onClick={handlePickPasta}>
-            📂 {handleConnected ? 'Trocar' : 'Selecionar'}
+            <Icon name="folder" size={13} /> {handleConnected ? 'Trocar' : 'Selecionar'}
           </Button>
           {handleConnected && (
             <Button variant="ghost" size="sm" onClick={() => void handleDisconnectPasta()}>

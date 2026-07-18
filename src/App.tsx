@@ -33,6 +33,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { ToastContainer } from './components/Toast/Toast';
 import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
 import { GlobalConfirmDialog } from './components/ConfirmDialog/GlobalConfirmDialog';
+import { Icon, type IconName } from './components/Icon/Icon';
 import { confirmAsync } from './stores/useConfirmStore';
 
 // Feature pages
@@ -50,21 +51,21 @@ import { ConfigPage } from './features/configuracoes/ConfigPage';
 interface NavItem {
   id: TabId;
   label: string;
-  icon: string;
+  icon: IconName;
 }
 
 const NAV_COMPRAS: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: '⊞' },
-  { id: 'nova-oc', label: 'Nova OC', icon: '+' },
-  { id: 'historico', label: 'Histórico', icon: '↺' },
-  { id: 'fornecedores', label: 'Fornecedores', icon: '👥' },
-  { id: 'obras', label: 'Obras', icon: '🏗' },
-  { id: 'prestadores', label: 'Prestadores', icon: '🔧' },
-  { id: 'catalogo', label: 'Catálogo ECR', icon: '📋' },
+  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { id: 'nova-oc', label: 'Nova OC', icon: 'plus' },
+  { id: 'historico', label: 'Histórico', icon: 'history' },
+  { id: 'fornecedores', label: 'Fornecedores', icon: 'users' },
+  { id: 'obras', label: 'Obras', icon: 'building' },
+  { id: 'prestadores', label: 'Prestadores', icon: 'wrench' },
+  { id: 'catalogo', label: 'Catálogo ECR', icon: 'clipboard' },
 ];
 
 const NAV_SISTEMA: NavItem[] = [
-  { id: 'config', label: 'Configurações', icon: '⚙' },
+  { id: 'config', label: 'Configurações', icon: 'settings' },
 ];
 
 const TAB_TITLES: Record<TabId, string> = {
@@ -277,7 +278,7 @@ export default function App() {
               className={[styles.tabBtn, activeTab === item.id ? styles.active : ''].join(' ')}
               onClick={() => setTab(item.id)}
             >
-              <span>{item.icon}</span>
+              <Icon name={item.icon} />
               <span>{item.label}</span>
             </button>
           ))}
@@ -288,7 +289,7 @@ export default function App() {
               className={[styles.tabBtn, activeTab === item.id ? styles.active : ''].join(' ')}
               onClick={() => setTab(item.id)}
             >
-              <span>{item.icon}</span>
+              <Icon name={item.icon} />
               <span>{item.label}</span>
             </button>
           ))}
@@ -313,17 +314,22 @@ export default function App() {
             </span>
           </div>
           <div className={styles.sfActions}>
-            <button className={styles.btnGhostSm} onClick={handleConnect}>📂 Conectar</button>
-            <button className={styles.btnGhostSm} onClick={handleReload}>↺ Recarregar</button>
+            <button className={styles.btnGhostSm} onClick={handleConnect}>
+              <Icon name="folder" size={13} /> Conectar
+            </button>
+            <button className={styles.btnGhostSm} onClick={handleReload}>
+              <Icon name="reload" size={13} /> Recarregar
+            </button>
           </div>
           <div className={styles.sfActions}>
-            <button className={styles.btnGhostSm} onClick={() => setTab('config')}>⚙ Config</button>
+            <button className={styles.btnGhostSm} onClick={() => setTab('config')}>
+              <Icon name="settings" size={13} /> Config
+            </button>
             <button
-              className={styles.btnGhostSm}
-              style={{ background: dirty ? 'var(--amber)' : undefined, color: dirty ? 'var(--navy-dark)' : undefined, fontWeight: dirty ? 700 : undefined }}
+              className={[styles.btnGhostSm, dirty ? styles.btnSaveDirty : ''].join(' ')}
               onClick={() => void handleSave()}
             >
-              💾 Salvar
+              <Icon name="save" size={13} /> Salvar
             </button>
           </div>
         </div>
@@ -344,8 +350,8 @@ export default function App() {
                 {sourceName}
               </div>
             )}
-            <button className="btn-navy" style={{ padding: '7px 14px', fontSize: 12, fontWeight: 700, background: 'var(--navy)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={() => void handleSave()}>
-              💾 Salvar
+            <button className={styles.topbarSaveBtn} onClick={() => void handleSave()}>
+              <Icon name="save" size={14} /> Salvar
             </button>
           </div>
         </header>

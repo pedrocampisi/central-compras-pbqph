@@ -10,6 +10,7 @@ import { EmitenteDrawer } from './EmitenteDrawer';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Field } from '../../components/Field/Field';
 import { Button } from '../../components/Button/Button';
+import { Icon } from '../../components/Icon/Icon';
 import { BACKUP_DIR_KEY } from '../../services/storage/backups';
 import { saveHandleByKey } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
@@ -160,19 +161,9 @@ export function ConfigPage() {
 
       {/* ── Integração IA ─────────────────────────────────────────────────── */}
       <FieldGroup title="Integração com IA (OpenRouter)">
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', gridColumn: '1 / -1' }}>
+        <div className={styles.rowFull}>
           <input
-            style={{
-              flex: 1,
-              padding: '7px 10px',
-              borderRadius: 7,
-              border: '1px solid var(--border)',
-              fontSize: 13,
-              fontFamily: 'monospace',
-              background: 'var(--surface)',
-              color: 'var(--text)',
-              outline: 'none',
-            }}
+            className={styles.monoInput}
             type={showApiKey ? 'text' : 'password'}
             placeholder="sk-or-…"
             value={apiKey}
@@ -191,7 +182,7 @@ export function ConfigPage() {
             {showApiKey ? '🙈' : '👁'}
           </Button>
         </div>
-        <p style={{ gridColumn: '1 / -1', fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
+        <p className={styles.hint}>
           Chave de API do{' '}
           <a href="https://openrouter.ai" target="_blank" rel="noreferrer" style={{ color: 'var(--navy)' }}>
             OpenRouter
@@ -221,19 +212,9 @@ export function ConfigPage() {
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nenhuma condição cadastrada.</span>
           )}
         </div>
-        <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}>
+        <div className={styles.rowFull}>
           <input
-            style={{
-              flex: 1,
-              padding: '6px 10px',
-              border: '1px solid var(--border)',
-              borderRadius: 7,
-              fontSize: 13,
-              fontFamily: 'inherit',
-              outline: 'none',
-              background: 'var(--surface)',
-              color: 'var(--text)',
-            }}
+            className={styles.textInput}
             placeholder="Ex: 30/60/90 dias"
             value={newCondicao}
             onChange={(e) => setNewCondicao(e.target.value)}
@@ -274,22 +255,7 @@ export function ConfigPage() {
       {/* ── Backups ───────────────────────────────────────────────────────── */}
       <FieldGroup title="Pasta de Backups Automáticos">
         {!cfg.pasta_backups && (
-          <div
-            role="alert"
-            style={{
-              gridColumn: '1 / -1',
-              padding: '8px 12px',
-              borderRadius: 7,
-              border: '1px solid var(--amber)',
-              background: 'rgba(255, 193, 7, 0.12)',
-              color: 'var(--navy-dark)',
-              fontSize: 12,
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
+          <div role="alert" className={styles.warnBanner}>
             <span>⚠️</span>
             <span>
               Nenhuma pasta de backups selecionada. Os backups rotativos estão{' '}
@@ -297,29 +263,15 @@ export function ConfigPage() {
             </span>
           </div>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, gridColumn: '1 / -1' }}>
-          <div
-            style={{
-              flex: 1,
-              padding: '7px 10px',
-              borderRadius: 7,
-              border: '1px solid var(--border)',
-              background: 'var(--surface-alt)',
-              fontSize: 12,
-              fontFamily: 'monospace',
-              color: cfg.pasta_backups ? 'var(--text)' : 'var(--text-muted)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
+        <div className={styles.rowFull}>
+          <div className={[styles.pathBox, cfg.pasta_backups ? '' : styles.pathBoxEmpty].join(' ')}>
             {cfg.pasta_backups || 'Nenhuma pasta selecionada — backups desativados'}
           </div>
           <Button variant="outline" size="sm" onClick={handlePickBackups}>
-            📂 Selecionar
+            <Icon name="folder" size={13} /> Selecionar
           </Button>
         </div>
-        <p style={{ gridColumn: '1 / -1', fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
+        <p className={styles.hint}>
           A cada salvamento, um snapshot timestampado é criado nesta pasta (máximo 10 backups rotativos).
         </p>
       </FieldGroup>

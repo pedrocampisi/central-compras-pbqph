@@ -91,3 +91,65 @@
   background: var(--danger-bg, #fee2e2);
   color: var(--danger, #dc2626);
 }
+
+/* ── Inputs e caixas (antes inline) ─────────────────────────────────────────── */
+
+.rowFull {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.textInput {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+.textInput:focus { border-color: var(--navy); }
+
+.monoInput {
+  composes: textInput;
+  font-family: monospace;
+}
+
+.pathBox {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  font-size: 12px;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pathBoxEmpty { color: var(--text-muted); }
+
+.hint {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.warnBanner {
+  grid-column: 1 / -1;
+  padding: 8px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--amber);
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--navy-dark);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

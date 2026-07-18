@@ -12,6 +12,7 @@ import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { Icon } from '../../components/Icon/Icon';
 import { computeItemTotal, computeOcTotals } from '../../domain/compute';
 import { formatBrl, todayIso, nowIso } from '../../domain/format';
 import { uid } from '../../domain/id';
@@ -503,10 +504,10 @@ export function NovaOcPage() {
         <div style={{ display: 'flex', gap: 8 }}>
           <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
           <Button variant="secondary" size="sm" onClick={handleSaveDraft}>
-            💾 Salvar Rascunho
+            <Icon name="save" size={13} /> Salvar Rascunho
           </Button>
           <Button variant="primary" size="sm" onClick={() => void handleEmitir()} loading={savingPdf}>
-            📄 Emitir OC + PDF
+            <Icon name="file-text" size={13} /> Emitir OC + PDF
           </Button>
         </div>
       </div>
@@ -599,7 +600,7 @@ export function NovaOcPage() {
               loading={importing}
               title="Importar itens de um pedido PDF via IA"
             >
-              🤖 Importar Pedido (IA)
+              <Icon name="sparkles" size={13} /> Importar Pedido (IA)
             </Button>
             <input
               ref={fileInputRef}
@@ -629,9 +630,11 @@ export function NovaOcPage() {
       {/* ── Footer actions ───────────────────────────────────────────────── */}
       <div className={styles.footerActions}>
         <Button variant="outline" onClick={() => void handleCancelar()}>Cancelar</Button>
-        <Button variant="secondary" onClick={handleSaveDraft}>💾 Salvar Rascunho</Button>
+        <Button variant="secondary" onClick={handleSaveDraft}>
+          <Icon name="save" size={13} /> Salvar Rascunho
+        </Button>
         <Button variant="primary" onClick={() => void handleEmitir()} loading={savingPdf}>
-          📄 Emitir OC + Gerar PDF
+          <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
         </Button>
       </div>
     </div>
