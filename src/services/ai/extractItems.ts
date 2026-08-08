@@ -84,16 +84,17 @@ export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<
   if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
 
   const url = import.meta.env['VITE_SUPABASE_URL'] as string;
-  const chave = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] as string;
 
   const { data: sess } = await supabase.auth.getSession();
   const token = sess.session?.access_token;
   if (!token) throw new Error('Sessão expirada. Saia e entre novamente.');
 
+  // Sem o header `apikey` de propósito: o CORS da função só permite
+  // authorization e content-type, e o token da sessão autentica sozinho
+  // (verificado em 08/08/2026 — com apikey o navegador bloqueia o preflight).
   const resp = await fetch(`${url}/functions/v1/extrair-itens`, {
     method: 'POST',
     headers: {
-      apikey: chave,
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
