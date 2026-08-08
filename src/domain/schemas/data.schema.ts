@@ -228,13 +228,12 @@ export const ConfigSchema = z.object({
   texto_condicoes_contratacao: z.string().default(''),
   texto_envio_nf: z.string().default(''),
   texto_qualidade: z.string().default(''),
-  openrouter_api_key: z.string().default(''),
   pasta_backups: z.string().default(''),
 });
 
 // ── Data raiz ──────────────────────────────────────────────────────────────
 export const DataSchema = z.object({
-  schema_version: z.number().default(4),
+  schema_version: z.number().default(5),
   version: z.number().default(1),
   app_name: z.string().default('Central de Compras PBQP-H V2 - Campisi'),
   shared_file_name: z.string().default('central-compras-data.json'),

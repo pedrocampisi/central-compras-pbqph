@@ -73,15 +73,13 @@ export function HistoricoPage() {
   }
 
   function handleDuplicate(oc: OrdemCompra) {
-    const currentYear = new Date().getFullYear();
-    const yearChanged = currentYear !== data!.config.ano_corrente;
-    const nextNum = yearChanged ? 1 : data!.config.ultimo_numero_oc + 1;
+    // Sem número: o banco numera ao salvar (reservarNumeroOc), nunca o navegador.
     const duplicated: OrdemCompra = {
       ...structuredClone(oc),
       id: uid('oc'),
-      numero: `${currentYear}/${String(nextNum).padStart(3, '0')}`,
-      sequencial: nextNum,
-      ano: currentYear,
+      numero: '',
+      sequencial: 0,
+      ano: new Date().getFullYear(),
       status: 'rascunho',
       data: new Date().toISOString().slice(0, 10),
       criado_em: nowIso(),

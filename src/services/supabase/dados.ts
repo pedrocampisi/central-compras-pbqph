@@ -87,7 +87,7 @@ export async function carregarDados(): Promise<Data> {
   const numeracaoAno = (cfgNum.data ?? []).find((n: Record<string, number>) => n['ano'] === anoCorrente);
 
   return {
-    schema_version: 4,
+    schema_version: 5,
     version: 1,
     app_name: 'Central de Compras PBQP-H',
     shared_file_name: '',
@@ -102,8 +102,7 @@ export async function carregarDados(): Promise<Data> {
       texto_condicoes_contratacao: '',
       texto_envio_nf: '',
       texto_qualidade: '',
-      // A chave da IA não vem mais junto dos dados: ela passou para o servidor.
-      openrouter_api_key: '',
+      // A chave da IA não existe mais no formato de dados: passou para o servidor.
       pasta_backups: '',
     },
     fornecedores: (forn.data ?? []).map(paraFornecedor),

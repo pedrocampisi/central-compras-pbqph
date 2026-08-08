@@ -70,7 +70,7 @@ export function aoMudarSessao(cb: (s: Session | null) => void): () => void {
 }
 
 /** As mensagens do Supabase vêm em inglês e técnicas demais para o usuário. */
-function traduzErroAuth(msg: string): string {
+export function traduzErroAuth(msg: string): string {
   if (/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos.';
   if (/email not confirmed/i.test(msg)) return 'E-mail ainda não confirmado.';
   if (/rate limit|too many/i.test(msg)) return 'Muitas tentativas. Aguarde um instante.';

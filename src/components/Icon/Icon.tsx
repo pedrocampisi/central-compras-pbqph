@@ -26,7 +26,8 @@ export type IconName =
   | 'file-text'
   | 'eye'
   | 'download'
-  | 'sparkles';
+  | 'sparkles'
+  | 'logout';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -122,6 +123,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
     <>
       <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
       <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z" />
+    </>
+  ),
+  logout: (
+    <>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </>
   ),
 };

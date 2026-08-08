@@ -1,107 +1,22 @@
 /**
- * Extração de itens de pedido via IA (OpenRouter + Claude Haiku 4.5).
- * Aceita imagens (data URLs JPEG) e retorna itens normalizados prontos para inserção.
- * Portado de CentralCompras-PBQPH.html linhas 2433-2526.
+ * Extração de itens de pedido via IA — agora pelo SERVIDOR.
+ *
+ * A chamada vai para a Edge Function `extrair-itens` do Supabase, que guarda a
+ * chave da OpenRouter nos segredos do projeto e busca os ECRs no banco sozinha.
+ * O navegador não conhece chave nenhuma — antes, qualquer pessoa com o
+ * inspetor aberto lia a chave no localStorage.
+ *
+ * A NORMALIZAÇÃO continua aqui de propósito: o servidor devolve os itens no
+ * mesmo formato cru que o modelo devolvia antes, e é o aplicativo que decide
+ * como mapear unidades e completar campos (normalizeUnit + normalizeItem).
  */
 
-import type { Ecr, Item } from '../../domain/types';
+import type { Item } from '../../domain/types';
 import { normalizeItem } from '../../domain/normalize';
 import { UN_PADRAO } from '../../domain/constants';
-import { callOpenRouter } from './openRouterClient';
+import { supabase } from '../supabase/client';
 
-// ── Prompt ────────────────────────────────────────────────────────────────────
-
-function buildPrompt(ecrs: Ecr[]): string {
-  // Para cada ECR, enviamos id/codigo/nome + alguns materiais típicos (se houver)
-  // para que a IA tenha contexto suficiente para mapear itens novos.
-  // Com ~20 ECRs e até 5 materiais cada, o overhead é ~1k tokens — vale o ganho
-  // em precisão da classificação.
-  const ecrsList = ecrs
-    .map((e) => {
-      const sample = e.materiais
-        .map((m) => m.descricao)
-        .filter(Boolean)
-        .slice(0, 5)
-        .join('; ');
-      const tail = sample ? ` [ex: ${sample}]` : '';
-      return `${e.id}: ${e.codigo} — ${e.nome}${tail}`;
-    })
-    .join('\n');
-
-  return `Você é um extrator de dados de pedidos/orçamentos de obra. Analise a(s) imagem(ns) e extraia TODAS as linhas de itens em JSON estrito.
-
-Formato OBRIGATÓRIO (apenas JSON, sem markdown, sem texto antes/depois):
-{"itens":[{"descricao":"texto da linha do item","observacao":"código/SKU do item se houver, senão string vazia","unidade":"un|kg|m|m²|m³|sc|L|gl|bd|cx|rl|pç","quantidade":number,"preco_unit":number,"ipi_pct":number,"desc_pct":number,"ecr_id":number_or_null}]}
-
-═══ REGRA CRÍTICA SOBRE PREÇO E DESCONTO ═══
-"preco_unit" é SEMPRE o preço BRUTO (de tabela / antes do desconto).
-"desc_pct" é o percentual de desconto da linha.
-O sistema aplica o desconto: total = qtd × preco_unit × (1 − desc_pct/100) × (1 + ipi_pct/100).
-
-NUNCA repasse o desconto duas vezes. Se a tabela mostra colunas separadas tipo:
-  | TABELA | DESC% | VALOR UNITÁRIO | TOTAL |
-  |  22,50 |  9,00 |     20,48      | 102,38 |
-então: preco_unit = 22.50 (TABELA), desc_pct = 9, NÃO 20.48.
-
-VERIFIQUE matematicamente cada linha antes de devolver:
-  qtd × preco_unit × (1 − desc_pct/100) ≈ TOTAL da linha (tolerância 1%).
-Se não bater, está errado — você confundiu bruto com líquido. Corrija.
-
-Caso só haja UMA coluna de preço (sem coluna de desconto explícita): preco_unit = esse preço, desc_pct = 0.
-
-═══ CLASSIFICAÇÃO DE ECR ═══
-"ecr_id" é o ID numérico (campo antes do ":") do ECR mais apropriado para o item.
-
-Use o NOME e os EXEMPLOS de materiais de cada ECR como guia. Match por semântica
-da DESCRIÇÃO do item, não por palavra exata.
-
-Heurísticas (não é regra fixa, é só direção):
-- Tubos / conexões / registros / caixas d'água / hidra / sifão / ralo / válvula → ECR de Hidrossanitário
-- Fios / cabos / disjuntor / interruptor / tomada / lâmpada / eletroduto / quadro → ECR de Elétrico
-- Tinta / textura / massa corrida / selador / verniz → ECR de Tinta/Textura/Selador
-- Telha / cumeeira / fibrocimento → ECR de Telhas
-- Bloco / tijolo → ECR de Bloco
-- Areia / brita / pedrisco → ECR de Areia e Brita
-- Cimento (Portland, CP II, CP III) → ECR de Cimento
-- Aço / vergalhão / treliça / barra de aço → ECR de Barras e treliças de Aço
-- Cal / gesso / aditivo → ECR de Cal/Gesso/Aditivo
-- Madeira / caibro / tábua / compensado / sarrafo → ECR de Madeira
-- Concreto usinado / FCK → ECR de Concreto Usinado
-- Argamassa AC-I / AC-II / AC-III / colante → ECR de Argamassa colante
-- Cerâmica / porcelanato / azulejo / piso / revestimento → ECR de Revestimento
-- Janela / esquadria / guarda-corpo / vidro → ECR de Esquadrias
-- Porta / batente / fechadura → ECR de Portas
-- Vaso sanitário / pia / cuba / louça / metal sanitário → ECR de Louças e Metais
-- Bancada / peitoril / soleira → ECR de Bancada
-- Manta asfáltica / impermeabilizante → ECR de Impermeabilizante
-- Mangueira de gás / regulador / dispositivo de gás → ECR de Dispositivo de Gás
-- Estrutura metálica para telhado / madeiramento de telhado → ECR de Estrutura Metálica e madeira para telhado
-
-PREFIRA escolher um ECR provável a devolver null. Só use null se realmente não
-houver nenhum match razoável (ex: "frete", "mão de obra", "serviço" — itens
-não-físicos).
-
-ECRs DISPONÍVEIS:
-${ecrsList}
-
-═══ DEMAIS REGRAS ═══
-- Use ponto como separador decimal (ex: 22.50, não 22,50).
-- "quantidade" e "preco_unit" são números (não strings).
-- "ipi_pct" e "desc_pct" são percentuais (0 se ausente).
-- "observacao": código do produto / SKU se disponível na coluna "Item" ou "Cód." (ex: "2660"). Caso contrário, "".
-- "unidade" deve ser uma das unidades padrão. Mapeie:
-  • UN, UNID, UND, PEÇA, PC, PÇ → "un" ou "pç"
-  • KG → "kg"
-  • M, MT, METRO → "m"
-  • M2 → "m²", M3 → "m³"
-  • BARRA, BR, BR3MT, BR6MT → "un" (não há unidade "barra"; conte como unidade)
-  • CX, CAIXA → "cx"
-  • RL, ROLO → "rl"
-  • SC, SACO → "sc"
-  • L, LT, LITRO → "L"
-- Ignore totais, subtotais, cabeçalhos, dados do cliente/fornecedor/loja, vencimentos, formas de pagamento.
-- Se a imagem não contiver itens reconhecíveis, retorne {"itens":[]}.`;
-}
+const MAX_IMAGENS = 10;
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -140,43 +55,55 @@ interface RawExtractedItem {
   ecr_id?: unknown;
 }
 
+// ── Erros da função do servidor, em português ─────────────────────────────────
+
+function mensagemErro(status: number): string {
+  switch (status) {
+    case 401:
+      return 'Sessão expirada. Saia e entre novamente.';
+    case 403:
+      return 'Seu acesso não permite usar a importação por IA.';
+    case 422:
+      return 'A IA não conseguiu ler itens neste arquivo. Tente uma imagem mais nítida.';
+    case 502:
+      return 'O serviço de IA (OpenRouter) está fora do ar. Tente novamente em instantes.';
+    case 503:
+      return 'A importação por IA ainda não foi configurada no servidor. Avise o administrador.';
+    default:
+      return `Falha na importação por IA (erro ${status}). Tente novamente.`;
+  }
+}
+
 // ── Extração ──────────────────────────────────────────────────────────────────
 
 /**
- * Envia imagens para a IA e retorna itens normalizados.
- * Lança erro se apiKey não estiver configurada ou a IA não retornar JSON válido.
+ * Envia as imagens (data URLs JPEG) para a função do servidor e devolve os
+ * itens já normalizados, prontos para entrar na OC.
  */
-export async function extractItemsFromImages(
-  imagesDataUrls: string[],
-  ecrs: Ecr[],
-  apiKey: string,
-): Promise<Item[]> {
-  if (!apiKey) throw new Error('OpenRouter API key não configurada. Acesse Configurações.');
+export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<Item[]> {
   if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
 
-  const promptText = buildPrompt(ecrs);
+  const url = import.meta.env['VITE_SUPABASE_URL'] as string;
+  const chave = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] as string;
 
-  const content: Array<
-    { type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }
-  > = [{ type: 'text', text: promptText }];
+  const { data: sess } = await supabase.auth.getSession();
+  const token = sess.session?.access_token;
+  if (!token) throw new Error('Sessão expirada. Saia e entre novamente.');
 
-  for (const url of imagesDataUrls) {
-    content.push({ type: 'image_url', image_url: { url } });
-  }
+  const resp = await fetch(`${url}/functions/v1/extrair-itens`, {
+    method: 'POST',
+    headers: {
+      apikey: chave,
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ imagens: imagesDataUrls.slice(0, MAX_IMAGENS) }),
+  });
 
-  // Tokens dinâmicos: ~15 itens/página × ~80 tokens/item = 1200 tokens/página.
-  // Mínimo 800 (pedido pequeno), máximo 4000 (pedido enorme com muitas páginas).
-  const maxTokens = Math.max(800, Math.min(imagesDataUrls.length * 1200, 4000));
+  if (!resp.ok) throw new Error(mensagemErro(resp.status));
 
-  const raw = await callOpenRouter(apiKey, [{ role: 'user', content }], maxTokens);
-
-  // Extrai o bloco JSON da resposta (a IA pode adicionar texto antes/depois)
-  const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('}');
-  if (start < 0 || end < 0) throw new Error('Resposta da IA sem JSON válido.');
-
-  const parsed = JSON.parse(raw.slice(start, end + 1)) as { itens?: RawExtractedItem[] };
-  const rawItems = Array.isArray(parsed.itens) ? parsed.itens : [];
+  const payload = (await resp.json()) as { itens?: RawExtractedItem[] };
+  const rawItems = Array.isArray(payload.itens) ? payload.itens : [];
 
   return rawItems.map((it) =>
     normalizeItem({

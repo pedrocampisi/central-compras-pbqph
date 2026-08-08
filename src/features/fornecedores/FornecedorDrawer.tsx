@@ -11,6 +11,10 @@ import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { salvarFornecedor } from '../../services/supabase/dados';
+import { recarregarDados } from '../../services/supabase/sync';
+import { podeEditar } from '../../services/supabase/auth';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
@@ -44,9 +48,11 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   // O drawer é montado apenas quando aberto (render condicional na página),
   // então o estado inicial do form já reflete o fornecedor correto.
   const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
-  const upsertFornecedor = useDataStore((s) => s.upsertFornecedor);
+  const [salvando, setSalvando] = useState(false);
   const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
+  const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);
+  const editaOk = podeEditar(perfil?.papel);
 
   function set<K extends keyof Fornecedor>(key: K, value: Fornecedor[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -65,17 +71,23 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
     }));
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!form.razao_social.trim()) {
       showToast('Razão social é obrigatória.', 'warning');
       return;
     }
-    upsertFornecedor({
-      ...form,
-      atualizado_em: nowIso(),
-    });
-    showToast(fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor criado.', 'success');
-    onClose();
+    setSalvando(true);
+    try {
+      // Grava direto no banco; a lista é recarregada de lá em seguida.
+      await salvarFornecedor({ ...form, atualizado_em: nowIso() });
+      await recarregarDados();
+      showToast(fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor criado.', 'success');
+      onClose();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Falha ao gravar fornecedor.', 'error');
+    } finally {
+      setSalvando(false);
+    }
   }
 
   const isNew = !fornecedor;
@@ -88,7 +100,14 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
-          <Button variant="primary" size="sm" onClick={handleSave}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => void handleSave()}
+            loading={salvando}
+            disabled={!editaOk}
+            title={editaOk ? undefined : 'Seu acesso não permite editar fornecedores'}
+          >
             {isNew ? 'Criar' : 'Salvar'}
           </Button>
         </div>

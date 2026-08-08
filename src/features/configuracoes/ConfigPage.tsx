@@ -14,7 +14,6 @@ import { Icon } from '../../components/Icon/Icon';
 import { BACKUP_DIR_KEY } from '../../services/storage/backups';
 import { saveHandleByKey } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
-import { getApiKey, setApiKey } from '../../services/storage/apiKey';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { Emitente } from '../../domain/types';
 import styles from './ConfigPage.module.css';
@@ -27,9 +26,6 @@ export function ConfigPage() {
   const [emitenteDrawerOpen, setEmitenteDrawerOpen] = useState(false);
   const [editingEmitente, setEditingEmitente] = useState<Emitente | null>(null);
   const [newCondicao, setNewCondicao] = useState('');
-  const [showApiKey, setShowApiKey] = useState(false);
-  // Chave da IA é por dispositivo (localStorage), não vai para o JSON compartilhado.
-  const [apiKey, setApiKeyState] = useState(() => getApiKey());
 
   if (!data) return null;
 
@@ -160,36 +156,10 @@ export function ConfigPage() {
       </FieldGroup>
 
       {/* ── Integração IA ─────────────────────────────────────────────────── */}
-      <FieldGroup title="Integração com IA (OpenRouter)">
-        <div className={styles.rowFull}>
-          <input
-            className={styles.monoInput}
-            type={showApiKey ? 'text' : 'password'}
-            placeholder="sk-or-…"
-            value={apiKey}
-            onChange={(e) => {
-              setApiKeyState(e.target.value);
-              setApiKey(e.target.value);
-            }}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            data-lpignore="true"
-            data-1p-ignore="true"
-          />
-          <Button variant="ghost" size="sm" onClick={() => setShowApiKey((v) => !v)}>
-            {showApiKey ? '🙈' : '👁'}
-          </Button>
-        </div>
+      <FieldGroup title="Importação de Pedidos por IA">
         <p className={styles.hint}>
-          Chave de API do{' '}
-          <a href="https://openrouter.ai" target="_blank" rel="noreferrer" style={{ color: 'var(--navy)' }}>
-            OpenRouter
-          </a>{' '}
-          para importação de pedidos via IA. Armazenada <strong>apenas neste computador</strong> —
-          não vai para o arquivo compartilhado, OneDrive nem backups. Em outro computador,
-          informe a chave novamente.
+          A leitura de pedidos por IA agora roda no servidor, com a chave
+          guardada lá — nenhuma configuração é necessária neste computador.
         </p>
       </FieldGroup>
 

@@ -11,6 +11,7 @@
 import { migrateV1toV2 } from './v1-to-v2';
 import { migrateV2toV3 } from './v2-to-v3';
 import { migrateV3toV4 } from './v3-to-v4';
+import { migrateV4toV5 } from './v4-to-v5';
 
 type Raw = Record<string, unknown>;
 
@@ -25,6 +26,7 @@ export function runMigrations(raw: unknown): unknown {
   if (version < 2) data = migrateV1toV2(data);
   if (version < 3) data = migrateV2toV3(data);
   if (version < 4) data = migrateV3toV4(data);
+  if (version < 5) data = migrateV4toV5(data);
 
   return data;
 }

@@ -5,6 +5,16 @@
   overflow: hidden;
 }
 
+/* Telas de portão (verificando sessão / carregando dados) */
+.gateScreen {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .sidebar {
   width: 260px;

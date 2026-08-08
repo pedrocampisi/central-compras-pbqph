@@ -1,6 +1,11 @@
 /**
  * Shell raiz — Sidebar + Topbar + conteúdo da aba ativa.
- * Inicializa os dados ao montar (cache → file handle → seed).
+ *
+ * Fonte de dados: Supabase (login → carregarDados → realtime). O fluxo antigo
+ * de arquivo JSON (services/storage/*) continua no repositório como caminho de
+ * volta enquanto a virada não for aprovada, mas não é mais chamado daqui.
+ * Com o banco, cada gravação é imediata — não existe mais Ctrl+S nem "salvar
+ * arquivo": os botões de Conectar/Salvar da era do JSON saíram junto.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -9,34 +14,23 @@ import styles from './App.module.css';
 // Stores
 import { useDataStore } from './stores/useDataStore';
 import { useUiStore, type TabId } from './stores/useUiStore';
-import { useFileHandleStore } from './stores/useFileHandleStore';
+import { useAuthStore } from './stores/useAuthStore';
 
 // Services
-import { loadCache, purgeLegacyCaches } from './services/storage/cache';
-import { getApiKey, setApiKey } from './services/storage/apiKey';
-import {
-  connectFile,
-  saveData,
-  reloadFromHandle,
-  tryRestoreFileHandle,
-  loadFromFileHandle,
-} from './services/storage/fileSystem';
-import { runMigrations } from './domain/migrations';
-import { normalizeData } from './domain/normalize';
+import { sessaoAtual, aoMudarSessao, perfilAtual, sair, type Papel } from './services/supabase/auth';
+import { assinarMudancas } from './services/supabase/dados';
+import { recarregarDados } from './services/supabase/sync';
 
 // Hooks
-import { useAutoSave } from './hooks/useAutoSave';
-import { useDirtyGuard } from './hooks/useDirtyGuard';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 // Components
 import { ToastContainer } from './components/Toast/Toast';
-import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
 import { GlobalConfirmDialog } from './components/ConfirmDialog/GlobalConfirmDialog';
 import { Icon, type IconName } from './components/Icon/Icon';
-import { confirmAsync } from './stores/useConfirmStore';
 
 // Feature pages
+import { LoginPage, SemAcessoPage } from './features/auth/LoginPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
@@ -79,171 +73,158 @@ const TAB_TITLES: Record<TabId, string> = {
   config: 'Configurações',
 };
 
-// ── Componente de conflito de concorrência ─────────────────────────────────────
-
-interface ConflictState {
-  open: boolean;
-  remoteTs: string;
-  knownTs: string;
-}
+const PAPEL_LABEL: Record<Papel, string> = {
+  admin: 'Administrador',
+  engenharia: 'Engenharia',
+  financeiro: 'Financeiro',
+  leitura: 'Somente leitura',
+};
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const data = useDataStore((s) => s.data);
-  const dirty = useDataStore((s) => s.dirty);
-  const lastKnownSavedAt = useDataStore((s) => s.lastKnownSavedAt);
-  const setData = useDataStore((s) => s.setData);
-  const clearDirty = useDataStore((s) => s.clearDirty);
-  const updateConfig = useDataStore((s) => s.updateConfig);
 
   const activeTab = useUiStore((s) => s.activeTab);
   const setTab = useUiStore((s) => s.setActiveTab);
   const showToast = useUiStore((s) => s.showToast);
 
-  const fileHandle = useFileHandleStore((s) => s.fileHandle);
-  const sourceName = useFileHandleStore((s) => s.sourceName);
-  const setFileHandle = useFileHandleStore((s) => s.setFileHandle);
+  const verificando = useAuthStore((s) => s.verificando);
+  const sessao = useAuthStore((s) => s.sessao);
+  const perfil = useAuthStore((s) => s.perfil);
+  const setVerificando = useAuthStore((s) => s.setVerificando);
+  const setSessao = useAuthStore((s) => s.setSessao);
+  const setPerfil = useAuthStore((s) => s.setPerfil);
 
-  const [conflict, setConflict] = useState<ConflictState>({
-    open: false, remoteTs: '', knownTs: '',
-  });
-  // Hooks transversais
-  useAutoSave();
-  useDirtyGuard();
+  const [carregandoDados, setCarregandoDados] = useState(false);
+  const [erroDados, setErroDados] = useState('');
 
-  // ── Inicialização ───────────────────────────────────────────────────────────
+  // ── Sessão: estado inicial + mudanças (login, logout, expiração) ───────────
 
   useEffect(() => {
-    void (async () => {
-      // 0. Limpa caches de versões antigas (idempotente)
-      purgeLegacyCaches();
-
-      // 1. Tenta cache localStorage
-      const cached = loadCache();
-      if (cached) {
-        setData(cached.data, cached.data.last_saved);
-        setFileHandle(null, cached.sourceName);
-      }
-
-      // 2. Tenta restaurar handle do IndexedDB
-      const handle = await tryRestoreFileHandle();
-      if (handle) {
-        try {
-          const result = await loadFromFileHandle(handle);
-          setData(result.data, result.lastSavedAt);
-          setFileHandle(result.fileHandle, result.sourceName);
-          return;
-        } catch {
-          /* handle inválido — usa cache ou seed */
-        }
-      }
-
-      // 3. Se não tem nada, carrega seed público
-      if (!cached) {
-        try {
-          const resp = await fetch(`${import.meta.env.BASE_URL}seed-data.json`);
-          const raw = (await resp.json()) as unknown;
-          const migrated = runMigrations(raw);
-          const seedData = normalizeData(migrated);
-          setData(seedData, '');
-          setFileHandle(null, 'Base inicial embutida');
-        } catch {
-          showToast('Falha ao carregar dados iniciais.', 'error');
-        }
-      }
-    })();
+    void sessaoAtual().then((s) => {
+      setSessao(s);
+      setVerificando(false);
+    });
+    const cancelar = aoMudarSessao((s) => setSessao(s));
+    return cancelar;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Migração da chave OpenRouter para o dispositivo ─────────────────────────
-  // Chaves antigas viviam no JSON compartilhado (vazavam para OneDrive/backups).
-  // Ao detectar uma, move para o localStorage deste dispositivo e limpa do JSON
-  // (a limpeza marca dirty; o próximo save remove a chave do arquivo).
+  // ── Dados: perfil + carga inicial + realtime, amarrados ao usuário logado ──
+  // Chaveado no user.id (não no objeto sessão) para não recarregar tudo a cada
+  // renovação de token, que troca o objeto mas não o usuário.
+
+  const userId = sessao?.user.id ?? '';
 
   useEffect(() => {
-    const legacyKey = data?.config.openrouter_api_key;
-    if (!legacyKey) return;
-    if (!getApiKey()) setApiKey(legacyKey);
-    updateConfig({ openrouter_api_key: '' });
-  }, [data, updateConfig]);
+    if (!userId) {
+      setPerfil(null);
+      useDataStore.setState({ data: null, dirty: false, dirtySince: null });
+      return;
+    }
 
-  // ── Save ────────────────────────────────────────────────────────────────────
+    let ativo = true;
 
-  const handleSave = useCallback(async (force = false) => {
-    if (!data) return;
-    const result = await saveData({
-      data,
-      fileHandle,
-      sourceName,
-      lastKnownSavedAt,
-      force,
+    void (async () => {
+      try {
+        setErroDados('');
+        setCarregandoDados(true);
+        const p = await perfilAtual();
+        if (!ativo) return;
+        setPerfil(p);
+        if (p) await recarregarDados();
+      } catch (err) {
+        if (ativo) {
+          setErroDados(err instanceof Error ? err.message : 'Falha ao carregar dados.');
+        }
+      } finally {
+        if (ativo) setCarregandoDados(false);
+      }
+    })();
+
+    // Outra pessoa gravou → recarrega. Debounce porque uma gravação de OC gera
+    // vários eventos seguidos (cabeçalho + itens) e uma recarga basta.
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const cancelarRealtime = assinarMudancas(() => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        void recarregarDados().catch(() => {
+          /* transitório — a próxima mudança ou o Recarregar manual resolve */
+        });
+      }, 600);
     });
 
-    if (result.ok) {
-      setData(result.data, result.lastSavedAt);
-      if (result.fileHandle) setFileHandle(result.fileHandle, result.sourceName);
-      else clearDirty(result.lastSavedAt);
-      showToast('Salvo com sucesso.', 'success');
-    } else if (result.reason === 'conflict') {
-      setConflict({ open: true, remoteTs: result.remoteTs, knownTs: result.knownTs });
-    } else if (result.reason === 'download') {
-      setData(result.data, result.lastSavedAt);
-      clearDirty(result.lastSavedAt);
-      showToast('JSON baixado. Substitua manualmente o arquivo no OneDrive.', 'warning');
-    } else if (result.reason === 'aborted') {
-      showToast('Salvamento cancelado.', 'info');
-    }
-  }, [data, fileHandle, sourceName, lastKnownSavedAt, setData, setFileHandle, clearDirty, showToast]);
+    return () => {
+      ativo = false;
+      if (timer) clearTimeout(timer);
+      cancelarRealtime();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-  const handleConnect = useCallback(async () => {
-    try {
-      const result = await connectFile();
-      if (result) {
-        setData(result.data, result.lastSavedAt);
-        setFileHandle(result.fileHandle, result.sourceName);
-        showToast('Arquivo conectado.', 'success');
-      }
-    } catch {
-      showToast('Não consegui abrir o arquivo.', 'warning');
-    }
-  }, [setData, setFileHandle, showToast]);
+  // ── Ações ──────────────────────────────────────────────────────────────────
 
-  const handleReload = useCallback(async () => {
-    if (!fileHandle) { showToast('Nenhum arquivo conectado.', 'warning'); return; }
-    if (dirty) {
-      const ok = await confirmAsync({
-        title: 'Descartar alterações?',
-        message: 'Há alterações não salvas. Recarregar vai descartá-las e puxar a versão do arquivo.',
-        confirmLabel: 'Recarregar',
-        tone: 'danger',
-      });
-      if (!ok) return;
-    }
+  const handleRecarregar = useCallback(async () => {
     try {
-      const result = await reloadFromHandle(fileHandle);
-      setData(result.data, result.lastSavedAt);
-      showToast('Recarregado.', 'success');
+      await recarregarDados();
+      showToast('Dados recarregados do banco.', 'success');
     } catch (err) {
       showToast(`Falha: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     }
-  }, [fileHandle, dirty, setData, showToast]);
+  }, [showToast]);
+
+  const handleSair = useCallback(async () => {
+    try {
+      await sair();
+    } catch {
+      showToast('Não foi possível sair. Tente novamente.', 'warning');
+    }
+  }, [showToast]);
 
   useKeyboardShortcuts({
-    onSave: () => void handleSave(),
     onNewOC: () => setTab('nova-oc'),
   });
 
-  // ── Emitente banner ─────────────────────────────────────────────────────────
+  // ── Portões de entrada ─────────────────────────────────────────────────────
+
+  if (verificando) {
+    return (
+      <div className={styles.gateScreen}>
+        <p>Verificando sessão…</p>
+      </div>
+    );
+  }
+
+  if (!sessao) {
+    return (
+      <>
+        <LoginPage />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  if (!perfil && !carregandoDados && !erroDados) {
+    return (
+      <>
+        <SemAcessoPage email={sessao.user.email ?? ''} onSair={() => void handleSair()} />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  // ── Emitente banner ────────────────────────────────────────────────────────
 
   const emitentes = data?.config.emitentes ?? [];
   const principal = emitentes[0];
   const showBanner =
-    !principal ||
-    !principal.razao_social ||
-    (principal.tipo === 'PF' ? !principal.cpf : !principal.cnpj);
+    !!data &&
+    (!principal ||
+      !principal.razao_social ||
+      (principal.tipo === 'PF' ? !principal.cpf : !principal.cnpj));
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className={styles.layout}>
@@ -295,41 +276,26 @@ export default function App() {
           ))}
         </nav>
 
-        {/* Sidebar footer */}
+        {/* Sidebar footer — quem está logado + ações de sessão */}
         <div className={styles.sidebarFooter}>
           <div className={styles.sfRow}>
-            <span
-              className={[styles.dirtyDot, dirty ? styles.isDirty : ''].join(' ')}
-              title={dirty ? 'Alterações não salvas…' : 'Sem alterações'}
-            />
-            <span className={styles.sfLabel}>Arquivo:</span>
-            <span className={styles.sfValue} title={sourceName}>{sourceName}</span>
+            <span className={styles.sfLabel}>Usuário:</span>
+            <span className={styles.sfValue} title={sessao.user.email ?? ''}>
+              {perfil?.nome || sessao.user.email || '—'}
+            </span>
           </div>
           <div className={styles.sfRow}>
-            <span className={styles.sfLabel}>Salvo:</span>
+            <span className={styles.sfLabel}>Acesso:</span>
             <span className={styles.sfValue}>
-              {data?.last_saved
-                ? new Date(data.last_saved).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-                : '—'}
+              {perfil ? PAPEL_LABEL[perfil.papel] : '—'}
             </span>
           </div>
           <div className={styles.sfActions}>
-            <button className={styles.btnGhostSm} onClick={handleConnect}>
-              <Icon name="folder" size={13} /> Conectar
-            </button>
-            <button className={styles.btnGhostSm} onClick={handleReload}>
+            <button className={styles.btnGhostSm} onClick={() => void handleRecarregar()}>
               <Icon name="reload" size={13} /> Recarregar
             </button>
-          </div>
-          <div className={styles.sfActions}>
-            <button className={styles.btnGhostSm} onClick={() => setTab('config')}>
-              <Icon name="settings" size={13} /> Config
-            </button>
-            <button
-              className={[styles.btnGhostSm, dirty ? styles.btnSaveDirty : ''].join(' ')}
-              onClick={() => void handleSave()}
-            >
-              <Icon name="save" size={13} /> Salvar
+            <button className={styles.btnGhostSm} onClick={() => void handleSair()}>
+              <Icon name="logout" size={13} /> Sair
             </button>
           </div>
         </div>
@@ -344,20 +310,28 @@ export default function App() {
             <div className={styles.topbarTitle}>{TAB_TITLES[activeTab]}</div>
           </div>
           <div className={styles.topbarRight}>
-            {fileHandle && (
-              <div className={styles.syncChip}>
-                <span className={styles.chipDot} />
-                {sourceName}
-              </div>
-            )}
-            <button className={styles.topbarSaveBtn} onClick={() => void handleSave()}>
-              <Icon name="save" size={14} /> Salvar
-            </button>
+            <div className={styles.syncChip}>
+              <span className={styles.chipDot} />
+              Banco conectado
+            </div>
           </div>
         </header>
 
         {/* Content */}
         <main className={styles.mainContent}>
+          {erroDados && (
+            <div className={styles.banner}>
+              <span>⚠️ {erroDados}</span>
+              <button
+                className="btn-secondary"
+                style={{ padding: '5px 12px', fontSize: 12 }}
+                onClick={() => void handleRecarregar()}
+              >
+                Tentar de novo
+              </button>
+            </div>
+          )}
+
           {showBanner && (
             <div className={styles.banner}>
               <span>⚠️ Configure o emitente principal para emitir OCs.</span>
@@ -371,37 +345,30 @@ export default function App() {
             </div>
           )}
 
-          {activeTab === 'dashboard'     && <DashboardPage />}
-          {activeTab === 'nova-oc'       && <NovaOcPage />}
-          {activeTab === 'historico'     && <HistoricoPage />}
-          {activeTab === 'fornecedores'  && <FornecedoresPage />}
-          {activeTab === 'obras'         && <ObrasPage />}
-          {activeTab === 'prestadores'   && <PrestadoresPage />}
-          {activeTab === 'catalogo'      && <CatalogoPage />}
-          {activeTab === 'config'        && <ConfigPage />}
+          {!data && carregandoDados && (
+            <div className={styles.gateScreen}>
+              <p>Carregando dados do banco…</p>
+            </div>
+          )}
+
+          {data && (
+            <>
+              {activeTab === 'dashboard'     && <DashboardPage />}
+              {activeTab === 'nova-oc'       && <NovaOcPage />}
+              {activeTab === 'historico'     && <HistoricoPage />}
+              {activeTab === 'fornecedores'  && <FornecedoresPage />}
+              {activeTab === 'obras'         && <ObrasPage />}
+              {activeTab === 'prestadores'   && <PrestadoresPage />}
+              {activeTab === 'catalogo'      && <CatalogoPage />}
+              {activeTab === 'config'        && <ConfigPage />}
+            </>
+          )}
         </main>
       </div>
 
       {/* ── Global overlays ────────────────────────────────────────── */}
       <ToastContainer />
       <GlobalConfirmDialog />
-
-      <ConfirmDialog
-        open={conflict.open}
-        title="Conflito de edição simultânea"
-        message={`O arquivo foi modificado por outra sessão.\n\nSalvar agora vai SOBRESCREVER as alterações remotas. Continuar?`}
-        confirmLabel="Sobrescrever"
-        cancelLabel="Cancelar"
-        tone="danger"
-        onConfirm={() => {
-          setConflict((c) => ({ ...c, open: false }));
-          void handleSave(true);
-        }}
-        onCancel={() => {
-          setConflict((c) => ({ ...c, open: false }));
-          showToast('Salvamento cancelado. Use Recarregar para puxar a versão remota.', 'warning');
-        }}
-      />
     </div>
   );
 }

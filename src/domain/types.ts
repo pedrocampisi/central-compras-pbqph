@@ -186,7 +186,6 @@ export interface Config {
   texto_condicoes_contratacao: string;
   texto_envio_nf: string;
   texto_qualidade: string;
-  openrouter_api_key: string;
   pasta_backups: string;
 }
 
