@@ -48,11 +48,17 @@ export async function usuarioAtual(): Promise<User | null> {
  * distinguir "senha errada" de "você entrou mas não tem permissão".
  */
 export async function perfilAtual(): Promise<PerfilUsuario | null> {
+  // O filtro por user_id é obrigatório: administradores enxergam TODOS os
+  // perfis pela RLS, e sem o filtro o maybeSingle() recebe várias linhas e
+  // quebra. Confiar só na RLS aqui funcionava para papel comum, não para admin.
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) return null;
   const { data, error } = await core()
     .from('perfis')
     .select('user_id, nome, papel, ativo')
+    .eq('user_id', u.user.id)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throw new Error(`Falha ao carregar seu perfil: ${error.message}`);
   return data && data.ativo ? (data as PerfilUsuario) : null;
 }
 
