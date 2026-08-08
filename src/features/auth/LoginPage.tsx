@@ -12,13 +12,29 @@
 import { useState } from 'react';
 import { entrar, traduzErroAuth } from '../../services/supabase/auth';
 import { supabase } from '../../services/supabase/client';
+import { useUiStore } from '../../stores/useUiStore';
 import { Button } from '../../components/Button/Button';
 import styles from './LoginPage.module.css';
+
+/**
+ * Erro vindo do link do e-mail (ex.: token expirado), lido uma única vez no
+ * carregamento do módulo. O hash é limpo em seguida para o erro não
+ * reaparecer em recarregamentos futuros.
+ */
+const erroDoLink = (() => {
+  if (typeof window === 'undefined') return '';
+  const h = window.location.hash;
+  if (h.includes('error_code=otp_expired') || h.includes('error=access_denied')) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    return 'O link do e-mail é inválido ou já expirou (ele só vale uma vez). Peça um novo em "Esqueci minha senha".';
+  }
+  return '';
+})();
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
+  const [erro, setErro] = useState(erroDoLink);
   const [aviso, setAviso] = useState('');
   const [entrando, setEntrando] = useState(false);
   const [enviandoReset, setEnviandoReset] = useState(false);
@@ -112,18 +128,107 @@ export function LoginPage() {
           Entrar
         </Button>
 
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => void handleEsqueciSenha()}
+          loading={enviandoReset}
+        >
+          Primeiro acesso — definir minha senha
+        </Button>
+
         <button
           type="button"
           className={styles.linkBtn}
           onClick={() => void handleEsqueciSenha()}
           disabled={enviandoReset}
         >
-          {enviandoReset ? 'Enviando…' : 'Esqueci minha senha'}
+          Esqueci minha senha
         </button>
 
         <p className={styles.rodape}>
-          Primeiro acesso? Use "Esqueci minha senha" para definir a sua.
+          Usuários novos são criados pelo administrador. Depois de criado,
+          defina sua senha pelo botão acima.
         </p>
+      </form>
+    </div>
+  );
+}
+
+/**
+ * Tela de definição de senha nova — aparece quando a pessoa chega pelo link
+ * do e-mail (evento PASSWORD_RECOVERY). É aqui que cada usuário define a
+ * própria senha no primeiro acesso, ou troca quando esqueceu.
+ */
+export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
+  const [senha, setSenha] = useState('');
+  const [confirma, setConfirma] = useState('');
+  const [erro, setErro] = useState('');
+  const [salvando, setSalvando] = useState(false);
+  const showToast = useUiStore((s) => s.showToast);
+
+  async function handleSalvar(e: React.FormEvent) {
+    e.preventDefault();
+    setErro('');
+    if (senha.length < 8) {
+      setErro('Use pelo menos 8 caracteres.');
+      return;
+    }
+    if (senha !== confirma) {
+      setErro('As duas senhas não conferem.');
+      return;
+    }
+    setSalvando(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: senha });
+      if (error) throw new Error(traduzErroAuth(error.message));
+      showToast('Senha definida com sucesso!', 'success');
+      onConcluida();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Não foi possível salvar a senha.');
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <div className={styles.wrap}>
+      <form className={styles.card} onSubmit={(e) => void handleSalvar(e)}>
+        <div className={styles.brand}>
+          <div>
+            <div className={styles.brandName}>DEFINIR NOVA SENHA</div>
+            <div className={styles.brandSub}>Central de Compras · Campisi</div>
+          </div>
+        </div>
+
+        <label className={styles.field}>
+          <span>Nova senha</span>
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            placeholder="Mínimo de 8 caracteres"
+            autoFocus
+          />
+        </label>
+
+        <label className={styles.field}>
+          <span>Repita a nova senha</span>
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={confirma}
+            onChange={(e) => setConfirma(e.target.value)}
+            placeholder="Digite a mesma senha de novo"
+          />
+        </label>
+
+        {erro && <p className={styles.erro} role="alert">{erro}</p>}
+
+        <Button variant="primary" type="submit" loading={salvando}>
+          Salvar senha e entrar
+        </Button>
       </form>
     </div>
   );

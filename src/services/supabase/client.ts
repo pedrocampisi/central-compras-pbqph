@@ -28,7 +28,10 @@ export const supabase = createClient(url, chave, {
     // o usuário é deslogado ao atualizar a página, e a sessão morre em 1h.
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false,
+    // Processa o link de redefinição de senha vindo do e-mail (#access_token…).
+    // É por esse link que cada pessoa define a própria senha no primeiro
+    // acesso — com isto desligado, o link do e-mail não levava a lugar nenhum.
+    detectSessionInUrl: true,
   },
   db: { schema: 'public' },
 });

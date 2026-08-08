@@ -17,7 +17,8 @@ import { useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
 
 // Services
-import { sessaoAtual, aoMudarSessao, perfilAtual, sair, type Papel } from './services/supabase/auth';
+import { sessaoAtual, perfilAtual, sair, type Papel } from './services/supabase/auth';
+import { supabase } from './services/supabase/client';
 import { assinarMudancas } from './services/supabase/dados';
 import { recarregarDados } from './services/supabase/sync';
 
@@ -30,7 +31,7 @@ import { GlobalConfirmDialog } from './components/ConfirmDialog/GlobalConfirmDia
 import { Icon, type IconName } from './components/Icon/Icon';
 
 // Feature pages
-import { LoginPage, SemAcessoPage } from './features/auth/LoginPage';
+import { LoginPage, SemAcessoPage, DefinirSenhaPage } from './features/auth/LoginPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
@@ -98,16 +99,23 @@ export default function App() {
 
   const [carregandoDados, setCarregandoDados] = useState(false);
   const [erroDados, setErroDados] = useState('');
+  const [definindoSenha, setDefinindoSenha] = useState(false);
 
   // ── Sessão: estado inicial + mudanças (login, logout, expiração) ───────────
+  // Assinatura direta no supabase (e não via aoMudarSessao) porque aqui o NOME
+  // do evento importa: PASSWORD_RECOVERY significa que a pessoa chegou pelo
+  // link do e-mail e precisa definir a senha nova antes de usar o sistema.
 
   useEffect(() => {
     void sessaoAtual().then((s) => {
       setSessao(s);
       setVerificando(false);
     });
-    const cancelar = aoMudarSessao((s) => setSessao(s));
-    return cancelar;
+    const { data } = supabase.auth.onAuthStateChange((evento, s) => {
+      setSessao(s);
+      if (evento === 'PASSWORD_RECOVERY') setDefinindoSenha(true);
+    });
+    return () => data.subscription.unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -200,6 +208,15 @@ export default function App() {
     return (
       <>
         <LoginPage />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  if (definindoSenha) {
+    return (
+      <>
+        <DefinirSenhaPage onConcluida={() => setDefinindoSenha(false)} />
         <ToastContainer />
       </>
     );

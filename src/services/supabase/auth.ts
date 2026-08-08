@@ -74,5 +74,8 @@ export function traduzErroAuth(msg: string): string {
   if (/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos.';
   if (/email not confirmed/i.test(msg)) return 'E-mail ainda não confirmado.';
   if (/rate limit|too many/i.test(msg)) return 'Muitas tentativas. Aguarde um instante.';
+  if (/unable to validate email|invalid format/i.test(msg)) return 'E-mail inválido. Confira a digitação.';
+  if (/should be different from the old password/i.test(msg)) return 'A senha nova precisa ser diferente da antiga.';
+  if (/password should be at least/i.test(msg)) return 'A senha é curta demais.';
   return msg;
 }
