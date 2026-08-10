@@ -12,6 +12,18 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["dev", "--host"],
       "port": 5173
+    },
+    {
+      "name": "vite-preview-prod",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["preview", "--port", "5173", "--strictPort"],
+      "port": 5173
+    },
+    {
+      "name": "vite-preview-4173",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["preview", "--port", "4173", "--strictPort"],
+      "port": 4173
     }
   ]
 }

@@ -62,12 +62,22 @@ export async function perfilAtual(): Promise<PerfilUsuario | null> {
   return data && data.ativo ? (data as PerfilUsuario) : null;
 }
 
+/**
+ * Espelho das políticas do banco (não é a segurança em si — o RLS decide):
+ *   - OCs (compras.pode_emitir_oc) e fornecedores (fornecedores_escrita):
+ *     admin | engenharia | financeiro — o financeiro foi incluído pela
+ *     migration 20260810120000_financeiro_emite_oc, por decisão do Pedro.
+ *   - Catálogo técnico (ECRs/materiais), prestadores e avaliações
+ *     (core.pode_editar_cadastro): admin | engenharia apenas. As telas
+ *     correspondentes estão somente-leitura nesta versão, então não há
+ *     botão para o financeiro clicar e tomar erro.
+ */
 export function podeEditar(papel: Papel | null | undefined): boolean {
-  return papel === 'admin' || papel === 'engenharia';
+  return papel === 'admin' || papel === 'engenharia' || papel === 'financeiro';
 }
 
 export function podeEmitirOc(papel: Papel | null | undefined): boolean {
-  return papel === 'admin' || papel === 'engenharia';
+  return papel === 'admin' || papel === 'engenharia' || papel === 'financeiro';
 }
 
 export function aoMudarSessao(cb: (s: Session | null) => void): () => void {

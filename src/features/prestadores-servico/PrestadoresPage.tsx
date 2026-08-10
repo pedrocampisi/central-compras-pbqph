@@ -13,7 +13,6 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { PrestadorDrawer } from './PrestadorDrawer';
-import { confirmAsync } from '../../stores/useConfirmStore';
 import { ListToolbar, ToggleGroup, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CATEGORIAS_SERVICO } from '../../domain/constants';
 import type { Column } from '../../components/DataTable/DataTable';
@@ -27,8 +26,6 @@ interface IndicadoresPrestador {
 
 export function PrestadoresPage() {
   const data = useDataStore((s) => s.data);
-  const removePrestador = useDataStore((s) => s.removePrestador);
-  const showToast = useUiStore((s) => s.showToast);
   const prestadorFilter = useUiStore((s) => s.prestadorFilter);
   const setPrestadorFilter = useUiStore((s) => s.setPrestadorFilter);
 
@@ -81,30 +78,11 @@ export function PrestadoresPage() {
     return true;
   });
 
-  function openNew() {
-    setEditing(null);
-    setDrawerOpen(true);
-  }
-
+  // Criar/excluir prestador não existem nesta versão: a camada de dados não
+  // grava prestadores no banco. O drawer abre só para consulta.
   function openEdit(p: PrestadorServico) {
     setEditing(p);
     setDrawerOpen(true);
-  }
-
-  async function handleDelete(p: PrestadorServico) {
-    const n = indicadores[p.id]?.total ?? 0;
-    const msg = n > 0
-      ? `Excluir "${p.razao_social}"? Isso também removerá ${n} avaliação(ões) vinculada(s). Esta ação não pode ser desfeita.`
-      : `Excluir "${p.razao_social}"? Esta ação não pode ser desfeita.`;
-    const ok = await confirmAsync({
-      title: 'Excluir prestador',
-      message: msg,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removePrestador(p.id);
-    showToast('Prestador excluído.', 'success');
   }
 
   const columns: Column<PrestadorServico>[] = [
@@ -194,9 +172,6 @@ export function PrestadoresPage() {
             {' '}{data.avaliacoes_prestadores.length} avaliação(ões) registrada(s)
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={openNew}>
-          + Novo Prestador
-        </Button>
       </div>
 
       {/* Filtros */}
@@ -228,13 +203,8 @@ export function PrestadoresPage() {
           title="Nenhum prestador encontrado"
           description={
             data.prestadores_servico.length === 0
-              ? 'Cadastre o primeiro prestador de serviço clicando em "+ Novo Prestador".'
+              ? 'Os prestadores são cadastrados no banco central.'
               : 'Tente ajustar os filtros de busca.'
-          }
-          action={
-            data.prestadores_servico.length === 0
-              ? { label: '+ Novo Prestador', onClick: openNew }
-              : undefined
           }
         />
       ) : (
@@ -247,7 +217,6 @@ export function PrestadoresPage() {
           rowActions={(p) => (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>Abrir</Button>
-              <Button variant="danger" size="sm" onClick={() => void handleDelete(p)}>Excluir</Button>
             </div>
           )}
         />

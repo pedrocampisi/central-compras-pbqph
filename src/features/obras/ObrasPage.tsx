@@ -13,13 +13,9 @@ import { ObraDrawer } from './ObraDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Obra } from '../../domain/types';
-import { deleteObraDirHandle } from '../../services/storage/handles';
-import { confirmAsync } from '../../stores/useConfirmStore';
 
 export function ObrasPage() {
   const data = useDataStore((s) => s.data);
-  const removeObra = useDataStore((s) => s.removeObra);
-  const showToast = useUiStore((s) => s.showToast);
 
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
   const { search, status: showAtivas } = useUiStore((s) => s.obraFilter);
@@ -45,38 +41,12 @@ export function ObrasPage() {
     return true;
   });
 
-  function openNew() {
-    setEditing(null);
-    setDrawerOpen(true);
-  }
-
+  // Criar/excluir obra não existem nesta versão: a camada de dados não grava
+  // obras no banco. O drawer abre só para consulta (e para conectar a pasta
+  // de PDFs, que é local do navegador e funciona de verdade).
   function openEdit(o: Obra) {
     setEditing(o);
     setDrawerOpen(true);
-  }
-
-  async function handleDelete(o: Obra) {
-    // Integridade referencial: OCs e avaliações de prestadores apontam para a obra.
-    const emOcs = data!.ordens_compra.filter((oc) => oc.obra_id === o.id).length;
-    const emAvals = data!.avaliacoes_prestadores.filter((a) => a.obra_id === o.id).length;
-    if (emOcs > 0 || emAvals > 0) {
-      const refs = [
-        emOcs > 0 ? `${emOcs} OC(s)` : '',
-        emAvals > 0 ? `${emAvals} avaliação(ões) de prestador` : '',
-      ].filter(Boolean).join(' e ');
-      showToast(`"${o.nome}" é usada em ${refs}. Desative-a em vez de excluir.`, 'warning');
-      return;
-    }
-    const ok = await confirmAsync({
-      title: 'Excluir obra',
-      message: `Excluir "${o.nome}"? Esta ação não pode ser desfeita.`,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removeObra(o.id);
-    void deleteObraDirHandle(o.id); // limpa handle persistido (idempotente)
-    showToast('Obra excluída.', 'success');
   }
 
   const columns: Column<Obra>[] = [
@@ -140,9 +110,6 @@ export function ObrasPage() {
             {filtered.length} de {data.obras.length} cadastrada(s)
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={openNew}>
-          + Nova Obra
-        </Button>
       </div>
 
       {/* Filtros */}
@@ -165,13 +132,8 @@ export function ObrasPage() {
           title="Nenhuma obra encontrada"
           description={
             data.obras.length === 0
-              ? 'Cadastre a primeira obra clicando em "+ Nova Obra".'
+              ? 'As obras são cadastradas no banco central.'
               : 'Tente ajustar os filtros de busca.'
-          }
-          action={
-            data.obras.length === 0
-              ? { label: '+ Nova Obra', onClick: openNew }
-              : undefined
           }
         />
       ) : (
@@ -183,8 +145,7 @@ export function ObrasPage() {
           onRowClick={openEdit}
           rowActions={(o) => (
             <div style={{ display: 'flex', gap: 4 }}>
-              <Button variant="ghost" size="sm" onClick={() => openEdit(o)}>Editar</Button>
-              <Button variant="danger" size="sm" onClick={() => void handleDelete(o)}>Excluir</Button>
+              <Button variant="ghost" size="sm" onClick={() => openEdit(o)}>Ver / Pasta</Button>
             </div>
           )}
         />

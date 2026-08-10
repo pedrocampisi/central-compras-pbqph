@@ -20,3 +20,12 @@ ul,
 ol {
   margin: 0;
 }
+
+/* Fieldset invisível: usado para desabilitar um bloco inteiro de campos
+ * (telas somente-leitura) sem alterar o layout. */
+.fieldset-reset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

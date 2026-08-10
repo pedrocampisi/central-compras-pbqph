@@ -21,13 +21,12 @@ import { downloadBlob } from '../../services/storage/download';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
-import { confirmAsync } from '../../stores/useConfirmStore';
+import { salvarOrdemCompra } from '../../services/supabase/dados';
+import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
-  const updateOrdemCompra = useDataStore((s) => s.updateOrdemCompra);
-  const removeOrdemCompra = useDataStore((s) => s.removeOrdemCompra);
 
   const startEditing = useOcEditingStore((s) => s.startEditing);
 
@@ -96,16 +95,24 @@ export function HistoricoPage() {
       const fornNome = data!.fornecedores.find((f) => f.id === oc.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
-      updateOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
+      // Grava o carimbo no banco — sem isso a data de geração se perdia no reload.
+      await salvarOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
+      await recarregarDados();
       showToast('PDF regenerado.', 'success');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     }
   }
 
-  function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
-    updateOrdemCompra({ ...oc, status, atualizado_em: nowIso() });
-    showToast(`Status alterado para "${status}".`, 'success');
+  async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
+    try {
+      // Mudança de status é gravação de OC — a camada já suporta (salvarOrdemCompra).
+      await salvarOrdemCompra({ ...oc, status, atualizado_em: nowIso() });
+      await recarregarDados();
+      showToast(`Status alterado para "${status}".`, 'success');
+    } catch (err) {
+      showToast(`Erro ao alterar status: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
   }
 
   /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */
@@ -127,17 +134,9 @@ export function HistoricoPage() {
     showToast(`${ocs.length} OC(s) exportada(s) para CSV.`, 'success');
   }
 
-  async function handleDelete(oc: OrdemCompra) {
-    const ok = await confirmAsync({
-      title: 'Excluir Ordem de Compra',
-      message: `Excluir a OC ${oc.numero}? Esta ação não pode ser desfeita.`,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removeOrdemCompra(oc.id);
-    showToast('OC excluída.', 'success');
-  }
+  // Excluir OC não existe nesta versão (a camada de dados não apaga no banco,
+  // e o número da OC precisa continuar ocupado). Use "Cancelar" para
+  // invalidar uma OC — ela permanece no histórico, como manda o PBQP-H.
 
   // ── Columns ────────────────────────────────────────────────────────────────
 
@@ -264,16 +263,15 @@ export function HistoricoPage() {
                 <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
               )}
               {o.status === 'emitida' && (
-                <Button variant="ghost" size="sm" onClick={() => handleStatusChange(o, 'entregue')}>
+                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'entregue')}>
                   ✓ Entregue
                 </Button>
               )}
               {o.status !== 'cancelada' && (
-                <Button variant="ghost" size="sm" onClick={() => handleStatusChange(o, 'cancelada')}>
+                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
                   Cancelar
                 </Button>
               )}
-              <Button variant="danger" size="sm" onClick={() => void handleDelete(o)}>Excluir</Button>
             </div>
           )}
         />

@@ -1,12 +1,13 @@
 /**
- * Drawer de criação/edição de Prestador de Serviço.
+ * Drawer de consulta de Prestador de Serviço — SOMENTE LEITURA nesta versão.
  *
- * Layout dual: para prestadores existentes, abre com duas abas
- *   - Cadastro: dados do prestador
- *   - Avaliações: histórico + botão "Nova Avaliação" (carimbo digital PBQP-H)
+ * A camada de dados ainda não grava prestadores nem avaliações no banco
+ * (políticas core.pode_editar_cadastro = admin|engenharia, e a gravação será
+ * ligada numa próxima etapa). Até lá, a tela não pode fingir que salva:
+ * campos desabilitados, sem botões de criar/editar/excluir.
  *
- * Para prestadores novos, só mostra Cadastro até a primeira gravação —
- * sem ID persistido não dá pra criar avaliação.
+ * Layout dual preservado: aba Cadastro (dados) e aba Avaliações (histórico
+ * do carimbo digital PBQP-H, agora vindo do banco).
  */
 
 import { useMemo, useState } from 'react';
@@ -14,15 +15,13 @@ import { Drawer } from '../../components/Drawer/Drawer';
 import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
+import { AvisoSomenteLeitura } from '../../components/AvisoSomenteLeitura/AvisoSomenteLeitura';
 import { Button } from '../../components/Button/Button';
 import { useDataStore } from '../../stores/useDataStore';
-import { useUiStore } from '../../stores/useUiStore';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import { CATEGORIAS_SERVICO, TIPOS_PRESTADOR } from '../../domain/constants';
-import { NovaAvaliacaoDrawer } from './NovaAvaliacaoDrawer';
-import { confirmAsync } from '../../stores/useConfirmStore';
-import type { AvaliacaoPrestador, PrestadorServico } from '../../domain/types';
+import type { PrestadorServico } from '../../domain/types';
 import styles from './PrestadorDrawer.module.css';
 
 interface Props {
@@ -73,17 +72,11 @@ function StatusBadge({ status }: StatusBadgeProps) {
 }
 
 export function PrestadorDrawer({ open, prestador, onClose }: Props) {
-  // O drawer é montado apenas quando aberto (render condicional na página),
-  // então o estado inicial do form já reflete o prestador correto.
-  const [form, setForm] = useState<PrestadorServico>(() => prestador ?? emptyPrestador());
+  // Montado só quando aberto; o form é apenas exibição (campos desabilitados).
+  const [form] = useState<PrestadorServico>(() => prestador ?? emptyPrestador());
   const [tab, setTab] = useState<Tab>('cadastro');
-  const [avaliacaoOpen, setAvaliacaoOpen] = useState(false);
-  const [editingAvaliacao, setEditingAvaliacao] = useState<AvaliacaoPrestador | null>(null);
 
-  const upsertPrestador = useDataStore((s) => s.upsertPrestador);
-  const removeAvaliacao = useDataStore((s) => s.removeAvaliacao);
   const data = useDataStore((s) => s.data);
-  const showToast = useUiStore((s) => s.showToast);
 
   // Avaliações deste prestador, ordenadas por data desc.
   const avaliacoes = useMemo(() => {
@@ -93,47 +86,6 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
       .sort((a, b) => (b.data_avaliacao > a.data_avaliacao ? 1 : -1));
   }, [data, prestador]);
 
-  function set<K extends keyof PrestadorServico>(key: K, value: PrestadorServico[K]) {
-    setForm((f) => ({ ...f, [key]: value }));
-  }
-
-  function setEndereco(key: keyof PrestadorServico['endereco'], value: string) {
-    setForm((f) => ({ ...f, endereco: { ...f.endereco, [key]: value } }));
-  }
-
-  function handleSave() {
-    if (!form.razao_social.trim()) {
-      showToast('Razão social é obrigatória.', 'warning');
-      return;
-    }
-    upsertPrestador({ ...form, atualizado_em: nowIso() });
-    showToast(prestador ? 'Prestador atualizado.' : 'Prestador cadastrado.', 'success');
-    onClose();
-  }
-
-  function handleNovaAvaliacao() {
-    setEditingAvaliacao(null);
-    setAvaliacaoOpen(true);
-  }
-
-  function handleEditAvaliacao(a: AvaliacaoPrestador) {
-    setEditingAvaliacao(a);
-    setAvaliacaoOpen(true);
-  }
-
-  async function handleDeleteAvaliacao(a: AvaliacaoPrestador) {
-    const ok = await confirmAsync({
-      title: 'Excluir avaliação',
-      message: `Excluir a avaliação de ${formatDateBr(a.data_avaliacao)}? Esta ação não pode ser desfeita.`,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removeAvaliacao(a.id);
-    showToast('Avaliação excluída.', 'success');
-  }
-
-  const isNew = !prestador;
   const obrasMap = useMemo(() => {
     const map = new Map<string, string>();
     for (const o of data?.obras ?? []) map.set(o.id, o.nome);
@@ -141,214 +93,152 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
   }, [data]);
 
   return (
-    <>
-      <Drawer
-        open={open}
-        title={isNew ? 'Novo Prestador de Serviço' : 'Editar Prestador'}
-        onClose={onClose}
-        footer={
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
-            {tab === 'cadastro' && (
-              <Button variant="primary" size="sm" onClick={handleSave}>
-                {isNew ? 'Cadastrar' : 'Salvar'}
-              </Button>
-            )}
-            {tab === 'avaliacoes' && !isNew && (
-              <Button variant="primary" size="sm" onClick={handleNovaAvaliacao}>
-                + Nova Avaliação
-              </Button>
-            )}
-          </div>
-        }
-      >
-        {/* Tabs internas (só aparece se for edição) */}
-        {!isNew && (
-          <div className={styles.tabBar}>
-            <button
-              className={[styles.tabBtn, tab === 'cadastro' ? styles.tabActive : ''].join(' ')}
-              onClick={() => setTab('cadastro')}
+    <Drawer
+      open={open}
+      title="Prestador — somente leitura"
+      onClose={onClose}
+      footer={
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <Button variant="outline" size="sm" onClick={onClose}>Fechar</Button>
+          {tab === 'cadastro' && (
+            <Button
+              variant="primary"
+              size="sm"
+              disabled
+              title="A camada de dados ainda não grava prestadores — edição virá numa próxima etapa"
             >
-              📋 Cadastro
-            </button>
-            <button
-              className={[styles.tabBtn, tab === 'avaliacoes' ? styles.tabActive : ''].join(' ')}
-              onClick={() => setTab('avaliacoes')}
-            >
-              ⚖ Avaliações
-              {avaliacoes.length > 0 && (
-                <span className={styles.tabCount}>{avaliacoes.length}</span>
-              )}
-            </button>
-          </div>
-        )}
+              Salvar
+            </Button>
+          )}
+        </div>
+      }
+    >
+      {/* Tabs internas */}
+      <div className={styles.tabBar}>
+        <button
+          className={[styles.tabBtn, tab === 'cadastro' ? styles.tabActive : ''].join(' ')}
+          onClick={() => setTab('cadastro')}
+        >
+          📋 Cadastro
+        </button>
+        <button
+          className={[styles.tabBtn, tab === 'avaliacoes' ? styles.tabActive : ''].join(' ')}
+          onClick={() => setTab('avaliacoes')}
+        >
+          ⚖ Avaliações
+          {avaliacoes.length > 0 && (
+            <span className={styles.tabCount}>{avaliacoes.length}</span>
+          )}
+        </button>
+      </div>
 
-        {tab === 'cadastro' && (
-          <>
+      {tab === 'cadastro' && (
+        <>
+          <AvisoSomenteLeitura oQue="o cadastro de prestadores" />
+
+          <fieldset disabled className="fieldset-reset">
             <FieldGroup title="Identificação">
-              <Field
-                label="Razão Social / Nome"
-                required
-                span2
-                value={form.razao_social}
-                onChange={(e) => set('razao_social', e.target.value)}
-              />
-              <Field
-                label="Nome Fantasia"
-                value={form.nome_fantasia}
-                onChange={(e) => set('nome_fantasia', e.target.value)}
-              />
-              <Field
-                as="select"
-                label="Tipo"
-                value={form.tipo}
-                onChange={(e) => set('tipo', e.target.value as PrestadorServico['tipo'])}
-              >
+              <Field label="Razão Social / Nome" span2 value={form.razao_social} readOnly />
+              <Field label="Nome Fantasia" value={form.nome_fantasia} readOnly />
+              <Field as="select" label="Tipo" value={form.tipo} onChange={() => undefined}>
                 {TIPOS_PRESTADOR.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </Field>
-              <Field
-                label={form.tipo === 'PF' ? 'CPF' : 'CNPJ'}
-                value={form.cnpj_cpf}
-                placeholder={form.tipo === 'PF' ? '000.000.000-00' : '00.000.000/0000-00'}
-                onChange={(e) => set('cnpj_cpf', e.target.value)}
-              />
+              <Field label={form.tipo === 'PF' ? 'CPF' : 'CNPJ'} value={form.cnpj_cpf} readOnly />
               <Field
                 as="select"
                 label="Categoria de Serviço"
                 value={form.categoria_servico}
-                onChange={(e) => set('categoria_servico', e.target.value)}
+                onChange={() => undefined}
               >
-                <option value="">Selecione…</option>
+                <option value="">—</option>
                 {CATEGORIAS_SERVICO.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
+                {form.categoria_servico &&
+                  !(CATEGORIAS_SERVICO as readonly string[]).includes(form.categoria_servico) && (
+                    <option value={form.categoria_servico}>{form.categoria_servico}</option>
+                  )}
               </Field>
             </FieldGroup>
 
             <FieldGroup title="Contato">
-              <Field
-                label="E-mail"
-                type="email"
-                value={form.email}
-                onChange={(e) => set('email', e.target.value)}
-              />
-              <Field
-                label="Contato / Responsável"
-                value={form.contato_responsavel}
-                onChange={(e) => set('contato_responsavel', e.target.value)}
-              />
-              <Field
-                label="Telefone 1"
-                value={form.telefones[0]}
-                placeholder="(11) 99999-9999"
-                onChange={(e) => set('telefones', [e.target.value, form.telefones[1]])}
-              />
-              <Field
-                label="Telefone 2"
-                value={form.telefones[1]}
-                onChange={(e) => set('telefones', [form.telefones[0], e.target.value])}
-              />
+              <Field label="E-mail" type="email" value={form.email} readOnly />
+              <Field label="Contato / Responsável" value={form.contato_responsavel} readOnly />
+              <Field label="Telefone 1" value={form.telefones[0]} readOnly />
+              <Field label="Telefone 2" value={form.telefones[1]} readOnly />
             </FieldGroup>
 
             <FieldGroup title="Endereço">
-              <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
+              <EnderecoFields endereco={form.endereco} onChange={() => undefined} />
             </FieldGroup>
 
             <FieldGroup title="Observações">
-              <Field
-                as="textarea"
-                label="Observações"
-                span2
-                rows={3}
-                value={form.observacoes}
-                onChange={(e) => set('observacoes', e.target.value)}
-              />
+              <Field as="textarea" label="Observações" span2 rows={3} value={form.observacoes} readOnly />
             </FieldGroup>
 
             <FieldGroup title="Status">
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={form.ativo}
-                  onChange={(e) => set('ativo', e.target.checked)}
-                />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                <input type="checkbox" checked={form.ativo} readOnly />
                 Prestador ativo
               </label>
             </FieldGroup>
-          </>
-        )}
-
-        {tab === 'avaliacoes' && prestador && (
-          <div className={styles.avaliacoesPanel}>
-            {avaliacoes.length === 0 ? (
-              <div className={styles.emptyAval}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>⚖</div>
-                <strong>Nenhuma avaliação ainda</strong>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                  Clique em "+ Nova Avaliação" para registrar a primeira avaliação deste prestador.
-                </p>
-              </div>
-            ) : (
-              <div className={styles.avalList}>
-                {avaliacoes.map((a) => (
-                  <div key={a.id} className={styles.avalCard}>
-                    <div className={styles.avalHeader}>
-                      <div>
-                        <strong>{formatDateBr(a.data_avaliacao)}</strong>
-                        <div className={styles.avalObra}>
-                          🏗 {obrasMap.get(a.obra_id) ?? '— obra removida'}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <Button variant="ghost" size="sm" onClick={() => handleEditAvaliacao(a)}>
-                          Editar
-                        </Button>
-                        <Button variant="danger" size="sm" onClick={() => void handleDeleteAvaliacao(a)}>
-                          Excluir
-                        </Button>
-                      </div>
-                    </div>
-                    <div className={styles.avalCriterios}>
-                      <div className={styles.avalCrit}>
-                        <span className={styles.avalCritLabel}>Atendeu prazo:</span>
-                        <StatusBadge status={a.atendeu_prazo} />
-                      </div>
-                      <div className={styles.avalCrit}>
-                        <span className={styles.avalCritLabel}>Usou EPI:</span>
-                        <StatusBadge status={a.usou_epi} />
-                      </div>
-                      <div className={styles.avalCrit}>
-                        <span className={styles.avalCritLabel}>Conforme PES:</span>
-                        <StatusBadge status={a.conforme_pes} />
-                      </div>
-                    </div>
-                    {a.responsavel && (
-                      <div className={styles.avalFooter}>
-                        Responsável: <strong>{a.responsavel}</strong>
-                      </div>
-                    )}
-                    {a.observacoes && (
-                      <div className={styles.avalObs}>{a.observacoes}</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </Drawer>
-
-      {/* Drawer aninhado para criar/editar avaliação — montado só quando aberto */}
-      {prestador && avaliacaoOpen && (
-        <NovaAvaliacaoDrawer
-          open
-          prestador={prestador}
-          avaliacao={editingAvaliacao}
-          onClose={() => setAvaliacaoOpen(false)}
-        />
+          </fieldset>
+        </>
       )}
-    </>
+
+      {tab === 'avaliacoes' && prestador && (
+        <div className={styles.avaliacoesPanel}>
+          <AvisoSomenteLeitura oQue="o registro de avaliações" />
+          {avaliacoes.length === 0 ? (
+            <div className={styles.emptyAval}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>⚖</div>
+              <strong>Nenhuma avaliação registrada</strong>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                As avaliações deste prestador aparecerão aqui.
+              </p>
+            </div>
+          ) : (
+            <div className={styles.avalList}>
+              {avaliacoes.map((a) => (
+                <div key={a.id} className={styles.avalCard}>
+                  <div className={styles.avalHeader}>
+                    <div>
+                      <strong>{formatDateBr(a.data_avaliacao)}</strong>
+                      <div className={styles.avalObra}>
+                        🏗 {obrasMap.get(a.obra_id) ?? '— obra removida'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.avalCriterios}>
+                    <div className={styles.avalCrit}>
+                      <span className={styles.avalCritLabel}>Atendeu prazo:</span>
+                      <StatusBadge status={a.atendeu_prazo} />
+                    </div>
+                    <div className={styles.avalCrit}>
+                      <span className={styles.avalCritLabel}>Usou EPI:</span>
+                      <StatusBadge status={a.usou_epi} />
+                    </div>
+                    <div className={styles.avalCrit}>
+                      <span className={styles.avalCritLabel}>Conforme PES:</span>
+                      <StatusBadge status={a.conforme_pes} />
+                    </div>
+                  </div>
+                  {a.responsavel && (
+                    <div className={styles.avalFooter}>
+                      Responsável: <strong>{a.responsavel}</strong>
+                    </div>
+                  )}
+                  {a.observacoes && (
+                    <div className={styles.avalObs}>{a.observacoes}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </Drawer>
   );
 }

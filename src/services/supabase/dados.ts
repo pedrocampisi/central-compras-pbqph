@@ -19,7 +19,8 @@
  */
 
 import type {
-  Data, Ecr, Emitente, Endereco, Fornecedor, Item, Obra, OrdemCompra,
+  AvaliacaoPrestador, Data, Ecr, Emitente, Endereco, Fornecedor, Item, Obra,
+  OrdemCompra, PrestadorServico,
 } from '../../domain/types';
 import { core, compras, supabase } from './client';
 
@@ -65,7 +66,7 @@ const soDigitos = (v: string | undefined): string | null => {
 // ---------------------------------------------------------------------------
 
 export async function carregarDados(): Promise<Data> {
-  const [forn, obras, ecrs, ocs, emits, cfgNum] = await Promise.all([
+  const [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals] = await Promise.all([
     core().from('fornecedores').select('*').order('razao_social'),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável.
@@ -77,9 +78,11 @@ export async function carregarDados(): Promise<Data> {
     compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
     compras().from('emitentes').select('*').order('padrao', { ascending: false }),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
+    compras().from('prestadores_servico').select('*').order('razao_social'),
+    compras().from('avaliacoes_prestadores').select('*').order('data_avaliacao'),
   ]);
 
-  for (const r of [forn, obras, ecrs, ocs, emits, cfgNum]) {
+  for (const r of [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
   }
 
@@ -109,8 +112,8 @@ export async function carregarDados(): Promise<Data> {
     obras: (obras.data ?? []).map(paraObra),
     ecrs: (ecrs.data ?? []).map(paraEcr),
     ordens_compra: (ocs.data ?? []).map(paraOc),
-    prestadores_servico: [],
-    avaliacoes_prestadores: [],
+    prestadores_servico: (prest.data ?? []).map(paraPrestador),
+    avaliacoes_prestadores: (avals.data ?? []).map(paraAvaliacao),
   };
 }
 
@@ -216,16 +219,59 @@ function paraOc(l: Record<string, unknown>): OrdemCompra {
 
 function paraEmitente(l: Record<string, unknown>): Emitente {
   const tels = (l['telefones'] as string[]) ?? [];
+  const tipo = (l['tipo'] as Emitente['tipo']) ?? 'PJ';
+  const documento = vazio(l['documento']);
   return {
     id: String(l['id']),
-    tipo: (l['tipo'] as Emitente['tipo']) ?? 'PJ',
+    tipo,
     razao_social: vazio(l['razao_social']),
     nome_fantasia: vazio(l['nome_fantasia']),
-    cnpj: vazio(l['documento']),
+    // O banco guarda um `documento` só; o app separa por tipo de pessoa.
+    // Sem este desvio, um emitente PF (ex.: o padrão atual) ficava sem CPF e a
+    // interface exibia "Configure o emitente" com 5 emitentes cadastrados.
+    cnpj: tipo === 'PJ' ? documento : undefined,
+    cpf: tipo === 'PF' ? documento : undefined,
     ie: vazio(l['inscricao_estadual']),
     email_envio_nf: vazio(l['email_envio_nf']),
     telefones: [tels[0] ?? '', tels[1] ?? ''],
     endereco: paraEndereco(l),
+  };
+}
+
+function paraPrestador(l: Record<string, unknown>): PrestadorServico {
+  const tels = (l['telefones'] as string[]) ?? [];
+  return {
+    id: String(l['id']),
+    razao_social: vazio(l['razao_social']),
+    nome_fantasia: vazio(l['nome_fantasia']),
+    tipo: (l['tipo'] as PrestadorServico['tipo']) ?? 'PJ',
+    cnpj_cpf: vazio(l['documento']),
+    categoria_servico: vazio(l['categoria_servico']),
+    endereco: paraEndereco(l),
+    telefones: [tels[0] ?? '', tels[1] ?? ''],
+    email: vazio(l['email']),
+    contato_responsavel: vazio(l['contato_responsavel']),
+    observacoes: vazio(l['observacoes']),
+    ativo: l['ativo'] !== false,
+    criado_em: vazio(l['criado_em']),
+    atualizado_em: vazio(l['atualizado_em']),
+  };
+}
+
+function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
+  return {
+    id: String(l['id']),
+    prestador_id: vazio(l['prestador_id']),
+    // Mesma tradução usada nas OCs: "obra" na tela é a intervenção no banco.
+    obra_id: vazio(l['intervencao_id']),
+    data_avaliacao: vazio(l['data_avaliacao']),
+    responsavel: vazio(l['responsavel']),
+    atendeu_prazo: (l['atendeu_prazo'] as AvaliacaoPrestador['atendeu_prazo']) ?? null,
+    usou_epi: (l['usou_epi'] as AvaliacaoPrestador['usou_epi']) ?? null,
+    conforme_pes: (l['conforme_pes'] as AvaliacaoPrestador['conforme_pes']) ?? null,
+    observacoes: vazio(l['observacoes']),
+    criado_em: vazio(l['criado_em']),
+    atualizado_em: vazio(l['atualizado_em']),
   };
 }
 
