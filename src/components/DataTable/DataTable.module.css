@@ -1,33 +1,53 @@
+/* Tabela densa do padrão Campisi: linha 40–44px, cabeçalho micro em caixa
+ * alta, números em tabular (as colunas de valor alinham na vírgula). */
+
 .wrap {
   overflow-x: auto;
 }
 .table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--surface);
+  background: var(--painel);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
 }
 .table thead th {
-  background: var(--bg);
+  background: var(--painel);
   text-align: left;
-  padding: 10px;
+  padding: 0 12px 8px;
   font-size: 11px;
-  color: var(--text-mid);
+  color: var(--texto-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border-bottom: 2px solid var(--border);
-  font-weight: 700;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--borda-forte);
+  font-weight: 600;
   position: sticky;
   top: 0;
   white-space: nowrap;
 }
 .table tbody td {
-  padding: 10px;
-  border-bottom: 1px solid var(--border-light);
-  font-size: 13px;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--borda);
   vertical-align: middle;
 }
-.table tbody tr:hover { background: #f5f9fd; }
-.actionsCol { width: 1%; white-space: nowrap; }
+.table tbody tr {
+  transition: background var(--transicao);
+}
+.table tbody tr:hover {
+  background: var(--marca-fraca);
+}
+
+/* Documentos (CNPJ, número da OC) em mono: dígito com largura fixa é o que
+ * deixa comparar duas linhas de relance. */
+.table td :global(.doc),
+.table td :global(.mono) {
+  font-family: var(--fonte-mono);
+}
+
+.actionsCol {
+  width: 1%;
+  white-space: nowrap;
+}
 .rowActions {
   display: flex;
   gap: 4px;
@@ -35,7 +55,8 @@
   justify-content: flex-end;
 }
 .rowActions button {
-  padding: 5px 9px;
-  font-size: 11px;
-  border-radius: 6px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  border-radius: var(--raio-pequeno);
 }

@@ -81,7 +81,6 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd }: ItemsTableProps)
   if (items.length === 0) {
     return (
       <EmptyState
-        icon="📦"
         title="Nenhum item adicionado"
         description={'Clique em "+ Adicionar Item" ou importe um pedido via IA.'}
         action={{ label: '+ Adicionar Item', onClick: onAdd }}
@@ -478,7 +477,7 @@ export function NovaOcPage() {
   if (!data || !ocEditing) {
     return (
       <div className="section">
-        <EmptyState icon="+" title="Inicializando…" description="Preparando nova ordem de compra." />
+        <EmptyState title="Inicializando…" description="Preparando nova ordem de compra." />
       </div>
     );
   }
@@ -520,8 +519,10 @@ export function NovaOcPage() {
           >
             <Icon name="save" size={13} /> Salvar Rascunho
           </Button>
+          {/* Atalho do topo em secundário de propósito: o laranja desta tela
+              é o "Emitir OC" do rodapé, depois dos totais. */}
           <Button
-            variant="primary"
+            variant="outline"
             size="sm"
             onClick={() => void handleEmitir()}
             loading={savingPdf}

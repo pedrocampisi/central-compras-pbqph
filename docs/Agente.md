@@ -30,6 +30,42 @@ Dívida conhecida e priorizada: `docs/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10
 (P0-01 gravação de OC não-transacional e P0-02 CI/RLS são trabalho de banco,
 no repositório `campisi-central`).
 
+## 0.1 Padrão visual (direção "Creme") — regras que valem para todo CSS daqui
+
+Fonte oficial: `campisi-central/Padrao_Front_end/` (`DESIGN.md`, `tokens.css`,
+`template-base.html`, `template-login.html`). Aplicado aqui em 12/08/2026.
+
+- `src/styles/tokens.css` é a **única fonte de cor/sombra/raio/fonte**. Nada de
+  hex solto em módulo — o bloco de apelidos no fim traduz os nomes antigos
+  (`--navy`, `--bg`, `--text`…) para os novos; em código novo use os oficiais
+  (`--marca`, `--fundo`, `--texto`, `--acento`…).
+- Tema escuro: `data-tema="escuro"` no `<html>`. Aplicado por script inline no
+  `index.html` **antes da primeira pintura** (senão a tela pisca clara);
+  `hooks/useTema.ts` só lê e alterna. Escolha manual manda e fica salva; sem
+  escolha, segue o sistema.
+- **Uma ação primária (laranja) por tela.** `<Button variant="primary">` é o
+  laranja; qualquer segundo botão é `outline`. Em Nova OC o laranja é o
+  "Emitir OC" do rodapé — o atalho do topo é secundário de propósito.
+- **Ícone é `<Icon>` (traço 1.6), nunca emoji.** Emoji desenha diferente em
+  cada sistema e não aceita a cor do tema.
+- **Mascote longe de dado.** `<EmptyState>` mostra o mascote quando o vazio é a
+  tela; dentro de cartão que convive com números, use `compacto`.
+- **Movimento só em espera e no login.** `<Loader>` (martelo) é o único
+  permitido nas telas de trabalho, e só aparece depois de 250ms.
+- Selo (`<Pill>`) é **neutro por padrão**; verde/vermelho só quando a
+  informação for mesmo situação.
+- Documentos, códigos e chaves em `var(--fonte-mono)`; números de tabela em
+  `font-variant-numeric: tabular-nums`.
+- **Sem portão de boas-vindas e sem animação de entrada neste aplicativo**
+  (decisão do Pedro em 12/08/2026): a cerimônia da marca — portão, vídeo e som
+  — é da **Central** (`Softwares da Campisi Engenharia/Central`), que será a
+  porta de entrada da equipe. Aqui o login é só formulário, e some no dia em
+  que a Central assumir a autenticação. Por isso `public/marca/` não tem
+  `anim-entrada.mp4`, `anim-poster-final.png` nem `efeito-entrada.mp3`; se
+  precisar deles um dia, a fonte é `campisi-central/Padrao_Front_end/assets/`.
+- Os quadros do martelo ficam **fora do pré-carregamento** do service worker
+  (`globIgnores` no `vite.config.ts`) — só são baixados em espera real.
+
 ## 1. Stack e dependências
 
 | Lib | Versão | Uso |

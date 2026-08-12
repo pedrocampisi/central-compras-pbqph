@@ -1,46 +1,60 @@
 .wrap {
-  padding: 36px 32px;
+  padding: 40px 20px;
   text-align: center;
-  color: var(--text-muted);
-  border: 1px dashed var(--border);
-  border-radius: 10px;
-  background: var(--bg);
+  color: var(--texto-suave);
 }
 
-.icon {
-  font-size: 28px;
-  margin-bottom: 10px;
-  line-height: 1;
+/* Vazio dentro de cartão: sem mascote e sem moldura, para não competir com o
+ * dado que está ao lado. */
+.wrapCompacto {
+  padding: 26px 16px;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+/* O mascote é colorido — não leva o filtro de inversão do brasão no escuro. */
+.mascote {
+  width: 175px;
+  max-width: 60%;
+  height: auto;
+  display: block;
+  margin: 0 auto 4px;
 }
 
 .title {
   display: block;
-  color: var(--text);
-  margin-bottom: 5px;
-  font-size: 15px;
+  color: var(--texto);
+  font-family: var(--fonte-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .detail {
-  margin: 0 0 12px;
-  font-size: 13px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--texto-suave);
 }
 
 .action {
-  margin-top: 14px;
+  margin-top: 16px;
   display: flex;
   justify-content: center;
 }
 
 .actionBtn {
-  padding: 7px 18px;
-  background: var(--navy);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
+  height: 38px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--marca);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  font-size: 13.5px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: background var(--transicao);
 }
-.actionBtn:hover { opacity: 0.88; }
+.actionBtn:hover {
+  background: var(--marca-fraca);
+}

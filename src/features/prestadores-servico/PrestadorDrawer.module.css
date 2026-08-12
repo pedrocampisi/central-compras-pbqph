@@ -26,7 +26,7 @@
 
 .tabBtn:hover {
   color: var(--navy);
-  background: rgba(29, 79, 124, 0.05);
+  background: var(--marca-fraca);
 }
 
 .tabActive {
@@ -44,7 +44,7 @@
   text-align: center;
   background: var(--navy);
   color: #fff;
-  border-radius: 9px;
+  border-radius: var(--raio);
   font-weight: 600;
 }
 
@@ -69,7 +69,7 @@
 
 .avalCard {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--raio);
   padding: 12px 14px;
   background: var(--surface);
 }
@@ -123,7 +123,7 @@
   color: var(--text);
   background: var(--surface-alt);
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: var(--raio-pequeno);
   border-left: 3px solid var(--navy);
 }
 
@@ -135,20 +135,20 @@
   padding: 2px 8px;
   font-size: 11px;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: var(--raio-pequeno);
   border: 1px solid transparent;
 }
 
 .badgeOk {
-  background: rgba(34, 167, 93, 0.12);
+  background: var(--sucesso-bg);
   color: var(--green);
-  border-color: rgba(34, 167, 93, 0.3);
+  border-color: var(--sucesso);
 }
 
 .badgeNc {
-  background: rgba(207, 65, 56, 0.12);
+  background: var(--erro-bg);
   color: var(--red);
-  border-color: rgba(207, 65, 56, 0.3);
+  border-color: var(--erro);
 }
 
 .badgeMuted {
@@ -159,9 +159,9 @@
 
 /* ── NovaAvaliacaoDrawer ──────────────────────────────────────────────────── */
 .avalIdent {
-  background: linear-gradient(180deg, rgba(29, 79, 124, 0.06), rgba(29, 79, 124, 0.02));
-  border: 1px solid rgba(29, 79, 124, 0.2);
-  border-radius: 10px;
+  background: linear-gradient(180deg, var(--marca-fraca), var(--marca-fraca));
+  border: 1px solid var(--marca-media);
+  border-radius: var(--raio);
   padding: 12px 14px;
   margin-bottom: 16px;
 }
@@ -189,7 +189,7 @@
   color: #fff;
   font-size: 11px;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: var(--raio-pequeno);
 }
 
 /* ── Picker CONFORME/NÃO CONFORME ─────────────────────────────────────────── */
@@ -200,7 +200,7 @@
   gap: 14px;
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--raio);
   background: var(--surface);
 }
 
@@ -235,7 +235,7 @@
   font-family: inherit;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--raio-pequeno);
   color: var(--text-mid);
   cursor: pointer;
   transition: all 0.14s;

@@ -1,122 +1,169 @@
+/* Entrada da Central de Compras.
+ *
+ * SEM portão de boas-vindas e SEM animação de entrada: a cerimônia da marca é
+ * da Central (`Softwares da Campisi Engenharia/Central`), que é por onde a
+ * equipe entra. Aqui fica só o necessário para autenticar — e o dia em que a
+ * Central assumir o login, esta tela some.
+ *
+ * Diferente do resto do padrão, esta tela acompanha o tema normalmente: sem o
+ * vídeo, não há mais cor de fundo para casar. */
+
 .wrap {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  background: var(--fundo);
+  color: var(--texto);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sidebar-bg, #eef3f9);
-  padding: 24px;
+  padding: 40px 24px;
 }
 
 .card {
-  width: 100%;
-  max-width: 380px;
-  background: var(--surface, #fff);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 10px 40px rgba(13, 43, 74, 0.12);
-  padding: 28px 26px;
+  background: var(--painel);
+  border-radius: var(--raio-grande);
+  box-shadow: var(--sombra-elevada);
+  padding: 40px 40px 28px;
+  width: min(420px, 92vw);
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
 .logo {
-  width: 46px;
-  height: 46px;
-  object-fit: contain;
+  width: 72px;
+  display: block;
+  margin: 0 auto 16px;
 }
-
+[data-tema='escuro'] .logo {
+  filter: brightness(0) invert(1) opacity(0.94);
+}
 .brandName {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 19px;
-  color: var(--navy);
-  line-height: 1.1;
+  font-family: var(--fonte-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--texto);
 }
-
 .brandSub {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.6px;
-  color: var(--navy-mid);
-  text-transform: uppercase;
-  margin-top: 3px;
+  color: var(--texto-suave);
+  margin: 0 0 18px;
+  font-size: 14px;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: block;
+  text-align: left;
 }
-
 .field span {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-mid);
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--texto-suave);
+  margin: 14px 0 6px;
 }
-
 .field input {
-  padding: 9px 11px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
-  outline: none;
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  background: var(--painel-2);
+  color: var(--texto);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  font: inherit;
+  font-size: 14.5px;
+  transition: border-color var(--transicao);
 }
-
+.field input:hover,
 .field input:focus {
-  border-color: var(--navy);
-  box-shadow: 0 0 0 2px rgba(29, 79, 124, 0.12);
+  border-color: var(--marca);
+}
+.field input::placeholder {
+  color: var(--texto-muted);
 }
 
-.erro {
-  margin: 0;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--red, #dc2626);
-  background: var(--red-bg, #fee2e2);
-  border: 1px solid #fca5a5;
-  border-radius: 7px;
-  padding: 8px 10px;
+/* Única ação primária da tela. */
+.btnEntrar {
+  width: 100%;
+  height: 48px;
+  margin-top: 24px;
+  background: var(--acento);
+  color: var(--acento-texto);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border: 0;
+  border-radius: var(--raio-pill);
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.btnEntrar:hover:not(:disabled) {
+  background: var(--acento-sombra);
+}
+.btnEntrar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.aviso {
-  margin: 0;
-  font-size: 12.5px;
+.btnSecundario {
+  width: 100%;
+  height: 44px;
+  margin-top: 12px;
+  background: transparent;
+  color: var(--marca);
+  font: inherit;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--green, #15803d);
-  background: var(--green-bg, #dcfce7);
-  border: 1px solid #86efac;
-  border-radius: 7px;
-  padding: 8px 10px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.btnSecundario:hover:not(:disabled) {
+  background: var(--marca-fraca);
+}
+.btnSecundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .linkBtn {
   background: none;
-  border: none;
-  color: var(--navy);
-  font-size: 12.5px;
+  border: 0;
+  color: var(--marca);
+  font: inherit;
+  font-size: 13.5px;
   font-weight: 600;
-  font-family: inherit;
   cursor: pointer;
-  padding: 2px;
-  text-decoration: underline;
-  align-self: center;
+  margin-top: 16px;
+  padding: 4px;
 }
-.linkBtn:disabled { opacity: 0.6; cursor: default; }
+.linkBtn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.erro,
+.aviso {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+.erro {
+  border: 1px solid var(--erro);
+  background: var(--erro-bg);
+  color: var(--erro);
+}
+.aviso {
+  border: 1px solid var(--aviso);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}
 
 .rodape {
-  margin: 4px 0 0;
+  margin: 18px 0 0;
   font-size: 11.5px;
-  color: var(--text-muted);
-  text-align: center;
+  color: var(--texto-muted);
 }

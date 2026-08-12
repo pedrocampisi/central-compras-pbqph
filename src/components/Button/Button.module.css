@@ -1,83 +1,106 @@
-/* Espelha as classes btn-* do legado com escopo CSS Module */
+/* Botões do padrão Campisi.
+ *
+ * `primary` é o botão laranja — e o padrão manda UMA ação primária por tela.
+ * Se a tela já tem um laranja, o botão seguinte é `outline`. */
+
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 7px;
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--raio);
   font-family: inherit;
-  transition: filter 0.15s, background 0.15s;
+  font-size: 13.5px;
+  font-weight: 600;
+  height: 38px;
+  padding: 0 16px;
   white-space: nowrap;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
+  transition:
+    background var(--transicao),
+    border-color var(--transicao),
+    color var(--transicao);
 }
-.btn:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
-.btn:hover:not(:disabled) { filter: brightness(1.07); }
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-/* Variants */
+/* ── Ação primária: uma por tela ─────────────────────────────────────────── */
 .primary {
-  background: var(--amber);
-  color: var(--navy-dark);
-  border-color: var(--amber);
+  background: var(--acento);
+  color: var(--acento-texto);
+  border-color: transparent;
+  border-radius: var(--raio-pill);
   font-weight: 700;
+  height: 42px;
+  padding: 0 22px;
 }
-.primary:hover:not(:disabled) { background: var(--amber-dark); filter: none; }
+.primary:hover:not(:disabled) {
+  background: var(--acento-sombra);
+}
 
+/* ── Secundária ──────────────────────────────────────────────────────────
+ * `outline` e `secondary` são o mesmo botão do padrão; os dois nomes
+ * sobrevivem porque estão espalhados nas telas. */
+.outline,
+.secondary,
 .navy {
-  background: var(--navy);
-  color: #fff;
-  border-color: var(--navy);
-  font-weight: 700;
-}
-.navy:hover:not(:disabled) { background: var(--navy-dark); filter: none; }
-
-.secondary {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--border);
-}
-.secondary:hover:not(:disabled) { background: var(--bg); filter: none; }
-
-.outline {
   background: transparent;
-  color: var(--navy);
-  border: 1.5px solid var(--navy);
-  font-weight: 600;
+  color: var(--marca);
+  border: 1px solid var(--borda-forte);
 }
-.outline:hover:not(:disabled) { background: var(--accent-soft); filter: none; }
-
-.success {
-  background: var(--green);
-  color: #fff;
-  border-color: var(--green);
-  font-weight: 700;
+.outline:hover:not(:disabled),
+.secondary:hover:not(:disabled),
+.navy:hover:not(:disabled) {
+  background: var(--marca-fraca);
 }
-
-.danger {
-  background: var(--red-bg);
-  color: var(--red);
-  border: 1px solid #fca5a5;
-  font-weight: 600;
-}
-.danger:hover:not(:disabled) { filter: brightness(0.97); }
 
 .ghost {
   background: transparent;
-  color: var(--navy-mid);
+  color: var(--marca);
   border: none;
   font-weight: 600;
 }
-.ghost:hover:not(:disabled) { background: var(--accent-soft); filter: none; }
-
-/* Sizes */
-.sm {
-  padding: 5px 10px;
-  font-size: 12px;
+.ghost:hover:not(:disabled) {
+  background: var(--marca-fraca);
 }
 
-/* Loading spinner */
+.danger {
+  background: var(--erro);
+  color: #fff;
+  border-color: transparent;
+}
+[data-tema='escuro'] .danger {
+  color: #1c0e0b;
+}
+.danger:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.success {
+  background: var(--sucesso);
+  color: #fff;
+  border-color: transparent;
+}
+[data-tema='escuro'] .success {
+  color: #0b1a23;
+}
+
+/* ── Tamanhos ────────────────────────────────────────────────────────────── */
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+.sm.primary {
+  height: 34px;
+  padding: 0 16px;
+}
+
+/* Girador do estado "carregando" — é espera, não enfeite: o padrão só permite
+ * movimento em espera e no login. */
 .spinner {
   display: inline-block;
   width: 12px;
@@ -87,4 +110,13 @@
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

@@ -118,6 +118,7 @@ export function DashboardPage() {
           <h3>Últimas Ordens de Compra</h3>
           {ocs.length === 0 ? (
             <EmptyState
+              compacto
               title="Nenhuma OC ainda"
               detail="Crie sua primeira ordem de compra."
               action={
@@ -153,7 +154,7 @@ export function DashboardPage() {
           <div className={styles.card}>
             <h3>Top Fornecedores (por valor)</h3>
             {topForn.length === 0 ? (
-              <EmptyState title="Sem dados" />
+              <EmptyState title="Sem dados" compacto />
             ) : (
               <RankList entries={topForn} />
             )}
@@ -162,7 +163,7 @@ export function DashboardPage() {
           <div className={styles.card} style={{ marginTop: 16 }}>
             <h3>OCs por Obra (por valor)</h3>
             {topObras.length === 0 ? (
-              <EmptyState title="Sem dados" />
+              <EmptyState title="Sem dados" compacto />
             ) : (
               <RankList entries={topObras} />
             )}

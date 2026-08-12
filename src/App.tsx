@@ -25,10 +25,12 @@ import { recarregarDados } from './services/supabase/sync';
 
 // Hooks
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useTema } from './hooks/useTema';
 
 // Components
 import { ToastContainer } from './components/Toast/Toast';
 import { GlobalConfirmDialog } from './components/ConfirmDialog/GlobalConfirmDialog';
+import { Loader } from './components/Loader/Loader';
 import { Icon, type IconName } from './components/Icon/Icon';
 
 // Feature pages
@@ -82,6 +84,16 @@ const PAPEL_LABEL: Record<Papel, string> = {
   leitura: 'Somente leitura',
 };
 
+/** Iniciais para o avatar do rodapé (padrão: círculo com 2 letras). */
+function iniciais(nome: string, email: string): string {
+  const base = nome.trim() || email.split('@')[0]?.replace(/[._-]+/g, ' ') || '';
+  const partes = base.split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return '—';
+  const primeira = partes[0]?.[0] ?? '';
+  const ultima = partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? '') : '';
+  return (primeira + ultima).toUpperCase();
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -101,6 +113,8 @@ export default function App() {
   const [carregandoDados, setCarregandoDados] = useState(false);
   const [erroDados, setErroDados] = useState('');
   const [definindoSenha, setDefinindoSenha] = useState(false);
+
+  const { escuro, alternar } = useTema();
 
   // ── Sessão: estado inicial + mudanças (login, logout, expiração) ───────────
   // Assinatura direta no supabase (e não via aoMudarSessao) porque aqui o NOME
@@ -202,11 +216,7 @@ export default function App() {
   // ── Portões de entrada ─────────────────────────────────────────────────────
 
   if (verificando) {
-    return (
-      <div className={styles.gateScreen}>
-        <p>Verificando sessão…</p>
-      </div>
-    );
+    return <Loader texto="Verificando sessão…" />;
   }
 
   if (!sessao) {
@@ -255,16 +265,16 @@ export default function App() {
         <div className={styles.brand}>
           <div className={styles.logoWrap}>
             <img
-              src={`${import.meta.env.BASE_URL}brazao1.png`}
-              alt="Campisi"
+              src={`${import.meta.env.BASE_URL}marca/brasao.png`}
+              alt="Campisi Engenharia"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           </div>
           <div>
-            <div className={styles.brandName}>COMPRAS</div>
-            <div className={styles.brandSub}>PBQP-H · CAMPISI</div>
+            <div className={styles.brandName}>Compras</div>
+            <div className={styles.brandSub}>Campisi</div>
           </div>
         </div>
 
@@ -298,19 +308,26 @@ export default function App() {
           ))}
         </nav>
 
-        {/* Sidebar footer — quem está logado + ações de sessão */}
+        {/* Rodapé da lateral — quem está logado, tema e ações de sessão */}
         <div className={styles.sidebarFooter}>
-          <div className={styles.sfRow}>
-            <span className={styles.sfLabel}>Usuário:</span>
-            <span className={styles.sfValue} title={sessao.user.email ?? ''}>
-              {perfil?.nome || sessao.user.email || '—'}
-            </span>
-          </div>
-          <div className={styles.sfRow}>
-            <span className={styles.sfLabel}>Acesso:</span>
-            <span className={styles.sfValue}>
-              {perfil ? PAPEL_LABEL[perfil.papel] : '—'}
-            </span>
+          <div className={styles.sfIdentidade}>
+            <div className={styles.avatar} aria-hidden="true">
+              {iniciais(perfil?.nome ?? '', sessao.user.email ?? '')}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div className={styles.sfNome} title={sessao.user.email ?? ''}>
+                {perfil?.nome || sessao.user.email || '—'}
+              </div>
+              <div className={styles.sfPapel}>{perfil ? PAPEL_LABEL[perfil.papel] : '—'}</div>
+            </div>
+            <button
+              className={styles.temaBtn}
+              onClick={alternar}
+              title={escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro'}
+              aria-label={escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro'}
+            >
+              <Icon name={escuro ? 'moon' : 'sun'} size={16} />
+            </button>
           </div>
           <div className={styles.sfActions}>
             <button className={styles.btnGhostSm} onClick={() => void handleRecarregar()}>
@@ -343,7 +360,7 @@ export default function App() {
         <main className={styles.mainContent}>
           {erroDados && (
             <div className={styles.banner}>
-              <span>⚠️ {erroDados}</span>
+              <span>{erroDados}</span>
               <button
                 className="btn-secondary"
                 style={{ padding: '5px 12px', fontSize: 12 }}
@@ -356,7 +373,7 @@ export default function App() {
 
           {showBanner && (
             <div className={styles.banner}>
-              <span>⚠️ Configure o emitente principal para emitir OCs.</span>
+              <span>Configure o emitente principal para emitir OCs.</span>
               <button
                 className="btn-secondary"
                 style={{ padding: '5px 12px', fontSize: 12 }}
@@ -367,11 +384,7 @@ export default function App() {
             </div>
           )}
 
-          {!data && carregandoDados && (
-            <div className={styles.gateScreen}>
-              <p>Carregando dados do banco…</p>
-            </div>
-          )}
+          {!data && carregandoDados && <Loader texto="Carregando dados do banco…" />}
 
           {data && (
             <>

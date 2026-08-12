@@ -1,44 +1,115 @@
-/* Design tokens — single source of truth para cores, espaçamentos e elevações.
-   Migrado direto do legacy CentralCompras-PBQPH.html (linhas 17-57). */
+/* Padrão Front-end Campisi Engenharia — direção "Creme" (claro) e
+ * "Creme noturno" (escuro). Fonte oficial: campisi-central/Padrao_Front_end/
+ * tokens.css. Este arquivo é a ÚNICA fonte de verdade de cor, sombra, raio e
+ * fonte deste aplicativo — não escreva hex solto em módulo nenhum.
+ *
+ * Tema escuro: atributo data-tema="escuro" no <html> (ver hooks/useTema.ts).
+ *
+ * Os nomes em português são os oficiais do padrão. O bloco de apelidos no fim
+ * mantém os nomes antigos (--navy, --bg, --text…) vivos apontando para os
+ * novos: são centenas de usos espalhados nos módulos, e trocar tudo de uma vez
+ * seria um diff impossível de revisar. Em código novo, use os nomes oficiais. */
 
 :root {
-  --navy: #1d4f7c;
-  --navy-dark: #0d2b4a;
-  --navy-mid: #2467a0;
-  --navy-light: #3a88c8;
-  --amber: #f5a623;
-  --amber-dark: #d48b0f;
-  --sidebar-bg: #f7fafe;
-  --bg: #eef3f8;
-  --surface: #ffffff;
-  --border: #c5d3df;
-  --border-light: #e0e9f2;
-  --text: #0d2137;
-  --text-mid: #2a4c6a;
-  --text-muted: #6082a0;
-  --green: #16a34a;
-  --green-bg: #dcfce7;
-  --red: #dc2626;
-  --red-bg: #fee2e2;
-  --warn: #d97706;
-  --warn-bg: #fffbeb;
-  --warn-border: #fde68a;
-  --radius: 8px;
-  --shadow: 0 2px 12px rgba(13, 43, 74, 0.08);
+  --fundo: #fbf3de;
+  --painel: #fffdf8; /* cards, sidebar */
+  --painel-2: #fbf3de; /* inputs sobre painel */
+  --borda: #ead9c0;
+  --borda-forte: #d9be97;
+  --texto: #1c3242;
+  --texto-suave: #5e594c;
+  --texto-muted: #9c9382; /* só em texto grande/secundário */
+  --marca: #023b56; /* títulos, links, ação secundária */
+  --marca-fraca: rgba(2, 59, 86, 0.09); /* hover, item ativo, chips */
+  --marca-media: rgba(2, 59, 86, 0.14);
+  --acento: #f6a425; /* UMA ação primária por tela */
+  --acento-sombra: #de690e;
+  --acento-texto: #3a2200; /* texto sobre laranja (AA) */
+  --terra: #b15d1d; /* eyebrows, detalhes quentes */
+  --sucesso: #2e7d4f;
+  --sucesso-bg: #e3f0e5;
+  --erro: #c24e3a;
+  --erro-bg: #f7e0d8;
+  --aviso: #8a5300;
+  --aviso-bg: #fff3d6;
+  --sombra-suave: 0 1px 2px rgba(140, 62, 22, 0.04), 0 12px 30px rgba(140, 62, 22, 0.1);
+  --sombra-elevada: 0 4px 12px rgba(140, 62, 22, 0.08), 0 18px 44px rgba(140, 62, 22, 0.14);
+  --raio-pequeno: 8px;
+  --raio: 12px;
+  --raio-grande: 20px;
+  --raio-pill: 999px; /* busca, botões primários, chips, nav ativo */
+  --transicao: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --fonte-display: 'Source Serif 4', Georgia, serif;
+  --fonte-sans: 'Albert Sans', system-ui, -apple-system, sans-serif;
+  --fonte-mono: ui-monospace, 'SF Mono', Consolas, monospace; /* CNPJ, códigos */
+}
 
-  /* Aliases legados (referenciados em código que será migrado gradualmente) */
-  --muted: #6082a0;
-  --muted-strong: #2a4c6a;
-  --surface-alt: #eef3f8;
-  --accent: #1d4f7c;
-  --accent-soft: rgba(29, 79, 124, 0.08);
-  --accent-strong: #0d2b4a;
-  --success: #16a34a;
-  --success-soft: #dcfce7;
-  --danger: #dc2626;
-  --danger-soft: #fee2e2;
-  --warning: #d97706;
-  --warning-soft: #fffbeb;
-  --neutral-soft: #eef3f8;
-  --border-strong: #c5d3df;
+[data-tema='escuro'] {
+  --fundo: #0b1a23;
+  --painel: #12242f;
+  --painel-2: #152a37;
+  --borda: rgba(237, 231, 217, 0.1);
+  --borda-forte: rgba(237, 231, 217, 0.22);
+  --texto: #ede7d9; /* creme quente, não branco frio */
+  --texto-suave: #c9cfc5;
+  --texto-muted: #93a0a6;
+  --marca: #7cc4e8; /* navy é escuro demais p/ destaque no escuro */
+  --marca-fraca: rgba(124, 196, 232, 0.13);
+  --marca-media: rgba(124, 196, 232, 0.22);
+  --acento: #f6a425;
+  --acento-sombra: #de690e;
+  --acento-texto: #3a2200;
+  --terra: #f0b95a;
+  --sucesso: #5bc48e;
+  --sucesso-bg: rgba(91, 196, 142, 0.14);
+  --erro: #e88070;
+  --erro-bg: rgba(232, 128, 112, 0.14);
+  --aviso: #f0b95a;
+  --aviso-bg: rgba(240, 185, 90, 0.14);
+  --sombra-suave: 0 0 0 4px rgba(124, 196, 232, 0.05), 0 12px 30px rgba(0, 10, 18, 0.4);
+  --sombra-elevada: 0 0 0 4px rgba(124, 196, 232, 0.06), 0 18px 44px rgba(0, 10, 18, 0.5);
+}
+
+/* ── Apelidos dos nomes antigos ─────────────────────────────────────────────
+ * Mantêm o CSS já escrito funcionando e mudando de tema junto. Cada linha é
+ * uma tradução do vocabulário antigo (azul-marinho fixo) para o novo. */
+:root,
+[data-tema='escuro'] {
+  --navy: var(--marca);
+  --navy-dark: var(--marca);
+  --navy-mid: var(--texto-suave);
+  --navy-light: var(--marca);
+  --amber: var(--acento);
+  --amber-dark: var(--acento-sombra);
+  --sidebar-bg: var(--painel);
+  --bg: var(--fundo);
+  --surface: var(--painel);
+  --border: var(--borda);
+  --border-light: var(--borda);
+  --text: var(--texto);
+  --text-mid: var(--texto-suave);
+  --text-muted: var(--texto-muted);
+  --green: var(--sucesso);
+  --green-bg: var(--sucesso-bg);
+  --red: var(--erro);
+  --red-bg: var(--erro-bg);
+  --warn: var(--aviso);
+  --warn-bg: var(--aviso-bg);
+  --warn-border: var(--aviso);
+  --radius: var(--raio);
+  --shadow: var(--sombra-suave);
+  --muted: var(--texto-muted);
+  --muted-strong: var(--texto-suave);
+  --surface-alt: var(--painel-2);
+  --accent: var(--marca);
+  --accent-soft: var(--marca-fraca);
+  --accent-strong: var(--marca);
+  --success: var(--sucesso);
+  --success-soft: var(--sucesso-bg);
+  --danger: var(--erro);
+  --danger-soft: var(--erro-bg);
+  --warning: var(--aviso);
+  --warning-soft: var(--aviso-bg);
+  --neutral-soft: var(--marca-fraca);
+  --border-strong: var(--borda-forte);
 }

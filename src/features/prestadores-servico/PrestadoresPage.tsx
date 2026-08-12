@@ -199,7 +199,6 @@ export function PrestadoresPage() {
       {/* Tabela */}
       {filtered.length === 0 ? (
         <EmptyState
-          icon="🔧"
           title="Nenhum prestador encontrado"
           description={
             data.prestadores_servico.length === 0

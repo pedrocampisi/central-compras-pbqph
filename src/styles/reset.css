@@ -1,6 +1,6 @@
-/* Reset minimalista + base. Migrado do legacy. */
-
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
+/* Reset minimalista + base do padrão Campisi.
+ * As fontes (Source Serif 4 + Albert Sans) são carregadas no index.html, com
+ * preconnect — @import dentro do CSS atrasa o primeiro texto na tela. */
 
 * {
   box-sizing: border-box;
@@ -10,10 +10,20 @@ html,
 body {
   margin: 0;
   height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Barlow', 'Segoe UI', Arial, sans-serif;
-  line-height: 1.45;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Títulos na serifada; o peso e o tamanho ficam com cada tela. */
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-display);
+  color: var(--texto);
 }
 
 button,
@@ -26,18 +36,36 @@ textarea {
 button {
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--raio);
   transition:
-    filter 0.15s,
-    background 0.15s;
-}
-
-button:hover {
-  filter: brightness(1.07);
+    background var(--transicao),
+    border-color var(--transicao),
+    color var(--transicao);
 }
 
 a {
-  color: var(--navy-mid);
+  color: var(--marca);
+}
+
+/* Acabamento obrigatório do padrão — as superfícies que o navegador desenha
+ * também são da marca. */
+::selection {
+  background: var(--marca-media);
+}
+
+input,
+textarea {
+  caret-color: var(--marca);
+}
+
+:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borda-forte) transparent;
 }
 
 .hidden {
@@ -45,8 +73,8 @@ a {
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -54,8 +82,8 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--borda-forte);
+  border-radius: var(--raio-pill);
 }
 
 #root {

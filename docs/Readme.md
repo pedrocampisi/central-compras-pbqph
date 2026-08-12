@@ -22,6 +22,20 @@ backups, concurrency, cache) e os hooks `useAutoSave`/`useDirtyGuard`
 enquanto a virada não for aprovada. Quem for mexer lá deve ler
 `services/supabase/*` primeiro.
 
+## Padrão visual
+
+Desde 12/08/2026 a interface segue o **padrão front-end da Campisi** (direção
+"Creme", claro e escuro), cuja fonte oficial é
+`campisi-central/Padrao_Front_end/`. As regras que restringem qualquer CSS novo
+estão resumidas na seção 0.1 do `docs/Agente.md`; o resumo do resumo:
+cor só via `src/styles/tokens.css`, **um** botão laranja por tela, ícone de
+traço (nunca emoji), mascote longe de tabela e movimento só em espera. Os
+arquivos da marca ficam em `public/marca/`.
+
+A tela de entrada com portão e animação **não existe aqui** — ela é da
+**Central**, que será a porta de entrada da equipe. O login deste aplicativo é
+só o formulário, e sai de cena quando a Central assumir a autenticação.
+
 O estado da migração e a lista de pendências estão em
 `docs/RELATORIO-RODADA-2-2026-08-10.md`,
 `docs/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica

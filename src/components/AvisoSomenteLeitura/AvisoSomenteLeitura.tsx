@@ -15,7 +15,6 @@ import styles from './AvisoSomenteLeitura.module.css';
 export function AvisoSomenteLeitura({ oQue }: { oQue?: string }) {
   return (
     <p className={styles.aviso} role="note">
-      <span aria-hidden="true">🔒</span>{' '}
       Somente leitura nesta versão — {oQue ?? 'este cadastro'} ainda não é
       gravado no banco. A edição chega numa próxima etapa.
     </p>

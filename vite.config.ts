@@ -18,13 +18,15 @@ export default defineConfig(({ command }) => {
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['brazao1.png', 'icons/*.png'],
+      includeAssets: ['marca/brasao.png', 'marca/mascote-rosto.png', 'icons/*.png'],
       manifest: {
         name: 'Central de Compras PBQP-H',
         short_name: 'Central Compras',
         description: 'Sistema de Ordens de Compra — Campisi PBQP-H',
-        theme_color: '#0d2b4a',
-        background_color: '#f4f6fa',
+        // Cores do padrão "Creme": a barra do sistema no celular acompanha a
+        // tela em vez de brigar com ela.
+        theme_color: '#FBF3DE',
+        background_color: '#FBF3DE',
         display: 'standalone',
         start_url: base,
         icons: [
@@ -40,6 +42,10 @@ export default defineConfig(({ command }) => {
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2,json}'],
+        // Os quadros do martelo (133 KB) ficam fora do pacote pré-carregado:
+        // só aparecem em espera acima de 250ms, e o próprio loader os busca
+        // na hora.
+        globIgnores: ['**/marca/loader-quadro-*.png'],
         // Large chunks — cache them longer
         runtimeCaching: [
           {

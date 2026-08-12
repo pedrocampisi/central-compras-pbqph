@@ -252,7 +252,6 @@ export function HistoricoPage() {
       {/* Tabela */}
       {ocs.length === 0 ? (
         <EmptyState
-          icon="↺"
           title="Nenhuma OC encontrada"
           description={
             data.ordens_compra.length === 0

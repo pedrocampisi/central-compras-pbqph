@@ -1,8 +1,8 @@
 /* Estilos globais que NÃO devem ficar em CSS Modules.
- * Cada componente em src/components/ ou src/features/ tem seu próprio .module.css.
- * Este arquivo é deliberadamente pequeno: só utilitários verdadeiros. */
+ * Cada componente em src/components/ ou src/features/ tem seu próprio
+ * .module.css. Aqui ficam só as classes que as telas compartilham por nome
+ * (`section`, `section-header`…) e utilitários verdadeiros. */
 
-/* Reseta margens em headings — controlamos via componentes */
 h1,
 h2,
 h3,
@@ -19,6 +19,68 @@ p {
 ul,
 ol {
   margin: 0;
+}
+
+/* ── Cabeçalho de tela ─────────────────────────────────────────────────────
+ * Estas classes já eram usadas por todas as páginas, mas não existia
+ * definição para elas — os títulos saíam no tamanho padrão do navegador.
+ * Agora seguem a escala do padrão: título na serifada, subtítulo suave. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.section-header h2 {
+  font-family: var(--fonte-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--texto);
+}
+
+.section-sub {
+  color: var(--texto-suave);
+  font-size: 13.5px;
+  margin-top: 4px;
+}
+
+/* Botão secundário para os poucos pontos que não usam o componente Button. */
+.btn-secondary {
+  height: 38px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--marca);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.btn-secondary:hover {
+  background: var(--marca-fraca);
+}
+
+/* Números que precisam alinhar por dígito (valores, quantidades, datas). */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Documentos e códigos: CNPJ, CPF, número da OC. */
+.doc,
+.mono {
+  font-family: var(--fonte-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Fieldset invisível: usado para desabilitar um bloco inteiro de campos

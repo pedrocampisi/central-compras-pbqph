@@ -128,7 +128,6 @@ export function ObrasPage() {
       {/* Tabela */}
       {filtered.length === 0 ? (
         <EmptyState
-          icon="🏗"
           title="Nenhuma obra encontrada"
           description={
             data.obras.length === 0

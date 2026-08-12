@@ -7,14 +7,19 @@
  *   2. "Esqueci minha senha" — resetPasswordForEmail. Não é acessório: as
  *      contas da equipe foram criadas SEM senha conhecida, e é por este
  *      fluxo que cada pessoa define a dela no primeiro acesso.
+ *
+ * Sem portão de boas-vindas e sem animação de entrada: a cerimônia da marca é
+ * da Central, que é por onde a equipe entra. Aqui fica só o formulário, no
+ * padrão visual comum das telas de trabalho.
  */
 
 import { useState } from 'react';
 import { entrar, traduzErroAuth } from '../../services/supabase/auth';
 import { supabase } from '../../services/supabase/client';
 import { useUiStore } from '../../stores/useUiStore';
-import { Button } from '../../components/Button/Button';
 import styles from './LoginPage.module.css';
+
+const MARCA = `${import.meta.env.BASE_URL}marca/`;
 
 /**
  * Erro vindo do link do e-mail (ex.: token expirado), lido uma única vez no
@@ -83,20 +88,16 @@ export function LoginPage() {
   return (
     <div className={styles.wrap}>
       <form className={styles.card} onSubmit={(e) => void handleEntrar(e)}>
-        <div className={styles.brand}>
-          <img
-            src={`${import.meta.env.BASE_URL}brazao1.png`}
-            alt=""
-            className={styles.logo}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-          <div>
-            <div className={styles.brandName}>CENTRAL DE COMPRAS</div>
-            <div className={styles.brandSub}>PBQP-H · CAMPISI ENGENHARIA</div>
-          </div>
-        </div>
+        <img
+          src={`${MARCA}brasao.png`}
+          alt=""
+          className={styles.logo}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <h1 className={styles.brandName}>Central de Compras</h1>
+        <p className={styles.brandSub}>Entre com seu e-mail da empresa.</p>
 
         <label className={styles.field}>
           <span>E-mail</span>
@@ -121,21 +122,25 @@ export function LoginPage() {
           />
         </label>
 
-        {erro && <p className={styles.erro} role="alert">{erro}</p>}
+        {erro && (
+          <p className={styles.erro} role="alert">
+            {erro}
+          </p>
+        )}
         {aviso && <p className={styles.aviso}>{aviso}</p>}
 
-        <Button variant="primary" type="submit" loading={entrando}>
-          Entrar
-        </Button>
+        <button className={styles.btnEntrar} type="submit" disabled={entrando}>
+          {entrando ? 'Entrando…' : 'Entrar'}
+        </button>
 
-        <Button
-          variant="outline"
+        <button
           type="button"
+          className={styles.btnSecundario}
           onClick={() => void handleEsqueciSenha()}
-          loading={enviandoReset}
+          disabled={enviandoReset}
         >
-          Primeiro acesso — definir minha senha
-        </Button>
+          {enviandoReset ? 'Enviando…' : 'Primeiro acesso — definir minha senha'}
+        </button>
 
         <button
           type="button"
@@ -147,8 +152,8 @@ export function LoginPage() {
         </button>
 
         <p className={styles.rodape}>
-          Usuários novos são criados pelo administrador. Depois de criado,
-          defina sua senha pelo botão acima.
+          Usuários novos são criados pelo administrador. Depois de criado, defina sua senha pelo
+          botão acima.
         </p>
       </form>
     </div>
@@ -194,12 +199,16 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
   return (
     <div className={styles.wrap}>
       <form className={styles.card} onSubmit={(e) => void handleSalvar(e)}>
-        <div className={styles.brand}>
-          <div>
-            <div className={styles.brandName}>DEFINIR NOVA SENHA</div>
-            <div className={styles.brandSub}>Central de Compras · Campisi</div>
-          </div>
-        </div>
+        <img
+          src={`${MARCA}brasao.png`}
+          alt=""
+          className={styles.logo}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <h1 className={styles.brandName}>Definir nova senha</h1>
+        <p className={styles.brandSub}>Central de Compras · Campisi</p>
 
         <label className={styles.field}>
           <span>Nova senha</span>
@@ -224,11 +233,15 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
           />
         </label>
 
-        {erro && <p className={styles.erro} role="alert">{erro}</p>}
+        {erro && (
+          <p className={styles.erro} role="alert">
+            {erro}
+          </p>
+        )}
 
-        <Button variant="primary" type="submit" loading={salvando}>
-          Salvar senha e entrar
-        </Button>
+        <button className={styles.btnEntrar} type="submit" disabled={salvando}>
+          {salvando ? 'Salvando…' : 'Salvar senha e entrar'}
+        </button>
       </form>
     </div>
   );
@@ -243,20 +256,23 @@ export function SemAcessoPage({ email, onSair }: { email: string; onSair: () => 
   return (
     <div className={styles.wrap}>
       <div className={styles.card}>
-        <div className={styles.brand}>
-          <div>
-            <div className={styles.brandName}>ACESSO PENDENTE</div>
-            <div className={styles.brandSub}>Central de Compras · Campisi</div>
-          </div>
-        </div>
-        <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text)' }}>
-          Você entrou como <strong>{email}</strong>, mas o seu acesso ainda não
-          foi liberado por um administrador.
+        <img
+          src={`${MARCA}mascote-corpo.png`}
+          alt=""
+          className={styles.logo}
+          style={{ width: 150 }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <h1 className={styles.brandName}>Acesso pendente</h1>
+        <p className={styles.brandSub}>
+          Você entrou como <strong>{email}</strong>, mas o seu acesso ainda não foi liberado por um
+          administrador.
         </p>
-        <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted)' }}>
-          Peça a liberação e entre novamente.
-        </p>
-        <Button variant="outline" onClick={onSair}>Sair</Button>
+        <button type="button" className={styles.btnSecundario} onClick={onSair}>
+          Sair
+        </button>
       </div>
     </div>
   );

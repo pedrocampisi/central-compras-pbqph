@@ -119,13 +119,13 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
           className={[styles.tabBtn, tab === 'cadastro' ? styles.tabActive : ''].join(' ')}
           onClick={() => setTab('cadastro')}
         >
-          📋 Cadastro
+          Cadastro
         </button>
         <button
           className={[styles.tabBtn, tab === 'avaliacoes' ? styles.tabActive : ''].join(' ')}
           onClick={() => setTab('avaliacoes')}
         >
-          ⚖ Avaliações
+          Avaliações
           {avaliacoes.length > 0 && (
             <span className={styles.tabCount}>{avaliacoes.length}</span>
           )}
@@ -193,7 +193,6 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
           <AvisoSomenteLeitura oQue="o registro de avaliações" />
           {avaliacoes.length === 0 ? (
             <div className={styles.emptyAval}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>⚖</div>
               <strong>Nenhuma avaliação registrada</strong>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
                 As avaliações deste prestador aparecerão aqui.
@@ -207,7 +206,7 @@ export function PrestadorDrawer({ open, prestador, onClose }: Props) {
                     <div>
                       <strong>{formatDateBr(a.data_avaliacao)}</strong>
                       <div className={styles.avalObra}>
-                        🏗 {obrasMap.get(a.obra_id) ?? '— obra removida'}
+                        {obrasMap.get(a.obra_id) ?? '— obra removida'}
                       </div>
                     </div>
                   </div>

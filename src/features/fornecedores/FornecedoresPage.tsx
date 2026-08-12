@@ -135,7 +135,6 @@ export function FornecedoresPage() {
       {/* Tabela */}
       {filtered.length === 0 ? (
         <EmptyState
-          icon="👥"
           title="Nenhum fornecedor encontrado"
           description={
             data.fornecedores.length === 0
