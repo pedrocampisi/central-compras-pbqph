@@ -4,7 +4,9 @@
  */
 
 import { z } from 'zod';
-import { STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO } from '../constants';
+import {
+  STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO, CURRENT_SCHEMA_VERSION,
+} from '../constants';
 
 // ── Endereço ────────────────────────────────────────────────────────────────
 export const EnderecoSchema = z.object({
@@ -233,7 +235,7 @@ export const ConfigSchema = z.object({
 
 // ── Data raiz ──────────────────────────────────────────────────────────────
 export const DataSchema = z.object({
-  schema_version: z.number().default(5),
+  schema_version: z.number().default(CURRENT_SCHEMA_VERSION),
   version: z.number().default(1),
   app_name: z.string().default('Central de Compras PBQP-H V2 - Campisi'),
   shared_file_name: z.string().default('central-compras-data.json'),

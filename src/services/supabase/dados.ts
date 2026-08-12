@@ -22,6 +22,7 @@ import type {
   AvaliacaoPrestador, Data, Ecr, Emitente, Endereco, Fornecedor, Item, Obra,
   OrdemCompra, PrestadorServico,
 } from '../../domain/types';
+import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
 
 // ---------------------------------------------------------------------------
@@ -90,7 +91,7 @@ export async function carregarDados(): Promise<Data> {
   const numeracaoAno = (cfgNum.data ?? []).find((n: Record<string, number>) => n['ano'] === anoCorrente);
 
   return {
-    schema_version: 5,
+    schema_version: CURRENT_SCHEMA_VERSION,
     version: 1,
     app_name: 'Central de Compras PBQP-H',
     shared_file_name: '',

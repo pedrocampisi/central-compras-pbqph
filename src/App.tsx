@@ -13,6 +13,7 @@ import styles from './App.module.css';
 
 // Stores
 import { useDataStore } from './stores/useDataStore';
+import { useOcEditingStore } from './stores/useOcEditingStore';
 import { useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
 
@@ -129,6 +130,10 @@ export default function App() {
     if (!userId) {
       setPerfil(null);
       useDataStore.setState({ data: null, dirty: false, dirtySince: null });
+      // O rascunho de OC aberto também é dado de quem estava logado: sem isto,
+      // quem entra depois no mesmo computador encontra a OC do colega no editor.
+      useOcEditingStore.getState().stopEditing();
+      setTab('dashboard');
       return;
     }
 

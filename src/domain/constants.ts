@@ -68,5 +68,11 @@ export const CATEGORIAS_SERVICO = [
   'Outros',
 ] as const;
 
-/** Versão atual do schema do JSON. Bump a cada mudança incompatível + adicionar migration. */
-export const CURRENT_SCHEMA_VERSION = 4;
+/**
+ * Versão atual do schema dos dados. Bump a cada mudança incompatível +
+ * adicionar a migration correspondente em `domain/migrations/`.
+ *
+ * Estava em 4 enquanto o pipeline de migrações, o Zod e a camada do banco já
+ * produziam v5 — divergência apontada na perícia de 10/08/2026 (P2-08).
+ */
+export const CURRENT_SCHEMA_VERSION = 5;

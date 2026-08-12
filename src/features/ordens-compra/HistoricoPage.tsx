@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { podeEmitirOc } from '../../services/supabase/auth';
 import { DataTable } from '../../components/DataTable/DataTable';
 import { Pill } from '../../components/Pill/Pill';
 import { Button } from '../../components/Button/Button';
@@ -29,6 +31,12 @@ export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
 
   const startEditing = useOcEditingStore((s) => s.startEditing);
+
+  // Espelho da permissão do banco: quem não pode gravar OC não deve ver botão
+  // que só vai tomar erro do RLS depois do clique. A trava real é do banco.
+  const perfil = useAuthStore((s) => s.perfil);
+  const gravaOk = podeEmitirOc(perfil?.papel);
+  const semPermissao = 'Seu acesso é somente leitura para ordens de compra';
 
   const histFilter = useUiStore((s) => s.histFilter);
   const setHistFilter = useUiStore((s) => s.setHistFilter);
@@ -96,8 +104,12 @@ export function HistoricoPage() {
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
       // Grava o carimbo no banco — sem isso a data de geração se perdia no reload.
-      await salvarOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
-      await recarregarDados();
+      // Quem é somente-leitura leva o PDF do mesmo jeito (é consulta, não edição),
+      // mas não tenta gravar: o banco recusaria e a tela mostraria um erro à toa.
+      if (gravaOk) {
+        await salvarOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
+        await recarregarDados();
+      }
       showToast('PDF regenerado.', 'success');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
@@ -189,7 +201,13 @@ export function HistoricoPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
           </Button>
-          <Button variant="primary" size="sm" onClick={() => setTab('nova-oc')}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setTab('nova-oc')}
+            disabled={!gravaOk}
+            title={gravaOk ? undefined : semPermissao}
+          >
             + Nova OC
           </Button>
         </div>
@@ -242,7 +260,7 @@ export function HistoricoPage() {
               : 'Tente ajustar os filtros de busca.'
           }
           action={
-            data.ordens_compra.length === 0
+            data.ordens_compra.length === 0 && gravaOk
               ? { label: '+ Nova OC', onClick: () => setTab('nova-oc') }
               : undefined
           }
@@ -255,19 +273,21 @@ export function HistoricoPage() {
           emptyTitle="Nenhuma OC encontrada"
           rowActions={(o) => (
             <div style={{ display: 'flex', gap: 4 }}>
-              {o.status === 'rascunho' && (
+              {o.status === 'rascunho' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => handleEdit(o)}>Editar</Button>
               )}
-              <Button variant="ghost" size="sm" onClick={() => handleDuplicate(o)}>Duplicar</Button>
+              {gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => handleDuplicate(o)}>Duplicar</Button>
+              )}
               {o.status !== 'rascunho' && (
                 <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
               )}
-              {o.status === 'emitida' && (
+              {o.status === 'emitida' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'entregue')}>
                   ✓ Entregue
                 </Button>
               )}
-              {o.status !== 'cancelada' && (
+              {o.status !== 'cancelada' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
                   Cancelar
                 </Button>

@@ -1,7 +1,34 @@
 # Agente.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-05-06
+> Última atualização: 2026-08-12
 > Público: IA de manutenção. Densidade máxima, zero prosa.
+
+## 0. Duas branches, dois contratos — leia antes de usar este arquivo
+
+As seções 1–8 descrevem a arquitetura **da branch `main`** (JSON via File
+System Access API, sem login). Na branch `migracao-supabase` valem estas
+diferenças; onde houver conflito, o que está aqui na seção 0 vence:
+
+| Assunto | `main` | `migracao-supabase` |
+|---|---|---|
+| Fonte da verdade | `services/storage/fileSystem.ts` | `services/supabase/dados.ts` (`carregarDados`, `salvarOrdemCompra`, `salvarFornecedor`) |
+| Auth | inexistente | `services/supabase/auth.ts` — `perfilAtual()`, `podeEditar()`, `podeEmitirOc()`; espelho do RLS, não a trava |
+| Bootstrap | cache → handle → seed | sessão → `perfilAtual` → `recarregarDados` → realtime (`assinarMudancas`) |
+| Persistência | Ctrl+S → `saveData` | cada ação grava direto; `useAutoSave`/`useDirtyGuard` **não montados** |
+| Numeração OC | `config.ultimo_numero_oc` no navegador | RPC `compras.proximo_numero_oc` no servidor |
+| IA | `services/ai/openRouterClient.ts` (chave no JSON) | Edge Function `extrair-itens` (chave no servidor); `openRouterClient.ts` não existe |
+| Env | — | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (client.ts lança sem elas) |
+| Stores | +`useFileHandleStore` | +`useAuthStore`; `useDataStore.data` é populado só a partir do banco |
+| Schema version | 4 | 5 — `CURRENT_SCHEMA_VERSION` é a única fonte (Zod e `dados.ts` importam) |
+
+Telas deliberadamente somente-leitura na branch de migração (a camada não
+grava): obras, prestadores, avaliações, configurações e **ECRs que o
+fornecedor atende**. Padrão: `<AvisoSomenteLeitura>` + campos `disabled`.
+Regra que originou isso: a tela não pode dizer "salvo" e perder no reload.
+
+Dívida conhecida e priorizada: `docs/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`
+(P0-01 gravação de OC não-transacional e P0-02 CI/RLS são trabalho de banco,
+no repositório `campisi-central`).
 
 ## 1. Stack e dependências
 
@@ -69,7 +96,7 @@ computeOcTotals(oc: OrdemCompra): {
 ### `domain/migrations/index.ts`
 ```ts
 runMigrations(raw: unknown): unknown
-// Lê schema_version (default 1). Roda v1→v2 e/ou v2→v3 conforme.
+// Lê schema_version (default 1). Roda em ordem tudo que faltar até v5.
 // Não valida com Zod — apenas migra. Validação é em normalizeData.
 ```
 
@@ -193,7 +220,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 
 | Constante | Arquivo | Valor | Impacto se alterada |
 |---|---|---|---|
-| `CURRENT_SCHEMA_VERSION` | `domain/constants.ts` | 3 | Bump exige criar `vN-to-vN+1.ts` em `domain/migrations/` e registrar no `index.ts` |
+| `CURRENT_SCHEMA_VERSION` | `domain/constants.ts` | 5 | Bump exige criar `vN-to-vN+1.ts` em `domain/migrations/` e registrar no `index.ts`. `data.schema.ts` e `services/supabase/dados.ts` importam a constante — não duplicar o número |
 | `DEBOUNCE_MS` | `hooks/useAutoSave.ts` | 800 | Auto-save mais rápido/lento; só toca cache, não JSON |
 | `MAX_BACKUPS` | `services/storage/backups.ts` | 10 | Disco; FIFO |
 | `MAX_PDF_PAGES` | `services/ai/pdfToImages.ts` | 5 | Páginas enviadas à IA; afeta tokens |
