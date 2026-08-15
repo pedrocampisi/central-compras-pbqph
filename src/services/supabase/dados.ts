@@ -281,18 +281,22 @@ function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
 // ---------------------------------------------------------------------------
 
 /**
- * Reserva o próximo número de OC.
+ * Reserva o próximo número de OC — **gasta** o número e move o contador.
  *
- * ATENÇÃO ao ligar isto na tela: chame ao SALVAR, não ao abrir a tela de nova
- * OC. Hoje o número é reservado na abertura, então quem desiste deixa um buraco
- * permanente na sequência — e duas pessoas abrindo ao mesmo tempo recebem o
- * mesmo número. Aqui o banco garante que não repete, mas só chamar na hora
- * certa evita o buraco.
+ * Chame ao SALVAR, nunca ao abrir a tela: quem abre e desiste deixaria um
+ * buraco permanente na sequência (número entregue não volta, por decisão do
+ * PBQP-H). Duas pessoas salvando ao mesmo tempo recebem números diferentes —
+ * a reserva é atômica no Postgres.
+ *
+ * Usa `reservar_numero_oc`, e não a antiga `proximo_numero_oc`: aquela tinha
+ * nome de pergunta e era ação, e o banco vai apagá-la. Se um dia alguma tela
+ * precisar MOSTRAR o número antes de salvar, a chamada é
+ * `espiar_proximo_numero_oc` (não escreve nada) — nunca esta.
  */
 export async function reservarNumeroOc(
   ano?: number,
 ): Promise<{ ano: number; sequencial: number; numero: string }> {
-  const { data, error } = await compras().rpc('proximo_numero_oc', { p_ano: ano ?? null });
+  const { data, error } = await compras().rpc('reservar_numero_oc', { p_ano: ano ?? null });
   if (error) throw new Error(`Não foi possível reservar o número da OC: ${error.message}`);
   const linha = Array.isArray(data) ? data[0] : data;
   return linha as { ano: number; sequencial: number; numero: string };
