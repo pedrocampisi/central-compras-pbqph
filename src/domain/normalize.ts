@@ -160,6 +160,7 @@ export function normalizeOC(oc: unknown): OrdemCompra {
     criado_em: String(o['criado_em'] ?? nowIso()),
     atualizado_em: String(o['atualizado_em'] ?? nowIso()),
     pdf_gerado_em: String(o['pdf_gerado_em'] ?? ''),
+    versao: toNum(o['versao']),
   };
   return OrdemCompraSchema.parse(raw);
 }

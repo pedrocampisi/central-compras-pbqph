@@ -23,7 +23,7 @@ import { fileToImagesBase64 } from '../../services/ai/pdfToImages';
 import { extractItemsFromImages } from '../../services/ai/extractItems';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
-import { reservarNumeroOc, salvarOrdemCompra } from '../../services/supabase/dados';
+import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
 import { recarregarDados } from '../../services/supabase/sync';
 import { podeEditar, podeEmitirOc } from '../../services/supabase/auth';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -35,8 +35,9 @@ import styles from './NovaOcPage.module.css';
 
 /**
  * OC nova em edição. O número fica VAZIO de propósito: quem numera é o banco,
- * via reservarNumeroOc(), na hora de salvar — nunca o navegador. Numerar aqui
- * produzia número repetido quando duas pessoas emitiam ao mesmo tempo.
+ * e só na EMISSÃO — rascunho aberto e descartado não pode queimar um número do
+ * PBQP-H. Numerar no navegador produzia número repetido quando duas pessoas
+ * emitiam ao mesmo tempo.
  */
 function buildNewOc(
   ano: number,
@@ -49,6 +50,7 @@ function buildNewOc(
     id: uid('oc'),
     numero: '',
     sequencial: 0,
+    versao: 0,
     ano,
     data: todayIso(),
     status: 'rascunho',
@@ -305,7 +307,7 @@ export function NovaOcPage() {
   // ── Inicialização ───────────────────────────────────────────────────────────
   // Runs once on mount. If ocEditing already exists (navigated from Histórico),
   // skip creation — the user is editing an existing OC.
-  // OC nova nasce SEM número: o banco numera ao salvar (reservarNumeroOc).
+  // OC nova nasce SEM número: o banco numera na emissão.
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -328,17 +330,31 @@ export function NovaOcPage() {
   // ── Save ────────────────────────────────────────────────────────────────────
 
   /**
-   * Garante que a OC tem um número reservado no banco antes de gravar.
-   * OC nova (id local `oc-…`) ou sem número → reservarNumeroOc(), que é
-   * atômico no Postgres: duas pessoas salvando juntas recebem números
-   * diferentes. OC vinda do banco mantém o número que já tem.
+   * Identidade da TENTATIVA de salvamento, não da OC.
+   *
+   * O banco usa isto para ser idempotente: repetir o mesmo identificador
+   * devolve a mesma ordem de compra, sem criar outra e sem gastar outro
+   * número. Por isso ele só é descartado quando a gravação dá certo — o
+   * "tentar de novo" depois de uma falha precisa reaproveitar o mesmo.
    */
-  const comNumeroReservado = useCallback(async (oc: OrdemCompra): Promise<OrdemCompra> => {
-    const ehNova = oc.id.startsWith('oc-');
-    if (!ehNova && oc.numero) return oc;
-    const n = await reservarNumeroOc();
-    return { ...oc, ano: n.ano, sequencial: n.sequencial, numero: n.numero };
+  const tentativaRef = useRef<string | null>(null);
+  const idDaTentativa = useCallback(() => {
+    tentativaRef.current ??= crypto.randomUUID();
+    return tentativaRef.current;
   }, []);
+
+  const avisarErro = useCallback(
+    (verbo: string, err: unknown) => {
+      // O banco já devolve a frase pronta quando outra pessoa alterou a OC —
+      // reescrevê-la só tiraria a informação de qual versão está onde.
+      if (err instanceof ConflitoDeVersao) {
+        showToast(err.message, 'warning');
+        return;
+      }
+      showToast(`Erro ao ${verbo}: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    },
+    [showToast],
+  );
 
   const handleSaveDraft = useCallback(async () => {
     if (!ocEditing || !data) return;
@@ -348,18 +364,26 @@ export function NovaOcPage() {
 
     setSavingDraft(true);
     try {
-      const numerada = await comNumeroReservado(ocEditing);
-      await salvarOrdemCompra({ ...numerada, status: 'rascunho', atualizado_em: nowIso() });
+      // Rascunho não recebe número: ele nasce na emissão, para quem abre e
+      // desiste não queimar um número do PBQP-H.
+      const gravada = await salvarOrdemCompra(
+        { ...ocEditing, status: 'rascunho', atualizado_em: nowIso() },
+        idDaTentativa(),
+      );
+      tentativaRef.current = null;
       await recarregarDados();
       stopEditing();
-      showToast(`Rascunho ${numerada.numero} salvo.`, 'success');
+      showToast(
+        gravada.numero ? `Rascunho ${gravada.numero} salvo.` : 'Rascunho salvo — o número sai na emissão.',
+        'success',
+      );
       setTab('historico');
     } catch (err) {
-      showToast(`Erro ao salvar: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+      avisarErro('salvar', err);
     } finally {
       setSavingDraft(false);
     }
-  }, [ocEditing, data, stopEditing, showToast, setTab, comNumeroReservado]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
@@ -369,12 +393,25 @@ export function NovaOcPage() {
 
     setSavingPdf(true);
     try {
-      const numerada = await comNumeroReservado(ocEditing);
-      const emitida: OrdemCompra = { ...numerada, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
+      // Uma operação só no banco: cabeçalho, itens e a reserva do número. Se
+      // qualquer parte falhar, nada fica gravado pela metade.
+      const gravada = await salvarOrdemCompra(
+        { ...ocEditing, status: 'emitida', atualizado_em: nowIso() },
+        idDaTentativa(),
+      );
+      tentativaRef.current = null;
 
-      // Grava no banco ANTES de gerar o PDF: se a geração falhar, a OC está
-      // emitida e numerada — regenerar o PDF pelo Histórico resolve.
-      await salvarOrdemCompra(emitida);
+      // O número e a versão vêm do banco — é lá que eles nascem.
+      const emitida: OrdemCompra = {
+        ...ocEditing,
+        id: gravada.id,
+        status: gravada.status,
+        numero: gravada.numero,
+        ano: gravada.ano,
+        sequencial: gravada.sequencial,
+        versao: gravada.versao,
+        pdf_gerado_em: '',
+      };
 
       const blob = await generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
@@ -397,6 +434,15 @@ export function NovaOcPage() {
       }
 
       const result = await savePdfToFile(blob, filename, obraHandle);
+
+      // Carimbo DEPOIS de o arquivo existir. Antes ele era gravado junto com a
+      // OC, e o banco podia afirmar "PDF gerado" de um arquivo que nunca saiu.
+      try {
+        await marcarPdfGerado(gravada.id);
+      } catch {
+        /* o PDF saiu; só o carimbo falhou. Regenerar pelo Histórico resolve. */
+      }
+
       await recarregarDados();
       stopEditing();
       if (result === 'saved') {
@@ -411,11 +457,11 @@ export function NovaOcPage() {
       }
       setTab('historico');
     } catch (err) {
-      showToast(`Erro ao emitir: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+      avisarErro('emitir', err);
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, stopEditing, showToast, setTab, comNumeroReservado]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
 
   /**
    * Abre o PDF da OC em uma nova aba SEM emitir — para conferência antes
@@ -501,7 +547,7 @@ export function NovaOcPage() {
               : 'Nova Ordem de Compra'}
           </h2>
           <p className="section-sub">
-            OC Nº {ocEditing.numero || '— (o banco numera ao salvar)'}
+            OC Nº {ocEditing.numero || '— (numera ao emitir)'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>

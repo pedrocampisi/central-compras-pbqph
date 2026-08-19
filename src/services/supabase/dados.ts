@@ -67,7 +67,7 @@ const soDigitos = (v: string | undefined): string | null => {
 // ---------------------------------------------------------------------------
 
 export async function carregarDados(): Promise<Data> {
-  const [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals] = await Promise.all([
+  const [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals, fornEcrs] = await Promise.all([
     core().from('fornecedores').select('*').order('razao_social'),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável.
@@ -81,10 +81,23 @@ export async function carregarDados(): Promise<Data> {
     compras().from('numeracao').select('ano, ultimo_sequencial'),
     compras().from('prestadores_servico').select('*').order('razao_social'),
     compras().from('avaliacoes_prestadores').select('*').order('data_avaliacao'),
+    // Quais ECRs cada fornecedor atende. Tabela própria desde 17/08 — até
+    // então a tela deixava marcar e a marcação sumia no reload.
+    compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id'),
   ]);
 
-  for (const r of [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals]) {
+  for (const r of [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals, fornEcrs]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
+  }
+
+  // ECRs agrupados por fornecedor, para o mapeador não varrer a lista inteira
+  // a cada fornecedor.
+  const ecrsPorFornecedor = new Map<string, number[]>();
+  for (const l of (fornEcrs.data ?? []) as Record<string, unknown>[]) {
+    const id = String(l['fornecedor_id']);
+    const lista = ecrsPorFornecedor.get(id) ?? [];
+    lista.push(Number(l['ecr_id']));
+    ecrsPorFornecedor.set(id, lista);
   }
 
   const anoCorrente = new Date().getFullYear();
@@ -109,7 +122,9 @@ export async function carregarDados(): Promise<Data> {
       // A chave da IA não existe mais no formato de dados: passou para o servidor.
       pasta_backups: '',
     },
-    fornecedores: (forn.data ?? []).map(paraFornecedor),
+    fornecedores: (forn.data ?? []).map((l) =>
+      paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? []),
+    ),
     obras: (obras.data ?? []).map(paraObra),
     ecrs: (ecrs.data ?? []).map(paraEcr),
     ordens_compra: (ocs.data ?? []).map(paraOc),
@@ -118,7 +133,7 @@ export async function carregarDados(): Promise<Data> {
   };
 }
 
-function paraFornecedor(l: Record<string, unknown>): Fornecedor {
+function paraFornecedor(l: Record<string, unknown>, ecrsAtende: number[] = []): Fornecedor {
   return {
     id: String(l['id']),
     razao_social: vazio(l['razao_social']),
@@ -129,7 +144,7 @@ function paraFornecedor(l: Record<string, unknown>): Fornecedor {
     telefones: [(l['telefones'] as string[])?.[0] ?? '', (l['telefones'] as string[])?.[1] ?? ''],
     email: vazio(l['email']),
     contato_responsavel: vazio(l['contato_responsavel']),
-    ecrs_atende: [],
+    ecrs_atende: [...ecrsAtende].sort((a, b) => a - b),
     observacoes: vazio(l['observacoes']),
     ativo: l['ativo'] !== false,
     criado_em: vazio(l['criado_em']),
@@ -215,6 +230,7 @@ function paraOc(l: Record<string, unknown>): OrdemCompra {
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
     pdf_gerado_em: vazio(l['pdf_gerado_em']),
+    versao: Number(l['versao']) || 0,
   };
 }
 
@@ -279,35 +295,21 @@ function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
 // ---------------------------------------------------------------------------
 // Numeração de OC
 // ---------------------------------------------------------------------------
-
-/**
- * Reserva o próximo número de OC — **gasta** o número e move o contador.
- *
- * Chame ao SALVAR, nunca ao abrir a tela: quem abre e desiste deixaria um
- * buraco permanente na sequência (número entregue não volta, por decisão do
- * PBQP-H). Duas pessoas salvando ao mesmo tempo recebem números diferentes —
- * a reserva é atômica no Postgres.
- *
- * Usa `reservar_numero_oc`, e não a antiga `proximo_numero_oc`: aquela tinha
- * nome de pergunta e era ação, e o banco vai apagá-la. Se um dia alguma tela
- * precisar MOSTRAR o número antes de salvar, a chamada é
- * `espiar_proximo_numero_oc` (não escreve nada) — nunca esta.
- */
-export async function reservarNumeroOc(
-  ano?: number,
-): Promise<{ ano: number; sequencial: number; numero: string }> {
-  const { data, error } = await compras().rpc('reservar_numero_oc', { p_ano: ano ?? null });
-  if (error) throw new Error(`Não foi possível reservar o número da OC: ${error.message}`);
-  const linha = Array.isArray(data) ? data[0] : data;
-  return linha as { ano: number; sequencial: number; numero: string };
-}
+//
+// Não existe função de reservar número aqui, e é de propósito: desde 18/08/2026
+// quem numera é o banco, dentro de `salvar_oc` e de `definir_status_oc`, e só
+// na EMISSÃO. Uma chamada avulsa daqui gastaria um número do PBQP-H sem
+// documento — que é exatamente o defeito que essa mudança fechou.
+//
+// Se um dia alguma tela precisar MOSTRAR o próximo número sem gastá-lo, a
+// função é `compras.espiar_proximo_numero_oc` (não escreve nada).
 
 // ---------------------------------------------------------------------------
 // Gravação
 // ---------------------------------------------------------------------------
 
-export async function salvarFornecedor(f: Fornecedor): Promise<void> {
-  const { error } = await core().from('fornecedores').upsert({
+export async function salvarFornecedor(f: Fornecedor): Promise<string> {
+  const { data, error } = await core().from('fornecedores').upsert({
     ...(f.id && !f.id.startsWith('forn-') ? { id: f.id } : {}),
     razao_social: f.razao_social,
     nome_fantasia: f.nome_fantasia || null,
@@ -319,63 +321,183 @@ export async function salvarFornecedor(f: Fornecedor): Promise<void> {
     ...deEndereco(f.endereco),
     observacoes: f.observacoes || null,
     ativo: f.ativo !== false,
-  });
-  if (error) throw new Error(`Falha ao gravar fornecedor: ${error.message}`);
-}
-
-export async function salvarOrdemCompra(oc: OrdemCompra): Promise<string> {
-  const cabecalho = {
-    ...(oc.id && !oc.id.startsWith('oc-') ? { id: oc.id } : {}),
-    ano: oc.ano,
-    sequencial: oc.sequencial,
-    data: oc.data,
-    status: oc.status,
-    intervencao_id: oc.obra_id || null,
-    fornecedor_id: oc.fornecedor_id || null,
-    emitente_id: oc.emitente_id || null,
-    condicao_pagamento: oc.condicao_pagamento || null,
-    frete: oc.frete ?? 0,
-    outras_despesas: oc.outras_despesas ?? 0,
-    desconto_material: oc.desconto_material ?? 0,
-    observacoes: oc.observacoes || null,
-    pdf_gerado_em: oc.pdf_gerado_em || null,
-  };
-
-  const { data, error } = await compras()
-    .from('ordens_compra')
-    .upsert(cabecalho, { onConflict: 'ano,sequencial' })
+  })
     .select('id')
     .single();
-  if (error) throw new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
+  if (error) throw new Error(`Falha ao gravar fornecedor: ${error.message}`);
 
-  const ocId = String((data as Record<string, unknown>)['id']);
+  const id = String((data as Record<string, unknown>)['id']);
+  await salvarEcrsDoFornecedor(id, f.ecrs_atende ?? []);
+  return id;
+}
 
-  // Itens são regravados por inteiro: a tela edita a lista como um todo
-  // (adiciona, remove, reordena), e casar item a item aqui seria reimplementar
-  // no cliente uma comparação que o banco resolve com apagar-e-inserir.
-  const { error: erroApagar } = await compras().from('oc_itens').delete().eq('oc_id', ocId);
-  if (erroApagar) throw new Error(`Falha ao atualizar itens: ${erroApagar.message}`);
+/**
+ * Sincroniza quais ECRs o fornecedor atende.
+ *
+ * Grava a diferença — insere só o que foi marcado, apaga só o que foi
+ * desmarcado — em vez de apagar tudo e reinserir. Apagar-e-reinserir abriria a
+ * janela em que uma falha no meio deixa o fornecedor sem nenhum ECR, que é
+ * exatamente o defeito que o banco acabou de fechar do lado das OCs.
+ */
+async function salvarEcrsDoFornecedor(fornecedorId: string, desejados: number[]): Promise<void> {
+  const { data, error } = await compras()
+    .from('fornecedor_ecrs')
+    .select('ecr_id')
+    .eq('fornecedor_id', fornecedorId);
+  if (error) throw new Error(`Falha ao ler os ECRs do fornecedor: ${error.message}`);
 
-  if (oc.itens?.length) {
-    const { error: erroItens } = await compras().from('oc_itens').insert(
-      oc.itens.map((i, idx) => ({
-        oc_id: ocId,
-        posicao: idx + 1,
-        ecr_id: i.ecr_id ?? null,
-        material_id: i.material_id || null,
-        descricao: i.descricao || 'Item sem descrição',
-        observacao: i.observacao || null,
-        quantidade: i.quantidade ?? 0,
-        unidade: i.unidade || null,
-        preco_unit: i.preco_unit ?? 0,
-        ipi_pct: i.ipi_pct ?? 0,
-        desc_pct: i.desc_pct ?? 0,
-        prazo_entrega: i.prazo_entrega || null,
-      })),
-    );
-    if (erroItens) throw new Error(`Falha ao gravar itens: ${erroItens.message}`);
+  const atuais = new Set(((data ?? []) as Record<string, unknown>[]).map((l) => Number(l['ecr_id'])));
+  const alvo = new Set(desejados);
+  const inserir = [...alvo].filter((id) => !atuais.has(id));
+  const remover = [...atuais].filter((id) => !alvo.has(id));
+
+  if (inserir.length) {
+    const { error: erroIns } = await compras()
+      .from('fornecedor_ecrs')
+      .insert(inserir.map((ecr_id) => ({ fornecedor_id: fornecedorId, ecr_id })));
+    if (erroIns) throw new Error(`Falha ao gravar os ECRs do fornecedor: ${erroIns.message}`);
   }
-  return ocId;
+  if (remover.length) {
+    const { error: erroDel } = await compras()
+      .from('fornecedor_ecrs')
+      .delete()
+      .eq('fornecedor_id', fornecedorId)
+      .in('ecr_id', remover);
+    if (erroDel) throw new Error(`Falha ao remover os ECRs do fornecedor: ${erroDel.message}`);
+  }
+}
+
+/** Estado da OC como o banco devolveu depois de gravar. */
+export interface OcGravada {
+  id: string;
+  numero: string;
+  ano: number;
+  sequencial: number;
+  status: OrdemCompra['status'];
+  versao: number;
+  pdf_gerado_em: string;
+}
+
+/** Erro de gravação concorrente: outra pessoa salvou esta OC antes de você. */
+export class ConflitoDeVersao extends Error {}
+
+function paraOcGravada(linha: Record<string, unknown>): OcGravada {
+  return {
+    id: String(linha['id']),
+    numero: vazio(linha['numero']),
+    ano: Number(linha['ano']) || 0,
+    sequencial: Number(linha['sequencial']) || 0,
+    status: (linha['status'] as OrdemCompra['status']) ?? 'rascunho',
+    versao: Number(linha['versao']) || 0,
+    pdf_gerado_em: vazio(linha['pdf_gerado_em']),
+  };
+}
+
+/**
+ * Grava a ordem de compra INTEIRA numa operação só (`compras.salvar_oc`).
+ *
+ * Antes eram três requisições sem transação comum — cabeçalho, apagar itens,
+ * inserir itens — e uma falha no meio deixava OC numerada sem item nenhum.
+ * Era o achado P0 da perícia. Agora quem garante é o Postgres: se qualquer
+ * linha falhar, o banco desfaz tudo sozinho.
+ *
+ * `requestId` é a identidade da TENTATIVA, não da OC. Repetir o mesmo devolve
+ * a mesma OC, sem criar outra e sem gastar outro número — é o que protege do
+ * clique duplo e do "tentar de novo". Gere um por tentativa de salvamento e
+ * **reaproveite no retry**.
+ *
+ * O número não nasce aqui quando é rascunho: por decisão do Pedro (18/08) ele
+ * só existe a partir da emissão.
+ */
+export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Promise<OcGravada> {
+  const ehNova = !oc.id || oc.id.startsWith('oc-');
+
+  const payload: Record<string, unknown> = {
+    request_id: requestId,
+    cabecalho: {
+      data: oc.data,
+      status: oc.status,
+      intervencao_id: oc.obra_id || null,
+      fornecedor_id: oc.fornecedor_id || null,
+      emitente_id: oc.emitente_id || null,
+      // Texto vai como string vazia, NUNCA null. No contrato do banco a
+      // atualização é `coalesce(novo, antigo)`: null significa "não mexa neste
+      // campo". Mandar null aqui faria o apagar de uma observação voltar
+      // sozinho no reload — a tela diria que salvou e o texto reapareceria.
+      condicao_pagamento: oc.condicao_pagamento ?? '',
+      frete: oc.frete ?? 0,
+      outras_despesas: oc.outras_despesas ?? 0,
+      desconto_material: oc.desconto_material ?? 0,
+      observacoes: oc.observacoes ?? '',
+    },
+    // Mandamos a lista SEMPRE: a tela edita os itens como um todo. Omitir a
+    // chave significaria "não mexa nos itens", e lista vazia significa
+    // "apague todos" — são pedidos diferentes no contrato do banco.
+    itens: (oc.itens ?? []).map((i, idx) => ({
+      posicao: idx + 1,
+      ecr_id: i.ecr_id ?? null,
+      material_id: i.material_id || null,
+      descricao: i.descricao || 'Item sem descrição',
+      observacao: i.observacao || null,
+      quantidade: i.quantidade ?? 0,
+      unidade: i.unidade || null,
+      preco_unit: i.preco_unit ?? 0,
+      ipi_pct: i.ipi_pct ?? 0,
+      desc_pct: i.desc_pct ?? 0,
+      prazo_entrega: i.prazo_entrega || null,
+    })),
+  };
+
+  if (!ehNova) {
+    payload['oc_id'] = oc.id;
+    payload['versao'] = oc.versao;
+  }
+
+  const { data, error } = await compras().rpc('salvar_oc', { p: payload });
+  if (error) {
+    // 40001 = serialization_failure: o banco recusou porque a OC mudou desde
+    // que esta tela a leu. A mensagem já vem pronta para o usuário.
+    if (error.code === '40001') throw new ConflitoDeVersao(error.message);
+    throw new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
+  }
+  const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
+  return paraOcGravada(linha);
+}
+
+/**
+ * Muda só o status — sem tocar nos itens.
+ *
+ * Emitir reserva o número, se ainda não houver; emitir de novo, ou passar a
+ * entregue, não gasta outro. Mandar a versão é opcional no banco, mas quem
+ * manda ganha a proteção contra sobrescrever a mudança de outra pessoa.
+ */
+export async function definirStatusOc(
+  ocId: string,
+  status: OrdemCompra['status'],
+  versao?: number,
+): Promise<OcGravada> {
+  const { data, error } = await compras().rpc('definir_status_oc', {
+    p_oc_id: ocId,
+    p_status: status,
+    p_versao: versao ?? null,
+  });
+  if (error) {
+    if (error.code === '40001') throw new ConflitoDeVersao(error.message);
+    throw new Error(`Falha ao alterar o status: ${error.message}`);
+  }
+  const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
+  return paraOcGravada(linha);
+}
+
+/**
+ * Carimba a data de geração do PDF. Não mexe na versão de propósito: gerar
+ * PDF não muda conteúdo, e subir a versão invalidaria a tela de quem estiver
+ * editando — alarme falso.
+ */
+export async function marcarPdfGerado(ocId: string): Promise<string> {
+  const { data, error } = await compras().rpc('marcar_pdf_gerado', { p_oc_id: ocId });
+  if (error) throw new Error(`Falha ao registrar a geração do PDF: ${error.message}`);
+  return vazio(data);
 }
 
 /** Totais calculados pelo banco — a mesma conta para tela, PDF e relatório. */

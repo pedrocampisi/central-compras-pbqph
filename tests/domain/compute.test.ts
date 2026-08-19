@@ -32,6 +32,7 @@ function makeOC(overrides: Partial<OrdemCompra> = {}): OrdemCompra {
     id: 'oc-1',
     numero: '001/2026',
     sequencial: 1,
+    versao: 1,
     ano: 2026,
     data: '2026-01-15',
     status: 'rascunho',

@@ -23,7 +23,7 @@ import { downloadBlob } from '../../services/storage/download';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
-import { salvarOrdemCompra } from '../../services/supabase/dados';
+import { definirStatusOc, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 
@@ -80,7 +80,8 @@ export function HistoricoPage() {
   }
 
   function handleDuplicate(oc: OrdemCompra) {
-    // Sem número: o banco numera ao salvar (reservarNumeroOc), nunca o navegador.
+    // Cópia nova: sem número (ele nasce na emissão), sem versão (ainda não
+    // existe no banco) e sempre como rascunho.
     const duplicated: OrdemCompra = {
       ...structuredClone(oc),
       id: uid('oc'),
@@ -92,6 +93,7 @@ export function HistoricoPage() {
       criado_em: nowIso(),
       atualizado_em: nowIso(),
       pdf_gerado_em: '',
+      versao: 0,
     };
     startEditing(duplicated);
     setTab('nova-oc');
@@ -103,11 +105,13 @@ export function HistoricoPage() {
       const fornNome = data!.fornecedores.find((f) => f.id === oc.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
-      // Grava o carimbo no banco — sem isso a data de geração se perdia no reload.
+      // Comando estreito: carimba a data e não toca em mais nada. Antes isto
+      // passava pela gravação inteira da OC, que apagava e regravava todos os
+      // itens só para anotar uma data.
       // Quem é somente-leitura leva o PDF do mesmo jeito (é consulta, não edição),
       // mas não tenta gravar: o banco recusaria e a tela mostraria um erro à toa.
       if (gravaOk) {
-        await salvarOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
+        await marcarPdfGerado(oc.id);
         await recarregarDados();
       }
       showToast('PDF regenerado.', 'success');
@@ -118,11 +122,23 @@ export function HistoricoPage() {
 
   async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
     try {
-      // Mudança de status é gravação de OC — a camada já suporta (salvarOrdemCompra).
-      await salvarOrdemCompra({ ...oc, status, atualizado_em: nowIso() });
+      // Comando estreito: muda o status e nada mais. Vai com a versão que esta
+      // tela leu — se outra pessoa mexeu na OC nesse meio-tempo, o banco recusa
+      // em vez de sobrescrever o trabalho dela.
+      // Emitir daqui também é o que reserva o número, se ainda não houver.
+      const gravada = await definirStatusOc(oc.id, status, oc.versao);
       await recarregarDados();
-      showToast(`Status alterado para "${status}".`, 'success');
+      showToast(
+        status === 'emitida' && gravada.numero
+          ? `OC emitida com o número ${gravada.numero}.`
+          : `Status alterado para "${status}".`,
+        'success',
+      );
     } catch (err) {
+      if (err instanceof ConflitoDeVersao) {
+        showToast(err.message, 'warning');
+        return;
+      }
       showToast(`Erro ao alterar status: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     }
   }
@@ -156,7 +172,12 @@ export function HistoricoPage() {
     {
       key: 'numero',
       label: 'Número',
-      render: (o) => <strong style={{ fontFamily: 'monospace' }}>{o.numero}</strong>,
+      render: (o) =>
+        o.numero ? (
+          <strong className="doc">{o.numero}</strong>
+        ) : (
+          <span style={{ color: 'var(--texto-muted)', fontSize: 12 }}>(numera ao emitir)</span>
+        ),
     },
     { key: 'data', label: 'Data', render: (o) => formatDate(o.data) },
     {

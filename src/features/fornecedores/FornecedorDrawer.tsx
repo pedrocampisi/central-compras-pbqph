@@ -9,7 +9,6 @@ import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
-import { AvisoSomenteLeitura } from '../../components/AvisoSomenteLeitura/AvisoSomenteLeitura';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -61,6 +60,15 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
 
   function setEndereco(key: keyof Fornecedor['endereco'], value: string) {
     setForm((f) => ({ ...f, endereco: { ...f.endereco, [key]: value } }));
+  }
+
+  function toggleEcr(ecr_id: number) {
+    setForm((f) => ({
+      ...f,
+      ecrs_atende: f.ecrs_atende.includes(ecr_id)
+        ? f.ecrs_atende.filter((id) => id !== ecr_id)
+        : [...f.ecrs_atende, ecr_id],
+    }));
   }
 
   async function handleSave() {
@@ -161,16 +169,14 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
       </FieldGroup>
 
       {/*
-        A relação fornecedor × ECR não existe no banco (não há tabela de junção),
-        e o carregamento devolve sempre lista vazia. Deixar marcar aqui era o pior
-        tipo de bug: a tela dizia "salvo" e a escolha sumia no reload.
-        Volta a ser editável quando a tabela de junção existir e a camada gravar.
+        Voltou a ser editável em 19/08/2026: a tabela `compras.fornecedor_ecrs`
+        passou a existir, e a camada grava a diferença. Entre 12 e 19/08 este
+        bloco ficou somente-leitura de propósito — a tela dizia "salvo" e a
+        marcação sumia no reload, e mentir para quem usa é pior que não deixar
+        editar.
       */}
       {ecrs.length > 0 && (
         <FieldGroup title="ECRs que Atende">
-          <div style={{ gridColumn: '1 / -1' }}>
-            <AvisoSomenteLeitura oQue="quais ECRs o fornecedor atende" />
-          </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, gridColumn: '1 / -1' }}>
             {ecrs.map((ecr) => (
               <label
@@ -180,23 +186,22 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
                   alignItems: 'center',
                   gap: 5,
                   fontSize: 12,
-                  cursor: 'not-allowed',
+                  cursor: editaOk ? 'pointer' : 'not-allowed',
                   padding: '4px 8px',
-                  borderRadius: 6,
+                  borderRadius: 'var(--raio-pill)',
                   background: form.ecrs_atende.includes(ecr.id)
-                    ? 'rgba(29,79,124,0.12)'
-                    : 'var(--surface-alt)',
-                  border: `1px solid ${form.ecrs_atende.includes(ecr.id) ? 'var(--navy)' : 'var(--border)'}`,
-                  color: form.ecrs_atende.includes(ecr.id) ? 'var(--navy)' : 'var(--text-muted)',
+                    ? 'var(--marca-fraca)'
+                    : 'var(--painel-2)',
+                  border: `1px solid ${form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--borda)'}`,
+                  color: form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--texto-suave)',
                   fontWeight: form.ecrs_atende.includes(ecr.id) ? 600 : 400,
-                  opacity: 0.75,
                 }}
               >
                 <input
                   type="checkbox"
                   checked={form.ecrs_atende.includes(ecr.id)}
-                  disabled
-                  readOnly
+                  onChange={() => toggleEcr(ecr.id)}
+                  disabled={!editaOk}
                   style={{ margin: 0 }}
                 />
                 {ecr.codigo} — {ecr.nome}

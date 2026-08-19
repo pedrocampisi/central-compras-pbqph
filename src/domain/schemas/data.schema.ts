@@ -168,6 +168,9 @@ export const OrdemCompraSchema = z.object({
   criado_em: z.string().default(''),
   atualizado_em: z.string().default(''),
   pdf_gerado_em: z.string().default(''),
+  // Versão do banco. 0 = ainda não existe lá — é o que distingue "OC nova"
+  // de "OC lida do banco" na hora de gravar.
+  versao: z.number().default(0),
 });
 
 // ── Prestador de Serviço ──────────────────────────────────────────────────
