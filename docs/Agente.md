@@ -1,6 +1,6 @@
 # Agente.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-08-12
+> Última atualização: 2026-08-19
 > Público: IA de manutenção. Densidade máxima, zero prosa.
 
 ## 0. Duas branches, dois contratos — leia antes de usar este arquivo
@@ -11,24 +11,21 @@ diferenças; onde houver conflito, o que está aqui na seção 0 vence:
 
 | Assunto | `main` | `migracao-supabase` |
 |---|---|---|
-| Fonte da verdade | `services/storage/fileSystem.ts` | `services/supabase/dados.ts` (`carregarDados`, `salvarOrdemCompra`, `salvarFornecedor`) |
+| Fonte da verdade | `services/storage/fileSystem.ts` | `services/supabase/dados.ts` (`carregarDados`, `salvarOrdemCompra`, `definirStatusOc`, `marcarPdfGerado`, `salvarFornecedor`) |
 | Auth | inexistente | `services/supabase/auth.ts` — `perfilAtual()`, `podeEditar()`, `podeEmitirOc()`; espelho do RLS, não a trava |
 | Bootstrap | cache → handle → seed | sessão → `perfilAtual` → `recarregarDados` → realtime (`assinarMudancas`) |
 | Persistência | Ctrl+S → `saveData` | cada ação grava direto; `useAutoSave`/`useDirtyGuard` **não montados** |
-| Numeração OC | `config.ultimo_numero_oc` no navegador | RPC `compras.proximo_numero_oc` no servidor |
+| Numeração OC | `config.ultimo_numero_oc` no navegador | do banco, e **só na emissão** — dentro de `salvar_oc` / `definir_status_oc`. Rascunho fica sem número |
 | IA | `services/ai/openRouterClient.ts` (chave no JSON) | Edge Function `extrair-itens` (chave no servidor); `openRouterClient.ts` não existe |
 | Env | — | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (client.ts lança sem elas) |
 | Stores | +`useFileHandleStore` | +`useAuthStore`; `useDataStore.data` é populado só a partir do banco |
 | Schema version | 4 | 5 — `CURRENT_SCHEMA_VERSION` é a única fonte (Zod e `dados.ts` importam) |
 
 Telas deliberadamente somente-leitura na branch de migração (a camada não
-grava): obras, prestadores, avaliações, configurações e **ECRs que o
-fornecedor atende**. Padrão: `<AvisoSomenteLeitura>` + campos `disabled`.
-Regra que originou isso: a tela não pode dizer "salvo" e perder no reload.
-
-Dívida conhecida e priorizada: `docs/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`
-(P0-01 gravação de OC não-transacional e P0-02 CI/RLS são trabalho de banco,
-no repositório `campisi-central`).
+grava): obras, prestadores, avaliações e configurações. Padrão:
+`<AvisoSomenteLeitura>` + campos `disabled`. Regra que originou isso: a tela
+não pode dizer "salvo" e perder no reload. *(Os ECRs do fornecedor saíram desta
+lista em 19/08: ganharam tabela no banco e voltaram a ser editáveis.)*
 
 ## 0.1 Padrão visual (direção "Creme") — regras que valem para todo CSS daqui
 
@@ -65,6 +62,46 @@ Fonte oficial: `campisi-central/Padrao_Front_end/` (`DESIGN.md`, `tokens.css`,
   precisar deles um dia, a fonte é `campisi-central/Padrao_Front_end/assets/`.
 - Os quadros do martelo ficam **fora do pré-carregamento** do service worker
   (`globIgnores` no `vite.config.ts`) — só são baixados em espera real.
+
+## 0.2 Contrato de gravação da OC — leia antes de mexer em `salvarOrdemCompra`
+
+Vigente desde 18–19/08/2026. Quem manda é o banco; o cliente só obedece.
+
+```
+compras.salvar_oc(p jsonb) → a linha inteira de compras.ordens_compra
+compras.definir_status_oc(p_oc_id uuid, p_status compras.status_oc, p_versao integer) → a linha
+compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
+```
+
+- **Uma chamada, uma transação.** Cabeçalho e itens juntos. Não volte a gravar
+  cabeçalho e itens em requisições separadas: era o P0-01 da perícia, e deixava
+  OC numerada sem itens.
+- **`request_id` é obrigatório** e é a identidade da TENTATIVA, não da OC.
+  Repetido, devolve a mesma OC sem gastar outro número. Gere um por tentativa e
+  **reaproveite no retry** — em `NovaOcPage` isso é o `tentativaRef`, descartado
+  só quando a gravação dá certo.
+- **`versao` é obrigatória ao atualizar.** Conflito volta como
+  `serialization_failure` (código `40001`), que a camada converte em
+  `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
+  reescreva.
+- **Os três casos de cada campo do `cabecalho`:** chave ausente = não mexe;
+  chave com valor = grava; **chave com `null` = APAGA**. Exceções declaradas,
+  que continuam em `coalesce` (null mantém): `data`, `status`, `frete`,
+  `outras_despesas`, `desconto_material`.
+- **`itens` ausente ≠ `itens: []`.** Ausente não mexe nos itens; lista vazia
+  apaga todos. A tela edita a lista inteira, então manda sempre.
+- **Status e PDF têm comando estreito.** Trocar status não regrava itens;
+  `marcar_pdf_gerado` não mexe na versão (gerar PDF não muda conteúdo) e é
+  chamado **depois** de o arquivo existir.
+
+Dívida conhecida: `docs/Arquivo Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`. O
+P0-01 (gravação não-transacional) foi fechado em 18–19/08. Segue aberto o
+P0-02 (CI que reconstrói o banco e testes de RLS), que é trabalho do
+`campisi-central`.
+
+⚠️ **Nada disso foi provado na tela ainda:** ninguém emitiu OC por este
+aplicativo depois da troca. O contrato foi conferido campo a campo por leitura
+no banco, o que é outra coisa.
 
 ## 1. Stack e dependências
 

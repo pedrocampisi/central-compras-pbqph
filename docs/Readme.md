@@ -1,6 +1,6 @@
 # Central de Compras PBQP-H — Guia para Desenvolvedores
 
-> Última atualização: 2026-08-12
+> Última atualização: 2026-08-19
 
 ## ⚠️ Leia antes: onde ficam os dados hoje
 
@@ -32,14 +32,18 @@ cor só via `src/styles/tokens.css`, **um** botão laranja por tela, ícone de
 traço (nunca emoji), mascote longe de tabela e movimento só em espera. Os
 arquivos da marca ficam em `public/marca/`.
 
+O contrato de gravação da ordem de compra (uma transação só, `request_id`,
+`versao`, número na emissão) está na seção 0.2 do `docs/Agente.md`. Quem for
+mexer em `salvarOrdemCompra` lê aquilo antes.
+
 A tela de entrada com portão e animação **não existe aqui** — ela é da
 **Central**, que será a porta de entrada da equipe. O login deste aplicativo é
 só o formulário, e sai de cena quando a Central assumir a autenticação.
 
 O estado da migração e a lista de pendências estão em
-`docs/RELATORIO-RODADA-2-2026-08-10.md`,
-`docs/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica
-`docs/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`.
+`docs/Arquivo Morto/RELATORIO-RODADA-2-2026-08-10.md`,
+`docs/Arquivo Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica
+`docs/Arquivo Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`.
 
 ## Visão geral
 

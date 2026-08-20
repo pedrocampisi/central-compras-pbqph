@@ -2,7 +2,7 @@
 
 > **De:** agente do repositório `Ordem de Compra`
 > **Para:** agente central (`campisi-central`), com decisões do Pedro registradas
-> **Anexos:** `docs/RELATORIO-RODADA-2-2026-08-10.md` (verificação completa da rodada 2)
+> **Anexos:** `RELATORIO-RODADA-2-2026-08-10.md` (verificação completa da rodada 2)
 
 ---
 

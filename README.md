@@ -1,73 +1,46 @@
-# React + TypeScript + Vite
+# Central de Compras PBQP-H — Campisi Engenharia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicativo web que a Campisi usa para emitir **ordens de compra** dentro do
+padrão PBQP-H: cadastros de fornecedor e obra, catálogo ECR, importação de
+pedido por IA e o PDF no layout da empresa.
 
-Currently, two official plugins are available:
+## Comece por aqui
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+👉 **[`docs/INDICE.md`](docs/INDICE.md)** — o índice diz o que vale hoje e o
+que já fechou. Se você é uma IA de manutenção, o arquivo denso é
+[`docs/Agente.md`](docs/Agente.md), e **a seção 0 dele vence sobre o resto**.
 
-## React Compiler
+## Duas versões ao mesmo tempo — não confunda
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| | `main` | `migracao-supabase` |
+|---|---|---|
+| É o que está no ar? | **sim**, é a que a empresa usa | não, ainda não liberada |
+| Onde ficam os dados | um arquivo JSON no OneDrive | banco Supabase |
+| Entrada | sem login | login por pessoa, com papéis |
 
-## Expanding the ESLint configuration
+O trabalho novo acontece na `migracao-supabase`. **A `main` publica em
+produção a cada push** (GitHub Pages, `deploy.yml`) — não envie nada para ela
+sem aprovação do Pedro.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Rodar
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Na branch de migração é preciso um `.env.local` com `VITE_SUPABASE_URL` e
+`VITE_SUPABASE_PUBLISHABLE_KEY`; sem as duas o aplicativo não abre. Os demais
+comandos (`typecheck`, `lint`, `test`, `build`) estão em
+[`docs/Readme.md`](docs/Readme.md).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Antes de mexer, três regras desta casa
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **A tela não pode mentir.** Se a camada não grava, o campo fica
+   somente-leitura com aviso — nunca aceite uma edição que some no reload.
+2. **Pendência que depende do banco vira arquivo**, em
+   [`docs/Devolucoes_Agentes/`](docs/Devolucoes_Agentes/) — não vira mensagem
+   avulsa ao dono.
+3. **Prove antes de afirmar a causa.** Leitura é barata (`git ls-remote`,
+   consulta ao catálogo do banco, `--dry-run`) e não estraga nada. Sem prova,
+   diga que é hipótese e chame assim.

@@ -420,15 +420,16 @@ export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Pro
       intervencao_id: oc.obra_id || null,
       fornecedor_id: oc.fornecedor_id || null,
       emitente_id: oc.emitente_id || null,
-      // Texto vai como string vazia, NUNCA null. No contrato do banco a
-      // atualização é `coalesce(novo, antigo)`: null significa "não mexa neste
-      // campo". Mandar null aqui faria o apagar de uma observação voltar
-      // sozinho no reload — a tela diria que salvou e o texto reapareceria.
-      condicao_pagamento: oc.condicao_pagamento ?? '',
+      // Desde 19/08/2026 o contrato distingue os três casos: chave ausente não
+      // mexe no campo, chave com valor grava, chave com null APAGA. Por isso
+      // mandamos null quando a pessoa esvaziou o campo — é o que faz o apagar
+      // realmente pegar. (Antes null significava "não mexa", e apagar uma
+      // observação a trazia de volta no reload.)
+      condicao_pagamento: oc.condicao_pagamento || null,
       frete: oc.frete ?? 0,
       outras_despesas: oc.outras_despesas ?? 0,
       desconto_material: oc.desconto_material ?? 0,
-      observacoes: oc.observacoes ?? '',
+      observacoes: oc.observacoes || null,
     },
     // Mandamos a lista SEMPRE: a tela edita os itens como um todo. Omitir a
     // chave significaria "não mexa nos itens", e lista vazia significa

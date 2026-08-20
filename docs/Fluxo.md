@@ -1,6 +1,6 @@
 # Fluxo.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-08-12
+> Última atualização: 2026-08-19
 > Público: dono/operador. Foco em entender o que acontece, sem abrir código.
 
 ## ⚠️ Existem duas versões neste momento
@@ -14,15 +14,20 @@ JSON no OneDrive, sem login). A versão em migração (branch
    somente leitura).
 2. **Não existe mais salvar.** Não há Ctrl+S nem arquivo para conectar: cada
    ação grava na hora, e quem está com a tela aberta vê a mudança do colega.
-3. **A numeração da OC é do servidor.** Dois computadores não conseguem mais
-   tirar o mesmo número.
+3. **A numeração da OC é do servidor, e só nasce na emissão.** Dois
+   computadores não conseguem mais tirar o mesmo número — e rascunho que você
+   abre e desiste não queima mais um número de documento. Enquanto a OC é
+   rascunho, o número aparece como "numera ao emitir", e isso é o certo.
+4. **Clique duplo não cria duas OCs**, e se dois engenheiros mexerem na mesma
+   ordem, quem salvar por último recebe um aviso para recarregar em vez de
+   apagar o trabalho do outro sem ninguém notar.
 
 O que **não** muda: as telas, o PDF, o catálogo ECR e a importação de pedido
 por IA continuam iguais.
 
 Enquanto a virada não for aprovada, **a OC oficial continua sendo emitida no
 sistema antigo**. O estado da migração está em
-`docs/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md`.
+`docs/Arquivo Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md`.
 
 ## O que o sistema faz
 
