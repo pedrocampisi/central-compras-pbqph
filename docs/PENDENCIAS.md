@@ -70,6 +70,11 @@ organização dura poucas semanas** — a observação é do próprio Banco, e v
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
+**Medido em 31/08/2026, para ninguém ler isto como atraso:** a `migracao-supabase` está **20
+registros à frente da `main`**, e isso é desenho, não dívida. A publicação do site dispara em
+`push` para a `main` — juntar as duas republica, na hora, o que a equipe usa hoje. **É esse
+botão que a virada aperta**, e ele é do Pedro.
+
 ---
 
 ## ✅ Fechadas (registro)

@@ -317,3 +317,29 @@ publicado.
 **CONSEQUÊNCIA**
 Três cartas seguem com data errada, de propósito e com o aviso ao lado. A régua corrigida foi
 devolvida ao `CTO`, que ia levar a versão errada dela para a plataforma inteira.
+
+---
+
+## Decisão 11 — o instrumento da decisão 10 tem um limite, e ele se declara antes de medir · 31/08/2026
+
+**O QUE FOI DECIDIDO**
+Quem for medir data de documento pela **hora de nascimento no disco** confere antes se o
+repositório foi re-clonado. **Se foi, o instrumento não serve** — e a resposta certa é "não deu
+para medir", nunca um número.
+
+**POR QUÊ**
+Re-clonar carimba todos os arquivos com a hora do clone. A medição continua rodando, continua
+devolvendo número, e o número é lixo — sem nenhum sintoma. É o pior formato de erro que existe
+nesta casa: **a ferramenta não falha, ela mente com confiança.**
+
+O limite foi apontado pelo `CTO` em 31/08, depois de ele refazer a medição das seis casas com este
+instrumento. **A falha era minha:** eu propus o instrumento sem declarar quando ele não vale.
+
+**O QUE ISSO ENSINA ALÉM DO CASO**
+Instrumento novo entra com o limite dele escrito junto. Medida sem limite declarado é a mesma
+coisa que "fechou" sem "não deu para conferir" — some o terceiro desfecho, e é nele que mora o
+erro silencioso.
+
+**CONSEQUÊNCIA**
+Em 31/08 nenhuma das seis casas tinha sido re-clonada, então a medição daquele dia vale. A
+próxima confere primeiro.
