@@ -2,11 +2,14 @@
 
 **Atualizado em 31/08/2026.** Índice de cima: [`../INDICE.md`](../INDICE.md).
 
-> ⚠️ **As cartas desta casa marcadas 28/08 foram escritas em 31/08.** Erro meu: segui a data
-> escrita nas cartas que chegaram em vez de conferir o relógio. O conteúdo delas vale; a data,
-> não. Correção enviada às duas casas em 31/08 —
-> `../Enviados/2026-08-31_..._minhas-cartas-de-hoje-sairam-com-a-data-errada.md`. As cartas de
-> 22, 23 e 26/08, que chegaram de fora, têm a data certa.
+> ⚠️ **TRÊS cartas desta casa estão marcadas 28/08 e não são de 28/08** — medido pela hora em
+> que o arquivo nasceu no disco: `nulo-fica-e-a-sua-oferta` e `a-carta-fechou-o-cofre` são de
+> **30/08**, e `o-cofre-fechou-o-pedro-mandou` é de **31/08**. As outras três de 28/08 estão
+> certas, e **todas as cartas que chegaram de fora estão certas**.
+>
+> Causa: uma conversa que durou de 20 a 31/08 sem recomeçar — a data da primeira metade foi
+> carregada para a segunda. Ver caderno, decisão 10 (que corrige o diagnóstico da 9).
+> O conteúdo das três vale; só a data mente.
 
 > **Arquivar não é apagar.** O conteúdo continua valendo como registro do que
 > foi pedido, do que foi respondido e do que era verdade naquela data. O que

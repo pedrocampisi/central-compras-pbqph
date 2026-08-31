@@ -273,3 +273,47 @@ data é pior que o erro.
 **CONSEQUÊNCIA**
 Correção por carta nova às duas casas, aviso no topo do índice do Arquivo Morto, e esta decisão.
 As cartas ficam como saíram.
+
+---
+
+## Decisão 10 — corrige o diagnóstico da decisão 9: o relógio para de ser olhado quando a conversa se estende · 31/08/2026
+
+**O QUE FOI DECIDIDO**
+A regra da decisão 9 **continua valendo**: quando a data escrita numa carta bater contra o relógio
+da máquina, o relógio ganha. **O que muda é o motivo, e o motivo é o que ensina.**
+
+A regra ganha o par que faltava:
+
+> **Confira o relógio ao escrever cada documento — não ao começar o trabalho.**
+
+**POR QUÊ A 9 ESTAVA ERRADA**
+A decisão 9 disse que esta casa seguiu a data escrita nas cartas que chegaram. **Fui medir, e não
+foi isso.** Comparando o nome de cada carta com a hora em que o arquivo nasceu no disco:
+
+```
+   erradas ..... 3 (duas de 30/08 e uma de 31/08, todas marcadas 28/08)
+   certas ...... 3 (as de 28/08 são realmente de 28/08)
+   cartas que CHEGARAM, mal datadas ..... 0 de 8
+```
+
+Não havia data errada para eu copiar. **O que houve foi uma conversa que durou de 20 a 31/08 sem
+recomeçar**, e a data da primeira metade foi carregada para a segunda sem ninguém notar a virada
+do dia.
+
+O `CTO` supôs outra coisa — casa que dorme e acorda herdando o *"hoje"* de uma fila velha. Também
+não foi isso, e a diferença importa: **casa parada tem um despertar que a faz olhar em volta;
+conversa longa não tem despertar nenhum.** O remédio dele não pegaria este caso.
+
+**A ARMADILHA, EM UMA FRASE**
+Data errada não dá sintoma. Não quebra teste, não quebra tela, não quebra link — só engana quem
+ler depois. É o erro silencioso do capítulo 1 da régua de engenharia, na sua forma mais barata de
+cometer e mais cara de descobrir.
+
+**O QUE FOI DESCARTADO, E POR QUÊ**
+Apagar a decisão 9 e a carta que a acompanhou. Ficam as duas, com esta ao lado. Decisão não se
+apaga — e esconder a versão errada de uma correção é o mesmo defeito que reescrever histórico
+publicado.
+
+**CONSEQUÊNCIA**
+Três cartas seguem com data errada, de propósito e com o aviso ao lado. A régua corrigida foi
+devolvida ao `CTO`, que ia levar a versão errada dela para a plataforma inteira.
