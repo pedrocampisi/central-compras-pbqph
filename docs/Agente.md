@@ -1,4 +1,4 @@
-# Agente.md — Central de Compras PBQP-H
+﻿# Agente.md — Central de Compras PBQP-H
 
 > Última atualização: 2026-08-19
 > Público: IA de manutenção. Densidade máxima, zero prosa.
@@ -94,7 +94,7 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   `marcar_pdf_gerado` não mexe na versão (gerar PDF não muda conteúdo) e é
   chamado **depois** de o arquivo existir.
 
-Dívida conhecida: `docs/Arquivo Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`. O
+Dívida conhecida: `docs/Arquivo_Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`. O
 P0-01 (gravação não-transacional) foi fechado em 18–19/08. Segue aberto o
 P0-02 (CI que reconstrói o banco e testes de RLS), que é trabalho do
 `campisi-central`.

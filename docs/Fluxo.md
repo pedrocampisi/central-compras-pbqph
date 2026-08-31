@@ -1,4 +1,4 @@
-# Fluxo.md — Central de Compras PBQP-H
+﻿# Fluxo.md — Central de Compras PBQP-H
 
 > Última atualização: 2026-08-19
 > Público: dono/operador. Foco em entender o que acontece, sem abrir código.
@@ -27,7 +27,7 @@ por IA continuam iguais.
 
 Enquanto a virada não for aprovada, **a OC oficial continua sendo emitida no
 sistema antigo**. O estado da migração está em
-`docs/Arquivo Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md`.
+`docs/Arquivo_Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md`.
 
 ## O que o sistema faz
 

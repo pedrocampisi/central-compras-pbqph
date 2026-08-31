@@ -1,4 +1,4 @@
-# Esta pasta é a sua caixa de correio com o agente do banco
+﻿# Esta pasta é a sua caixa de correio com o agente do banco
 
 **Convenção do Pedro** — criada em 14/08/2026, e estendida em 17/08 para que a
 devolução chegue **dentro da pasta de cada programa**, e não só no repositório do
@@ -77,7 +77,7 @@ primeiro toma decisão em cima de um estado que não existe mais.
 ```
 docs/
   INDICE.md              → só o que está VIVO ou EM ABERTO
-  Arquivo Morto/
+  Arquivo_Morto/
     INDICE.md            → o que já fechou, e POR QUE fechou
 ```
 

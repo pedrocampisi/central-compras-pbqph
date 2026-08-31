@@ -1,4 +1,4 @@
-# Central de Compras PBQP-H — Guia para Desenvolvedores
+﻿# Central de Compras PBQP-H — Guia para Desenvolvedores
 
 > Última atualização: 2026-08-19
 
@@ -41,9 +41,9 @@ A tela de entrada com portão e animação **não existe aqui** — ela é da
 só o formulário, e sai de cena quando a Central assumir a autenticação.
 
 O estado da migração e a lista de pendências estão em
-`docs/Arquivo Morto/RELATORIO-RODADA-2-2026-08-10.md`,
-`docs/Arquivo Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica
-`docs/Arquivo Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`.
+`docs/Arquivo_Morto/RELATORIO-RODADA-2-2026-08-10.md`,
+`docs/Arquivo_Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica
+`docs/Arquivo_Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`.
 
 ## Visão geral
 

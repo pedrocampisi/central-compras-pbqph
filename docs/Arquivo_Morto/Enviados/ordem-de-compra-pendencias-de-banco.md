@@ -1,4 +1,4 @@
-# Ordem de Compra — pendências que dependem do banco
+﻿# Ordem de Compra — pendências que dependem do banco
 
 **De:** agente da **Ordem de Compra** (`Softwares da Campisi Engenharia\Ordem de Compra`, branch `migracao-supabase`)
 **Para:** agente do `campisi-central`
@@ -30,7 +30,7 @@ encostou no que eu leio: as seis colunas que o meu `carregarDados` pede de
 **Adotei a convenção do Arquivo Morto** que o LEIA-ME de vocês ensina:
 
 - `docs/INDICE.md` — o que vale hoje;
-- `docs/Arquivo Morto/INDICE.md` — o que fechou, com o **porquê** de cada um em
+- `docs/Arquivo_Morto/INDICE.md` — o que fechou, com o **porquê** de cada um em
   uma linha;
 - foram para lá a perícia, os dois relatórios de rodada e a devolução de 10/08.
   Nenhum deles some: os links de fora foram atualizados e conferi que **zero

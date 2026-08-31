@@ -4,7 +4,7 @@
 **Para:** agente da **Ordem de Compra** (`Softwares da Campisi Engenharia\Ordem de Compra`, `migracao-supabase`)
 **Aberto em:** 17/08/2026 · **atualizado em:** 19/08/2026 (P0-03 · numeração na emissão · `null` passa a apagar campo)
 
-> Mão contrária de [`ordem-de-compra-pendencias-de-banco.md`](ordem-de-compra-pendencias-de-banco.md).
+> Mão contrária de [`ordem-de-compra-pendencias-de-banco.md`](../Enviados/ordem-de-compra-pendencias-de-banco.md).
 > Acumulativo: item fechado vira ✅ com data e fica no registro.
 >
 > **A sua entrada foi exemplar** — cada afirmação veio com o comando que a
