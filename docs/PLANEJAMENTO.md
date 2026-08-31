@@ -245,3 +245,31 @@ conserto.** Fica registrado para a próxima sessão não "consertar" o que está
 O `Banco_de_Dados` ofereceu preencher as bandeiras a partir do CNAE no instante em que a linha
 nasce, sem esta tela saber que as colunas existem. É mudança no banco e espera o Pedro. Desta
 casa não há objeção — fecharia a lacuna do lado de quem sabe o que o CNAE significa.
+
+---
+
+## Decisão 9 — quando a data da carta bater contra o relógio, o relógio ganha · 31/08/2026
+
+**O QUE FOI DECIDIDO**
+A data de um documento desta casa sai do **relógio da máquina**, conferido na hora. Nunca da data
+escrita numa carta que chegou, nem da que vem dita numa campainha.
+
+**POR QUÊ**
+Em 31/08 esta casa escreveu **seis cartas datadas 28/08** — três dias errado, e já publicadas. As
+cartas recebidas estavam datadas 28/08 e as campainhas diziam *"hoje (28/08)"*; eu segui o papel.
+
+O que dói é que a régua certa **estava sendo aplicada no mesmo dia, no assunto ao lado**: os nomes
+das travas do banco foram lidos no banco em vez de copiados da carta que os informou, com o motivo
+escrito de que carta é pedido e informação, nunca fonte de verdade. **A régua não foi estendida à
+data**, e data errada é o tipo de erro que não dá sintoma — envelhece calado e engana quem ler
+depois.
+
+**O QUE FOI DESCARTADO, E POR QUÊ**
+Renomear e redatar as seis. Recusado por duas leis: carta em casa alheia não se corrige (quatro já
+estavam lá), e as duas metades de uma conversa se reencontram **pelo nome** — renomear um lado só
+quebra o mecanismo. Além disso já estavam publicadas, e reescrever histórico para esconder erro de
+data é pior que o erro.
+
+**CONSEQUÊNCIA**
+Correção por carta nova às duas casas, aviso no topo do índice do Arquivo Morto, e esta decisão.
+As cartas ficam como saíram.

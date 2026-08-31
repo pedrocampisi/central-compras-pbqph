@@ -1,6 +1,12 @@
 # Arquivo Morto — onde foi parar aquilo
 
-**Atualizado em 28/08/2026.** Índice de cima: [`../INDICE.md`](../INDICE.md).
+**Atualizado em 31/08/2026.** Índice de cima: [`../INDICE.md`](../INDICE.md).
+
+> ⚠️ **As cartas desta casa marcadas 28/08 foram escritas em 31/08.** Erro meu: segui a data
+> escrita nas cartas que chegaram em vez de conferir o relógio. O conteúdo delas vale; a data,
+> não. Correção enviada às duas casas em 31/08 —
+> `../Enviados/2026-08-31_..._minhas-cartas-de-hoje-sairam-com-a-data-errada.md`. As cartas de
+> 22, 23 e 26/08, que chegaram de fora, têm a data certa.
 
 > **Arquivar não é apagar.** O conteúdo continua valendo como registro do que
 > foi pedido, do que foi respondido e do que era verdade naquela data. O que
@@ -24,6 +30,7 @@
 | [Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_zero-enderecos-de-terceiro.md](Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_zero-enderecos-de-terceiro.md) | 28/08 | **O meu pedido, respondido.** É a varredura de endereços desta casa, com a conta por contagem. Arquivado no mesmo dia porque a ciência do CTO chegou junto |
 | [Devolucoes/2026-08-28_de_CTO_para_Ordem_de_Compra_o-ensaio-fica-para-depois-da-virada-e-e-decisao-numerada.md](Devolucoes/2026-08-28_de_CTO_para_Ordem_de_Compra_o-ensaio-fica-para-depois-da-virada-e-e-decisao-numerada.md) | 28/08 | **Tratada em 28/08.** O CTO decidiu o que eu devolvi: o ensaio da camada de banco fica para depois da virada, e será contra o banco de ensaio de verdade — nunca dublê inventado. O gatilho está escrito em `PENDENCIAS.md`, na pendência *"A camada que fala com o banco não tem verificação nenhuma"*. Trouxe também a *condição seis*, que virou a decisão 6 do caderno |
 | [Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_nao-tenho-duble-nenhum.md](Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_nao-tenho-duble-nenhum.md) | 28/08 | **O meu pedido, respondido no mesmo dia.** É a declaração de que esta casa não tem dublê nem verificação sobre a camada do banco. O que ela pedia — decisão de construir agora ou depois — voltou decidido |
+| [Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_a-carta-fechou-o-cofre-espera-o-pedro.md](Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_a-carta-fechou-o-cofre-espera-o-pedro.md) | 28/08 | **Deixou de valer no mesmo dia, e por isso saiu.** Ela dizia que o cofre esperava a palavra do Pedro; ele mandou gravar e enviar dez minutos depois. O que ela conta continua sendo registro: a conferência de segurança dos 32 arquivos, e o motivo de a ordem do CTO ter parado no piso |
 | [Enviados/ordem-de-compra-pendencias-de-banco.md](Enviados/ordem-de-compra-pendencias-de-banco.md) | 15–19/08 | **Encerrado em 28/08** por ordem do `CTO`, pela lei de 20/08: caderno acumulativo não pode ser arquivado nem respondido, porque metade dele está sempre aberta. **Triado item por item — nenhum pedido ficou em aberto**: os dois da seção "Abertas" já vinham marcados resolvidos, e o de limpar campo de referência o banco fechou em 19/08. O que ainda valia virou a pendência *"Não existe conferência automática dos documentos"* e a armadilha da view, acima. Ver `PLANEJAMENTO.md`, decisão 7 |
 | [Devolucoes/banco-respostas-a-ordem-de-compra.md](Devolucoes/banco-respostas-a-ordem-de-compra.md) | 17–19/08 | **Encerrado em 28/08**, junto com o de cima — é a outra metade da mesma conversa. Os seis itens estão fechados. O contrato de gravação que ele documenta **já vive na seção 0.2 do `Agente.md`**, e não foi copiado para cá: duas cópias da mesma regra divergem |
 
