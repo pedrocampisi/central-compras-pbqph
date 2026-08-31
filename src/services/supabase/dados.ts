@@ -24,6 +24,7 @@ import type {
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
+import { traduzirErroDoBanco } from './erros';
 
 // ---------------------------------------------------------------------------
 // Conversões entre o formato do banco (colunas planas) e o do app (objetos)
@@ -324,7 +325,14 @@ export async function salvarFornecedor(f: Fornecedor): Promise<string> {
   })
     .select('id')
     .single();
-  if (error) throw new Error(`Falha ao gravar fornecedor: ${error.message}`);
+  if (error) {
+    // Trava conhecida vira frase de gente e substitui a mensagem inteira; o
+    // resto continua subindo cru, que é onde a mensagem técnica ajuda.
+    const traduzida = traduzirErroDoBanco(error.message);
+    throw new Error(
+      traduzida === error.message ? `Falha ao gravar fornecedor: ${error.message}` : traduzida,
+    );
+  }
 
   const id = String((data as Record<string, unknown>)['id']);
   await salvarEcrsDoFornecedor(id, f.ecrs_atende ?? []);
