@@ -22,7 +22,7 @@ primeira resposta e antes de olhar qualquer código:**
 @../00_Diretrizes_e_padroes/Padrao_Ouro/3_AGENTES_E_CORREIO.md
 @../00_Diretrizes_e_padroes/Padrao_Ouro/4_COMO_SE_CONSTROI_SOFTWARE.md
 
-A primeira lei — conduta e como se fala com o Pedro — chega pelo arquivo do computador.
+A primeira lei — conduta e como se fala com o Pedro — chega pelo arquivo da raiz da Plataforma.
 
 Este arquivo guarda **só o que é específico do Ordem de Compra**. Em conflito, vale a lei.
 
