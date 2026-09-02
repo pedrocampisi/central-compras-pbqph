@@ -343,3 +343,58 @@ erro silencioso.
 **CONSEQUÊNCIA**
 Em 31/08 nenhuma das seis casas tinha sido re-clonada, então a medição daquele dia vale. A
 próxima confere primeiro.
+
+---
+
+## Decisão 12 — o zero é resposta, e quem o protege aqui é a comparação explícita · 31/08/2026
+
+**O QUE FOI DECIDIDO**
+Onde o valor pode ser número, `||` não decide nada sozinho. Vale uma das duas:
+
+```
+   Number(x) || 0            ← permitido: o zero sobrevive, e NaN vira 0
+   x === 0 ? '' : x          ← na tela, comparação explícita
+   x ?? y                    ← quando a pergunta é "veio alguma coisa?"
+
+   x || ''   ·   x || '-'    ← PROIBIDO sobre número: o zero some, e no
+                               segundo caso some parecendo informação
+```
+
+**POR QUÊ**
+Numa ordem de compra **zero é resposta**: quantidade zero, desconto zero, frete zero. Em
+JavaScript `0` é falso, então um `||` no caminho troca um número legítimo por vazio **sem erro,
+sem log e lendo bem em voz alta**. Alerta do `CTO` em 31/08, nascido de um achado da
+`Central_Financeiro`.
+
+**A MEDIÇÃO**
+
+```
+   79 arquivos vivos · 48 candidatos · 36 com cara de número · 0 defeitos vivos
+```
+
+Os 36 são todos `Number(x) || 0`, e a tela já usa comparação explícita nos campos de dinheiro e
+quantidade. **Nada foi alterado** — mexer no que está certo é o conserto do que não estava
+quebrado.
+
+**⚠️ O QUE ESTA VARREDURA ENSINOU SOBRE INSTRUMENTO, E É O QUE MAIS VALE**
+O varredor de chave repetida que esta casa escreveu acusou **113 ocorrências**. Eram falsas: ele
+contava objetos irmãos de uma lista como se fossem um só. **Não quebrou, não avisou — devolveu um
+número com cara de medição**, no mesmo dia em que esta casa escreveu que ferramenta ruim mente com
+confiança (decisão 11).
+
+Trocado pelo instrumento que não mente: **reintroduzir o defeito e ver quem acusa.** Um
+`{ a: 1, b: 2, a: 3 }` colocado num arquivo real desta casa levanta `TS1117` no `pnpm typecheck`.
+Não é contagem zero — é impossibilidade provada, e o arquivo foi restaurado idêntico.
+
+**DOIS LIMITES DECLARADOS, porque instrumento entra com o limite escrito**
+
+- **`no-dupe-keys` do eslint está DESLIGADA aqui** (severidade 0), desligada de propósito pelo
+  `typescript-eslint` porque o compilador cobre. Está certo — mas **quem rodar `eslint` sem rodar
+  `tsc` não tem essa proteção e não é avisado de que não tem**;
+- o compilador pega chave escrita à mão, **não pega chave calculada** (`{[k]: 1, [k]: 2}`). Esta
+  casa tem 10 chaves calculadas, todas sozinhas no objeto delas — colisão impossível hoje.
+
+**O QUE NÃO FOI MEDIDO**
+`legacy/CentralCompras-PBQPH.html`, o aplicativo antigo de arquivo único: 188 candidatos, **não
+olhados um a um**. Ele não é referenciado por nenhum arquivo e não entra no pacote publicado — é
+museu. **Não está declarado limpo: está declarado não medido.**
