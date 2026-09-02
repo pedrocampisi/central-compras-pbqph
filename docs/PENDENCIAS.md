@@ -28,7 +28,29 @@ a mesma OC.
 emite. A próxima OC de verdade sairia **2026/008**, e se a contagem começa daí ou do zero é
 **palavra do Pedro** — o número vai no papel que chega ao fornecedor.
 
-### 2. A camada que fala com o banco não tem verificação nenhuma
+### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
+
+*Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*
+Anotada em 02/09 por ordem do `CTO`: **é dívida, não defeito vivo.**
+
+```
+   src/services/supabase/client.ts:15   as string | undefined  +  throw se faltar
+   src/services/ai/extractItems.ts:86   as string              +  NADA
+```
+
+O `client.ts` estoura na cara de quem abre quando a variável falta. O `extractItems.ts` faz o
+mesmo `import.meta.env['VITE_SUPABASE_URL']` **sem checagem nenhuma**: ficaria `undefined`
+calado. Achado em 02/09, lendo o código por causa da carta da publicação.
+
+**Por que é dívida e não defeito:** com as duas travas novas do `deploy.yml`, publicação sem
+endereço **não sai mais**. O caminho que levava ao `undefined` deixou de existir pela porta da
+publicação. O que fica é a diferença de tratamento entre dois arquivos que leem a mesma coisa —
+e diferença sem motivo escrito é armadilha para quem chegar depois.
+
+**Não foi consertado de propósito:** é código de produto, e produto está congelado (decisão 137
+do `CTO`: o congelamento mede o que o usuário vê).
+
+### 3. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
 
@@ -48,7 +70,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 3. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 

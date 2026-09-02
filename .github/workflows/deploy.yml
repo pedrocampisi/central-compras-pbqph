@@ -124,9 +124,33 @@ jobs:
         with:
           path: dist
 
+      # Passo pulado sem explicacao e o mesmo mal que esta casa combate: quem
+      # rodou tem de saber POR QUE nao publicou, sem ir ler o YAML.
+      - name: Dizer o que acontece a seguir
+        run: |
+          if [ "${{ inputs.ensaio }}" = "true" ]; then
+            echo "ENSAIO: montou e conferiu. NAO publica -- foi o que voce pediu na caixinha."
+          elif [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::warning::NAO vai publicar: este ramo e ${{ github.ref }}, e publicar so acontece a partir da main."
+            echo "::warning::O pacote foi montado e conferido, mas o site no ar continua como esta."
+          else
+            echo "Vai publicar: ramo main, ensaio desmarcado."
+          fi
+
+  # ⚠️ PUBLICAR QUER DIZER `main`, POR QUALQUER PORTA.
+  # `workflow_dispatch` sempre existiu aqui sem restrição de ramo. Enquanto
+  # ninguém usava o botão, era arma guardada; a partir do momento em que o
+  # ensaio convida a usá-lo, uma caixinha desmarcada por engano a partir da
+  # `migracao-supabase` publicaria o ramo SEM juntar — e o site ficaria no ar
+  # diferente da `main`, sem ninguém ter decidido isso.
+  #
+  #   push na main ·············· publica          (o botão do Pedro)
+  #   dispatch da main, sem marcar  publica
+  #   dispatch de outro ramo ···· NÃO publica  ← a trava
+  #   dispatch com `ensaio` ····· NÃO publica
   deploy:
     needs: build
-    if: ${{ inputs.ensaio != true }}
+    if: ${{ inputs.ensaio != true && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages

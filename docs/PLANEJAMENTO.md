@@ -792,3 +792,23 @@ agora dá para provar a fiação **sem** pôr. Desmarcado, o comportamento é o 
 porque é assim que `VITE_` funciona. `Secrets` só esconde o valor do log. Quem protege o banco é
 a política (RLS) dentro dele, avaliada contra o usuário logado — e a chave `sb_secret_…` nunca
 entrou e nunca entra neste arquivo.
+
+**EMENDA, no mesmo dia — publicar quer dizer `main`, por qualquer porta**
+O ensaio abriu um buraco que o `CTO` viu antes de qualquer um usar, e ele é consequência direta
+do acréscimo: `workflow_dispatch` **sempre existiu aqui sem restrição de ramo**. Enquanto ninguém
+usava o botão, era arma guardada. A partir do momento em que o ensaio **convida** a usá-lo, uma
+caixinha desmarcada por engano a partir da `migracao-supabase` publicaria o ramo **sem juntar** —
+e o site ficaria no ar diferente da `main`, sem ninguém ter decidido isso.
+
+```
+   push na main ················ publica          (o botão do Pedro)
+   dispatch da main, desmarcado · publica
+   dispatch de OUTRO ramo ······ NÃO publica  ← a trava nova
+   dispatch com `ensaio` ······· NÃO publica
+```
+
+E **passo pulado deixou de ser silêncio**: o fluxo diz, em texto, por que não publicou. Os quatro
+casos foram rodados com a substituição que o GitHub faz: **4 de 4 certos**.
+
+*Quem convida para o botão responde pelo botão* — a frase é do `CTO`, e o buraco era dele por
+origem e meu por consequência.
