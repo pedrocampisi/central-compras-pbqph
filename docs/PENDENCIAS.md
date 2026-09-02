@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 28/08/2026
+> **Data:** 02/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -13,32 +13,11 @@ fim.
 
 ## 🔴 Abertas
 
-### 1. Cumprir a lei da organização dos documentos
-
-A lei — `..\..\00_Diretrizes_e_padroes\Padrao_Ouro\2_ORGANIZACAO_DOS_DOCUMENTOS.md` — pede coisas
-que esta casa ainda não tem. **O esqueleto foi montado em 20/08/2026; falta o conteúdo, que só
-quem conhece o software sabe escrever.**
-
-| O que falta | O que fazer |
-|---|---|
-| **Estado em todo documento** | Cada `.md` desta casa ganha `Data`, `Estado` e `Escopo` no topo. Estado é um de: *vale hoje · proposta · concluído (é registro) · substituído por X*. Sem isso, uma IA nova reexecuta plano pronto |
-| **Os motivos saem do `Agente.md`** | O que lá é **motivo** vem para `PLANEJAMENTO.md`, numerado. O que é **descrição** fica. Documento que descreve e justifica junto não envelhece em partes |
-| **`Readme.md` → `README.md`** | O arquivo hoje está em `docs/` e com nome que o GitHub não reconhece. A porta do humano é `README.md` na raiz |
-| **`pecas/` e `roteiros/`** | Nascem com o primeiro documento de cada uma — pasta vazia não se cria. Peça descreve *o que a coisa é*; roteiro manda *executar passo a passo* |
-
-### 2. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
+### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
-### 3. Perícia P0-02: CI que reconstrói o banco do zero e testa as permissões
-
-*Espera o `Banco_de_Dados`.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
-
-⚠️ Este item **não tem carta em `Enviados/`**. Enquanto não tiver, o `Banco_de_Dados` não sabe
-que está sendo esperado — e a lei diz que o que espera outro agente vive na pasta, não numa
-lista. **Escrever a carta.**
-
-### 4. A camada que fala com o banco não tem verificação nenhuma
+### 2. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
 
@@ -58,7 +37,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 5. Não existe conferência automática dos documentos
+### 3. Não existe conferência automática dos documentos
 
 *Meu.* Vindo do caderno de convenção antiga encerrado em 28/08/2026.
 
@@ -66,7 +45,7 @@ O `Banco_de_Dados` tem um programa que reprova documento fora do índice e link 
 (`conferir_tudo.py`). Aqui a checagem é manual, e foi feita uma vez, em 19/08. **Sem ela a
 organização dura poucas semanas** — a observação é do próprio Banco, e vale para esta casa.
 
-### 6. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
@@ -78,6 +57,46 @@ botão que a virada aperta**, e ele é do Pedro.
 ---
 
 ## ✅ Fechadas (registro)
+
+### Perícia P0-02: não é minha — é o item 13 do `Banco_de_Dados` — 02/09/2026
+
+Esperei treze dias em silêncio: a lista dizia *"espera o `Banco_de_Dados`"* desde 20/08 e
+**nenhuma carta nunca disse isso a ele**. Escrevi a carta em 02/09 e ele **respondeu no mesmo
+dia**: é o mesmo assunto, e o item 13 dele (*"não há integração contínua nem ambiente reproduzível
+na nuvem"*) é **mais largo que o meu e o contém**.
+
+Antes de escrever, fui medir a casa dele em vez de repetir o achado de 10/08 — e três das quatro
+coisas que a perícia pedia **já estavam feitas**: 146 migrations versionadas, reconstrução do zero
+executável (`montar_ensaio.py`, que recusa rodar contra produção antes de qualquer outra coisa) e
+22 arquivos de teste de permissão. Falta **o fio entre eles**, e o fio é da casa dele.
+
+**Ele não deu data, e está certo em não dar** — prioridade é do Pedro. Comprometeu-se a avisar por
+carta antes de marcar como feito.
+
+Duas coisas ficaram para mim: a **decisão 19** (número certo colado no substantivo errado — eu
+disse 169 migrations, são 146) e a conferência de entrega dele, `toda_carta_enviada_chegou()`, que
+entra na pendência da conferência automática.
+
+### A lei da organização dos documentos está cumprida — 02/09/2026
+
+| O que a lei pedia | Como ficou |
+|---|---|
+| **Estado em todo documento** | **17 documentos, 17 cabeçalhos** `Data / Estado / Escopo`. As **22 cartas** ficam de fora **de propósito**: o estado de uma carta é a gaveta em que ela está (**decisão 13**) |
+| **Os motivos saem do `Agente.md`** | Viraram as **decisões 14 a 18**. O `Agente.md` ficou só com a regra e o número da decisão ao lado |
+| **`Readme.md` → `README.md`** | Não era o que parecia: o `README.md` da raiz **já existia e já era a porta certa** desde 20/08. O `docs/Readme.md` era **outro documento** — um guia de 280 linhas para dev. Virou [`docs/roteiros/guia-do-desenvolvedor.md`](roteiros/guia-do-desenvolvedor.md), e com isso sumiu o segundo arquivo com cara de "leia-me" |
+| **`pecas/` e `roteiros/`** | `roteiros/` **nasceu** com o guia acima. `pecas/` continua não existindo, **e isso é a lei sendo cumprida**: pasta vazia não se cria |
+
+**Duas coisas apareceram no caminho e foram consertadas:** a pasta `melhorias futuras/` estava
+**fora de `docs/`** (a lei só admite `CLAUDE.md` e `README.md` lá fora) e virou
+[`docs/melhorias-futuras/`](melhorias-futuras/), com as três ideias marcadas **PROPOSTA**; e o
+`Agente.md` apontava o padrão visual para `campisi-central/`, **pasta que não existe mais** desde a
+arrumação — agora aponta para `00_Diretrizes_e_padroes/Padrao_Front_end/`, conferido arquivo por
+arquivo.
+
+**Uma pergunta ficou de pé, como proposta:** `docs/Fluxo.md` descreve o que o sistema faz para
+quem não abre código — é o candidato natural a primeira **peça**. Não foi movido porque mover
+quebra os apontamentos de fora por um ganho só de arrumação, e **esta casa está em congelamento**.
+Quem decide é o Pedro.
 
 ### A tela de fornecedor NÃO classifica — e nunca classificou por engano — 28/08/2026
 

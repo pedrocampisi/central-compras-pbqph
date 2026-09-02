@@ -1,5 +1,9 @@
 ﻿# Esta pasta é a sua caixa de correio com o agente do banco
 
+> **Data:** 18/08/2026
+> **Estado:** SUBSTITUÍDO por `00_Diretrizes_e_padroes/Padrao_Ouro/3_AGENTES_E_CORREIO.md`
+> **Escopo:** era a convenção original da caixa de correio (14–18/08/2026). Hoje quem manda é a lei do correio, e os dois cadernos acumulativos que este texto descreve foram **fechados pela Decisão 7**. Fica como registro de onde a convenção nasceu — **não é o lugar de aprender o protocolo de hoje**.
+
 **Convenção do Pedro** — criada em 14/08/2026, e estendida em 17/08 para que a
 devolução chegue **dentro da pasta de cada programa**, e não só no repositório do
 banco.

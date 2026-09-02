@@ -1,6 +1,9 @@
 ﻿# Central de Compras PBQP-H — Guia para Desenvolvedores
 
-> Última atualização: 2026-08-19
+> **Data:** 31/08/2026
+> **Estado:** VALE HOJE — para a branch `main`
+> **Escopo:** como rodar, mapa de arquivos e como adicionar as coisas comuns. Descreve o fluxo em **arquivo JSON** (branch `main`). **NÃO** descreve a camada de banco da `migracao-supabase` — para isso, `Agente.md` seção 0.
+
 
 ## ⚠️ Leia antes: onde ficam os dados hoje
 

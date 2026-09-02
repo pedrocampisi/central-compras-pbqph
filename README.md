@@ -1,5 +1,9 @@
 # Central de Compras PBQP-H — Campisi Engenharia
 
+> **Data:** 20/08/2026
+> **Estado:** VALE HOJE
+> **Escopo:** a porta do humano — o que o programa faz, como rodar e as duas versões que convivem. **NÃO** descreve arquitetura nem código: para isso, `docs/`.
+
 Aplicativo web que a Campisi usa para emitir **ordens de compra** dentro do
 padrão PBQP-H: cadastros de fornecedor e obra, catálogo ECR, importação de
 pedido por IA e o PDF no layout da empresa.
@@ -32,7 +36,7 @@ pnpm dev
 Na branch de migração é preciso um `.env.local` com `VITE_SUPABASE_URL` e
 `VITE_SUPABASE_PUBLISHABLE_KEY`; sem as duas o aplicativo não abre. Os demais
 comandos (`typecheck`, `lint`, `test`, `build`) estão em
-[`docs/Readme.md`](docs/Readme.md).
+[`docs/roteiros/guia-do-desenvolvedor.md`](docs/roteiros/guia-do-desenvolvedor.md).
 
 ## Antes de mexer, três regras desta casa
 

@@ -1,5 +1,9 @@
 # Índice — o que vale hoje
 
+> **Data:** 02/09/2026
+> **Estado:** VALE HOJE
+> **Escopo:** a porta de `docs/` — o que vale hoje e onde está. **NÃO** lista cartas (a gaveta é a verdade, Decisão 7) nem o que já fechou (`Arquivo_Morto/INDICE.md`).
+
 **Projeto:** Central de Compras PBQP-H (Ordem de Compra) · branch de trabalho
 `migracao-supabase` · **atualizado em 28/08/2026**
 
@@ -16,7 +20,8 @@
 | Documento | Para quem | O que responde |
 |---|---|---|
 | [Agente.md](Agente.md) | IA de manutenção | Arquitetura, contratos, constantes. **Comece pela seção 0**: as duas branches divergem, e a 0 vence sobre o resto. A 0.1 é o padrão visual; a 0.2 é o contrato de gravação da OC |
-| [Readme.md](Readme.md) | dev humano que nunca viu o projeto | Como rodar, mapa de arquivos, como adicionar coisas comuns |
+| [roteiros/guia-do-desenvolvedor.md](roteiros/guia-do-desenvolvedor.md) | dev humano que nunca viu o projeto | Como rodar, mapa de arquivos, como adicionar coisas comuns. **Descreve a branch `main`** (arquivo JSON) |
+| [melhorias-futuras/](melhorias-futuras/) | Pedro e IA | Ideias ainda não implementadas. É **proposta**, não plano de execução |
 | [Fluxo.md](Fluxo.md) | dono/operador | O que acontece na tela, sem abrir código |
 
 ## Vivos — conversa em andamento

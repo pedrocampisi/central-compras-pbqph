@@ -1,5 +1,9 @@
 # Ordem de Compra
 
+> **Data:** 01/09/2026
+> **Estado:** VALE HOJE
+> **Escopo:** o que é **só** do Ordem de Compra e por onde a IA começa. **NÃO** contém as leis (moram no `Padrao_Ouro/`) nem a arquitetura (mora em `docs/Agente.md`).
+
 A Central de Compras PBQP-H: emissão, aprovação e controle das ordens de compra da Campisi
 Engenharia, ligadas às obras.
 

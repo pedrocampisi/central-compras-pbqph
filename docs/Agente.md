@@ -1,6 +1,9 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-08-19
+> **Data:** 02/09/2026
+> **Estado:** VALE HOJE
+> **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
+
 > Público: IA de manutenção. Densidade máxima, zero prosa.
 
 ## 0. Duas branches, dois contratos — leia antes de usar este arquivo
@@ -29,43 +32,44 @@ lista em 19/08: ganharam tabela no banco e voltaram a ser editáveis.)*
 
 ## 0.1 Padrão visual (direção "Creme") — regras que valem para todo CSS daqui
 
-Fonte oficial: `campisi-central/Padrao_Front_end/` (`DESIGN.md`, `tokens.css`,
-`template-base.html`, `template-login.html`). Aplicado aqui em 12/08/2026.
+Fonte oficial: `00_Diretrizes_e_padroes/Padrao_Front_end/` (`DESIGN.md`,
+`tokens.css`, `template-base.html`, `template-login.html`). Aplicado aqui em
+12/08/2026. **O motivo de cada regra está nas decisões 14, 15 e 16 do
+[`PLANEJAMENTO.md`](PLANEJAMENTO.md)** — aqui fica só a regra.
 
 - `src/styles/tokens.css` é a **única fonte de cor/sombra/raio/fonte**. Nada de
   hex solto em módulo — o bloco de apelidos no fim traduz os nomes antigos
   (`--navy`, `--bg`, `--text`…) para os novos; em código novo use os oficiais
-  (`--marca`, `--fundo`, `--texto`, `--acento`…).
-- Tema escuro: `data-tema="escuro"` no `<html>`. Aplicado por script inline no
-  `index.html` **antes da primeira pintura** (senão a tela pisca clara);
-  `hooks/useTema.ts` só lê e alterna. Escolha manual manda e fica salva; sem
-  escolha, segue o sistema.
+  (`--marca`, `--fundo`, `--texto`, `--acento`…). · **decisão 14**
+- Tema escuro: `data-tema="escuro"` no `<html>`, por script inline no
+  `index.html` **antes da primeira pintura**; `hooks/useTema.ts` só lê e
+  alterna. Escolha manual manda e fica salva; sem escolha, segue o sistema.
+  · **decisão 14**
 - **Uma ação primária (laranja) por tela.** `<Button variant="primary">` é o
   laranja; qualquer segundo botão é `outline`. Em Nova OC o laranja é o
-  "Emitir OC" do rodapé — o atalho do topo é secundário de propósito.
-- **Ícone é `<Icon>` (traço 1.6), nunca emoji.** Emoji desenha diferente em
-  cada sistema e não aceita a cor do tema.
+  "Emitir OC" do rodapé — o atalho do topo é secundário. · **decisão 15**
+- **Ícone é `<Icon>` (traço 1.6), nunca emoji.** · **decisão 15**
+- Selo (`<Pill>`) é **neutro por padrão**; verde/vermelho só quando a
+  informação for mesmo situação. · **decisão 15**
 - **Mascote longe de dado.** `<EmptyState>` mostra o mascote quando o vazio é a
   tela; dentro de cartão que convive com números, use `compacto`.
+  · **decisão 15**
 - **Movimento só em espera e no login.** `<Loader>` (martelo) é o único
-  permitido nas telas de trabalho, e só aparece depois de 250ms.
-- Selo (`<Pill>`) é **neutro por padrão**; verde/vermelho só quando a
-  informação for mesmo situação.
+  permitido nas telas de trabalho, e só aparece depois de 250ms. · **decisão 16**
+- **Sem portão de boas-vindas e sem animação de entrada neste aplicativo.** Por
+  isso `public/marca/` não tem `anim-entrada.mp4`, `anim-poster-final.png` nem
+  `efeito-entrada.mp3` — a fonte deles, se um dia precisar, é
+  `00_Diretrizes_e_padroes/Padrao_Front_end/assets/`. E os quadros do martelo
+  ficam **fora do pré-carregamento** do service worker (`globIgnores` no
+  `vite.config.ts`). · **decisão 16**
 - Documentos, códigos e chaves em `var(--fonte-mono)`; números de tabela em
   `font-variant-numeric: tabular-nums`.
-- **Sem portão de boas-vindas e sem animação de entrada neste aplicativo**
-  (decisão do Pedro em 12/08/2026): a cerimônia da marca — portão, vídeo e som
-  — é da **Central** (`Softwares da Campisi Engenharia/Central`), que será a
-  porta de entrada da equipe. Aqui o login é só formulário, e some no dia em
-  que a Central assumir a autenticação. Por isso `public/marca/` não tem
-  `anim-entrada.mp4`, `anim-poster-final.png` nem `efeito-entrada.mp3`; se
-  precisar deles um dia, a fonte é `campisi-central/Padrao_Front_end/assets/`.
-- Os quadros do martelo ficam **fora do pré-carregamento** do service worker
-  (`globIgnores` no `vite.config.ts`) — só são baixados em espera real.
 
 ## 0.2 Contrato de gravação da OC — leia antes de mexer em `salvarOrdemCompra`
 
 Vigente desde 18–19/08/2026. Quem manda é o banco; o cliente só obedece.
+**Por que o contrato tem esta forma: decisão 17 do
+[`PLANEJAMENTO.md`](PLANEJAMENTO.md)** — aqui fica só o contrato.
 
 ```
 compras.salvar_oc(p jsonb) → a linha inteira de compras.ordens_compra
@@ -74,12 +78,11 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
 ```
 
 - **Uma chamada, uma transação.** Cabeçalho e itens juntos. Não volte a gravar
-  cabeçalho e itens em requisições separadas: era o P0-01 da perícia, e deixava
-  OC numerada sem itens.
+  cabeçalho e itens em requisições separadas.
 - **`request_id` é obrigatório** e é a identidade da TENTATIVA, não da OC.
-  Repetido, devolve a mesma OC sem gastar outro número. Gere um por tentativa e
-  **reaproveite no retry** — em `NovaOcPage` isso é o `tentativaRef`, descartado
-  só quando a gravação dá certo.
+  Repetido, devolve a mesma OC. Gere um por tentativa e **reaproveite no
+  retry** — em `NovaOcPage` isso é o `tentativaRef`, descartado só quando a
+  gravação dá certo.
 - **`versao` é obrigatória ao atualizar.** Conflito volta como
   `serialization_failure` (código `40001`), que a camada converte em
   `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
@@ -91,8 +94,8 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
 - **`itens` ausente ≠ `itens: []`.** Ausente não mexe nos itens; lista vazia
   apaga todos. A tela edita a lista inteira, então manda sempre.
 - **Status e PDF têm comando estreito.** Trocar status não regrava itens;
-  `marcar_pdf_gerado` não mexe na versão (gerar PDF não muda conteúdo) e é
-  chamado **depois** de o arquivo existir.
+  `marcar_pdf_gerado` não mexe na versão e é chamado **depois** de o arquivo
+  existir.
 
 Dívida conhecida: `docs/Arquivo_Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`. O
 P0-01 (gravação não-transacional) foi fechado em 18–19/08. Segue aberto o
@@ -326,7 +329,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 ## 6. Regras de negócio implícitas
 
 - **Numeração de OC:** `${ano}/${seq.padStart(3,'0')}`. Se `new Date().getFullYear() !== data.config.ano_corrente`, **reseta o sequencial para 1** e atualiza `ano_corrente`. Increment ocorre em `NovaOcPage` ao iniciar nova OC (não ao salvar). Sem lock real — `NovaOcPage#ensureUniqueNumero` re-checa colisão no momento do `Salvar Rascunho`/`Emitir` e reatribui `max(sequencial)+1` se necessário (mitigação parcial; conflitos cruzando dispositivos só são detectados no save explícito do JSON, não em tempo real).
-- **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto. ERPs comuns fazem outro caminho.
+- **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto — parece defeito e não é: **decisão 18**. Não "conserte".
 - **Total geral:** `Σ sub - Σ desc + Σ IPI + frete + outras_despesas - desconto_material`.
 - **Hierarquia de emitente:** `oc.emitente_id` → `config.emitentes[0]` → `config.emitente` legado.
 - **Conflito:** comparação ISO string (`"2026-05-06T..."`). Funciona porque ISO é lexicograficamente ordenável. Falha de leitura remota = não bloqueia (assume ok).

@@ -1,5 +1,9 @@
 # Relatório de sessão — Ordem de Compra ligado ao Supabase (Fase 2 do plano)
 
+> **Data:** 08/08/2026
+> **Estado:** CONCLUÍDO — é registro
+> **Escopo:** o que a sessão de **08/08/2026** fez na fase 2 da migração. **NÃO** descreve o estado de hoje: o código andou muito desde então. **NÃO reexecute os passos.**
+
 > **De:** agente do repositório `Ordem de Compra` (Claude Code)
 > **Para:** agente central (`campisi-central`) e Pedro
 > **Data:** 08/08/2026

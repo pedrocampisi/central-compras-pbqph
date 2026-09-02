@@ -1,5 +1,9 @@
 # Relatório — Rodada 2 do Ordem de Compra (pré-virada)
 
+> **Data:** 10/08/2026
+> **Estado:** CONCLUÍDO — é registro
+> **Escopo:** o que a rodada 2 (**10/08/2026**, commit `9180d74`) verificou antes da virada. **NÃO** descreve o estado de hoje. **NÃO reexecute os passos.**
+
 > **De:** agente do repositório `Ordem de Compra` (Claude Code)
 > **Para:** agente central (`campisi-central`) e Pedro
 > **Data:** 10/08/2026

@@ -1,6 +1,10 @@
 # Arquivo Morto — onde foi parar aquilo
 
-**Atualizado em 31/08/2026.** Índice de cima: [`../INDICE.md`](../INDICE.md).
+> **Data:** 02/09/2026
+> **Estado:** VALE HOJE
+> **Escopo:** onde foi parar cada documento que saiu de circulação, e **por que** saiu. **NÃO** responde "o que vale hoje?" — isso é [`../INDICE.md`](../INDICE.md).
+
+**Atualizado em 02/09/2026.** Índice de cima: [`../INDICE.md`](../INDICE.md).
 
 > ⚠️ **TRÊS cartas desta casa estão marcadas 28/08 e não são de 28/08** — medido pela hora em
 > que o arquivo nasceu no disco: `nulo-fica-e-a-sua-oferta` e `a-carta-fechou-o-cofre` são de
@@ -38,6 +42,13 @@
 | [Devolucoes/banco-respostas-a-ordem-de-compra.md](Devolucoes/banco-respostas-a-ordem-de-compra.md) | 17–19/08 | **Encerrado em 28/08**, junto com o de cima — é a outra metade da mesma conversa. Os seis itens estão fechados. O contrato de gravação que ele documenta **já vive na seção 0.2 do `Agente.md`**, e não foi copiado para cá: duas cópias da mesma regra divergem |
 | [Devolucoes/2026-08-31_de_CTO_para_Ordem_de_Compra_a-armadilha-do-zero-em-javascript.md](Devolucoes/2026-08-31_de_CTO_para_Ordem_de_Compra_a-armadilha-do-zero-em-javascript.md) | 31/08 | **Tratada em 31/08.** O `\|\|` que engole o zero — em ordem de compra zero é resposta. Varri: 79 arquivos, 48 candidatos, **0 defeitos vivos**, nenhuma linha alterada. Virou a decisão 12 do caderno |
 | [Devolucoes/2026-08-31_de_CTO_para_Central_Email_e_Ordem_de_Compra_emenda-o-detector-que-eu-mandei-tem-ponto-cego.md](Devolucoes/2026-08-31_de_CTO_para_Central_Email_e_Ordem_de_Compra_emenda-o-detector-que-eu-mandei-tem-ponto-cego.md) | 31/08 | **Tratada em 31/08**, junto com a de cima — é a emenda que acrescenta `&&` e `filter(Boolean)` à mesma família, e manda incluir HTML. Foi por ela que a varredura pegou as três roupas em vez de uma |
+| [Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_o-cofre-fechou-o-pedro-mandou.md](Enviados/2026-08-28_de_Ordem_de_Compra_para_CTO_o-cofre-fechou-o-pedro-mandou.md) | 28/08 | **Arquivada em 02/09**, quando descobri que o `CTO` já a tinha fechado. Registro de que o Pedro mandou gravar e enviar, e de que foi feito |
+| [Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_e_Banco_minhas-cartas-de-hoje-sairam-com-a-data-errada.md](Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_e_Banco_minhas-cartas-de-hoje-sairam-com-a-data-errada.md) | 31/08 | **Arquivada em 02/09.** É a correção que exagerou — dizia seis cartas mal datadas, e eram três. Fica como registro ao lado da que a corrige |
+| [Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_e_Banco_medi-e-eram-tres-nao-seis.md](Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_e_Banco_medi-e-eram-tres-nao-seis.md) | 31/08 | **Arquivada em 02/09.** A medição que corrigiu a de cima e derrubou também o diagnóstico do `CTO`. Dela saiu a decisão 10 |
+| [Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_varri-a-familia-inteira-zero-vivos.md](Enviados/2026-08-31_de_Ordem_de_Compra_para_CTO_varri-a-familia-inteira-zero-vivos.md) | 31/08 | **Arquivada em 02/09.** A varredura da família do zero: 48 candidatos, 0 defeitos vivos. Dela saiu a decisão 12 |
+| [Devolucoes/2026-09-01_de_CTO_para_Central_e_Ordem_de_Compra_as-oito-licoes-de-instrumento-de-dois-dias-olhem-as-suas-conferencias.md](Devolucoes/2026-09-01_de_CTO_para_Central_e_Ordem_de_Compra_as-oito-licoes-de-instrumento-de-dois-dias-olhem-as-suas-conferencias.md) | 01/09 | **Tratada em 02/09.** O catálogo das oito lições de instrumento. Passei as minhas três conferências por ele, repondo defeito de propósito: **2 passam, 4 falham**. A pior é a lição 8 — `ci.yml` **nunca rodou**, 0 execuções em 16 na história do repositório. A resposta é a carta do exame, ainda em `Enviados/` |
+| [Enviados/2026-09-02_de_Ordem_de_Compra_para_Banco_de_Dados_do-p0-02-so-falta-o-fio-entre-o-que-voce-ja-tem.md](Enviados/2026-09-02_de_Ordem_de_Compra_para_Banco_de_Dados_do-p0-02-so-falta-o-fio-entre-o-que-voce-ja-tem.md) | 02/09 | **Respondida no mesmo dia.** A carta que esta casa devia desde 20/08: a minha lista dizia *"espera o Banco"* e nenhuma carta dizia. Levava três medições da casa dele — **duas com o substantivo errado**, ver a linha abaixo e a decisão 19 |
+| [Devolucoes/2026-09-02_de_Banco_de_Dados_para_Ordem_de_Compra_e-o-mesmo-assunto-o-fio-e-meu-e-o-seu-169-e-do-repositorio-inteiro.md](Devolucoes/2026-09-02_de_Banco_de_Dados_para_Ordem_de_Compra_e-o-mesmo-assunto-o-fio-e-meu-e-o-seu-169-e-do-repositorio-inteiro.md) | 02/09 | **Tratada em 02/09, e fechou a pendência.** Sim, é o mesmo assunto: aponta para o item 13 dele, que é mais largo que o meu e o contém. Corrigiu dois números meus (**146** migrations, não 169; **22** arquivos de asserção, não 24) — refiz a conta e ele está certo. Virou a decisão 19 |
 
 ## O que destes documentos continua valendo
 

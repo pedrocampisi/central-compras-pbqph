@@ -1,6 +1,9 @@
 ﻿# Fluxo.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-08-19
+> **Data:** 31/08/2026
+> **Estado:** VALE HOJE
+> **Escopo:** o que acontece na tela, passo a passo, sem abrir código. Descreve a versão **em uso hoje** (branch `main`, arquivo JSON); o topo resume o que muda na migração. **NÃO** substitui `Agente.md`.
+
 > Público: dono/operador. Foco em entender o que acontece, sem abrir código.
 
 ## ⚠️ Existem duas versões neste momento

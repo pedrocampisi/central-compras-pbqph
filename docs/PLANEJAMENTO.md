@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 20/08/2026
+> **Data:** 02/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -398,3 +398,211 @@ Não é contagem zero — é impossibilidade provada, e o arquivo foi restaurado
 `legacy/CentralCompras-PBQPH.html`, o aplicativo antigo de arquivo único: 188 candidatos, **não
 olhados um a um**. Ele não é referenciado por nenhum arquivo e não entra no pacote publicado — é
 museu. **Não está declarado limpo: está declarado não medido.**
+
+---
+
+## Decisão 13 — carta não leva cabeçalho de estado: a gaveta é o estado dela · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+Os `.md` desta casa nascem com `Data / Estado / Escopo` no topo — **menos as cartas**. Carta já
+entra com o cabeçalho dela (De · Para · Data · Assunto · Responde · Espero de volta), e o estado
+dela é **a pasta em que está**:
+
+```
+   Devolucoes/            chegou e NÃO foi tratada
+   Enviados/              pedi e ainda não responderam
+   Arquivo_Morto/…        fechada, com o motivo no INDICE
+```
+
+**POR QUÊ**
+Um `Estado: VALE HOJE` dentro de uma carta que já está no `Arquivo_Morto/` cria **duas verdades
+sobre o mesmo papel**, e a de dentro do arquivo é a que ninguém lembra de atualizar quando move a
+pasta. É a decisão 4 outra vez, e a 7: **lista que repete o que a gaveta já diz é lista que
+desatualiza.** Some o segundo lugar, some o desencontro.
+
+E carta que já saiu daqui **não se reescreve**: metade dela mora na casa de outro agente, e mudar
+só a minha metade rompe o par.
+
+**O ALCANCE**
+
+```
+   39 arquivos .md nesta casa
+   ├── 22 cartas ······················ isentas por esta decisão
+   └── 17 documentos ·················· 17 com cabeçalho, conferido em 02/09
+```
+
+---
+
+## Decisão 14 — cor, sombra, raio e fonte vêm todos de um arquivo só · 12/08/2026
+
+> Decisão tomada em 12/08/2026 e escrita até hoje dentro do `Agente.md` 0.1. Trazida para o
+> caderno em **02/09/2026**, porque motivo mora aqui e regra mora lá.
+
+**O QUE FOI DECIDIDO**
+`src/styles/tokens.css` é a **única fonte** de cor, sombra, raio e fonte. Nenhum hexadecimal solto
+dentro de módulo. O tema escuro (`data-tema="escuro"` no `<html>`) é aplicado por **script inline
+no `index.html`, antes da primeira pintura**; `hooks/useTema.ts` só lê e alterna.
+
+**POR QUÊ**
+Cor solta em módulo é marca que anda sozinha: o padrão visual vem de fora
+(`00_Diretrizes_e_padroes/Padrao_Front_end/`), e cada hexadecimal copiado à mão é um lugar que
+deixa de acompanhar a fonte. O bloco de apelidos no fim do `tokens.css` (`--navy`, `--bg`,
+`--text`…) existe **só para o código antigo não quebrar** — código novo usa os oficiais
+(`--marca`, `--fundo`, `--texto`, `--acento`).
+
+O tema antes da primeira pintura tem motivo próprio e curto: **senão a tela pisca clara** antes de
+escurecer, e quem trabalha no escuro leva um flash branco a cada abertura.
+
+---
+
+## Decisão 15 — uma ação laranja por tela; ícone é desenho; selo é neutro até provar o contrário · 12/08/2026
+
+> Mesma origem da decisão 14: estava no `Agente.md` 0.1, veio para o caderno em 02/09/2026.
+
+**O QUE FOI DECIDIDO**
+
+```
+   uma ação primária (laranja) por tela ····· o segundo botão é sempre outline
+   ícone é <Icon>, traço 1.6 ··············· nunca emoji
+   <Pill> nasce neutro ····················· verde/vermelho só quando for mesmo situação
+   mascote longe de dado ··················· <EmptyState> cheio quando o vazio é a tela;
+                                              compacto dentro de cartão com números
+```
+
+**POR QUÊ**
+Duas laranjas na mesma tela é o mesmo que nenhuma — a cor deixa de dizer "é por aqui". Em Nova OC
+o laranja é o **"Emitir OC" do rodapé**; o atalho do topo é secundário **de propósito**, e trocar
+isso por "ficou mais visível" desfaz a regra.
+
+Emoji **desenha diferente em cada sistema e não aceita a cor do tema**: o mesmo símbolo vira outro
+desenho no Windows, no celular e no PDF. E selo colorido em tudo faz o vermelho parar de assustar
+justamente onde ele precisa assustar.
+
+---
+
+## Decisão 16 — a cerimônia da marca é da Central; aqui a entrada é formulário · 12/08/2026
+
+> Decisão **do Pedro**, 12/08/2026. Estava no `Agente.md` 0.1; veio para o caderno em 02/09/2026.
+
+**O QUE FOI DECIDIDO**
+Este aplicativo **não tem portão de boas-vindas e não tem animação de entrada**. O login é
+formulário, e some no dia em que a `Central` assumir a autenticação. Movimento só em **espera e no
+login** — `<Loader>` (o martelo) é o único permitido nas telas de trabalho, e só aparece **depois
+de 250 ms**.
+
+**POR QUÊ**
+A cerimônia da marca — portão, vídeo e som — é da **Central**, que será a porta de entrada da
+equipe. Repetir a cerimônia em cada programa transforma abertura em pedágio: quem emite dez OCs
+por dia assiste dez vezes.
+
+Os 250 ms do martelo têm motivo separado: **abaixo disso a espera termina antes de o olho
+registrar**, e o giro vira pisca-pisca — parece defeito, não parece trabalho.
+
+**A CONSEQUÊNCIA NO DISCO**
+`public/marca/` **não tem** `anim-entrada.mp4`, `anim-poster-final.png` nem `efeito-entrada.mp3`.
+Não é falta: é a decisão. Se um dia precisarem, a fonte é
+`00_Diretrizes_e_padroes/Padrao_Front_end/assets/`. E os quadros do martelo ficam **fora do
+pré-carregamento** do service worker (`globIgnores` no `vite.config.ts`) — só baixam em espera
+real.
+
+---
+
+## Decisão 17 — a gravação da OC é uma chamada só, e quem manda é o banco · 18–19/08/2026
+
+> O contrato campo a campo continua no `Agente.md` 0.2 — é lá que se consulta antes de mexer em
+> `salvarOrdemCompra`. Aqui fica **por que ele tem essa forma**. Trazido em 02/09/2026.
+
+**O QUE FOI DECIDIDO**
+Cabeçalho e itens da OC gravam **numa transação só**, por `compras.salvar_oc(p jsonb)`. O cliente
+não decide nada: manda o pedido inteiro e obedece à resposta.
+
+**POR QUÊ — cada regra veio de um estrago concreto**
+
+| A regra | O estrago que ela evita |
+|---|---|
+| uma chamada, uma transação | era o **P0-01 da perícia**: gravar cabeçalho e itens separados deixava **OC numerada sem itens** quando a segunda chamada falhava |
+| `request_id` é a identidade da **tentativa**, não da OC | repetir a tentativa não pode **gastar outro número de documento**. Por isso ele se reaproveita no retry (`tentativaRef`) e só é descartado quando grava |
+| `versao` obrigatória ao atualizar | duas pessoas na mesma OC. O banco devolve `40001`, a camada converte em `ConflitoDeVersao`, e **a mensagem do banco já está pronta para a tela** — reescrever é piorar |
+| chave com `null` **APAGA** | apagar campo precisa ser possível. Por isso ausente ≠ `null`: ausente não mexe, `null` limpa. As exceções (`data`, `status`, `frete`, `outras_despesas`, `desconto_material`) ficam em `coalesce` **declaradas**, não por acaso |
+| `itens` ausente ≠ `itens: []` | lista vazia **apaga todos**. A tela edita a lista inteira, então manda sempre — omitir por engano seria apagar por engano |
+| status e PDF com comando estreito | trocar status não regrava itens; `marcar_pdf_gerado` **não mexe na versão** (gerar PDF não muda conteúdo) e roda **depois** de o arquivo existir |
+
+**⚠️ O LIMITE, QUE CONTINUA VALENDO**
+Nada disso foi **provado na tela**. Ninguém emitiu OC por este aplicativo depois da troca — o
+contrato foi conferido campo a campo por leitura no banco, **que é outra coisa**. Está aberto como
+item 2 das `PENDENCIAS`.
+
+---
+
+## Decisão 18 — o IPI incide sobre o líquido, não sobre o bruto · anterior a este caderno
+
+**O QUE FOI DECIDIDO**
+A ordem de cálculo da linha é, e continua sendo:
+
+```
+   bruto → desconto → LÍQUIDO → IPI → total
+
+   total_linha = (qtd × preço × (1 − desc/100)) × (1 + ipi/100)
+```
+
+**POR QUÊ ESTÁ NO CADERNO**
+Não é uma decisão tomada agora — é uma decisão **que parece defeito para quem chega**. ERPs comuns
+fazem o outro caminho (IPI sobre o bruto), e uma IA de manutenção que "corrija" isso muda o valor
+de **toda** ordem de compra da empresa, sem erro, sem teste vermelho e sem ninguém perceber até a
+nota chegar diferente.
+
+**A DATA HONESTA: não sei quando foi decidido.** Sei que **não foi na migração para React** — o
+aplicativo antigo de arquivo único já calculava assim:
+
+```
+   legacy/CentralCompras-PBQPH.html:1314   const ipi = (base - desc) * (…ipi_pct…)/100;
+   src/domain/compute.ts:38                const ipi = liquido * (ipiPct / 100);
+```
+
+Quem quiser mudar isto **pergunta ao Pedro**, não ao código.
+
+---
+
+## Decisão 19 — o número certo colado no substantivo errado · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+Contagem que vai para carta entra com **a pergunta que ela responde escrita ao lado**. Não basta o
+número estar certo: tem de estar certo **para a frase em que ele foi colado**.
+
+```
+   o que eu contei ····· find . -name '*.sql'      → 169
+   o que eu escrevi ···· "169 migrations versionadas"
+   o que era ··········· supabase/migrations/*.sql → 146
+                         os outros 23 são testes de RLS, roteiros e carga
+```
+
+**POR QUÊ**
+Escrevi ao `Banco_de_Dados`, em 02/09, que ele tinha **169 migrations**. Ele conferiu e devolveu:
+são **146**; 169 é o total de `.sql` da casa inteira. Refiz a conta aqui e **ele está certo**. O
+mesmo aconteceu com os testes de permissão: contei **24 entradas da pasta**, mas duas não são
+asserção — uma é `__pycache__` e outra é um teste em Python. **22** arquivos `.sql` de asserção.
+
+O número não estava errado. **A frase em volta dele estava** — e é a frase que viaja, é ela que o
+outro agente lê e repete.
+
+**O DETALHE QUE FAZ ISSO VIRAR REGRA E NÃO DESCULPA**
+É a **terceira vez em dois dias** que a mesma coisa acontece entre casas da plataforma: a
+`Central_Email` contou `create table` e chamou de mesas (uma era criada e apagada no mesmo
+arquivo); o `Banco_de_Dados` contou onze dígitos sem borda e achou CPF dentro de CNPJ; eu contei
+`.sql` e chamei de migration. **Três instrumentos honestos, três substantivos errados.**
+
+**COMO FICA, NA PRÁTICA**
+
+```
+   ❌  "169 migrations versionadas"
+   ✅  "169 arquivos .sql em toda a casa (find . -name '*.sql'), dos quais
+        146 em supabase/migrations/"
+```
+
+O comando que produziu o número vai junto. Quem lê confere em cinco segundos — e foi exatamente
+assim que o erro morreu em menos de uma hora, em vez de virar fato repetido.
+
+**⚠️ E A CARTA ERRADA NÃO FOI REESCRITA**
+Ela já estava na `Devolucoes` de duas casas quando o erro apareceu. Vale o que já valia aqui:
+**carta que saiu não se corrige por dentro** — a correção sai como carta nova, e o par fica no
+registro mostrando o erro e o conserto. Esconder o erro reescrevendo é pior que o erro.

@@ -1,5 +1,9 @@
 # Perícia técnica da estrutura de banco de dados — Ordem de Compra
 
+> **Data:** 10/08/2026
+> **Estado:** CONCLUÍDO — é registro
+> **Escopo:** foto do banco em **10/08/2026**, commit `685f93e`. O que continua valendo são os **fatos medidos**; a lista de achados já foi tratada — o que sobrou vive em `PENDENCIAS.md`. **NÃO reexecute os passos.**
+
 **Empresa:** Campisi Engenharia  
 **Sistema:** Central de Compras / Ordem de Compra  
 **Data da perícia:** 10 de agosto de 2026  

@@ -1,5 +1,9 @@
 # Prestadores de Serviço — Fase 3: Integrações
 
+> **Data:** 11/05/2026
+> **Estado:** PROPOSTA — aguardando o Pedro
+> **Escopo:** esboço da fase 3 de prestadores (integrações). **NÃO** foi implementado e **NÃO** se executa.
+
 ## Status: ⏸️ Não implementado (roadmap longo prazo)
 
 ## Contexto

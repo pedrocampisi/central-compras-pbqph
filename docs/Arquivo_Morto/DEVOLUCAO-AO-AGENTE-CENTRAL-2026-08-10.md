@@ -1,5 +1,9 @@
 # Devolução — Ordem de Compra → agente central (10/08/2026)
 
+> **Data:** 10/08/2026
+> **Estado:** CONCLUÍDO — é registro
+> **Escopo:** a devolução ao agente central em **10/08/2026**, com as decisões do Pedro daquele dia. **NÃO reexecute os passos**; o que vale são as decisões, hoje numeradas em `PLANEJAMENTO.md`.
+
 > **De:** agente do repositório `Ordem de Compra`
 > **Para:** agente central (`campisi-central`), com decisões do Pedro registradas
 > **Anexos:** `RELATORIO-RODADA-2-2026-08-10.md` (verificação completa da rodada 2)
