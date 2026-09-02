@@ -16,6 +16,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json,md}\"",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
+    "conferir": "node scripts/conferir-documentos.js",
     "test:watch": "vitest"
   },
   "dependencies": {

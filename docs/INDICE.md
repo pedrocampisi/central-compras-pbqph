@@ -21,7 +21,7 @@
 |---|---|---|
 | [Agente.md](Agente.md) | IA de manutenção | Arquitetura, contratos, constantes. **Comece pela seção 0**: as duas branches divergem, e a 0 vence sobre o resto. A 0.1 é o padrão visual; a 0.2 é o contrato de gravação da OC |
 | [roteiros/guia-do-desenvolvedor.md](roteiros/guia-do-desenvolvedor.md) | dev humano que nunca viu o projeto | Como rodar, mapa de arquivos, como adicionar coisas comuns. **Descreve a branch `main`** (arquivo JSON) |
-| [melhorias-futuras/](melhorias-futuras/) | Pedro e IA | Ideias ainda não implementadas. É **proposta**, não plano de execução |
+| [melhorias-futuras/README.md](melhorias-futuras/README.md) | Pedro e IA | O índice das ideias ainda não implementadas — ele responde pelos arquivos da pasta dele. É **proposta**, não plano de execução |
 | [Fluxo.md](Fluxo.md) | dono/operador | O que acontece na tela, sem abrir código |
 
 ## Vivos — conversa em andamento

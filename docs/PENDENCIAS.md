@@ -37,15 +37,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 3. Não existe conferência automática dos documentos
-
-*Meu.* Vindo do caderno de convenção antiga encerrado em 28/08/2026.
-
-O `Banco_de_Dados` tem um programa que reprova documento fora do índice e link morto
-(`conferir_tudo.py`). Aqui a checagem é manual, e foi feita uma vez, em 19/08. **Sem ela a
-organização dura poucas semanas** — a observação é do próprio Banco, e vale para esta casa.
-
-### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 3. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
@@ -56,7 +48,7 @@ botão que a virada aperta**, e ele é do Pedro.
 
 ---
 
-### 5. `deploy.yml` é o único lugar da casa com a versão digitada à mão
+### 4. `deploy.yml` é o único lugar da casa com a versão digitada à mão
 
 *Proposta pronta, para a retomada de **06/09/2026**.* Desenho aprovado pelo `CTO` em 02/09.
 
@@ -70,6 +62,20 @@ conferir sem publicar, e publicar é botão do Pedro.
 ---
 
 ## ✅ Fechadas (registro)
+
+### A conferência automática dos documentos existe, roda no CI, e mordeu na primeira vez — 02/09/2026
+
+Era a pendência de que a organização tinha sido conferida **à mão uma vez, em 19/08**.
+`scripts/conferir-documentos.js`, sete travas, ligado ao `pnpm conferir` **e ao CI no mesmo
+commit** — porque o dia de hoje ensinou que instrumento que não roda é instrumento que não existe.
+
+**A primeira execução saiu vermelha e achou quatro coisas reais:** três documentos que saíram de
+circulação sem ninguém escrever por quê (as cartas do CNAE e das travas tapadas, e o `LEIA-ME.md`
+do Arquivo Morto) e um apontamento de pasta onde tinha de ser de arquivo. Todos amarrados.
+
+**Ela acusou a si mesma duas vezes** — uma trava que reprovava a si própria e outra que estourava
+devolvendo *"não deu para medir"* com saída 0 — e as duas viraram regra. **8 sabotagens, 8
+acusações.** Ver `PLANEJAMENTO.md`, decisão 21, com o que ela **não** olha, declarado.
 
 ### O CI desta casa passou a existir, e o primeiro verde não é meu — 02/09/2026
 

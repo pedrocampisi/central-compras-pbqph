@@ -37,3 +37,11 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # A organizacao dos documentos tinha sido conferida A MAO uma vez, em
+      # 19/08. Aqui ela passa a rodar em todo push, como o resto. A trava da
+      # carta entregue declara "nao deu para medir" neste ambiente -- as
+      # outras casas da plataforma nao existem dentro do checkout -- e nao
+      # inventa um verde para tapar o buraco.
+      - name: Conferir os documentos
+        run: pnpm conferir

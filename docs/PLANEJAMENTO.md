@@ -655,3 +655,75 @@ esta casa não declara o que não mede (decisão 19).
 tocado porque não há como rodá-lo para conferir sem publicar, e publicar é botão do Pedro.
 **Proposta pronta para a retomada de 06/09**, com o desenho já aprovado pelo `CTO`: ele passa a ler
 o `.nvmrc` e o `packageManager`, como o CI.
+
+---
+
+## Decisão 21 — a conferência dos documentos é do tamanho desta casa, não da casa do Banco · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+`scripts/conferir-documentos.js`, ligado ao `pnpm conferir` e **ao CI no mesmo commit**. Sete
+travas:
+
+```
+   1  cabeçalho Data/Estado/Escopo em todo documento que não é carta
+   2  o Estado é um dos quatro da lei
+   3  nenhum link .md aponta para arquivo que não existe
+   4  todo documento está amarrado a um índice
+   5  só CLAUDE.md e README.md moram fora de docs/
+   6  toda carta em Enviados/ chegou na casa de quem recebe
+   7  a conferência não escreve — ela lê o próprio código e prova
+```
+
+**POR QUÊ AGORA, E POR QUE EM JAVASCRIPT**
+A organização foi conferida **à mão uma vez**, em 19/08. Conferência manual dura poucas semanas —
+a observação é do `Banco_de_Dados`, que já viu 27 documentos sem índice nenhum. E o dia de hoje
+ensinou o resto: **instrumento que não roda é instrumento que não existe** (o `ci.yml` desta casa,
+0 execuções em 16). Por isso ela nasce ligada ao CI no mesmo commit — não "depois".
+
+Em JavaScript, e não em Python, porque roda no Node que esta casa já declara. **Nenhuma ferramenta
+nova entrou na casa.**
+
+**O DESENHO É DO BANCO, E UMA COISA FOI MUDADA DE PROPÓSITO**
+Li o `conferir_tudo.py` dele em vez de pedir por carta — estava à mão. Mas **na casa dele as
+cartas são listadas no `INDICE.md`, e aqui não são**: as decisões 4 e 7 tiraram essa tabela porque
+a gaveta é a verdade. Copiar a regra dele acusaria **todas** as cartas vivas desta casa como
+órfãs — um vermelho errado, que é pior que verde nenhum. **Instrumento se adapta à casa; não se
+copia por cima dela.**
+
+**A PRIMEIRA EXECUÇÃO SAIU VERMELHA, E ACHOU COISA DE VERDADE**
+
+```
+   3 documentos saíram de circulação sem ninguém escrever POR QUÊ
+       · a carta do CNAE (28/08), que virou a decisão 8
+       · a carta das travas tapadas (28/08) — o nome dela aparecia DENTRO de
+         outra linha, o que não é a mesma coisa que ter linha
+       · o LEIA-ME.md do Arquivo Morto
+   1 apontamento de PASTA onde tinha de ser de arquivo (melhorias-futuras/)
+```
+
+**E ELA ACUSOU A SI MESMA DUAS VEZES, o que é o melhor sinal**
+
+- a trava 7 procurava os nomes proibidos com uma expressão **que continha os nomes proibidos**:
+  reprovou a si mesma na primeira execução da vida. Vigia que inventa achado (lição 6);
+- uma variável apagada fez a trava 4 **estourar**, e o programa devolveu *"não deu para medir"* com
+  código de saída **0**. Corrigido, e virou regra: **trava que estoura fica VERMELHA.** O "não deu
+  para medir" honesto é o que a própria trava **declara** — como a trava 6 faz dentro do CI, onde
+  as outras casas não existem no checkout.
+
+**A PROVA DE QUE ELA MORDE — 8 ensaios, 8 acusações**
+Cada trava foi sabotada de propósito e todas ficaram vermelhas: cabeçalho arrancado, estado
+inventado, link para arquivo inexistente, documento órfão, `.md` na raiz, carta que nunca saiu,
+poder de escrever, e trava quebrada. **Conferência que nasce verde e nunca se viu vermelha não é
+conferência.**
+
+**⚠️ O QUE O PRÓPRIO ENSAIO ENSINOU, e é o preço que eu paguei**
+O roteiro de sabotagem restaurava os arquivos com `git checkout --`. Num arquivo com **edição
+minha ainda não gravada**, isso não restaura: **apaga**. Ele comeu uma correção legítima do
+`INDICE.md`, e só a conferência seguinte mostrou. Roteiro de ensaio é instrumento também, e este
+tinha efeito colateral que ninguém tinha declarado.
+
+**O QUE ELA NÃO OLHA — declarado**
+Não lê o conteúdo de carta nenhuma; **não sabe se um documento está desatualizado** — só se ele
+declara o estado em que diz estar, então documento mentiroso passa verde aqui; não segue link
+http; não olha `legacy/`, `node_modules/` nem `dist/`; e fora desta casa responde a **uma**
+pergunta só: *"a carta que eu mandei chegou?"*.
