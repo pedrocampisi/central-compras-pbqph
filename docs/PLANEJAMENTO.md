@@ -877,10 +877,18 @@ duas travas estariam verdes. As duas metades viajam juntas ou não viajam.
 
 **⚠️ O QUE EU NÃO CONSEGUI PROVAR, e não vou fingir que provei**
 
-- **o ensaio no GitHub não alcança esta trava hoje.** Medido: `gh variable list` e `gh secret list`
-  voltam **vazios** — o Pedro ainda não digitou as duas variáveis do banco, e a primeira trava do
-  fluxo para **antes** do `build`. O ensaio prova o portão do banco; a trava do endereço fica sem
-  ser exercitada na máquina do GitHub até ele digitar;
+- **o ensaio no GitHub não alcança esta trava hoje** — e isto não é previsão: o ensaio **foi
+  rodado** (corrida `33683289814`, 21 segundos, vermelha) e morreu no portão anterior. Motivo
+  medido: `gh variable list` e `gh secret list` voltam **vazios**. Enquanto o Pedro não digitar as
+  duas variáveis do banco, **nenhum ensaio chega na trava do endereço** — ela está provada só na
+  minha máquina;
+
+  **⚠️ Mas o vermelho pagou por si e fechou TRÊS dos "não provados" da decisão 22:**
+  `${{ vars.X || secrets.X }}` **resolve na máquina do GitHub** sem erro de sintaxe (o log mostra a
+  variável vazia, ou seja: resolveu); a trava do banco **morde lá**, com a frase que o Pedro vai
+  ler; e `deploy: skipped` — **o ensaio parou antes de publicar**, como projetado. De quebra, o
+  botão do ensaio funciona a partir de um ramo que não é a `main`, coisa que não dava para saber
+  sem apertar;
 - **o registro de DNS não existe do meu lado.** Quem cria é o `Banco_de_Dados`, na Cloudflare, com
   a palavra do Pedro. Eu não vi `compras.campisi.com.br` responder;
 - **a página abrindo em navegador de gente** — só depois de publicar;
