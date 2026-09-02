@@ -126,11 +126,23 @@ o próprio Correio.** E o **cadastro está lá**: a equipe não precisa digitar 
 zona `campisi.com.br` já está na Cloudflare. O `base` **foi tocado** por isso, e o pacote agora
 prova que sabe onde mora. Ver `PLANEJAMENTO.md`, decisão 23.
 
-⚠️ **O que sobrou deste item para o Pedro, e a ORDEM importa:** o registro de DNS (o
-`Banco_de_Dados` cria, com a palavra dele), depois `Settings > Pages > Custom domain =
-compras.campisi.com.br`, e **só então** juntar os ramos. Fora dessa ordem, a `main` sobe com
-`base` de raiz num endereço que ainda não existe, e o site fica inalcançável até o DNS chegar.
-`Enforce HTTPS` quando o GitHub liberar o certificado, minutos a uma hora depois do DNS.
+⚠️ **O que sobrou deste item para o Pedro, e a ORDEM importa.** O primeiro passo **já caiu na mesma
+noite**: o `Banco_de_Dados` criou o registro, e eu conferi por conta própria contra o `8.8.8.8` —
+`compras` → `pedrocampisi.github.io`, TTL 300, nos quatro endereços do GitHub Pages.
+
+```
+   ✅ 1  o registro de DNS ················· feito, e medido aqui em 02/09
+      2  Settings > Pages > Custom domain = compras.campisi.com.br
+      3  as duas variáveis do banco ········ sem elas nenhum ensaio anda
+      4  rodar o ensaio de novo ··········· agora ele alcança as três travas
+      5  juntar os ramos ·················· por último
+         Enforce HTTPS quando o GitHub liberar o certificado
+```
+
+**O estado de hoje tem nome, medido:** `http://compras.campisi.com.br` responde **404 vindo do
+GitHub.com**, e o HTTPS ainda não tem certificado. O caminho do DNS está inteiro; o que falta é o
+GitHub **saber** que este domínio é deste repositório — o passo 2. Fora dessa ordem, a `main` sobe
+apontando para a raiz antes do endereço existir de verdade, e o site fica inalcançável.
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 

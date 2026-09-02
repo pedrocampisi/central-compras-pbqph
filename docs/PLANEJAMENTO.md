@@ -889,10 +889,25 @@ duas travas estariam verdes. As duas metades viajam juntas ou não viajam.
   ler; e `deploy: skipped` — **o ensaio parou antes de publicar**, como projetado. De quebra, o
   botão do ensaio funciona a partir de um ramo que não é a `main`, coisa que não dava para saber
   sem apertar;
-- **o registro de DNS não existe do meu lado.** Quem cria é o `Banco_de_Dados`, na Cloudflare, com
-  a palavra do Pedro. Eu não vi `compras.campisi.com.br` responder;
-- **a página abrindo em navegador de gente** — só depois de publicar;
-- **o certificado HTTPS**, que o GitHub só emite minutos a uma hora **depois** do DNS.
+- **a página abrindo em navegador de gente** — só depois de publicar.
+
+**✅ EMENDA DA MESMA NOITE — o DNS saiu do "não provado", e eu medi em vez de aceitar o relato**
+O `Banco_de_Dados` criou o registro com a palavra do Pedro, e o `CTO` avisou. Conferi por conta
+própria, contra o `8.8.8.8`:
+
+```
+   compras.campisi.com.br  CNAME  pedrocampisi.github.io   TTL 300
+                             → 185.199.108/109/110/111.153   (os quatro do GitHub Pages)
+   http://compras.campisi.com.br   → HTTP 404, servidor: GitHub.com
+   https://compras.campisi.com.br  → sem certificado válido ainda
+```
+
+**O 404 é a informação boa, não a ruim.** Ele vem **do GitHub**: o caminho do DNS está inteiro e
+chega lá — o que falta é o GitHub **saber** que este domínio é deste repositório, e isso é
+exatamente o clique `Settings > Pages > Custom domain`, que é do Pedro. E o HTTPS sem certificado
+é o esperado: o GitHub só emite **depois** que o domínio é registrado ali.
+
+Ou seja, o estado tem nome: **o DNS está pronto e o site ainda não foi apresentado ao domínio.**
 
 **⚠️ A ORDEM DAS COISAS IMPORTA, e é do Pedro**
 Este commit **não publica nada**: está na `migracao-supabase`, e publicar quer dizer `main` (a
