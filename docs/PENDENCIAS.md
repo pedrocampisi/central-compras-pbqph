@@ -17,6 +17,17 @@ fim.
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
+
+**Evidência nova, medida pelo `CTO` no banco de produção em 02/09/2026:** existem **2 ordens de
+compra** (2026/004 e 2026/005, ambas de 08/08) e o **contador está em 7** — os números 006 e 007
+foram gastos em 13/08 sem OC sobrevivente, que é o `reservar_numero_oc` **funcionando como
+projetado**: rascunho abandonado queima número, e é isso que impede dois computadores de emitirem
+a mesma OC.
+
+⚠️ **Isto não fecha o item.** Prova que a numeração do banco funciona; **não** prova que esta tela
+emite. A próxima OC de verdade sairia **2026/008**, e se a contagem começa daí ou do zero é
+**palavra do Pedro** — o número vai no papel que chega ao fornecedor.
+
 ### 2. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
@@ -48,20 +59,24 @@ botão que a virada aperta**, e ele é do Pedro.
 
 ---
 
-### 4. `deploy.yml` é o único lugar da casa com a versão digitada à mão
-
-*Proposta pronta, para a retomada de **06/09/2026**.* Desenho aprovado pelo `CTO` em 02/09.
-
-O `ci.yml` já lê o Node do `.nvmrc` e o pnpm do `packageManager`. O `deploy.yml` ainda diz
-`node-version: '20'` e `pnpm 9`, escritos à mão — exatamente o arranjo que deixou o `.nvmrc`
-quebrado por semanas sem ninguém saber (decisão 20).
-
-**Fica por último de propósito:** é o fluxo que publica o site que a equipe usa, não há como
-conferir sem publicar, e publicar é botão do Pedro.
-
 ---
 
 ## ✅ Fechadas (registro)
+
+### A publicação passou a levar o banco junto — e a provar que levou — 02/09/2026
+
+Era o item do `deploy.yml` com a versão digitada à mão, e virou coisa maior: o `CTO` mediu e
+achou que o fluxo **não tinha uma linha de `env`**. Como `VITE_…` é lida na hora de montar,
+juntar os ramos daria CI verde, publicação verde e **a tela sem alcançar o banco na mão da
+pessoa**.
+
+Agora ele tem duas travas — uma pergunta *"as variáveis chegaram?"*, a outra *"o endereço está
+DENTRO do pacote?"* —, o Node vem do `.nvmrc` e o pnpm do `packageManager`. **A primeira versão
+da segunda trava era cega** e o ensaio pegou antes de entrar. Ver `PLANEJAMENTO.md`, decisão 22,
+com o que **não** foi possível provar sem publicar.
+
+**Quem digita as duas variáveis é o Pedro**, em Settings → Secrets and variables → Actions. Não
+vieram por carta e não passaram por agente nenhum.
 
 ### A conferência automática dos documentos existe, roda no CI, e mordeu na primeira vez — 02/09/2026
 

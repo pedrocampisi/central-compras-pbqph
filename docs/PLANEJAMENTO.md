@@ -727,3 +727,68 @@ Não lê o conteúdo de carta nenhuma; **não sabe se um documento está desatua
 declara o estado em que diz estar, então documento mentiroso passa verde aqui; não segue link
 http; não olha `legacy/`, `node_modules/` nem `dist/`; e fora desta casa responde a **uma**
 pergunta só: *"a carta que eu mandei chegou?"*.
+
+---
+
+## Decisão 22 — a publicação prova que o banco entrou no pacote, e não que ela mandou · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+`deploy.yml` ganhou **duas travas**, e elas fazem perguntas diferentes de propósito:
+
+```
+   antes do build ···· "as duas variáveis chegaram?"   → responde "eu mandei?"
+   depois do build ··· "o endereço do banco está DENTRO do pacote?"
+                                                        → responde "chegou?"
+```
+
+As duas variáveis vêm de `vars` **ou** de `secrets` do repositório (`vars.X || secrets.X`), quem
+digita é o Pedro, e o valor **não passa por carta nem por agente nenhum**.
+
+**POR QUÊ**
+Até hoje o `deploy.yml` não tinha **uma linha** de `env`. `VITE_…` é lida na hora de **montar**:
+o que não estava lá durante o `pnpm build` não existe na página depois. Juntar os ramos hoje
+daria **CI verde, publicação verde, e a tela sem alcançar o banco na mão da pessoa** — o defeito
+achado pelo `CTO` lendo `deploy.yml` e `client.ts` lado a lado, no único fluxo desta casa que
+ninguém conseguia conferir, porque conferir exigia publicar.
+
+**A MEDIÇÃO, feita aqui antes de escrever a trava**
+
+```
+   build com VITE_SUPABASE_URL preenchida ····· 3 ocorrências do endereço dentro do pacote
+   build com ela vazia ······················· 0 · e o build NÃO reclama
+                                                 (a frase de erro do client.ts vai junto,
+                                                  para estourar no navegador da pessoa)
+```
+
+**⚠️ A PRIMEIRA VERSÃO DA SEGUNDA TRAVA ERA CEGA, e o ensaio pegou**
+Ela ia procurar `supabase.co` no pacote. Medido: **um pacote SEM banco também tem `supabase.co`**
+— a biblioteca carrega a string `*.supabase.co` dentro dela. A trava passaria verde nos dois
+casos. O padrão que discrimina é `https://<host>.supabase.co`: **3 × 0**. Verde cego evitado por
+testar a trava, não o programa.
+
+**A PROVA DAS DUAS, rodadas como o GitHub roda (`bash -e`), 6 casos, 6 certos**
+as duas presentes → passa · falta o endereço → para · falta a chave → para · faltam as duas →
+para · pacote com banco → passa · pacote sem banco → **para**. A armadilha que este ensaio
+existia para pegar era o `[ -z "$X" ] && …`, que sob `bash -e` derruba o passo **mesmo quando
+está tudo certo**. Por isso o roteiro usa `if`.
+
+**O ENSAIO SEM PUBLICAR, que não foi pedido e eu pus assim mesmo**
+`workflow_dispatch` ganhou a opção `ensaio`: monta, roda as duas travas e **para antes de
+publicar**. Existe porque este era o único fluxo da casa que só se conferia pondo no ar — e
+agora dá para provar a fiação **sem** pôr. Desmarcado, o comportamento é o de sempre.
+
+**O QUE EU NÃO CONSEGUI PROVAR, e não vou fingir que provei**
+
+- que `${{ vars.X || secrets.X }}` resolve como eu espero **na máquina do GitHub**. A sintaxe
+  está certa; só uma corrida de verdade prova. **É por isso que o ensaio existe: rodar ele é a
+  prova, e custa nada;**
+- que a página publicada **abre e alcança o banco** num navegador de gente. Isso só depois de
+  publicar;
+- o `base` do Vite continua **intocado**: onde este aplicativo vai morar (dentro da Central ou
+  em endereço próprio) é decisão do Pedro, e mexer nisso antes seria escolher por ele.
+
+**O QUE ESTA DECISÃO NÃO RESOLVE**
+`secrets` **não guarda segredo nenhum aqui**: as duas variáveis ficam dentro do pacote publicado,
+porque é assim que `VITE_` funciona. `Secrets` só esconde o valor do log. Quem protege o banco é
+a política (RLS) dentro dele, avaliada contra o usuário logado — e a chave `sb_secret_…` nunca
+entrou e nunca entra neste arquivo.

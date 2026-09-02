@@ -3,7 +3,18 @@ name: Build & Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # ⚠️ ENSAIO SEM PUBLICAR (Actions → este fluxo → "Run workflow"): marcando
+  # `ensaio`, ele monta, roda as duas travas do banco e PARA — não publica
+  # nada. Existe porque este era o único fluxo desta casa que ninguém
+  # conseguia conferir sem pôr no ar. Desmarcado, o comportamento é o de
+  # sempre. Publicação de verdade continua sendo `push` na `main`: botão do
+  # Pedro, e só dele.
   workflow_dispatch:
+    inputs:
+      ensaio:
+        description: 'Ensaio: monta e confere, mas NÃO publica'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,23 +25,68 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+# -----------------------------------------------------------------------------
+# ⚠️ ONDE O PEDRO DIGITA AS DUAS VARIÁVEIS (ninguém mais digita, e não vêm por
+# carta): Settings → Secrets and variables → Actions, no repositório.
+#
+#   VITE_SUPABASE_URL ................ o endereço do banco
+#   VITE_SUPABASE_PUBLISHABLE_KEY .... a chave publishable (a `sb_publishable_…`)
+#
+# Tanto faz a aba: este fluxo aceita as duas em **Variables** ou em **Secrets**.
+# Isso é de propósito — pôr na aba errada não pode virar publicação quebrada.
+#
+# 🔎 E a verdade sobre "segredo", para ninguém se enganar: as duas ficam
+# **dentro do pacote publicado**, porque `VITE_…` é lida na hora de MONTAR e
+# vira texto no JavaScript que o navegador baixa. `Secrets` só esconde o valor
+# do LOG. Quem protege o banco não é o esconderijo da chave — são as políticas
+# (RLS) dentro do banco, avaliadas contra o usuário logado. A chave secreta
+# (`sb_secret_…`) NUNCA entra aqui.
+# -----------------------------------------------------------------------------
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      # Sem `version:`: a ação lê o `packageManager` do package.json.
+      # Antes estava digitado `9` aqui, e podia divergir sem nada acusar.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
+      # Node vem do `.nvmrc`, pelo mesmo motivo. Em 02/09 o `.nvmrc` declarava
+      # um Node que não conseguia nem carregar os testes, e ninguém sabia
+      # porque a versão estava escrita em dois lugares.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # ⚠️ ESTA TRAVA EXISTE PORQUE A PUBLICAÇÃO NÃO LEVAVA O BANCO JUNTO.
+      # Até 02/09/2026 este fluxo não tinha UMA linha de env: montava verde,
+      # publicava verde, e a página chegava no navegador da pessoa sem
+      # conseguir alcançar o banco. Verde que não mede o que interessa.
+      - name: Conferir que as duas variáveis chegaram
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          faltando=""
+          if [ -z "${VITE_SUPABASE_URL}" ]; then
+            faltando="${faltando} VITE_SUPABASE_URL"
+          fi
+          if [ -z "${VITE_SUPABASE_PUBLISHABLE_KEY}" ]; then
+            faltando="${faltando} VITE_SUPABASE_PUBLISHABLE_KEY"
+          fi
+          if [ -n "${faltando}" ]; then
+            echo "::error::A publicacao parou de proposito. Falta:${faltando}."
+            echo "::error::Digite em Settings > Secrets and variables > Actions (Variables OU Secrets, tanto faz)."
+            echo "::error::Publicar sem isso sobe uma pagina que nao alcanca o banco, sem erro nenhum aqui."
+            exit 1
+          fi
+          echo "As duas chegaram. O valor nao e impresso aqui de proposito."
 
       - name: Type-check
         run: pnpm typecheck
@@ -39,7 +95,29 @@ jobs:
         run: pnpm test
 
       - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: pnpm build
+
+      # A trava de cima conferiu o que ENTROU. Esta confere o que SAIU — que é
+      # a pergunta certa (a de cima responde "eu mandei?", esta responde
+      # "chegou?"). Se o endereço do banco não está dentro do pacote, o pacote
+      # não presta, mesmo com tudo verde atrás.
+      #
+      # ⚠️ O padrão é `https://<host>.supabase.co`, e NÃO apenas `supabase.co`:
+      # a biblioteca carrega a string `*.supabase.co` dentro dela, então um
+      # grep por `supabase.co` fica VERDE num pacote vazio. Isso foi medido em
+      # 02/09 antes desta trava entrar: pacote sem banco -> 1 ocorrência de
+      # `supabase.co` e ZERO de `https://….supabase.co`.
+      - name: Provar que o endereço do banco entrou no pacote
+        run: |
+          if ! grep -rqE 'https://[a-z0-9-]{10,}\.supabase\.co' dist/; then
+            echo "::error::O pacote saiu SEM endereco de banco dentro."
+            echo "::error::Publicar assim sobe uma pagina que nao abre. Parando antes."
+            exit 1
+          fi
+          echo "O endereco do banco esta dentro do pacote."
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -48,6 +126,7 @@ jobs:
 
   deploy:
     needs: build
+    if: ${{ inputs.ensaio != true }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
