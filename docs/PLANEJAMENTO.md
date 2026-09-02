@@ -812,3 +812,101 @@ casos foram rodados com a substituição que o GitHub faz: **4 de 4 certos**.
 
 *Quem convida para o botão responde pelo botão* — a frase é do `CTO`, e o buraco era dele por
 origem e meu por consequência.
+
+---
+
+## Decisão 23 — este aplicativo nasce em `compras.campisi.com.br`, e o pacote prova que sabe onde mora · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+O endereço saiu do indefinido: **`compras.campisi.com.br`**, endereço próprio, e a equipe nunca
+decora o `github.io`. É a decisão 145 do `CTO`, e ela **revoga a ordem dele de mais cedo** ("não
+toque no `base`") — o que mudou foi uma medição: a zona `campisi.com.br` já está na Cloudflare, na
+mesma conta do Worker da Central, então endereço próprio custa **um registro de DNS**, criado pelo
+`Banco_de_Dados` com a palavra do Pedro.
+
+Três coisas neste commit, e **zero linha de código de produto**:
+
+```
+   public/CNAME ················ uma linha: compras.campisi.com.br
+                                 (o Vite copia public/ para dist/, e é por esse
+                                  arquivo que o GitHub Pages sabe o domínio)
+   VITE_BASE_PATH=/ no Build ··· o base padrão /central-compras-pbqph/ é certo
+                                 para github.io e ERRADO para domínio próprio
+   a terceira trava ··········· o pacote aponta para a raiz? sobrou caminho
+                                 velho? o CNAME veio junto?
+```
+
+**POR QUE NÃO PRECISOU DE CÓDIGO DE PRODUTO**
+O `vite.config.ts` **já lia** `VITE_BASE_PATH` (linha 11), de um conserto anterior. Conferido
+antes de escrever qualquer coisa: a ordem supunha uma peça, e a peça existia. Se não existisse,
+isto viraria proposta, porque o congelamento vale até 06/09.
+
+**A MEDIÇÃO, feita antes de escrever a trava — e ela pegou a MESMA cegueira do `supabase.co`**
+
+```
+                              pacote CERTO      pacote ERRADO
+   grep /assets/  (ingênuo)        6                 6     ← VERDE CEGO
+   grep "/assets/ (com a aspa)     6                 0
+   o slug no pacote inteiro    0 arquivos        3 arquivos
+```
+
+A pergunta ingênua fica verde nos dois porque **`/central-compras-pbqph/assets/` contém
+`/assets/`**. É a segunda vez no mesmo dia que uma trava minha ia nascer cega, e a segunda vez que
+medir os dois lados antes de escrever matou o verde falso. **Isto não é sorte duas vezes: é o
+método.**
+
+**O ENSAIO — 5 casos, 5 certos, e os três portões acusando sozinhos**
+O roteiro é lido **de dentro do `deploy.yml`** e rodado com `bash -e`, como o GitHub roda —
+ensaiar uma cópia do roteiro não prova nada sobre o roteiro que vai rodar.
+
+```
+   pacote do github.io ················ para   (portão 1 de 3)
+   pacote de raiz, inteiro ············ passa
+   raiz + sobra do caminho antigo ····· para   (portão 2 de 3)
+   raiz SEM o CNAME ·················· para   (portão 3 de 3)
+   pacote de raiz de novo ············· passa
+```
+
+Cada portão foi sabotado **separadamente** de propósito: o primeiro a disparar esconde os outros,
+e trava com portão nunca exercitado é trava que ninguém viu funcionar.
+
+**O TERCEIRO PORTÃO NÃO FOI PEDIDO, E EU PUS**
+`base` de raiz e `CNAME` são **duas metades da mesma decisão**. Um pacote de raiz publicado **sem**
+CNAME cai no endereço antigo e dá tela branca igual — só que sem aviso nenhum, porque as outras
+duas travas estariam verdes. As duas metades viajam juntas ou não viajam.
+
+**⚠️ O QUE EU NÃO CONSEGUI PROVAR, e não vou fingir que provei**
+
+- **o ensaio no GitHub não alcança esta trava hoje.** Medido: `gh variable list` e `gh secret list`
+  voltam **vazios** — o Pedro ainda não digitou as duas variáveis do banco, e a primeira trava do
+  fluxo para **antes** do `build`. O ensaio prova o portão do banco; a trava do endereço fica sem
+  ser exercitada na máquina do GitHub até ele digitar;
+- **o registro de DNS não existe do meu lado.** Quem cria é o `Banco_de_Dados`, na Cloudflare, com
+  a palavra do Pedro. Eu não vi `compras.campisi.com.br` responder;
+- **a página abrindo em navegador de gente** — só depois de publicar;
+- **o certificado HTTPS**, que o GitHub só emite minutos a uma hora **depois** do DNS.
+
+**⚠️ A ORDEM DAS COISAS IMPORTA, e é do Pedro**
+Este commit **não publica nada**: está na `migracao-supabase`, e publicar quer dizer `main` (a
+trava de ramo da decisão 22). Mas no dia em que ele juntar os ramos, **o endereço que a equipe usa
+muda**. Se a `main` subir com `base` de raiz **antes** do DNS e do `Settings > Pages`, o site fica
+inalcançável até o DNS chegar. A sequência segura é: **DNS primeiro, `Custom domain` depois,
+juntar os ramos por último** — e `Enforce HTTPS` quando o GitHub liberar o certificado.
+
+**⚠️ E O ENSAIO LOCAL TEM UM PONTO CEGO QUE ELE MESMO NÃO ENXERGA**
+O Git avisou que `public/CNAME` viraria CRLF nesta máquina, e eu fui medir se a trava aguentava.
+O teste disse "aguenta". **O teste estava certo e a conclusão estava errada:** os bytes (`od -c`)
+mostram `\r\n` no arquivo, mas o `$(cat)` devolveu **22 caracteres** — o Git Bash do Windows
+**come o `\r` sozinho**. Na máquina do CI, que é Linux, o `\r` **fica**, e a trava daria vermelho
+num arquivo correto. Ou seja: **este portão não pode ser ensaiado aqui**, porque a diferença que
+ele mede não existe nesta máquina.
+
+Dois consertos, e nenhum deles confia no outro: a trava passa o `tr -d '\r'` antes de comparar, e
+o `.gitattributes` prende o `CNAME` em LF em toda máquina. **A lição é mais larga que o `\r`:**
+instrumento ensaiado na máquina errada não prova o que ele faz na máquina certa — e foi um aviso
+do Git, que era fácil de ignorar, que abriu isso.
+
+**O QUE ESTA DECISÃO NÃO RESOLVE**
+O crachá compartilhado (sessão em cookie no `.campisi.com.br`, para não digitar senha em cada
+software) é **código de produto** e continua congelado até 06/09. Por ora a pessoa digita a senha
+da Central uma vez por máquina e a sessão persiste.

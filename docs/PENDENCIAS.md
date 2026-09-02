@@ -121,7 +121,16 @@ mandou**: `core.sinais_de_vida` já tem o Correio escrevendo a cada 30 minutos e
 às 08:00, enquanto o gratuito só pausa com sete dias quietos. **O código que acorda já existe e é
 o próprio Correio.** E o **cadastro está lá**: a equipe não precisa digitar nada para começar.
 
-⚠️ **O endereço continua sem palavra dele**, e por isso o `base` do Vite **não foi tocado**.
+✅ **O endereço saiu do indefinido na mesma noite:** `compras.campisi.com.br`, decisão 145 do
+`CTO` — que **revogou** a ordem dele de mais cedo ("não toque no `base`") depois de medir que a
+zona `campisi.com.br` já está na Cloudflare. O `base` **foi tocado** por isso, e o pacote agora
+prova que sabe onde mora. Ver `PLANEJAMENTO.md`, decisão 23.
+
+⚠️ **O que sobrou deste item para o Pedro, e a ORDEM importa:** o registro de DNS (o
+`Banco_de_Dados` cria, com a palavra dele), depois `Settings > Pages > Custom domain =
+compras.campisi.com.br`, e **só então** juntar os ramos. Fora dessa ordem, a `main` sobe com
+`base` de raiz num endereço que ainda não existe, e o site fica inalcançável até o DNS chegar.
+`Enforce HTTPS` quando o GitHub liberar o certificado, minutos a uma hora depois do DNS.
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 

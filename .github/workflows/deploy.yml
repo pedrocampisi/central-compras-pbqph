@@ -94,10 +94,16 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      # VITE_BASE_PATH nao e do Pedro e nao vai em Settings: e fixo aqui, porque
+      # e consequencia do endereco, nao escolha por publicacao. Sem ele o `base`
+      # cai no padrao `/central-compras-pbqph/` -- certo para o github.io e
+      # ERRADO para dominio proprio: o navegador iria buscar
+      # compras.campisi.com.br/central-compras-pbqph/assets/... e nao acharia.
       - name: Build
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_BASE_PATH: '/'
         run: pnpm build
 
       # A trava de cima conferiu o que ENTROU. Esta confere o que SAIU — que é
@@ -118,6 +124,46 @@ jobs:
             exit 1
           fi
           echo "O endereco do banco esta dentro do pacote."
+
+      # Mesma familia da trava de cima: confere o que SAIU. A pergunta aqui e
+      # "este pacote sabe onde ele mora?".
+      #
+      # ⚠️ A PERGUNTA INGENUA FICA VERDE NOS DOIS PACOTES. Medido em 02/09,
+      # antes desta trava entrar: `grep /assets/` acha 6 ocorrencias no pacote
+      # CERTO e 6 no pacote ERRADO -- porque `/central-compras-pbqph/assets/`
+      # CONTEM `/assets/`. O que discrimina e a aspa colada: `"/assets/` da
+      # 6 x 0. Mesma cegueira do `supabase.co`, pega do mesmo jeito: testando a
+      # trava, e nao o programa.
+      - name: Provar que o pacote sabe onde mora (raiz, e nao github.io)
+        run: |
+          if ! grep -qE '"/assets/' dist/index.html; then
+            echo "::error::O index.html NAO aponta para /assets/ na raiz."
+            echo "::error::Quase sempre isso e VITE_BASE_PATH que nao chegou no passo Build."
+            exit 1
+          fi
+          if grep -rq 'central-compras-pbqph' dist/; then
+            echo "::error::Sobrou o caminho antigo do github.io dentro do pacote, nestes arquivos:"
+            grep -rl 'central-compras-pbqph' dist/
+            echo "::error::Publicar assim em compras.campisi.com.br da TELA BRANCA."
+            exit 1
+          fi
+          # Nao foi pedido, e eu pus: `base` de raiz e CNAME sao as duas metades
+          # da MESMA decisao. Pacote de raiz publicado SEM CNAME cai no endereco
+          # antigo e da tela branca igual, so que sem aviso nenhum. As duas
+          # metades viajam juntas ou nao viajam.
+          #
+          # O `tr -d` nao e frescura: um CNAME gravado no Windows vem com \r no
+          # fim. Aqui (Linux) o \r FICA e a trava daria vermelho num arquivo
+          # certo; no Git Bash do Windows o `$(cat)` come o \r sozinho, entao o
+          # ensaio local NAO consegue enxergar essa diferenca -- medido em
+          # 02/09, com `od -c`. Instrumento ensaiado na maquina errada nao prova
+          # o que faz na maquina certa.
+          if [ "$(tr -d '\r' < dist/CNAME 2>/dev/null)" != "compras.campisi.com.br" ]; then
+            echo "::error::O pacote saiu sem o CNAME certo -- confira public/CNAME."
+            echo "::error::Sem ele o GitHub Pages nao sabe o dominio deste pacote."
+            exit 1
+          fi
+          echo "Raiz confirmada: /assets/, zero caminho antigo, CNAME compras.campisi.com.br."
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
