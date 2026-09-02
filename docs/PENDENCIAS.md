@@ -13,11 +13,37 @@ fim.
 
 ## 🔴 Abertas
 
-### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
+### 1. O CI está VERMELHO, e espera a decisão de qual Node esta casa declara
+
+*Espera o `CTO`.* Aberta em 02/09/2026, na primeira execução do fluxo `CI` na história deste
+repositório (`33620657411`, 22 segundos, ramo `migracao-supabase`).
+
+```
+   .nvmrc declara ..... Node 20.11.0
+   o vitest precisa ... util.styleText, que só existe do Node 20.12.0 em diante
+   resultado .......... "Run tests" reprova antes do primeiro teste rodar
+```
+
+**O ambiente que esta casa declara não consegue rodar os testes desta casa** — e é assim desde que
+o `.nvmrc` foi escrito. Nunca apareceu porque o CI nunca rodava, porque eu rodo em 24.14.1, e
+porque o fluxo antigo dizia `'20'` (a 20 mais recente), o que ficaria **verde por sorte** enquanto
+o `.nvmrc` seguia quebrado.
+
+**Não foi consertado de propósito.** Qual Node declarar é escolha — 20.19.x mantém o LTS 20 e
+devolve a divergência 20 × 24; 24.14.1 faz a minha máquina e a do CI serem a mesma. A carta com o
+custo dos dois lados está em
+[`Enviados/`](Enviados/2026-09-02_de_Ordem_de_Compra_para_CTO_o-ci-rodou-pela-primeira-vez-e-saiu-vermelho-no-node-que-eu-mesma-declarei.md).
+
+⚠️ **Achado que fica junto:** `deploy.yml` — o fluxo que publica o site que a equipe usa — **ainda
+tem a versão digitada à mão** (`node-version: '20'`, `pnpm 9`). É o único lugar da casa onde ela
+não vem de uma fonte só. Não mexi: não teria como rodar para conferir, e ele é o botão do Pedro.
+
+
+### 2. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
-### 2. A camada que fala com o banco não tem verificação nenhuma
+### 3. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
 
@@ -37,7 +63,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 3. Não existe conferência automática dos documentos
+### 4. Não existe conferência automática dos documentos
 
 *Meu.* Vindo do caderno de convenção antiga encerrado em 28/08/2026.
 
@@ -45,7 +71,7 @@ O `Banco_de_Dados` tem um programa que reprova documento fora do índice e link 
 (`conferir_tudo.py`). Aqui a checagem é manual, e foi feita uma vez, em 19/08. **Sem ela a
 organização dura poucas semanas** — a observação é do próprio Banco, e vale para esta casa.
 
-### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 5. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
