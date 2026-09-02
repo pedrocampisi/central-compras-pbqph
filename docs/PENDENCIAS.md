@@ -13,37 +13,11 @@ fim.
 
 ## 🔴 Abertas
 
-### 1. O CI está VERMELHO, e espera a decisão de qual Node esta casa declara
-
-*Espera o `CTO`.* Aberta em 02/09/2026, na primeira execução do fluxo `CI` na história deste
-repositório (`33620657411`, 22 segundos, ramo `migracao-supabase`).
-
-```
-   .nvmrc declara ..... Node 20.11.0
-   o vitest precisa ... util.styleText, que só existe do Node 20.12.0 em diante
-   resultado .......... "Run tests" reprova antes do primeiro teste rodar
-```
-
-**O ambiente que esta casa declara não consegue rodar os testes desta casa** — e é assim desde que
-o `.nvmrc` foi escrito. Nunca apareceu porque o CI nunca rodava, porque eu rodo em 24.14.1, e
-porque o fluxo antigo dizia `'20'` (a 20 mais recente), o que ficaria **verde por sorte** enquanto
-o `.nvmrc` seguia quebrado.
-
-**Não foi consertado de propósito.** Qual Node declarar é escolha — 20.19.x mantém o LTS 20 e
-devolve a divergência 20 × 24; 24.14.1 faz a minha máquina e a do CI serem a mesma. A carta com o
-custo dos dois lados está em
-[`Enviados/`](Enviados/2026-09-02_de_Ordem_de_Compra_para_CTO_o-ci-rodou-pela-primeira-vez-e-saiu-vermelho-no-node-que-eu-mesma-declarei.md).
-
-⚠️ **Achado que fica junto:** `deploy.yml` — o fluxo que publica o site que a equipe usa — **ainda
-tem a versão digitada à mão** (`node-version: '20'`, `pnpm 9`). É o único lugar da casa onde ela
-não vem de uma fonte só. Não mexi: não teria como rodar para conferir, e ele é o botão do Pedro.
-
-
-### 2. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
+### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
-### 3. A camada que fala com o banco não tem verificação nenhuma
+### 2. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
 
@@ -63,7 +37,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 4. Não existe conferência automática dos documentos
+### 3. Não existe conferência automática dos documentos
 
 *Meu.* Vindo do caderno de convenção antiga encerrado em 28/08/2026.
 
@@ -71,7 +45,7 @@ O `Banco_de_Dados` tem um programa que reprova documento fora do índice e link 
 (`conferir_tudo.py`). Aqui a checagem é manual, e foi feita uma vez, em 19/08. **Sem ela a
 organização dura poucas semanas** — a observação é do próprio Banco, e vale para esta casa.
 
-### 5. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
@@ -82,7 +56,43 @@ botão que a virada aperta**, e ele é do Pedro.
 
 ---
 
+### 5. `deploy.yml` é o único lugar da casa com a versão digitada à mão
+
+*Proposta pronta, para a retomada de **06/09/2026**.* Desenho aprovado pelo `CTO` em 02/09.
+
+O `ci.yml` já lê o Node do `.nvmrc` e o pnpm do `packageManager`. O `deploy.yml` ainda diz
+`node-version: '20'` e `pnpm 9`, escritos à mão — exatamente o arranjo que deixou o `.nvmrc`
+quebrado por semanas sem ninguém saber (decisão 20).
+
+**Fica por último de propósito:** é o fluxo que publica o site que a equipe usa, não há como
+conferir sem publicar, e publicar é botão do Pedro.
+
+---
+
 ## ✅ Fechadas (registro)
+
+### O CI desta casa passou a existir, e o primeiro verde não é meu — 02/09/2026
+
+```
+   antes ····· 16 execuções na história do repositório, 16 de publicação, 0 de CI
+   agora ····· o fluxo CI dispara em push de qualquer ramo
+```
+
+`ci.yml` disparava só em `pull_request` para a `main`, e **nunca houve pull request neste
+repositório**. O arquivo existia, era lido por quem passasse, e nunca tinha executado uma vez. Os
+"76 testes verdes" que esta casa escreveu em três cartas eram verdes **numa máquina só: a minha.**
+
+A primeira execução real saiu **vermelha em 22 segundos** — e foi ela que achou o defeito: o
+`.nvmrc` declarava Node 20.11.0, que não tem `util.styleText` e não consegue carregar o `vitest`.
+**O ambiente que esta casa declarava não rodava os testes desta casa.** Corrigido pela decisão 20:
+
+```
+   33620657411 ···· VERMELHO ···· .nvmrc 20.11.0
+   33621122253 ···· VERDE ······· .nvmrc 24.14.1 · node v24.14.1 · Tests 76 passed (76)
+```
+
+Ordem do `CTO` pela régua da decisão 129 dele: congelamento veta frente nova, não conserto de
+instrumento. **Zero linhas de código do produto foram tocadas.**
 
 ### Perícia P0-02: não é minha — é o item 13 do `Banco_de_Dados` — 02/09/2026
 

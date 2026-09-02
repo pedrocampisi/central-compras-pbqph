@@ -606,3 +606,52 @@ assim que o erro morreu em menos de uma hora, em vez de virar fato repetido.
 Ela já estava na `Devolucoes` de duas casas quando o erro apareceu. Vale o que já valia aqui:
 **carta que saiu não se corrige por dentro** — a correção sai como carta nova, e o par fica no
 registro mostrando o erro e o conserto. Esconder o erro reescrevendo é pior que o erro.
+
+---
+
+## Decisão 20 — a máquina que mede é a mesma máquina em que eu trabalho · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+
+```
+   .nvmrc ········· 20.11.0      →  24.14.1
+   engines.node ··· ">=20.11.0"  →  ">=24"
+```
+
+O CI baixa o Node pelo `.nvmrc` e o pnpm pelo `packageManager`. **A versão não está escrita em
+lugar nenhum duas vezes** — nem no fluxo, nem à mão.
+
+**POR QUÊ**
+Porque a alternativa devolvia a doença. Manter o Node 20 no CI enquanto eu trabalho no 24 é ter
+duas máquinas que podem discordar **sem ninguém medindo na diferença** — a lição 2 do catálogo do
+`CTO`, que este exame acabou de curar. E não havia argumento de estabilidade do outro lado: **o
+Node desta casa é ferramenta de construção, não de produção.** O usuário recebe página estática e
+nunca roda Node.
+
+**A PROVA, NOS DOIS SENTIDOS — e é ela que faz esta decisão valer**
+
+```
+   .nvmrc 20.11.0 ···· execução 33620657411 ···· VERMELHO em 22s
+                       SyntaxError: 'node:util' não exporta 'styleText'
+                       (styleText só existe do Node 20.12.0 em diante)
+
+   .nvmrc 24.14.1 ···· execução 33621122253 ···· VERDE em 36s
+                       node: v24.14.1 · pnpm v10.33.3 · Tests 76 passed (76)
+```
+
+**O 20.11.0 nunca conseguiu rodar os testes desta casa** — desde o dia em que o `.nvmrc` foi
+escrito. Ninguém soube porque o CI nunca rodava (decisão registrada na carta do exame), porque eu
+rodo em 24, e porque o fluxo antigo dizia `'20'`: baixaria a 20 mais recente e ficaria **verde por
+sorte**, numa versão que ninguém tinha declarado.
+
+**POR QUE O `engines` FOI JUNTO, sem ordem explícita**
+Deixar `">=20.11.0"` seria manter no arquivo **uma frase que a máquina já tinha desmentido**. O
+piso declarado passa a ser o único que alguém mede. O 20.12+ talvez funcione — **ninguém mede**, e
+esta casa não declara o que não mede (decisão 19).
+
+**O QUE FICA DE FORA, DECLARADO**
+`deploy.yml` — o fluxo que publica o site que a equipe usa — **ainda tem a versão digitada à mão**
+(`node-version: '20'`, `pnpm 9`). É o único lugar da casa onde ela não vem de uma fonte só. Não foi
+tocado porque não há como rodá-lo para conferir sem publicar, e publicar é botão do Pedro.
+**Proposta pronta para a retomada de 06/09**, com o desenho já aprovado pelo `CTO`: ele passa a ler
+o `.nvmrc` e o `packageManager`, como o CI.
