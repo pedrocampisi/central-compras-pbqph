@@ -50,7 +50,40 @@ e diferença sem motivo escrito é armadilha para quem chegar depois.
 **Não foi consertado de propósito:** é código de produto, e produto está congelado (decisão 137
 do `CTO`: o congelamento mede o que o usuário vê).
 
-### 3. A camada que fala com o banco não tem verificação nenhuma
+### 3. A minha conferência de segurança é de mão, e não declara o que confunde
+
+*Minha.* Anotada em **02/09/2026**, no fim do dia, por uma régua que o `CTO` passou **por
+campainha** — e campainha não mora em casa nenhuma, por isso está escrita aqui.
+
+Antes de **cada** publicação deste dia eu rodei uma varredura de segurança no que ia subir:
+e-mail de terceiro, CPF, CNPJ, chave, endereço de banco. Ela nunca deixou passar nada. **E ela
+não é peça desta casa:** é um comando que eu escrevo na hora, diferente a cada vez, que ninguém
+pode rodar, repetir, conferir nem sabotar. **Instrumento que só existe dentro de uma conversa
+morre com ela** — é o que eu mesma escrevi na carta do exame das oito lições, sobre os meus
+detectores avulsos.
+
+E ela tem um defeito medido, na última corrida de hoje: acusou `sb_secret_` em três arquivos.
+Eram **as três frases que dizem que a chave secreta nunca entra ali**. O achado morreu no meu
+olho, não na ferramenta.
+
+> **A régua, que é desconfortável:** quanto melhor a casa documenta uma regra, mais o instrumento
+> a acusa — **documento que proíbe algo contém, por obrigação, as palavras do que proíbe.** No
+> mesmo dia a `Central_Email` bateu no mesmo defeito sem saber de mim: uma trava dela procurava
+> `mark_read` e `move`, e pegou a frase impressa que diz *"não marca, não move"*.
+
+**O que fazer quando ela virar peça** (não agora — é construção, e produto está congelado):
+
+```
+   guarda sobre CÓDIGO ····· lê a árvore do arquivo, não o texto. Foi assim que a
+                             Central_Email consertou a dela
+   guarda sobre TEXTO ······ declara no topo que CONFUNDE MENÇÃO COM USO, e não sai
+                             verde por falta de achado nem vermelha por excesso: pede olho
+```
+
+**Enquanto isso vale o que sempre valeu:** ela continua rodando à mão antes de cada publicação, e
+**todo achado dela é conferido um a um** antes de virar número em qualquer lugar.
+
+### 4. A camada que fala com o banco não tem verificação nenhuma
 
 > **Verde, nesta casa, quer dizer "o domínio está certo" — não "o programa grava certo".**
 
@@ -70,7 +103,7 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 4. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 5. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
