@@ -24,9 +24,12 @@ foram gastos em 13/08 sem OC sobrevivente, que é o `reservar_numero_oc` **funci
 projetado**: rascunho abandonado queima número, e é isso que impede dois computadores de emitirem
 a mesma OC.
 
-⚠️ **Isto não fecha o item.** Prova que a numeração do banco funciona; **não** prova que esta tela
-emite. A próxima OC de verdade sairia **2026/008**, e se a contagem começa daí ou do zero é
-**palavra do Pedro** — o número vai no papel que chega ao fornecedor.
+✅ **O Pedro decidiu em 02/09/2026:** a primeira OC de verdade sai **`2026/008`**. As 004 e 005
+ficam como estão, os números 006 e 007 ficam queimados, **ninguém limpa nada**.
+
+⚠️ **Isto não fecha o item.** O que estava em aberto do lado do banco fechou; o que continua aberto
+é o que sempre foi meu: **provar na tela** que esta versão emite. A evidência de hoje prova que a
+numeração do banco funciona, **não** que esta tela funciona.
 
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
@@ -49,6 +52,13 @@ e diferença sem motivo escrito é armadilha para quem chegar depois.
 
 **Não foi consertado de propósito:** é código de produto, e produto está congelado (decisão 137
 do `CTO`: o congelamento mede o que o usuário vê).
+
+**Uma segunda coisa da mesma família entra aqui**, medida pelo `CTO` em 02/09: se o Correio da
+plataforma for desligado por semanas, o banco gratuito pode pausar — e **a tela mostra o erro do
+banco cru**. Hoje não é risco vivo (o Correio escreve a cada 30 minutos, o backup todo dia às
+08:00, e o gratuito só pausa com **sete dias** quietos), mas é o mesmo assunto: *o que a pessoa vê
+quando a camada falha*. A decisão 5 já disse que recusa conhecida vira frase de gente; **banco
+pausado ainda não é uma delas.**
 
 ### 3. A minha conferência de segurança é de mão, e não declara o que confunde
 
@@ -103,7 +113,15 @@ provaram que a bateria verde de hoje não os pega.
 **E o caminho está decidido junto: ensaio contra o banco de ensaio de verdade, nunca dublê fiel
 inventado.** Dublê fiel de banco é a armadilha seguinte; banco de ensaio não finge.
 
-### 5. Virada: Supabase gratuito → pago, migração dos dados reais, endereço do piloto
+### 5. Virada: migração dos dados reais e endereço do piloto
+
+✅ **Duas partes deste item fecharam pela palavra do Pedro em 02/09/2026.** O **plano do banco
+continua no gratuito** — e o `CTO` mediu antes de mandar construir "código que acorda", e **não
+mandou**: `core.sinais_de_vida` já tem o Correio escrevendo a cada 30 minutos e o backup todo dia
+às 08:00, enquanto o gratuito só pausa com sete dias quietos. **O código que acorda já existe e é
+o próprio Correio.** E o **cadastro está lá**: a equipe não precisa digitar nada para começar.
+
+⚠️ **O endereço continua sem palavra dele**, e por isso o `base` do Vite **não foi tocado**.
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
