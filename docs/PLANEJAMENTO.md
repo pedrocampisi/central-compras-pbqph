@@ -1103,3 +1103,67 @@ Eu escrevi `pnpm deploy` em sete lugares. **`pnpm deploy` é comando EMBUTIDO do
 workspace) e não roda o roteiro desta casa: o certo é `pnpm run deploy`, com o `run`. Corrigido em
 todos os documentos vivos e no `wrangler.jsonc`, com o motivo escrito — senão a próxima sessão
 "conserta" de volta.
+
+---
+
+## Decisão 26 — `compras.campisi.com.br` está no ar, e o endereço de ensaio morreu de propósito · 03/09/2026
+
+**O QUE FOI FEITO, com a palavra do Pedro na janela**
+`routes` com `custom_domain` entrou no `wrangler.jsonc` e a publicação subiu. O Cloudflare criou o
+DNS e o certificado sozinho.
+
+**A MEDIÇÃO DOS DOIS ENDEREÇOS — e medir os dois é a régua, não zelo extra**
+
+```
+   https://compras.campisi.com.br ·········· abre, HTTPS válido, tela de entrada
+        DNS ····························· 172.67.168.65 + dois AAAA (Cloudflare)
+        chamada ao banco ················· /auth/v1/token
+        a recusa ························ "E-mail ou senha incorretos."
+   https://compras.campisi.workers.dev ····· 404  ← de propósito, ver abaixo
+```
+
+A régua veio da `Central`, que pagou por ela no mesmo dia: **"medir só o que você acabou de fazer
+é o jeito mais limpo de não ver o que acabou de quebrar."**
+
+**⚠️ `workers_dev: false` É ESCOLHA ESCRITA, E NÃO O PADRÃO ACONTECENDO**
+Quando `routes` existe, o wrangler **desliga o `.workers.dev` por conta própria** e avisa no meio
+da saída do deploy, onde é fácil não ler. A `Central` descobriu isso levando 404 por alguns
+minutos no endereço dela, em 03/09.
+
+Aqui a escolha é **desligar**, e por um motivo: `compras.campisi.workers.dev` era **ensaio**, e
+ensaio que fica no ar vira endereço que alguém salva. Um endereço a menos para confundir com o de
+verdade — e esta casa já tem um problema desses vivo (a pendência 6).
+
+**O corte não abriu janela sem endereço** porque **ninguém usa nenhum dos dois ainda**: a equipe só
+chega em `compras.campisi.com.br` depois de juntar os ramos e trocar os atalhos. Por isso deu para
+fazer numa publicação só. Se alguém já estivesse usando, seriam duas: liga o novo, confere, depois
+desliga o velho.
+
+**⚠️ O SUSTO DA MEDIÇÃO, QUE ERA O MEU INSTRUMENTO E NÃO O SITE**
+No endereço novo, o formulário de entrada parecia **não fazer nada**: nenhuma chamada ao banco,
+nenhuma mensagem. Isso tem cara de "o site não alcança o banco", que seria o pior desfecho
+possível de uma publicação.
+
+Era o contrário: **o formulário nunca era enviado.** A ferramenta que eu usava escreve o valor
+dentro do campo **sem avisar o React**, então o programa via os campos vazios e não chamava nada.
+Quando o preenchimento passou a disparar os eventos que uma pessoa dispara ao digitar, a chamada
+saiu e a frase apareceu.
+
+**A lição é a de ontem com roupa nova** (`instrumento ensaiado na máquina errada não prova o que
+faz na máquina certa`): **instrumento que não faz o que uma pessoa faz não mede o que uma pessoa
+vive.** E o modo de falhar é traiçoeiro — ele produz *silêncio*, que se parece com defeito grave.
+Se eu tivesse parado no primeiro resultado, teria escrito na carta que a publicação subiu quebrada.
+
+**O QUE CONTINUA QUEBRADO, e é o de sempre**
+O erro `Unexpected token '<'` continua no console, nos dois endereços: é a **pendência 7**, o PWA
+que nunca foi gerado. Não muda com o domínio.
+
+**UMA OBSERVAÇÃO NOVA, QUE NÃO É DEFEITO MAS É INFORMAÇÃO**
+No endereço próprio o Cloudflare injeta um pedido para `/cdn-cgi/rum` — é a medição de audiência
+dele, ligada na zona, e **não** é código desta casa. Não existia no `.workers.dev`. Fica escrito
+para ninguém achar, daqui a seis meses, que este aplicativo passou a mandar dado para algum lugar
+por conta própria. Se o Pedro não quiser, desliga-se na Cloudflare, e é decisão dele.
+
+**O QUE AINDA NÃO FOI PROVADO**
+Emitir uma OC. Exige estar dentro, e eu não tenho senha nem uso a de ninguém. **Quem fecha é uma
+pessoa com conta** — está na pendência 1.

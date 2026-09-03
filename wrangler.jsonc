@@ -44,9 +44,25 @@
     // A linha fica porque no dia em que existir, a falta dela aparece como
     // 404 no navegador de uma pessoa, e nao aqui.
     "not_found_handling": "single-page-application"
-  }
+  },
 
-  // SEM `routes` de proposito. O endereco proprio (compras.campisi.com.br)
-  // entra so depois do ensaio no .workers.dev abrir e ser medido, e com a
-  // palavra do Pedro. Ver PLANEJAMENTO.md, decisao 24.
+  // O endereco proprio. Entrou em 03/09/2026, DEPOIS de o ensaio em
+  // compras.campisi.workers.dev abrir e ser medido, e com a palavra do Pedro.
+  // O Cloudflare cria o DNS e o certificado sozinho a partir daqui.
+  "routes": [{ "pattern": "compras.campisi.com.br", "custom_domain": true }],
+
+  // ⚠️ ESCOLHA EXPLICITA, e nao o padrao. Quando `routes` existe, o wrangler
+  // DESLIGA o endereco .workers.dev por conta propria e avisa no meio da saida
+  // do deploy -- a Central descobriu isso em 03/09 levando 404 por alguns
+  // minutos no endereco dela.
+  //
+  // Aqui a escolha e `false`, e de proposito: compras.campisi.workers.dev era
+  // ENSAIO, e ensaio que continua no ar vira endereco que alguem salva. Um
+  // endereco a menos para a equipe confundir com o de verdade.
+  //
+  // O corte nao machuca ninguem HOJE porque ninguem usa nenhum dos dois: a
+  // equipe so chega em compras.campisi.com.br depois de juntar os ramos e
+  // trocar os atalhos (pendencia 6). Por isso da para fazer numa publicacao
+  // so, sem janela de ninguem sem endereco.
+  "workers_dev": false
 }

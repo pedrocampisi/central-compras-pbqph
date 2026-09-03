@@ -149,11 +149,12 @@ no endereço próprio; o endereço `compras.campisi.com.br` **não muda**, muda 
 
 ```
    ✅ preparado, sem publicar (commit de 02/09)
-      1  ensaio: `pnpm run deploy` → compras.campisi.workers.dev
-            ⚠️ sai desta máquina: só com a palavra do Pedro na janela dele
-      2  medir no navegador: tela abre, login fala com o banco, PDF sai
-      3  produção: `routes` com o endereço próprio + `pnpm run deploy` de novo
-            o Cloudflare cria DNS e certificado sozinho
+   ✅ 1  ensaio em compras.campisi.workers.dev ····· 03/09, palavra do Pedro
+   ✅ 2  medido: tela abre, alcança o banco, recusa traduzida
+            (o PDF NÃO foi medido: exige estar dentro — pendência 1)
+   ✅ 3  produção: compras.campisi.com.br NO AR ···· 03/09, palavra do Pedro
+            HTTPS válido, DNS na Cloudflare, e o endereço de ensaio
+            desligado de propósito (`workers_dev: false`) — decisão 26
       4  a virada: juntar os ramos
       5  trocar os atalhos nas máquinas das pessoas   ← ver o item do atalho
 ```

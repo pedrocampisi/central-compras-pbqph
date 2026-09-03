@@ -34,7 +34,12 @@ sistema antigo**. O estado da migração está em
 
 ## O que o sistema faz
 
-A Central de Compras é um aplicativo web (instalável como PWA) que ajuda a Campisi a **criar, controlar e imprimir ordens de compra** dentro do padrão PBQP-H. Você cadastra fornecedores, obras, emitentes (a empresa que assina a OC) e usa o catálogo de 20 categorias ECR para classificar os itens. Cria a OC, digita os itens (ou deixa a IA extrair de um PDF do Sigescom), gera o PDF padrão Campisi e salva tudo num único arquivo JSON na sua pasta do OneDrive. O PDF vai pra pasta da obra; uma cópia rotativa do JSON inteiro vai para uma pasta de backups.
+> ⚠️ **O modo instalável está fora do ar, e nunca funcionou em produção.** Medido em 03/09/2026:
+> os dois arquivos que fazem o aplicativo ser instalável e abrir sem internet não são gerados pela
+> montagem — nem hoje, nem no site publicado. Enquanto isso não fechar, **este documento não
+> promete instalação nem uso offline**. Ver `PENDENCIAS.md`, item 7.
+
+A Central de Compras é um aplicativo web que ajuda a Campisi a **criar, controlar e imprimir ordens de compra** dentro do padrão PBQP-H. Você cadastra fornecedores, obras, emitentes (a empresa que assina a OC) e usa o catálogo de 20 categorias ECR para classificar os itens. Cria a OC, digita os itens (ou deixa a IA extrair de um PDF do Sigescom), gera o PDF padrão Campisi e salva tudo num único arquivo JSON na sua pasta do OneDrive. O PDF vai pra pasta da obra; uma cópia rotativa do JSON inteiro vai para uma pasta de backups.
 
 ## Diagrama de fluxo principal
 
@@ -110,7 +115,7 @@ flowchart TD
 
 **Responsável:** `index.html` → `src/main.tsx` → `src/App.tsx`.
 
-**O que precisa para funcionar:** conexão de internet (na primeira vez; depois o PWA roda offline) e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
+**O que precisa para funcionar:** conexão de internet **sempre** (o modo offline não está no ar — item 7 das pendências) e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
 
 **O que pode dar errado:** se o Service Worker do PWA está com versão antiga em cache, você pode ver a tela de antes. Solução: `Ctrl+Shift+R` para forçar atualização. Se o navegador for Firefox/Safari, o app abre mas a parte de salvar arquivo não funciona.
 
