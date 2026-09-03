@@ -71,10 +71,12 @@
     background: transparent;
   }
   .passos h2 { font-size: .95rem; text-transform: uppercase; letter-spacing: .06em;
-               color: var(--texto-suave); margin: 0 0 12px; }
-  ol { margin: 0; padding-left: 20px; }
-  li { margin-bottom: 10px; }
-  li:last-child { margin-bottom: 0; }
+               color: var(--texto-suave); margin: 0 0 16px; }
+  .caso { margin: 0 0 18px; }
+  .caso:last-child { margin-bottom: 0; }
+  .caso .rotulo { font-weight: 700; margin: 0 0 4px; }
+  .caso p { margin: 0; color: var(--texto-suave); }
+  .caso.novo { padding-top: 16px; border-top: 1px solid var(--borda); }
   .rodape { margin: 26px 0 0; font-size: .9rem; color: var(--texto-suave); }
   .marca { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
   .marca svg { flex: none; }
@@ -102,13 +104,17 @@
   <a class="acao" href="https://compras.campisi.com.br/">compras.campisi.com.br</a>
 
   <div class="passos">
-    <h2>Na primeira vez que você entrar</h2>
-    <ol>
-      <li>Clique em <strong>“Primeiro acesso — definir minha senha”</strong>. Sua conta já existe,
-          mas a senha ainda não — você mesmo escolhe.</li>
-      <li>Use o <strong>seu e-mail da empresa</strong>, o mesmo de sempre.</li>
-      <li>Depois disso, é só entrar com e-mail e senha, como em qualquer sistema.</li>
-    </ol>
+    <h2>Como entrar</h2>
+    <div class="caso">
+      <p class="rotulo">Você já usa a Central de Compras?</p>
+      <p>Entre com o <strong>mesmo e-mail e a mesma senha</strong> de sempre. É a mesma conta —
+        você não precisa cadastrar nada de novo.</p>
+    </div>
+    <div class="caso novo">
+      <p class="rotulo">Nunca definiu uma senha?</p>
+      <p>Clique em <strong>“Primeiro acesso — definir minha senha”</strong> e use o seu e-mail da
+        empresa. Isso só vale para quem o administrador acabou de cadastrar.</p>
+    </div>
   </div>
 
   <p class="rodape">

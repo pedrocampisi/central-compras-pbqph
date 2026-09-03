@@ -217,10 +217,23 @@ das pessoas — **não faço nada disso sem a palavra dele.**
 [`aviso-endereco-antigo/index.html`](../aviso-endereco-antigo/index.html). Uma página só, sem
 dependência nenhuma, no padrão visual da casa (uma ação laranja, ícone desenhado, sem animação).
 
-Ela diz três coisas, e a terceira é a que evita o "o sistema novo não funciona" do primeiro dia:
-o endereço mudou, qual é o novo, e **que cada pessoa precisa usar "Primeiro acesso — definir minha
-senha"** antes de conseguir entrar. Isso saiu da própria tela de entrada, que avisa que a conta é
-criada pelo administrador mas a senha é escolhida por quem usa.
+Ela diz o endereço novo e **separa dois caminhos de entrada** — a correção veio do `CTO` em
+03/09, medida por ele na produção e conferida por mim:
+
+```
+   quem já usa a Central ····· MESMO e-mail, MESMA senha. Não faz "primeiro acesso".
+   conta nova (sem senha) ···· "Primeiro acesso — definir minha senha".
+```
+
+**Por quê:** os dois apps usam o **mesmo projeto Supabase de produção** (mesmo `auth.users`),
+então a senha de uma pessoa é a mesma nos dois — não por login automático (o crachá compartilhado
+**continua congelado**, a pessoa digita e-mail e senha em cada app), mas por ser o mesmo cadastro.
+Medido pelo `CTO`: das contas que existem hoje, **todas já têm senha** — ou seja, "primeiro
+acesso" na prática só serve para conta que o administrador criar dali para frente.
+
+**Eu confiri por conta própria** que o site no ar (`compras.campisi.com.br`) liga no projeto de
+produção, e não no de ensaio: disparei um login na tela e o host da chamada bate com o ref de
+produção. Sem isso, a frase sobre senha estaria escrita no escuro.
 
 **Os dois caminhos para publicá-la, e nenhum é automático:**
 
