@@ -1,0 +1,48 @@
+// Como este aplicativo vai para o ar.
+//
+// POR QUE CLOUDFLARE E NAO GITHUB PAGES. Palavra do Pedro em 02/09/2026,
+// confirmada na janela dele: tudo o mais da plataforma mora no Cloudflare, e
+// nao ha motivo para este software morar sozinho em outro lugar. A escolha
+// anterior pelo Pages era inercia -- era o que esta casa ja tinha.
+//
+// POR QUE WORKER E NAO PAGES DO CLOUDFLARE. Medido na Central em 11/08/2026:
+// a conta recusa criar projeto Pages ("user email must been verified",
+// code 8000077), enquanto o mesmo login cria KV na mesma conta. O bloqueio e
+// do produto Pages, nao da conta. E o proprio Cloudflare parou de recomendar
+// Pages para site novo, apontando Workers com assets estaticos.
+//
+// SEM `main`: nao existe codigo de servidor aqui. Este Worker so entrega os
+// arquivos de `dist/`, igual o Pages fazia. Copiado do wrangler.jsonc da
+// Central, que ja esta no ar por este caminho.
+//
+// USO
+//   pnpm deploy       monta, CONFERE o pacote e sobe   <- e o caminho certo
+//   wrangler deploy   sobe o que estiver em dist/, sem conferir nada
+//
+// ⚠️ `wrangler deploy` e ato que sai desta maquina. So roda com a palavra do
+// Pedro, dita na janela dele -- nunca por carta, nunca por decisao de agente.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // O nome vira o comeco do endereco de ensaio: `compras.campisi.workers.dev`.
+  // A conta e `campisi`, entao `compras` e nao `central-compras-pbqph`: evita o
+  // redundante e ja tem a forma do endereco proprio que a gente quer.
+  "name": "compras",
+  "compatibility_date": "2026-09-02",
+
+  "assets": {
+    "directory": "./dist",
+
+    // ⚠️ Isto aqui e SEGURO, e nao necessidade -- e a diferenca importa para
+    // quem ler depois. Esta casa nao tem roteador de cliente (conferido em
+    // 02/09: nenhum `react-router` nas dependencias, a tela e uma so, com
+    // estado interno), entao hoje nao existe endereco interno para recarregar.
+    // A linha fica porque no dia em que existir, a falta dela aparece como
+    // 404 no navegador de uma pessoa, e nao aqui.
+    "not_found_handling": "single-page-application"
+  }
+
+  // SEM `routes` de proposito. O endereco proprio (compras.campisi.com.br)
+  // entra so depois do ensaio no .workers.dev abrir e ser medido, e com a
+  // palavra do Pedro. Ver PLANEJAMENTO.md, decisao 24.
+}

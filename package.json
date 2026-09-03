@@ -17,6 +17,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "conferir": "node scripts/conferir-documentos.js",
+    "conferir:pacote": "node scripts/conferir-pacote.js",
+    "deploy": "pnpm build && pnpm conferir:pacote && wrangler deploy",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -49,6 +51,7 @@
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",
     "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wrangler": "4.128.0"
   }
 }

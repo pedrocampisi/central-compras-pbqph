@@ -310,7 +310,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 | `CACHE_KEY` | `services/storage/cache.ts` | `central-compras-cache-v1` | Mudar perde cache |
 | `STATUS_OC` | `domain/constants.ts` | `['rascunho','emitida','entregue','cancelada']` | Serialização — mudar exige migration |
 | `UN_PADRAO` | idem | 12 unidades | UN_MAP em `extractItems.ts` mapeia variações p/ esses valores |
-| `base` | `vite.config.ts` | `/central-compras-pbqph/` em qualquer build (`command === 'build'`), `/` em dev. Override por `VITE_BASE_PATH`. | Mudar nome do repo no GH exige atualizar (ou exportar `VITE_BASE_PATH`) |
+| `base` | `vite.config.ts` | `/` sempre, em dev e em build | Era `/central-compras-pbqph/` (subendereço do GitHub Pages) até 02/09/2026. O Pages saiu, o subendereço morreu e a variável `VITE_BASE_PATH` saiu junto. `scripts/conferir-pacote.js` impede o subendereço de voltar sem ninguém ver |
 
 ## 5. Fluxo de dados (rastreio do `data`)
 
@@ -353,7 +353,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 | Trocar modelo de IA | `services/ai/openRouterClient.ts#MODEL` (e revisar `MAX_TOKENS` se trocar família) |
 | Mudar layout do PDF | `services/pdf/generateOcPdf.ts` (paridade visual com legado em `legacy/CentralCompras-PBQPH.html` linhas 1637-1830) |
 | Nova feature/aba | criar `src/features/<nome>/` + adicionar em `App.tsx#NAV_*` + `TabId` em `useUiStore` + render condicional no shell |
-| Mudar URL prod | `vite.config.ts#base` + `start.bat` (URL hardcoded) + `.github/workflows/deploy.yml` |
+| Mudar URL prod | `wrangler.jsonc#routes` (endereço próprio) + `start.bat` (URL hardcoded) + `SUBENDERECO_MORTO` em `scripts/conferir-pacote.js` se o nome antigo mudar. O `base` do Vite **não** entra mais nessa lista: ele é `/` e fica |
 | Novo schema Zod | `domain/schemas/data.schema.ts` (sem throw — todos os campos têm `.default()`) |
 
 ## 8. Inconsistências conhecidas (avisos)
@@ -365,6 +365,6 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 - PDF worker assume path `/assets/pdfjs/pdf.worker.min.mjs` no build; alterar `assetsDir` do Vite quebra OCR de PDFs importados.
 - `OpenRouter API key` é gravada em texto puro em `config.openrouter_api_key` no JSON — input em `ConfigPage` já mascara (password) e desativa autocomplete/spellcheck/gerenciadores de senha; tratar arquivo (e backups) como sensível.
 - ~~`DashboardPage.tsx` e `CatalogoPage.tsx` têm comentários `TODO Fase 7`.~~ **Resolvido:** comentários atualizados; implementações estavam completas.
-- ~~Build local sem env `GITHUB_ACTIONS` gera `dist/` com base `/`.~~ **Resolvido:** `vite.config.ts` agora deriva o base de `command === 'build'` (qualquer build → `/central-compras-pbqph/`); override via `VITE_BASE_PATH=/`.
+- ~~Build local sem env `GITHUB_ACTIONS` gera `dist/` com base `/`.~~ **Sem objeto desde 02/09/2026:** o subendereço saiu com o GitHub Pages, o base é `/` em todo build, e não há mais nada que possa divergir.
 - Auto-save (`useAutoSave`, 800ms) **só grava no localStorage** — perceptível para o operador. Persistência no JSON só ocorre via Ctrl+S / botão Salvar.
 - Backups: dependem de pasta escolhida em Configurações. Quando ausente, `ConfigPage` agora mostra um banner amarelo de aviso explícito acima do seletor.

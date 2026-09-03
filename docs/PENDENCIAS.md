@@ -45,9 +45,10 @@ O `client.ts` estoura na cara de quem abre quando a variável falta. O `extractI
 mesmo `import.meta.env['VITE_SUPABASE_URL']` **sem checagem nenhuma**: ficaria `undefined`
 calado. Achado em 02/09, lendo o código por causa da carta da publicação.
 
-**Por que é dívida e não defeito:** com as duas travas novas do `deploy.yml`, publicação sem
-endereço **não sai mais**. O caminho que levava ao `undefined` deixou de existir pela porta da
-publicação. O que fica é a diferença de tratamento entre dois arquivos que leem a mesma coisa —
+**Por que é dívida e não defeito:** publicação sem endereço **não sai mais** — a trava mudou de
+casa em 02/09 (de `deploy.yml` para `scripts/conferir-pacote.js`, que roda dentro do `pnpm
+deploy`), mas a pergunta é a mesma e agora ela está no caminho do ato real. O caminho que levava
+ao `undefined` deixou de existir pela porta da publicação. O que fica é a diferença de tratamento entre dois arquivos que leem a mesma coisa —
 e diferença sem motivo escrito é armadilha para quem chegar depois.
 
 **Não foi consertado de propósito:** é código de produto, e produto está congelado (decisão 137
@@ -75,6 +76,14 @@ detectores avulsos.
 E ela tem um defeito medido, na última corrida de hoje: acusou `sb_secret_` em três arquivos.
 Eram **as três frases que dizem que a chave secreta nunca entra ali**. O achado morreu no meu
 olho, não na ferramenta.
+
+**Um segundo defeito, de outra família, medido na varredura da decisão 24:** ela acusou um
+`integrity: sha512-…` do `pnpm-lock.yaml` como se fosse credencial. O padrão procura `eyJ` (o
+começo de um JWT) **sem diferenciar maiúscula de minúscula**, e qualquer base64 comprido cedo ou
+tarde contém `Eyj` no meio. Não é mentira ocasional: **é ruído garantido em todo arquivo de
+travas.** Quando ela virar peça, a procura por JWT tem de ser **sensível a maiúsculas** e ancorada
+no começo de um valor — senão a lista de achados fica longa demais para alguém ler de verdade, que
+é como um vigia deixa de ser vigia.
 
 > **A régua, que é desconfortável:** quanto melhor a casa documenta uma regra, mais o instrumento
 > a acusa — **documento que proíbe algo contém, por obrigação, as palavras do que proíbe.** No
@@ -126,23 +135,27 @@ o próprio Correio.** E o **cadastro está lá**: a equipe não precisa digitar 
 zona `campisi.com.br` já está na Cloudflare. O `base` **foi tocado** por isso, e o pacote agora
 prova que sabe onde mora. Ver `PLANEJAMENTO.md`, decisão 23.
 
-⚠️ **O que sobrou deste item para o Pedro, e a ORDEM importa.** O primeiro passo **já caiu na mesma
-noite**: o `Banco_de_Dados` criou o registro, e eu conferi por conta própria contra o `8.8.8.8` —
-`compras` → `pedrocampisi.github.io`, TTL 300, nos quatro endereços do GitHub Pages.
+⚠️ **A HOSPEDAGEM MUDOU NA MESMA NOITE, e a lista de cima virou outra.** O Pedro perguntou por que
+este software ia para o GitHub Pages se tudo o mais mora no Cloudflare, e disse **"vai com o
+Cloudflare"** — confirmado por ele na janela, e não só por carta. O Pages morreu antes de nascer
+no endereço próprio; o endereço `compras.campisi.com.br` **não muda**, muda quem serve. Ver
+`PLANEJAMENTO.md`, decisão 24.
 
 ```
-   ✅ 1  o registro de DNS ················· feito, e medido aqui em 02/09
-      2  Settings > Pages > Custom domain = compras.campisi.com.br
-      3  as duas variáveis do banco ········ sem elas nenhum ensaio anda
-      4  rodar o ensaio de novo ··········· agora ele alcança as três travas
-      5  juntar os ramos ·················· por último
-         Enforce HTTPS quando o GitHub liberar o certificado
+   ✅ preparado, sem publicar (commit de 02/09)
+      1  ensaio: `pnpm deploy` → compras.campisi.workers.dev
+            ⚠️ sai desta máquina: só com a palavra do Pedro na janela dele
+      2  medir no navegador: tela abre, login fala com o banco, PDF sai
+      3  produção: `routes` com o endereço próprio + `pnpm deploy` de novo
+            o Cloudflare cria DNS e certificado sozinho
+      4  a virada: juntar os ramos
+      5  trocar os atalhos nas máquinas das pessoas   ← ver o item do atalho
 ```
 
-**O estado de hoje tem nome, medido:** `http://compras.campisi.com.br` responde **404 vindo do
-GitHub.com**, e o HTTPS ainda não tem certificado. O caminho do DNS está inteiro; o que falta é o
-GitHub **saber** que este domínio é deste repositório — o passo 2. Fora dessa ordem, a `main` sobe
-apontando para a raiz antes do endereço existir de verdade, e o site fica inalcançável.
+**O que sobrou do caminho antigo, e que agora é lixo a recolher:** o registro de DNS que o
+`Banco_de_Dados` criou apontando para `pedrocampisi.github.io` **precisa sair** antes do endereço
+próprio subir no Cloudflare (ordem já dada a ele pelo `CTO`). Se o `wrangler` reclamar de registro
+existente, é porque ainda não saiu — **parar e avisar, não apagar nada por conta própria.**
 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
@@ -152,6 +165,44 @@ registros à frente da `main`**, e isso é desenho, não dívida. A publicação
 botão que a virada aperta**, e ele é do Pedro.
 
 ---
+
+---
+
+### 6. O atalho das pessoas aponta para o endereço velho — e o endereço velho vai continuar abrindo
+
+Achado em 02/09/2026, lendo o `Fluxo.md` para corrigir o que ele dizia sobre o GitHub Pages.
+
+O `start.bat` desta pasta — que é o atalho copiado para a **área de trabalho das pessoas** — tem o
+endereço escrito dentro dele:
+
+```
+   antes  ...  https://pedrocampisi.github.io/central-compras-pbqph/
+   agora  ...  https://compras.campisi.com.br/          (corrigido no repositório)
+```
+
+**Corrigir o arquivo aqui não corrige as cópias que já estão nas máquinas.** Ninguém atualiza a
+área de trabalho de outra pessoa a partir deste repositório.
+
+⚠️ **E o risco não é só o atalho quebrar — é ele NÃO quebrar.** Quando o GitHub Pages deixar de
+receber publicação, o site que está lá **não some**: ele congela na última versão publicada, que é
+a `main` de hoje — **a versão de arquivo no OneDrive, sem login e sem banco**. Quem clicar no
+atalho antigo vai abrir um aplicativo que funciona, que parece o certo, e que **grava em outro
+lugar**. Duas versões vivas ao mesmo tempo, e nenhuma delas avisando.
+
+**Isto não é problema de programação, é de combinação com as pessoas**, e por isso é do Pedro
+decidir como resolver. Os caminhos que eu enxergo, e o custo de cada um:
+
+```
+   desligar o Pages depois da virada ...... o atalho velho dá erro seco.
+                                            Quebra na cara, mas quebra CEDO.
+   deixar o Pages com uma página de aviso .. exige uma última publicação lá,
+                                            só com o recado e o link novo
+   trocar os atalhos, um por um ........... o único que não deixa ninguém para trás
+```
+
+**Recomendo os dois últimos juntos:** trocar os atalhos e deixar o endereço velho avisando, para
+quem tiver o link salvo no navegador em vez do atalho. Mas isso é publicação e é mudança no dia
+das pessoas — **não faço nada disso sem a palavra dele.**
 
 ---
 

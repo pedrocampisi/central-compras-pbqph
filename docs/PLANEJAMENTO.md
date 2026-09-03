@@ -933,3 +933,104 @@ do Git, que era fácil de ignorar, que abriu isso.
 O crachá compartilhado (sessão em cookie no `.campisi.com.br`, para não digitar senha em cada
 software) é **código de produto** e continua congelado até 06/09. Por ora a pessoa digita a senha
 da Central uma vez por máquina e a sessão persiste.
+
+---
+
+## Decisão 24 — a hospedagem vai para o Cloudflare, e publicar deixa de ser automático · 02/09/2026
+
+**O QUE FOI DECIDIDO**
+O GitHub Pages saiu. Este aplicativo passa a morar no **Cloudflare**, junto com a Central e com o
+resto da plataforma. **Palavra do Pedro, dita na janela dele** — a carta do `CTO` (decisão 154
+dele) trazia a mesma coisa, mas eu perguntei antes de executar, porque mudança de direção que
+joga fora trabalho do mesmo dia não se faz sobre relato.
+
+O endereço **não muda**: continua `compras.campisi.com.br`. Muda **quem serve**.
+
+**POR QUE — e a razão é boa o bastante para o desperdício**
+A escolha anterior pelo Pages era **inércia**: era o que esta casa já tinha. O Pedro perguntou o
+óbvio, que ninguém tinha perguntado — *por que a hospedagem vai para um lugar diferente de tudo o
+mais?* Não havia resposta. Uma plataforma com cada software num lugar diferente cobra esse preço
+todo dia, em cabeça de quem mantém.
+
+**O QUE FOI JOGADO FORA, e escrito para não se fingir que não houve custo**
+
+```
+   public/CNAME + a linha dele no .gitattributes ····· 3 horas de vida
+   .github/workflows/deploy.yml (o fluxo inteiro) ···· o trabalho da tarde
+   a variável VITE_BASE_PATH ························ nasceu e morreu no mesmo dia
+```
+
+O desperdício é da decisão anterior, não do trabalho: **as travas sobreviveram inteiras**, porque
+elas nunca foram sobre o GitHub — eram sobre o pacote. Mudaram de casa, não de pergunta.
+
+**AS TRAVAS MUDARAM DE CASA, E A CASA NOVA É MELHOR**
+`scripts/conferir-pacote.js`, ligado ao `pnpm deploy`:
+
+```
+   pnpm deploy  =  pnpm build  &&  pnpm conferir:pacote  &&  wrangler deploy
+```
+
+Três perguntas: **o banco entrou no pacote?**, **o pacote aponta para a raiz?**, **o subendereço
+morto voltou?**
+
+Elas ficaram **locais** e não no CI por um motivo medido, não por preguiça: conferir o pacote
+exige **montar** o pacote, e montar exige o endereço e a chave do banco. No CI isso obrigaria o
+Pedro a digitar as duas coisas **também lá**, criando mais um lugar no mundo com o nome do banco
+dentro. Aqui elas vêm do `.env.local`, que já está na pasta, que o Vite já lê sozinho, e que
+**nenhum agente nunca abriu**.
+
+E há um ganho que o CI não dava: **a trava passou a ficar no caminho do ato real.** Antes, a
+conferência era num lugar e a publicação em outro; agora não existe caminho que suba sem passar
+por ela — a não ser digitar `wrangler deploy` na mão, e isso está escrito no topo do
+`wrangler.jsonc`.
+
+**O ENSAIO — 6 casos, 6 certos, cada portão sabotado sozinho**
+
+```
+   pacote inteiro ····················· passa
+   sem endereço de banco ·············· para   (1 de 3)
+   index não aponta para a raiz ······· para   (2 de 3)
+   o subendereço morto ressuscitou ···· para   (3 de 3)
+   sem index.html no pacote ·········· para   ← trava que QUEBRA fica vermelha
+   pacote inteiro de novo ············· passa
+```
+
+A sabotagem do portão 1 foi feita **por substituição no pacote montado**, com expressão regular:
+o endereço do banco foi trocado **sem nunca ser lido nem impresso**. Remontar com a variável
+errada seria mais simples e faria o valor passar por mim.
+
+**O QUE MUDOU NO `vite.config.ts`, e por que isso não fere o congelamento**
+O `base` deixou de ser variável e virou `/`, em dev e em build. **A variável `VITE_BASE_PATH` foi
+apagada**: manivela que só tem uma posição é manivela que engana.
+
+É código de produto? É arquivo de construção, e a régua que vale é a **decisão 137 do `CTO`: o
+congelamento mede o que o usuário vê.** Isto não muda uma tela, um cálculo nem uma regra — muda de
+onde o navegador busca os arquivos. **Zero arquivos em `src/`**, como em todo o dia de hoje.
+
+**ONDE EU DIVERGI DA CENTRAL, DE PROPÓSITO**
+A Central chama `npx wrangler deploy`, **sem versão presa**. Aqui o `wrangler` entrou como
+dependência de desenvolvimento **fixada em `4.128.0`**, sem acento circunflexo — a decisão 20
+desta casa diz que versão mora num lugar só, e ferramenta que publica é o último lugar onde se
+quer descobrir uma diferença de versão.
+
+**UMA LINHA QUE É SEGURO, E NÃO NECESSIDADE — declarado no arquivo**
+`not_found_handling: single-page-application` entrou copiado da Central. **Esta casa não tem
+roteador de cliente** (conferido: nenhum `react-router` nas dependências; a navegação é estado
+interno), então hoje não existe endereço interno para recarregar. A linha fica porque, no dia em
+que existir, a falta dela aparece como 404 no navegador de uma pessoa — e não aqui.
+
+**⚠️ O QUE ESTE COMMIT NÃO FEZ, E NÃO VAI FAZER SOZINHO**
+**Nada foi publicado.** `wrangler deploy` é ato que sai desta máquina, e só roda com a palavra do
+Pedro dita na janela dele. Conferido que o `wrangler` **já está logado** nesta máquina (sem
+imprimir a conta), então o ensaio depende só da palavra — não de configuração.
+
+Continuam sem prova: o endereço `compras.campisi.workers.dev` existindo, a tela abrindo, o login
+falando com o banco, e o PDF saindo. Tudo isso é medição **depois** do ensaio.
+
+**⚠️ E UMA COISA QUE ESTE COMMIT DESCOBRIU, QUE É MAIOR QUE ELE**
+Corrigindo o `Fluxo.md`, apareceu o `start.bat` — o atalho copiado para a **área de trabalho das
+pessoas**, com o endereço escrito dentro. Corrigi o arquivo daqui, **e isso não corrige as
+cópias**. Pior: quando o Pages parar de receber publicação, o site de lá **não some** — congela na
+`main` de hoje, que é a versão de arquivo no OneDrive, sem login e sem banco. Quem clicar no
+atalho velho abre um aplicativo que **funciona**, parece o certo, e grava em outro lugar. Virou a
+**pendência 6**, e é decisão do Pedro, não minha: mexe no dia das pessoas.

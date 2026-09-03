@@ -1,4 +1,0 @@
-# O CNAME vai para o GitHub Pages como NOME DE DOMINIO. Se ele terminar com
-# o retorno de carro do Windows (CR), o dominio lido vira outro, e a pagina
-# nao abre. Este arquivo nasce e morre com fim de linha LF, em toda maquina.
-CNAME text eol=lf

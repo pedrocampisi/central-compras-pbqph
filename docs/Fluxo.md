@@ -104,7 +104,9 @@ flowchart TD
 
 ### Passo 1 — Abertura do app
 
-**O que acontece:** Você clica no atalho da Área de Trabalho (`Central de Compras PBQP-H.bat`). Ele abre o navegador na URL do GitHub Pages. O navegador busca os arquivos JS/CSS, monta a tela e dispara a inicialização.
+**O que acontece:** Você clica no atalho da Área de Trabalho (`Central de Compras PBQP-H.bat`). Ele abre o navegador no endereço do aplicativo. O navegador busca os arquivos JS/CSS, monta a tela e dispara a inicialização.
+
+⚠️ **O endereço mudou em 02/09/2026** e a troca ainda não chegou nas máquinas: o aplicativo sai do GitHub Pages e vai para o Cloudflare, em `compras.campisi.com.br`. **As cópias do atalho nas áreas de trabalho das pessoas não se atualizam sozinhas.** Ver `PENDENCIAS.md`, o item do atalho.
 
 **Responsável:** `index.html` → `src/main.tsx` → `src/App.tsx`.
 
@@ -296,11 +298,13 @@ Depois adiciona **itens**, um por linha:
 **Onde dos materiais cadastráveis:** aba Catálogo ECR (UI).
 **Onde dos 20 ECRs em si:** estão no `seed-data.json`. Para alterar normas/objetivo/escopo de um ECR existente nas instalações antigas, é uma migração de schema (`v3-to-v4.ts`).
 
-### 6. Mudar URL de produção / nome do repositório
-**Onde:** três lugares precisam casar:
-- `vite.config.ts` → constante `base` (subpath do GH Pages).
-- `start.bat` (atalho da Área de Trabalho) → URL hardcoded.
-- `.github/workflows/deploy.yml` → workflow de deploy do GH Actions.
+### 6. Mudar URL de produção
+**Onde:** dois lugares precisam casar, **mais as máquinas das pessoas**:
+- `wrangler.jsonc` → `routes` (o endereço próprio que o Cloudflare atende).
+- `start.bat` (atalho da Área de Trabalho) → URL escrita dentro do arquivo.
+- ⚠️ **e as cópias do atalho já espalhadas**, que ninguém atualiza a partir daqui.
+
+O `base` do Vite saiu desta lista em 02/09/2026: ele é `/` e não muda mais. O `deploy.yml` do GitHub Pages deixou de existir — publicar é `pnpm deploy`, um ato deliberado.
 
 ## Avisos importantes
 

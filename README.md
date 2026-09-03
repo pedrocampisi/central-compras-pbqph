@@ -22,9 +22,14 @@ que já fechou. Se você é uma IA de manutenção, o arquivo denso é
 | Onde ficam os dados | um arquivo JSON no OneDrive | banco Supabase |
 | Entrada | sem login | login por pessoa, com papéis |
 
-O trabalho novo acontece na `migracao-supabase`. **A `main` publica em
-produção a cada push** (GitHub Pages, `deploy.yml`) — não envie nada para ela
-sem aprovação do Pedro.
+O trabalho novo acontece na `migracao-supabase`. **Não envie nada para a `main`
+sem aprovação do Pedro** — ela é o que está em produção.
+
+⚠️ **A publicação mudou de casa em 02/09/2026** (palavra do Pedro): este
+aplicativo vai para o **Cloudflare**, junto com o resto da plataforma, e o
+GitHub Pages saiu. Com isso a `main` **deixou de publicar sozinha a cada
+push** — publicar passou a ser um ato deliberado, `pnpm deploy`, que monta,
+confere o pacote e sobe. Ver `docs/PLANEJAMENTO.md`, decisão 24.
 
 ## Rodar
 
