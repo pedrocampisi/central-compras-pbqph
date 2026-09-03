@@ -213,6 +213,43 @@ das pessoas — **não faço nada disso sem a palavra dele.**
 
 ---
 
+✅ **A página de aviso está pronta e NÃO publicada**, por decisão do Pedro em 03/09/2026:
+[`aviso-endereco-antigo/index.html`](../aviso-endereco-antigo/index.html). Uma página só, sem
+dependência nenhuma, no padrão visual da casa (uma ação laranja, ícone desenhado, sem animação).
+
+Ela diz três coisas, e a terceira é a que evita o "o sistema novo não funciona" do primeiro dia:
+o endereço mudou, qual é o novo, e **que cada pessoa precisa usar "Primeiro acesso — definir minha
+senha"** antes de conseguir entrar. Isso saiu da própria tela de entrada, que avisa que a conta é
+criada pelo administrador mas a senha é escolhida por quem usa.
+
+**Os dois caminhos para publicá-la, e nenhum é automático:**
+
+```
+   A  Settings > Pages > Source: "Deploy from a branch"
+      apontando para um ramo que tenha esta pasta na raiz
+      → não depende de fluxo nenhum, e FUNCIONA MESMO DEPOIS DA VIRADA
+   B  pelo fluxo que a `main` ainda tem hoje
+      → deixa de existir quando os ramos forem juntados
+```
+
+⚠️ **Correção de uma coisa que eu disse errado ao Pedro em 03/09:** eu afirmei que a virada
+fechava a porta do aviso. **Fecha só a porta B.** A porta A independe de fluxo e continua aberta
+depois. A ordem entre virada e aviso é preferência, não restrição.
+
+**A sequência que eu recomendo, e que não é minha para decidir:**
+
+```
+   1  avisar a equipe que o endereço muda, e quando
+   2  cada pessoa faz "Primeiro acesso" no endereço novo — ANTES de perder o velho
+   3  trocar os atalhos das máquinas
+   4  só então pôr a página de aviso no endereço velho
+```
+
+O passo 2 antes do 4 é o que importa: **cortar o endereço velho antes de as senhas existirem
+deixa a equipe sem os dois sistemas ao mesmo tempo.**
+
+---
+
 ### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
 
 *Minha, para a retomada de **06/09/2026**.* Achado em 03/09, no primeiro ensaio no ar.
