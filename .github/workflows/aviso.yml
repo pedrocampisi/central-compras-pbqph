@@ -1,0 +1,53 @@
+# O que este arquivo faz, e por que ele existe
+# ---------------------------------------------------------------------------
+# Este endereço -- pedrocampisi.github.io/central-compras-pbqph -- foi a casa
+# da Central de Compras até 03/09/2026. A partir daquele dia o programa passou
+# a morar em https://compras.campisi.com.br, servido pela Cloudflare.
+#
+# Endereço antigo que some sem avisar vira "o sistema sumiu" na boca da equipe.
+# Por isso ele continua vivo, mostrando UMA página que diz onde é o novo lugar
+# e como entrar. Nada é compilado aqui: sobe um HTML sozinho, sem dependência.
+#
+# O 404.html é cópia do index.html de propósito: quem tinha um atalho para uma
+# tela interna cai no aviso, e não no 404 preto do GitHub.
+#
+# Este arquivo SUBSTITUI o antigo deploy.yml, que compilava o programa. A troca
+# foi feita apagando um e criando outro, e não editando o antigo, para que a
+# junção dos ramos (a virada) não tenha conflito para alguém resolver errado:
+# os dois lados apagaram o deploy.yml, e só a main tem o aviso.yml.
+name: Aviso no endereço antigo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aviso-endereco-antigo/**'
+      - '.github/workflows/aviso.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Empacotar a página de aviso
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: aviso-endereco-antigo
+
+      - name: Publicar
+        id: deploy
+        uses: actions/deploy-pages@v4

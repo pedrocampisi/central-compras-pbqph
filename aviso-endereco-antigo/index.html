@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Central de Compras mudou de endereço</title>
+<style>
+  :root {
+    --fundo: #fbf3de;
+    --cartao: #fffdf7;
+    --borda: #ead9c0;
+    --texto: #1c3242;
+    --texto-suave: #5e594c;
+    --acento: #f6a425;
+    --acento-sombra: #de690e;
+    --acento-texto: #3a2200;
+    --raio: 12px;
+    --raio-grande: 20px;
+    --raio-pill: 999px;
+    --sombra: 0 1px 2px rgba(140, 62, 22, .04), 0 12px 30px rgba(140, 62, 22, .1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fundo: #0b1a23;
+      --cartao: #12242e;
+      --borda: rgba(237, 231, 217, .1);
+      --texto: #ede7d9;
+      --texto-suave: #c9cfc5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--fundo);
+    color: var(--texto);
+    font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  main {
+    width: 100%;
+    max-width: 620px;
+    background: var(--cartao);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-grande);
+    box-shadow: var(--sombra);
+    padding: 40px 36px;
+  }
+  h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 8px; }
+  .sub { color: var(--texto-suave); margin: 0 0 28px; }
+  a.acao {
+    display: block;
+    text-align: center;
+    background: var(--acento);
+    color: var(--acento-texto);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-decoration: none;
+    padding: 15px 20px;
+    border-radius: var(--raio-pill);
+    border-bottom: 2px solid var(--acento-sombra);
+    word-break: break-all;
+  }
+  .passos {
+    margin: 28px 0 0;
+    padding: 20px 22px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: transparent;
+  }
+  .passos h2 { font-size: .95rem; text-transform: uppercase; letter-spacing: .06em;
+               color: var(--texto-suave); margin: 0 0 16px; }
+  .caso { margin: 0 0 18px; }
+  .caso:last-child { margin-bottom: 0; }
+  .caso .rotulo { font-weight: 700; margin: 0 0 4px; }
+  .caso p { margin: 0; color: var(--texto-suave); }
+  .caso.novo { padding-top: 16px; border-top: 1px solid var(--borda); }
+  .rodape { margin: 26px 0 0; font-size: .9rem; color: var(--texto-suave); }
+  .marca { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .marca svg { flex: none; }
+  .marca span { font-weight: 600; letter-spacing: .02em; color: var(--texto-suave); }
+</style>
+</head>
+<body>
+<main>
+  <div class="marca">
+    <!-- Desenho, nunca emoji: emoji muda de forma em cada sistema e nao aceita
+         a cor do tema. Regra da casa. -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 6h2l2.2 9.4a2 2 0 0 0 2 1.6h6.9a2 2 0 0 0 2-1.5L20 8H6.2"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round"/>
+      <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
+      <circle cx="17" cy="20" r="1.4" fill="currentColor"/>
+    </svg>
+    <span>Central de Compras · Campisi Engenharia</span>
+  </div>
+
+  <h1>Este endereço saiu do ar.</h1>
+  <p class="sub">A Central de Compras passou a funcionar em um endereço novo. Guarde este link:</p>
+
+  <a class="acao" href="https://compras.campisi.com.br/">compras.campisi.com.br</a>
+
+  <div class="passos">
+    <h2>Como entrar</h2>
+    <div class="caso">
+      <p class="rotulo">Você já usa a Central de Compras?</p>
+      <p>Entre com o <strong>mesmo e-mail e a mesma senha</strong> de sempre. É a mesma conta —
+        você não precisa cadastrar nada de novo.</p>
+    </div>
+    <div class="caso novo">
+      <p class="rotulo">Nunca definiu uma senha?</p>
+      <p>Clique em <strong>“Primeiro acesso — definir minha senha”</strong> e use o seu e-mail da
+        empresa. Isso só vale para quem o administrador acabou de cadastrar.</p>
+    </div>
+  </div>
+
+  <p class="rodape">
+    Se você tinha um atalho na área de trabalho apontando para cá, ele precisa ser trocado.
+    Em caso de dúvida, procure o Pedro antes de refazer qualquer ordem de compra.
+  </p>
+</main>
+</body>
+</html>
