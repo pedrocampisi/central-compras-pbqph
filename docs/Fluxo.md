@@ -111,7 +111,7 @@ flowchart TD
 
 **O que acontece:** Você clica no atalho da Área de Trabalho (`Central de Compras PBQP-H.bat`). Ele abre o navegador no endereço do aplicativo. O navegador busca os arquivos JS/CSS, monta a tela e dispara a inicialização.
 
-⚠️ **O endereço mudou em 02/09/2026** e a troca ainda não chegou nas máquinas: o aplicativo sai do GitHub Pages e vai para o Cloudflare, em `compras.campisi.com.br`. **As cópias do atalho nas áreas de trabalho das pessoas não se atualizam sozinhas.** Ver `PENDENCIAS.md`, o item do atalho.
+⚠️ **O endereço mudou:** o aplicativo saiu do GitHub Pages e mora no Cloudflare, em `compras.campisi.com.br`, no ar desde 03/09/2026. **As cópias do atalho nas áreas de trabalho não se atualizam sozinhas** — mas quem clicar no atalho velho **não abre mais o programa antigo**: desde a noite de 03/09 aquele endereço mostra uma página de aviso com o link novo. Trocar as cópias virou arrumação, e deixou de ser risco. Ver `PENDENCIAS.md`, decisão 27 do `PLANEJAMENTO.md`.
 
 **Responsável:** `index.html` → `src/main.tsx` → `src/App.tsx`.
 

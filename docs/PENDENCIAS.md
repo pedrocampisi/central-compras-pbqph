@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 02/09/2026
+> **Data:** 03/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -8,6 +8,10 @@
 
 **De cima para baixo é a ordem em que se faz.** Item novo entra na posição que merece, não no
 fim.
+
+**O número de um item não é reaproveitado quando ele fecha.** Some da lista e deixa o buraco: as
+cartas já enviadas apontam para o número, e carta enviada não se corrige. Buraco na numeração é
+mais barato que carta apontando para o item errado.
 
 ---
 
@@ -156,7 +160,9 @@ no endereço próprio; o endereço `compras.campisi.com.br` **não muda**, muda 
             HTTPS válido, DNS na Cloudflare, e o endereço de ensaio
             desligado de propósito (`workers_dev: false`) — decisão 26
       4  a virada: juntar os ramos
-      5  trocar os atalhos nas máquinas das pessoas   ← ver o item do atalho
+   ✅ 5  o endereço velho passou a avisar ············ 03/09, palavra do Pedro
+            "pode trocar, tem ninguém usando ainda" — ver o registro nas Fechadas
+      6  trocar as cópias do atalho nas máquinas (arrumação, e não mais risco)
 ```
 
 **O que sobrou do caminho antigo, e que agora é lixo a recolher:** o registro de DNS que o
@@ -167,101 +173,18 @@ existente, é porque ainda não saiu — **parar e avisar, não apagar nada por 
 *Decisão do Pedro.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
 
 **Medido em 31/08/2026, para ninguém ler isto como atraso:** a `migracao-supabase` está **20
-registros à frente da `main`**, e isso é desenho, não dívida. A publicação do site dispara em
-`push` para a `main` — juntar as duas republica, na hora, o que a equipe usa hoje. **É esse
-botão que a virada aperta**, e ele é do Pedro.
+registros à frente da `main`**, e isso é desenho, não dívida.
+
+⚠️ **O que esta linha dizia deixou de valer em 03/09/2026, e vale mais corrigir que apagar.** Ela
+dizia que juntar os ramos republica na hora o que a equipe usa, e que **era esse o botão que a
+virada apertava**. Não é mais: a `main` não publica mais o programa — publica a página de aviso
+do endereço velho, e só quando essa página muda. **A virada virou papelada:** ela não muda nada
+para quem usa o software. O que está no ar já está no ar, servido pela Cloudflare.
 
 ---
 
 ---
 
-### 6. O atalho das pessoas aponta para o endereço velho — e o endereço velho vai continuar abrindo
-
-Achado em 02/09/2026, lendo o `Fluxo.md` para corrigir o que ele dizia sobre o GitHub Pages.
-
-O `start.bat` desta pasta — que é o atalho copiado para a **área de trabalho das pessoas** — tem o
-endereço escrito dentro dele:
-
-```
-   antes  ...  https://pedrocampisi.github.io/central-compras-pbqph/
-   agora  ...  https://compras.campisi.com.br/          (corrigido no repositório)
-```
-
-**Corrigir o arquivo aqui não corrige as cópias que já estão nas máquinas.** Ninguém atualiza a
-área de trabalho de outra pessoa a partir deste repositório.
-
-⚠️ **E o risco não é só o atalho quebrar — é ele NÃO quebrar.** Quando o GitHub Pages deixar de
-receber publicação, o site que está lá **não some**: ele congela na última versão publicada, que é
-a `main` de hoje — **a versão de arquivo no OneDrive, sem login e sem banco**. Quem clicar no
-atalho antigo vai abrir um aplicativo que funciona, que parece o certo, e que **grava em outro
-lugar**. Duas versões vivas ao mesmo tempo, e nenhuma delas avisando.
-
-**Isto não é problema de programação, é de combinação com as pessoas**, e por isso é do Pedro
-decidir como resolver. Os caminhos que eu enxergo, e o custo de cada um:
-
-```
-   desligar o Pages depois da virada ...... o atalho velho dá erro seco.
-                                            Quebra na cara, mas quebra CEDO.
-   deixar o Pages com uma página de aviso .. exige uma última publicação lá,
-                                            só com o recado e o link novo
-   trocar os atalhos, um por um ........... o único que não deixa ninguém para trás
-```
-
-**Recomendo os dois últimos juntos:** trocar os atalhos e deixar o endereço velho avisando, para
-quem tiver o link salvo no navegador em vez do atalho. Mas isso é publicação e é mudança no dia
-das pessoas — **não faço nada disso sem a palavra dele.**
-
----
-
-✅ **A página de aviso está pronta e NÃO publicada**, por decisão do Pedro em 03/09/2026:
-[`aviso-endereco-antigo/index.html`](../aviso-endereco-antigo/index.html). Uma página só, sem
-dependência nenhuma, no padrão visual da casa (uma ação laranja, ícone desenhado, sem animação).
-
-Ela diz o endereço novo e **separa dois caminhos de entrada** — a correção veio do `CTO` em
-03/09, medida por ele na produção e conferida por mim:
-
-```
-   quem já usa a Central ····· MESMO e-mail, MESMA senha. Não faz "primeiro acesso".
-   conta nova (sem senha) ···· "Primeiro acesso — definir minha senha".
-```
-
-**Por quê:** os dois apps usam o **mesmo projeto Supabase de produção** (mesmo `auth.users`),
-então a senha de uma pessoa é a mesma nos dois — não por login automático (o crachá compartilhado
-**continua congelado**, a pessoa digita e-mail e senha em cada app), mas por ser o mesmo cadastro.
-Medido pelo `CTO`: das contas que existem hoje, **todas já têm senha** — ou seja, "primeiro
-acesso" na prática só serve para conta que o administrador criar dali para frente.
-
-**Eu confiri por conta própria** que o site no ar (`compras.campisi.com.br`) liga no projeto de
-produção, e não no de ensaio: disparei um login na tela e o host da chamada bate com o ref de
-produção. Sem isso, a frase sobre senha estaria escrita no escuro.
-
-**Os dois caminhos para publicá-la, e nenhum é automático:**
-
-```
-   A  Settings > Pages > Source: "Deploy from a branch"
-      apontando para um ramo que tenha esta pasta na raiz
-      → não depende de fluxo nenhum, e FUNCIONA MESMO DEPOIS DA VIRADA
-   B  pelo fluxo que a `main` ainda tem hoje
-      → deixa de existir quando os ramos forem juntados
-```
-
-⚠️ **Correção de uma coisa que eu disse errado ao Pedro em 03/09:** eu afirmei que a virada
-fechava a porta do aviso. **Fecha só a porta B.** A porta A independe de fluxo e continua aberta
-depois. A ordem entre virada e aviso é preferência, não restrição.
-
-**A sequência que eu recomendo, e que não é minha para decidir:**
-
-```
-   1  avisar a equipe que o endereço muda, e quando
-   2  cada pessoa faz "Primeiro acesso" no endereço novo — ANTES de perder o velho
-   3  trocar os atalhos das máquinas
-   4  só então pôr a página de aviso no endereço velho
-```
-
-O passo 2 antes do 4 é o que importa: **cortar o endereço velho antes de as senhas existirem
-deixa a equipe sem os dois sistemas ao mesmo tempo.**
-
----
 
 ### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
 
@@ -300,6 +223,110 @@ documento nenhum**, porque quem lê para de acreditar no resto.
 ---
 
 ## ✅ Fechadas (registro)
+
+### O endereço velho parou de servir o programa e passou a avisar — 03/09/2026
+
+Achado em 02/09/2026, lendo o `Fluxo.md` para corrigir o que ele dizia sobre o GitHub Pages.
+
+O `start.bat` desta pasta — que é o atalho copiado para a **área de trabalho das pessoas** — tem o
+endereço escrito dentro dele:
+
+```
+   antes  ...  https://pedrocampisi.github.io/central-compras-pbqph/
+   agora  ...  https://compras.campisi.com.br/          (corrigido no repositório)
+```
+
+**Corrigir o arquivo aqui não corrige as cópias que já estão nas máquinas.** Ninguém atualiza a
+área de trabalho de outra pessoa a partir deste repositório.
+
+⚠️ **E o risco não é só o atalho quebrar — é ele NÃO quebrar.** Quando o GitHub Pages deixar de
+receber publicação, o site que está lá **não some**: ele congela na última versão publicada, que é
+a `main` de hoje — **a versão de arquivo no OneDrive, sem login e sem banco**. Quem clicar no
+atalho antigo vai abrir um aplicativo que funciona, que parece o certo, e que **grava em outro
+lugar**. Duas versões vivas ao mesmo tempo, e nenhuma delas avisando.
+
+**Isto não é problema de programação, é de combinação com as pessoas**, e por isso é do Pedro
+decidir como resolver. Os caminhos que eu enxergo, e o custo de cada um:
+
+```
+   desligar o Pages depois da virada ...... o atalho velho dá erro seco.
+                                            Quebra na cara, mas quebra CEDO.
+   deixar o Pages com uma página de aviso .. exige uma última publicação lá,
+                                            só com o recado e o link novo
+   trocar os atalhos, um por um ........... o único que não deixa ninguém para trás
+```
+
+**Recomendo os dois últimos juntos:** trocar os atalhos e deixar o endereço velho avisando, para
+quem tiver o link salvo no navegador em vez do atalho. Mas isso é publicação e é mudança no dia
+das pessoas — **não faço nada disso sem a palavra dele.**
+
+---
+
+✅ **A página de aviso está no ar no endereço velho**, desde a noite de 03/09/2026:
+[`aviso-endereco-antigo/index.html`](../aviso-endereco-antigo/index.html). Uma página só, sem
+dependência nenhuma, no padrão visual da casa (uma ação laranja, ícone desenhado, sem animação).
+
+Ela diz o endereço novo e **separa dois caminhos de entrada** — a correção veio do `CTO` em
+03/09, medida por ele na produção e conferida por mim:
+
+```
+   quem já usa a Central ····· MESMO e-mail, MESMA senha. Não faz "primeiro acesso".
+   conta nova (sem senha) ···· "Primeiro acesso — definir minha senha".
+```
+
+**Por quê:** os dois apps usam o **mesmo projeto Supabase de produção** (mesmo `auth.users`),
+então a senha de uma pessoa é a mesma nos dois — não por login automático (o crachá compartilhado
+**continua congelado**, a pessoa digita e-mail e senha em cada app), mas por ser o mesmo cadastro.
+Medido pelo `CTO`: das contas que existem hoje, **todas já têm senha** — ou seja, "primeiro
+acesso" na prática só serve para conta que o administrador criar dali para frente.
+
+**Eu confiri por conta própria** que o site no ar (`compras.campisi.com.br`) liga no projeto de
+produção, e não no de ensaio: disparei um login na tela e o host da chamada bate com o ref de
+produção. Sem isso, a frase sobre senha estaria escrita no escuro.
+
+**Como foi publicada, e por que deste jeito.** O endereço velho era servido por um fluxo
+automático na `main` que **compilava o programa antigo**. Em vez de editar esse fluxo, ele foi
+**apagado** e um outro, com outro nome, foi **criado** (`aviso.yml`, que sobe uma pasta com um
+HTML e nada mais):
+
+```
+   apagar um e criar outro ... na virada, os DOIS ramos apagaram o deploy.yml
+                               -> nada para alguem resolver errado
+   editar o antigo ........... modificado de um lado, apagado do outro
+                               -> conflito no meio da virada, na pressa
+```
+
+Isso também derruba a preocupação que estava escrita aqui: **o aviso não depende da virada.** O
+`aviso.yml` só existe na `main`, então a junção dos ramos o mantém. E o `index.html` do aviso é
+**idêntico** nos dois ramos, de propósito, para o arquivo não virar conflito.
+
+**O código do programa na `main` não foi tocado** — só a receita de publicação. Quem precisar da
+versão de arquivo um dia, ela está toda lá.
+
+**O que foi medido no ar depois de publicar** (e não o que foi enviado — lição 28):
+
+```
+   endereco velho, raiz ......... 200, "Este endereco saiu do ar."
+                                  zero resto do programa antigo na pagina
+   atalho de tela interna ....... 404 do GitHub servindo O AVISO, nao a tela preta
+   o link laranja, CLICADO ...... leva a tela de entrada de compras.campisi.com.br
+   compras.campisi.com.br ....... 200, o mesmo pacote de antes, intocado
+   compras.campisi.workers.dev .. 404, o ensaio segue morto
+```
+
+O clique foi de verdade, e não uma leitura do `href`: **cabeçalho de HTTP não prova que um link
+leva a algum lugar** — e a lição 31, do susto do instrumento, é justamente sobre isso.
+
+**O risco que este item descrevia acabou.** Ele não era o atalho quebrar, era o atalho **não**
+quebrar: o endereço velho ia congelar servindo o programa de arquivo, que funciona, parece o
+certo e grava em outro lugar. Duas versões vivas ao mesmo tempo. Hoje o endereço velho não serve
+programa nenhum — serve um recado.
+
+**O que sobra, e não é urgente:** trocar as cópias do atalho nas áreas de trabalho. Deixou de ser
+risco e virou arrumação, porque o atalho velho agora cai no aviso. O `start.bat` deste
+repositório já aponta para o endereço novo desde 02/09; as cópias nas máquinas, não.
+
+---
 
 ### A publicação passou a levar o banco junto — e a provar que levou — 02/09/2026
 

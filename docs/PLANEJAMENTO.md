@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 02/09/2026
+> **Data:** 03/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -1167,3 +1167,62 @@ por conta própria. Se o Pedro não quiser, desliga-se na Cloudflare, e é decis
 **O QUE AINDA NÃO FOI PROVADO**
 Emitir uma OC. Exige estar dentro, e eu não tenho senha nem uso a de ninguém. **Quem fecha é uma
 pessoa com conta** — está na pendência 1.
+
+---
+
+## Decisão 27 — o endereço velho parou de servir o programa e passou a avisar · 03/09/2026
+
+**A PALAVRA DO PEDRO, na janela do `CTO`, na noite de 03/09**
+*"Pode trocar, tem ninguém usando ainda."* Ele já tinha entrado em `compras.campisi.com.br`. Isso
+soltou a página que estava pronta e parada desde a manhã, por decisão dele mesmo.
+
+**O QUE ESTAVA EM JOGO — e não era o atalho quebrar**
+`pedrocampisi.github.io/central-compras-pbqph` **não some** quando deixa de receber publicação:
+congela na última versão que subiu, que era **a de arquivo no OneDrive, sem login e sem banco**.
+Quem clicasse no atalho antigo abriria um programa que funciona, que parece o certo, e que
+**grava em outro lugar**. Duas versões vivas ao mesmo tempo, e nenhuma delas avisando. O perigo
+era o endereço velho **não** quebrar.
+
+**COMO FOI FEITO, e por que apagar-e-criar em vez de editar**
+O endereço velho era servido por um fluxo na `main` que compilava o programa antigo. Ele foi
+**apagado**, e um outro, com outro nome, foi **criado** — `aviso.yml`, que sobe uma pasta com um
+HTML e nada mais, sem compilação e sem dependência.
+
+```
+   apagar um e criar outro ... os DOIS ramos apagaram o deploy.yml
+                               -> na virada, nada para alguem resolver errado
+   editar o antigo ........... modificado de um lado, apagado do outro
+                               -> conflito no meio da virada, na pressa
+```
+
+O `aviso.yml` existe **só na `main`**, então a junção dos ramos o mantém — e o `index.html` do
+aviso é **idêntico** nos dois ramos, de propósito, para o arquivo não virar conflito. **O código
+do programa na `main` não foi tocado**: só a receita de publicação.
+
+**O 404 TAMBÉM AVISA**
+`404.html` é cópia do `index.html`. Quem tinha atalho para uma tela interna cai no recado, e não
+na tela preta do GitHub. Custa um arquivo e cobre o caso que ninguém lembra de testar.
+
+**O QUE FOI MEDIDO NO AR, e não o que foi enviado**
+
+```
+   endereco velho, raiz ......... 200, "Este endereco saiu do ar."
+                                  zero resto do programa antigo na pagina
+   atalho de tela interna ....... 404 do GitHub servindo O AVISO
+   o link laranja, CLICADO ...... leva a tela de entrada de compras.campisi.com.br
+   compras.campisi.com.br ....... 200, o mesmo pacote de antes, intocado
+   compras.campisi.workers.dev .. 404, o ensaio segue morto
+```
+
+**O clique foi de verdade, e não uma leitura do `href`.** Cabeçalho de HTTP não prova que um link
+leva a algum lugar — é a lição 31, do susto do instrumento, aplicada antes de doer.
+
+**UMA COISA QUE ESTAVA ESCRITA E DEIXOU DE VALER**
+A pendência 5 dizia que juntar os ramos **republica na hora** o que a equipe usa, e que era esse
+o botão que a virada apertava. Não é mais: a `main` não publica o programa. **A virada virou
+papelada** — não muda nada para quem usa o software. Corrigido lá, e não apagado.
+
+**O QUE SOBRA**
+Trocar as cópias do atalho nas áreas de trabalho. Deixou de ser risco e virou arrumação, porque
+o atalho velho agora cai no aviso.
+
