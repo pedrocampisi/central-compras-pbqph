@@ -304,7 +304,7 @@ Depois adiciona **itens**, um por linha:
 - `start.bat` (atalho da Área de Trabalho) → URL escrita dentro do arquivo.
 - ⚠️ **e as cópias do atalho já espalhadas**, que ninguém atualiza a partir daqui.
 
-O `base` do Vite saiu desta lista em 02/09/2026: ele é `/` e não muda mais. O `deploy.yml` do GitHub Pages deixou de existir — publicar é `pnpm deploy`, um ato deliberado.
+O `base` do Vite saiu desta lista em 02/09/2026: ele é `/` e não muda mais. O `deploy.yml` do GitHub Pages deixou de existir — publicar é `pnpm run deploy`, um ato deliberado.
 
 ## Avisos importantes
 

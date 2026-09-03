@@ -16,8 +16,12 @@
 // Central, que ja esta no ar por este caminho.
 //
 // USO
-//   pnpm deploy       monta, CONFERE o pacote e sobe   <- e o caminho certo
+//   pnpm run deploy   monta, CONFERE o pacote e sobe   <- e o caminho certo
 //   wrangler deploy   sobe o que estiver em dist/, sem conferir nada
+//
+// ⚠️ E' `pnpm RUN deploy`, com o `run`. `pnpm deploy` sem o `run` e um comando
+// EMBUTIDO do proprio pnpm (empacotar workspace), que nao tem nada a ver com
+// isto e nao publica nada. Medido em 03/09/2026, no primeiro ensaio.
 //
 // ⚠️ `wrangler deploy` e ato que sai desta maquina. So roda com a palavra do
 // Pedro, dita na janela dele -- nunca por carta, nunca por decisao de agente.

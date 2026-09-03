@@ -129,6 +129,75 @@ function oSubenderecoMortoNaoVoltou(arquivos) {
   return [true, `nenhum resto de \`/${SUBENDERECO_MORTO}/\` no pacote`];
 }
 
+/**
+ * ⚠️ ESTA TRAVA NASCEU DE UM DEFEITO ACHADO NO AR, em 03/09/2026, no primeiro
+ * ensaio em `compras.campisi.workers.dev`.
+ *
+ * O `index.html` pede `/manifest.webmanifest` e `/registerSW.js`. Os dois
+ * **não são gerados** pela montagem — e ninguém tinha visto, porque no GitHub
+ * Pages eles davam 404 num canto que ninguém olhava, e no Cloudflare o
+ * `not_found_handling: single-page-application` faz coisa PIOR: devolve
+ * **200 com o `index.html` dentro**. O navegador tenta ler página como
+ * programa e estoura `Unexpected token '<'`.
+ *
+ * É a lição do dia 02/09 outra vez, de cara nova: **a pergunta óbvia (o
+ * arquivo respondeu?) fica verde nos dois casos.** A que discrimina é: o
+ * arquivo que o `index.html` pede EXISTE no pacote?
+ */
+const EXCECOES_DECLARADAS = new Map([
+  // Defeito ANTIGO, não regressão: medido em 03/09/2026, o site publicado no
+  // GitHub Pages (ramo `main`) também devolve 404 nos dois. O PWA desta casa
+  // nunca funcionou em produção. A hipótese é o `vite-plugin-pwa` não emitir
+  // os arquivos sob o Vite desta casa — o `sw.js` sai, estes dois não.
+  //
+  // Ficam aqui de propósito, VISÍVEIS, em vez de a trava ser fraca: é a
+  // pendência 7, e no dia em que ela fechar estas duas linhas somem. Exceção
+  // escrita é dívida que se cobra; trava frouxa é dívida que some.
+  ['/manifest.webmanifest', 'pendência 7 — o PWA não é gerado (defeito antigo)'],
+  ['/registerSW.js', 'pendência 7 — o PWA não é gerado (defeito antigo)'],
+]);
+
+function tudoQueOIndicePedeExiste() {
+  const indice = texto(join(PACOTE, 'index.html'));
+  if (!indice) return [false, 'não há `index.html` no pacote'];
+
+  const pedidos = new Set();
+  for (const m of indice.matchAll(/(?:src|href)="(\/[^"]*)"/g)) {
+    pedidos.add(m[1].split(/[?#]/)[0]);
+  }
+
+  const faltando = [];
+  const perdoados = [];
+  for (const pedido of pedidos) {
+    if (existsSync(join(PACOTE, pedido))) continue;
+    if (EXCECOES_DECLARADAS.has(pedido)) {
+      perdoados.push(`${pedido} — ${EXCECOES_DECLARADAS.get(pedido)}`);
+    } else {
+      faltando.push(pedido);
+    }
+  }
+
+  if (faltando.length) {
+    return [
+      false,
+      `o index.html pede ${faltando.length} arquivo(s) que NÃO estão no pacote:\n` +
+        faltando.map((c) => `           · ${c}`).join('\n') +
+        '\n           No ar isto não vira 404: vira 200 com HTML dentro, e o' +
+        '\n           navegador estoura "Unexpected token \'<\'".',
+    ];
+  }
+
+  const recado = `${pedidos.size} pedido(s) do index.html conferido(s)`;
+  if (perdoados.length) {
+    return [
+      true,
+      `${recado}\n           ⚠️ ${perdoados.length} exceção(ões) DECLARADA(S), que não são "está tudo bem":\n` +
+        perdoados.map((c) => `           · ${c}`).join('\n'),
+    ];
+  }
+  return [true, recado];
+}
+
 // ---------------------------------------------------------------------------
 
 function main() {
@@ -142,6 +211,7 @@ function main() {
     ['o banco entrou no pacote', () => oBancoEntrou(arquivos)],
     ['o pacote aponta para a raiz', () => apontaParaARaiz()],
     ['o subendereço morto não voltou', () => oSubenderecoMortoNaoVoltou(arquivos)],
+    ['tudo que o index.html pede existe', () => tudoQueOIndicePedeExiste()],
   ];
 
   let reprovadas = 0;

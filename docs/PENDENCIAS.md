@@ -31,6 +31,12 @@ ficam como estão, os números 006 e 007 ficam queimados, **ninguém limpa nada*
 é o que sempre foi meu: **provar na tela** que esta versão emite. A evidência de hoje prova que a
 numeração do banco funciona, **não** que esta tela funciona.
 
+**O ensaio de 03/09 andou com este item, sem fechar.** Com o aplicativo no ar em
+`compras.campisi.workers.dev`, ficou provado que **a tela carrega e alcança o banco**: uma chamada
+a `/auth/v1/token`, e a recusa voltou como frase de gente. **Emitir continua sem prova** — exige
+estar dentro, e eu não tenho senha nem uso a de ninguém. **Quem fecha este item é uma pessoa com
+conta**, emitindo uma OC de ensaio e conferindo o número e o PDF.
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*
@@ -143,10 +149,10 @@ no endereço próprio; o endereço `compras.campisi.com.br` **não muda**, muda 
 
 ```
    ✅ preparado, sem publicar (commit de 02/09)
-      1  ensaio: `pnpm deploy` → compras.campisi.workers.dev
+      1  ensaio: `pnpm run deploy` → compras.campisi.workers.dev
             ⚠️ sai desta máquina: só com a palavra do Pedro na janela dele
       2  medir no navegador: tela abre, login fala com o banco, PDF sai
-      3  produção: `routes` com o endereço próprio + `pnpm deploy` de novo
+      3  produção: `routes` com o endereço próprio + `pnpm run deploy` de novo
             o Cloudflare cria DNS e certificado sozinho
       4  a virada: juntar os ramos
       5  trocar os atalhos nas máquinas das pessoas   ← ver o item do atalho
@@ -203,6 +209,42 @@ decidir como resolver. Os caminhos que eu enxergo, e o custo de cada um:
 **Recomendo os dois últimos juntos:** trocar os atalhos e deixar o endereço velho avisando, para
 quem tiver o link salvo no navegador em vez do atalho. Mas isso é publicação e é mudança no dia
 das pessoas — **não faço nada disso sem a palavra dele.**
+
+---
+
+### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
+
+*Minha, para a retomada de **06/09/2026**.* Achado em 03/09, no primeiro ensaio no ar.
+
+O `index.html` pede dois arquivos que **a montagem não gera**:
+
+```
+   dist/manifest.webmanifest   FALTA        dist/sw.js            existe
+   dist/registerSW.js          FALTA        dist/workbox-*.js     existe
+```
+
+**Não é regressão da mudança para o Cloudflare** — medido: o site publicado no GitHub Pages
+responde **404 nos dois**. O que mudou foi só o disfarce: no Cloudflare, o
+`not_found_handling: single-page-application` devolve **200 com o `index.html` dentro**, e o
+navegador estoura `Unexpected token '<'` no console de quem abre.
+
+**O que isso custa hoje, na prática:** o aplicativo **não é instalável** e **não abre offline** —
+as duas coisas que o `Fluxo.md` promete ao operador ("aplicativo web instalável como PWA",
+"depois o PWA roda offline"). O `sw.js` existe mas ninguém o registra, porque quem registrava era
+o `registerSW.js` que não existe.
+
+**A hipótese, que é hipótese e não medição:** o `vite-plugin-pwa` (0.21) não emite esses dois
+arquivos sob o Vite desta casa (8.x) — a injeção no `index.html` acontece, a emissão não. Conferir
+antes de mexer; pode ser configuração, pode ser incompatibilidade de versão.
+
+**Enquanto não fecha, está trancado por escrito:** a quarta trava do `scripts/conferir-pacote.js`
+confere que tudo que o `index.html` pede existe, e estes dois estão numa **lista de exceções
+declaradas**, impressa a cada execução com o número desta pendência ao lado. Fechar esta pendência
+inclui **apagar as duas linhas de exceção** — se elas ficarem, a trava continua avisando.
+
+⚠️ **E tem uma decisão junto, que não é só técnica:** ou o PWA passa a funcionar, ou o `Fluxo.md`
+para de prometer que funciona. **Documento que promete o que o programa não faz é pior que
+documento nenhum**, porque quem lê para de acreditar no resto.
 
 ---
 

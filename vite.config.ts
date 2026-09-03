@@ -12,7 +12,7 @@ import path from 'node:path';
 // a variável, porque manivela que só tem uma posição é manivela que engana.
 //
 // A trava que impede o subendereço de voltar sem ninguém ver mora em
-// `scripts/conferir-pacote.js`, e roda no `pnpm deploy` antes de subir.
+// `scripts/conferir-pacote.js`, e roda no `pnpm run deploy` antes de subir.
 
 export default defineConfig(() => {
   const base = '/';

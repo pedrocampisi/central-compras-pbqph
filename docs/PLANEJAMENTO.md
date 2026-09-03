@@ -964,10 +964,10 @@ O desperdício é da decisão anterior, não do trabalho: **as travas sobreviver
 elas nunca foram sobre o GitHub — eram sobre o pacote. Mudaram de casa, não de pergunta.
 
 **AS TRAVAS MUDARAM DE CASA, E A CASA NOVA É MELHOR**
-`scripts/conferir-pacote.js`, ligado ao `pnpm deploy`:
+`scripts/conferir-pacote.js`, ligado ao `pnpm run deploy`:
 
 ```
-   pnpm deploy  =  pnpm build  &&  pnpm conferir:pacote  &&  wrangler deploy
+   pnpm run deploy  =  pnpm build  &&  pnpm conferir:pacote  &&  wrangler deploy
 ```
 
 Três perguntas: **o banco entrou no pacote?**, **o pacote aponta para a raiz?**, **o subendereço
@@ -1034,3 +1034,72 @@ cópias**. Pior: quando o Pages parar de receber publicação, o site de lá **n
 `main` de hoje, que é a versão de arquivo no OneDrive, sem login e sem banco. Quem clicar no
 atalho velho abre um aplicativo que **funciona**, parece o certo, e grava em outro lugar. Virou a
 **pendência 6**, e é decisão do Pedro, não minha: mexe no dia das pessoas.
+
+---
+
+## Decisão 25 — o primeiro ensaio no ar achou um defeito antigo, e a trava nova é sobre ele · 03/09/2026
+
+**O QUE FOI MEDIDO, com a palavra do Pedro na janela**
+`pnpm run deploy` subiu em `compras.campisi.workers.dev`. As quatro medições que o `CTO` pediu:
+
+```
+   a tela carrega ················· SIM — o formulário de entrada inteiro
+   a tela alcança o banco ········· SIM — 1 chamada a /auth/v1/token
+   a recusa é frase de gente ······ SIM — "E-mail ou senha incorretos."
+                                    (a decisão 5, funcionando no ar)
+   o PDF sai ····················· NÃO MEDIDO — exige estar dentro, e eu não
+                                    tenho senha nem uso a de ninguém
+```
+
+A prova do banco foi feita com um e-mail **que não existe** e uma senha sem valor: prova a fiação
+inteira sem tocar em conta de pessoa nenhuma e sem disparar e-mail.
+
+**⚠️ O DEFEITO QUE O ENSAIO ACHOU, E QUE É ANTIGO**
+O console acusou `Unexpected token '<'`. A rede não tinha **um 404 sequer** — e é justamente esse
+o problema:
+
+```
+   /manifest.webmanifest  →  200, content-type text/html, com o index.html dentro
+   /registerSW.js         →  200, content-type text/html, com o index.html dentro
+```
+
+O `index.html` pede os dois; **a montagem não os gera** (`dist/` não tem nenhum dos dois, e tem o
+`sw.js`). O `not_found_handling: single-page-application` transforma arquivo faltando em página
+inteira com **200**, e o navegador tenta ler página como programa.
+
+**NÃO É REGRESSÃO MINHA, e eu fui medir antes de dizer isso:** o site publicado no GitHub Pages
+(ramo `main`) responde **404 nos dois**. O PWA desta casa — o "instalável, funciona offline" que o
+`Fluxo.md` promete — **nunca funcionou em produção**. A hipótese é o `vite-plugin-pwa` não emitir
+os arquivos sob o Vite desta casa; é hipótese, não medição, e está escrita como hipótese.
+
+O que o Cloudflare mudou não foi criar o defeito: foi **trocar o 404 honesto por um 200 mentiroso**.
+
+**A TRAVA NOVA — a quarta pergunta do `conferir-pacote.js`**
+*Tudo que o `index.html` pede existe dentro do pacote?*
+
+É a mesma família das outras três, e a mesma cegueira de sempre: **"o arquivo respondeu?" fica
+verde nos dois casos**, porque o servidor responde 200 para tudo. A que discrimina é "o arquivo
+**existe**?".
+
+**Ensaiada:** escondi um `.css` que o índice pede — ficou **vermelha**, nomeando o arquivo. O
+pacote inteiro passa.
+
+**AS DUAS EXCEÇÕES SÃO DECLARADAS DENTRO DA TRAVA, E ISSO É DE PROPÓSITO**
+`/manifest.webmanifest` e `/registerSW.js` estão numa lista de exceções **com o motivo e o número
+da pendência escritos ao lado**, e a trava **imprime as duas toda vez que roda**, com um aviso de
+que exceção não é "está tudo bem".
+
+O caminho fácil era a trava não perguntar isso, ou perguntar frouxo. Recusado: **exceção escrita é
+dívida que se cobra; trava frouxa é dívida que some.** No dia em que a pendência 7 fechar, as duas
+linhas somem do código — e se alguém apagar a pendência sem consertar, a trava continua gritando.
+
+**POR QUE EU NÃO CONSERTEI O PWA AGORA**
+Produto está congelado até 06/09, e este é dos que o usuário vê (instalável, offline). Mais: a
+causa é hipótese, e conserto sobre hipótese, à noite, em ferramenta de montagem, é como se cria o
+defeito seguinte. Virou a **pendência 7**.
+
+**E UMA ARMADILHA QUE EU MESMA TINHA PLANTADO, achada ao rodar**
+Eu escrevi `pnpm deploy` em sete lugares. **`pnpm deploy` é comando EMBUTIDO do pnpm** (empacotar
+workspace) e não roda o roteiro desta casa: o certo é `pnpm run deploy`, com o `run`. Corrigido em
+todos os documentos vivos e no `wrangler.jsonc`, com o motivo escrito — senão a próxima sessão
+"conserta" de volta.

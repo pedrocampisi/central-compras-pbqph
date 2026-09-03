@@ -28,7 +28,7 @@ sem aprovação do Pedro** — ela é o que está em produção.
 ⚠️ **A publicação mudou de casa em 02/09/2026** (palavra do Pedro): este
 aplicativo vai para o **Cloudflare**, junto com o resto da plataforma, e o
 GitHub Pages saiu. Com isso a `main` **deixou de publicar sozinha a cada
-push** — publicar passou a ser um ato deliberado, `pnpm deploy`, que monta,
+push** — publicar passou a ser um ato deliberado, `pnpm run deploy`, que monta,
 confere o pacote e sobe. Ver `docs/PLANEJAMENTO.md`, decisão 24.
 
 ## Rodar
