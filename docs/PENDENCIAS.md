@@ -186,11 +186,60 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 ---
 
 
+### 8. O endereço do banco de produção está no repositório público desde 08/08/2026
+
+*Achado em 04/09/2026, conferindo o diff da virada antes de empurrar — e é a conferência que
+achou, não a sorte.*
+
+O valor está escrito em **um** documento arquivado,
+[`Arquivo_Morto/RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md`](Arquivo_Morto/RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md),
+que entrou no registro `ce72335`, de 08/08/2026 — antes desta caixa existir. **Já está público**,
+no ramo `migracao-supabase`, e não é novidade que a virada cria: é dívida que a virada só carrega
+para a `main`.
+
+⚠️ **CORREÇÃO DE UMA FRASE MINHA AO PEDRO, dita em 03/09:** eu disse que *"o endereço do banco não
+entrou em commit nenhum"*. Isso valia para **os meus** registros, e eu não disse essa parte. No
+repositório inteiro, é falso — está lá desde 08/08.
+
+**O tamanho real disto, medido e não estimado:**
+
+```
+   no pacote que o site entrega ... 1 arquivo .js, 3 ocorrencias
+                                    quem abre compras.campisi.com.br LE o valor
+   no repositorio publico ......... 1 documento arquivado, 1 ocorrencia
+```
+
+**O endereço do projeto não é segredo, e não pode ser** — o navegador precisa dele para falar com
+o banco, então ele viaja em todo pacote de todo aplicativo que usa Supabase. **Quem protege os
+dados é a política do banco (RLS) avaliada contra o usuário logado**, mais a chave publicável, que
+não autoriza nada sozinha. O que existe aqui é **quebra da régua da casa** (decisão 6: este é o
+único repositório público, e valor não se escreve nele), e não vazamento de senha.
+
+**Por que eu não conserto por conta própria:**
+
+```
+   tapar o valor no documento .... conserta a VITRINE, nao a historia:
+                                   o registro ce72335 continua publico
+   reescrever a historia ......... force-push em repositorio publico.
+                                   Ato grande, e quebra o clone de quem tiver um
+```
+
+Meia-medida que faz o repositório **parecer** limpo enquanto o registro antigo segue lá é pior que
+o problema, porque cria sossego falso. **A escolha é do Pedro**, e as duas pontas honestas são:
+deixar como está e saber por quê, ou reescrever a história de propósito, sabendo o preço.
+
+---
+
 ### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
 
 *Minha, para a retomada de **06/09/2026**.* Achado em 03/09, no primeiro ensaio no ar.
 
 O `index.html` pede dois arquivos que **a montagem não gera**:
+
+**Pista nova, medida em 04/09 na montagem da virada:** não é o PWA inteiro que falta. A montagem
+**gera** `sw.js` e `workbox-*.js` (29 arquivos em cache declarados), mas **não** gera os dois que
+o `index.html` pede. O gerador roda e entrega metade — o que aponta para configuração, e não para
+o gerador estar desligado. Começar por aí em 06/09.
 
 ```
    dist/manifest.webmanifest   FALTA        dist/sw.js            existe
