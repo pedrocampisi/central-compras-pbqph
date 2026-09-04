@@ -1,11 +1,45 @@
-# Fluxo.md — Central de Compras PBQP-H
+﻿# Fluxo.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-05-06
+> **Data:** 31/08/2026
+> **Estado:** VALE HOJE
+> **Escopo:** o que acontece na tela, passo a passo, sem abrir código. Descreve a versão **em uso hoje** (branch `main`, arquivo JSON); o topo resume o que muda na migração. **NÃO** substitui `Agente.md`.
+
 > Público: dono/operador. Foco em entender o que acontece, sem abrir código.
+
+## ⚠️ Existem duas versões neste momento
+
+Os fluxos descritos abaixo são os da **versão em uso hoje na empresa** (arquivo
+JSON no OneDrive, sem login). A versão em migração (branch
+`migracao-supabase`, ainda não liberada) muda três coisas no dia a dia:
+
+1. **Tem login.** Cada pessoa entra com o próprio e-mail e senha, e o que ela
+   pode fazer depende do papel (administrador, engenharia, financeiro ou
+   somente leitura).
+2. **Não existe mais salvar.** Não há Ctrl+S nem arquivo para conectar: cada
+   ação grava na hora, e quem está com a tela aberta vê a mudança do colega.
+3. **A numeração da OC é do servidor, e só nasce na emissão.** Dois
+   computadores não conseguem mais tirar o mesmo número — e rascunho que você
+   abre e desiste não queima mais um número de documento. Enquanto a OC é
+   rascunho, o número aparece como "numera ao emitir", e isso é o certo.
+4. **Clique duplo não cria duas OCs**, e se dois engenheiros mexerem na mesma
+   ordem, quem salvar por último recebe um aviso para recarregar em vez de
+   apagar o trabalho do outro sem ninguém notar.
+
+O que **não** muda: as telas, o PDF, o catálogo ECR e a importação de pedido
+por IA continuam iguais.
+
+Enquanto a virada não for aprovada, **a OC oficial continua sendo emitida no
+sistema antigo**. O estado da migração está em
+`docs/Arquivo_Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md`.
 
 ## O que o sistema faz
 
-A Central de Compras é um aplicativo web (instalável como PWA) que ajuda a Campisi a **criar, controlar e imprimir ordens de compra** dentro do padrão PBQP-H. Você cadastra fornecedores, obras, emitentes (a empresa que assina a OC) e usa o catálogo de 20 categorias ECR para classificar os itens. Cria a OC, digita os itens (ou deixa a IA extrair de um PDF do Sigescom), gera o PDF padrão Campisi e salva tudo num único arquivo JSON na sua pasta do OneDrive. O PDF vai pra pasta da obra; uma cópia rotativa do JSON inteiro vai para uma pasta de backups.
+> ⚠️ **O modo instalável está fora do ar, e nunca funcionou em produção.** Medido em 03/09/2026:
+> os dois arquivos que fazem o aplicativo ser instalável e abrir sem internet não são gerados pela
+> montagem — nem hoje, nem no site publicado. Enquanto isso não fechar, **este documento não
+> promete instalação nem uso offline**. Ver `PENDENCIAS.md`, item 7.
+
+A Central de Compras é um aplicativo web que ajuda a Campisi a **criar, controlar e imprimir ordens de compra** dentro do padrão PBQP-H. Você cadastra fornecedores, obras, emitentes (a empresa que assina a OC) e usa o catálogo de 20 categorias ECR para classificar os itens. Cria a OC, digita os itens (ou deixa a IA extrair de um PDF do Sigescom), gera o PDF padrão Campisi e salva tudo num único arquivo JSON na sua pasta do OneDrive. O PDF vai pra pasta da obra; uma cópia rotativa do JSON inteiro vai para uma pasta de backups.
 
 ## Diagrama de fluxo principal
 
@@ -75,11 +109,13 @@ flowchart TD
 
 ### Passo 1 — Abertura do app
 
-**O que acontece:** Você clica no atalho da Área de Trabalho (`Central de Compras PBQP-H.bat`). Ele abre o navegador na URL do GitHub Pages. O navegador busca os arquivos JS/CSS, monta a tela e dispara a inicialização.
+**O que acontece:** Você clica no atalho da Área de Trabalho (`Central de Compras PBQP-H.bat`). Ele abre o navegador no endereço do aplicativo. O navegador busca os arquivos JS/CSS, monta a tela e dispara a inicialização.
+
+⚠️ **O endereço mudou:** o aplicativo saiu do GitHub Pages e mora no Cloudflare, em `compras.campisi.com.br`, no ar desde 03/09/2026. **As cópias do atalho nas áreas de trabalho não se atualizam sozinhas** — mas quem clicar no atalho velho **não abre mais o programa antigo**: desde a noite de 03/09 aquele endereço mostra uma página de aviso com o link novo. Trocar as cópias virou arrumação, e deixou de ser risco. Ver `PENDENCIAS.md`, decisão 27 do `PLANEJAMENTO.md`.
 
 **Responsável:** `index.html` → `src/main.tsx` → `src/App.tsx`.
 
-**O que precisa para funcionar:** conexão de internet (na primeira vez; depois o PWA roda offline) e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
+**O que precisa para funcionar:** conexão de internet **sempre** (o modo offline não está no ar — item 7 das pendências) e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
 
 **O que pode dar errado:** se o Service Worker do PWA está com versão antiga em cache, você pode ver a tela de antes. Solução: `Ctrl+Shift+R` para forçar atualização. Se o navegador for Firefox/Safari, o app abre mas a parte de salvar arquivo não funciona.
 
@@ -267,11 +303,13 @@ Depois adiciona **itens**, um por linha:
 **Onde dos materiais cadastráveis:** aba Catálogo ECR (UI).
 **Onde dos 20 ECRs em si:** estão no `seed-data.json`. Para alterar normas/objetivo/escopo de um ECR existente nas instalações antigas, é uma migração de schema (`v3-to-v4.ts`).
 
-### 6. Mudar URL de produção / nome do repositório
-**Onde:** três lugares precisam casar:
-- `vite.config.ts` → constante `base` (subpath do GH Pages).
-- `start.bat` (atalho da Área de Trabalho) → URL hardcoded.
-- `.github/workflows/deploy.yml` → workflow de deploy do GH Actions.
+### 6. Mudar URL de produção
+**Onde:** dois lugares precisam casar, **mais as máquinas das pessoas**:
+- `wrangler.jsonc` → `routes` (o endereço próprio que o Cloudflare atende).
+- `start.bat` (atalho da Área de Trabalho) → URL escrita dentro do arquivo.
+- ⚠️ **e as cópias do atalho já espalhadas**, que ninguém atualiza a partir daqui.
+
+O `base` do Vite saiu desta lista em 02/09/2026: ele é `/` e não muda mais. O `deploy.yml` do GitHub Pages deixou de existir — publicar é `pnpm run deploy`, um ato deliberado.
 
 ## Avisos importantes
 

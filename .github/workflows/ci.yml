@@ -1,6 +1,11 @@
 name: CI
 
+# Dispara em TODO push, de qualquer ramo. Antes disparava so em pull_request
+# para a main -- e como nunca houve pull request aqui, este fluxo nunca rodou
+# uma vez sequer: 0 execucoes em 16 na historia do repositorio (medido em
+# 02/09/2026). Fluxo que nao roda e' arquivo que parece protecao.
 on:
+  push:
   pull_request:
     branches: [main]
 
@@ -10,13 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Sem `version:` de proposito: a acao le o `packageManager` do
+      # package.json. Uma fonte so para a versao do pnpm.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
+      # Node vem do .nvmrc, pelo mesmo motivo. Um '20' digitado aqui podia
+      # divergir do .nvmrc sem nada acusar.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -30,3 +37,11 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # A organizacao dos documentos tinha sido conferida A MAO uma vez, em
+      # 19/08. Aqui ela passa a rodar em todo push, como o resto. A trava da
+      # carta entregue declara "nao deu para medir" neste ambiente -- as
+      # outras casas da plataforma nao existem dentro do checkout -- e nao
+      # inventa um verde para tapar o buraco.
+      - name: Conferir os documentos
+        run: pnpm conferir

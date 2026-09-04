@@ -1,151 +1,225 @@
-/* Layout raiz */
+/* Casca do aplicativo no padrão Campisi: barra lateral de 248px em painel,
+ * itens de menu em pílula, conteúdo sobre o fundo creme. */
+
 .layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+/* Telas de portão (verificando sessão / carregando dados) */
+.gateScreen {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+/* ── Barra lateral ───────────────────────────────────────────────────────── */
 .sidebar {
-  width: 260px;
+  width: 248px;
   flex-shrink: 0;
-  background: var(--sidebar-bg);
-  border-right: 1px solid #c5d5e8;
+  background: var(--painel);
+  border-right: 1px solid var(--borda);
   display: flex;
   flex-direction: column;
+  gap: 18px;
+  padding: 20px 14px;
   height: 100vh;
   overflow: hidden;
 }
 .brand {
-  padding: 22px 18px 18px;
-  border-bottom: 1px solid #d5e3f0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  padding: 0 8px;
 }
 .logoWrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 10px;
-  overflow: hidden;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(29, 79, 124, 0.08);
-  border: 1px solid rgba(29, 79, 124, 0.15);
 }
-.logoWrap img { width: 44px; height: 44px; object-fit: contain; }
+.logoWrap img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+/* No escuro o brasão vira monocromático claro — o desenho original some no
+ * fundo azul-noite. */
+[data-tema='escuro'] .logoWrap img {
+  filter: brightness(0) invert(1) opacity(0.94);
+}
 .brandName {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 21px;
-  color: var(--navy);
-  letter-spacing: 0.3px;
-  line-height: 1;
+  font-family: var(--fonte-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--texto);
+  line-height: 1.2;
 }
 .brandSub {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--navy-mid);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--texto-suave);
   text-transform: uppercase;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .pbqphBadge {
-  margin: 12px 16px;
-  background: rgba(29, 79, 124, 0.08);
-  border: 1px solid rgba(29, 79, 124, 0.18);
-  border-radius: 7px;
-  padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0 8px;
+  padding: 6px 10px;
+  background: var(--marca-fraca);
+  border-radius: var(--raio-pill);
 }
-.pbqphDot { width: 8px; height: 8px; background: var(--navy); border-radius: 50%; flex-shrink: 0; }
-.pbqphLabel { font-size: 10px; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; text-transform: uppercase; }
-.navLabel {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
+.pbqphDot {
+  width: 7px;
+  height: 7px;
+  background: var(--marca);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pbqphLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--marca);
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 16px 20px 6px;
+}
+.navLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--terra);
+  padding: 14px 12px 6px;
 }
 
-/* Nav */
-#tabsNav { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+/* Menu */
+#tabsNav {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .tabBtn {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 11px 18px;
+  gap: 10px;
+  padding: 9px 12px;
   width: 100%;
   background: transparent;
   border: none;
-  border-left: 3px solid transparent;
-  color: var(--text-mid);
-  font-size: 14px;
+  border-radius: var(--raio-pill);
+  color: var(--texto-suave);
+  font-size: 13.5px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s;
-  border-radius: 0;
   font-family: inherit;
+  transition:
+    background var(--transicao),
+    color var(--transicao);
 }
-.tabBtn:hover { background: rgba(29, 79, 124, 0.05); color: var(--navy); }
+.tabBtn:hover {
+  background: var(--marca-fraca);
+}
 .tabBtn.active {
-  border-left-color: var(--amber);
-  background: rgba(29, 79, 124, 0.08);
-  color: var(--navy);
-  font-weight: 700;
+  background: var(--marca-fraca);
+  color: var(--marca);
+  font-weight: 600;
 }
 
-/* Footer */
-.sidebarFooter { padding: 14px 16px; border-top: 1px solid #d5e3f0; }
-.sfRow { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.sfLabel { font-size: 12px; color: var(--text-muted); }
-.sfValue { font-size: 12px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
-.sfActions { display: flex; gap: 7px; margin-top: 7px; }
+/* Rodapé da lateral: quem está logado, papel, tema e sair */
+.sidebarFooter {
+  margin-top: auto;
+  padding: 12px 8px 0;
+  border-top: 1px solid var(--borda);
+}
+.sfIdentidade {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--marca-fraca);
+  color: var(--marca);
+  display: grid;
+  place-items: center;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.sfNome {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sfPapel {
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+.temaBtn {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--borda-forte);
+  background: transparent;
+  color: var(--texto-suave);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background var(--transicao),
+    color var(--transicao);
+}
+.temaBtn:hover {
+  background: var(--marca-fraca);
+  color: var(--marca);
+}
+.sfActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
 .btnGhostSm {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 7px 0;
-  font-size: 11px;
+  gap: 6px;
+  height: 32px;
+  font-size: 12px;
   font-weight: 600;
-  background: transparent;
-  color: var(--text-mid);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  text-align: center;
-  cursor: pointer;
   font-family: inherit;
+  background: transparent;
+  color: var(--marca);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  cursor: pointer;
+  transition: background var(--transicao);
 }
-.btnGhostSm:hover { background: rgba(29, 79, 124, 0.05); }
-.btnSaveDirty {
-  background: var(--amber);
-  color: var(--navy-dark);
-  font-weight: 700;
-  border-color: var(--amber);
+.btnGhostSm:hover {
+  background: var(--marca-fraca);
 }
-.btnSaveDirty:hover { background: var(--amber); }
 
-/* Dirty indicator */
-.dirtyDot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  flex-shrink: 0;
-}
-.dirtyDot.isDirty { background: var(--warn); animation: pulse 1.6s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-/* ── Main wrapper ────────────────────────────────────────────────────────── */
+/* ── Área principal ──────────────────────────────────────────────────────── */
 .mainWrapper {
   flex: 1;
   display: flex;
@@ -154,10 +228,10 @@
   overflow: hidden;
 }
 .topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 56px;
+  background: var(--fundo);
+  border-bottom: 1px solid var(--borda);
+  padding: 0 40px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -165,82 +239,104 @@
   flex-shrink: 0;
 }
 .topbarContext {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--terra);
 }
 .topbarTitle {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  color: var(--navy);
-  letter-spacing: 0.3px;
-  line-height: 1.1;
+  font-family: var(--fonte-display);
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: -0.015em;
+  color: var(--texto);
+  line-height: 1.15;
 }
-.topbarRight { display: flex; align-items: center; gap: 8px; }
-.topbarSaveBtn {
-  display: inline-flex;
+.topbarRight {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: inherit;
-  background: var(--navy);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  gap: 8px;
 }
-.topbarSaveBtn:hover { filter: brightness(1.12); }
 .syncChip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--green-bg);
-  border: 1px solid #86efac;
-  border-radius: 20px;
-  padding: 3px 10px;
+  gap: 7px;
+  background: var(--marca-fraca);
+  border-radius: var(--raio-pill);
+  padding: 4px 12px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--green);
-  max-width: 200px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.chipDot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+.chipDot {
+  width: 6px;
+  height: 6px;
+  background: var(--sucesso);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 .mainContent {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px 32px;
+  padding: 28px 40px 60px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-/* Banner */
+/* Faixa de aviso — âmbar, sempre acima do conteúdo que ela qualifica. */
 .banner {
-  background: var(--warn-bg);
-  border: 1px solid var(--warn-border);
-  border-left: 4px solid var(--amber);
-  color: #92400e;
+  border: 1px solid var(--aviso);
+  background: var(--aviso-bg);
+  color: var(--aviso);
   padding: 11px 14px;
-  border-radius: 8px;
+  border-radius: var(--raio);
   display: flex;
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
-/* Responsive */
+/* Responsivo */
 @media (max-width: 900px) {
-  .sidebar { width: 56px; }
-  .brandName, .brandSub, .pbqphLabel, .navLabel,
-  .tabBtn span:last-child, .sfLabel, .sfValue, .sfActions,
-  .pbqphBadge { display: none; }
-  .tabBtn { padding: 10px; justify-content: center; }
-  .logoWrap { margin: 0 auto; }
+  .sidebar {
+    width: 64px;
+    padding: 20px 10px;
+  }
+  .brandName,
+  .brandSub,
+  .pbqphLabel,
+  .navLabel,
+  .tabBtn span:last-child,
+  .sfNome,
+  .sfPapel,
+  .sfActions,
+  .pbqphBadge {
+    display: none;
+  }
+  .tabBtn {
+    padding: 10px;
+    justify-content: center;
+  }
+  .brand,
+  .sfIdentidade {
+    justify-content: center;
+  }
+  .temaBtn {
+    margin: 0 auto;
+  }
+  .topbar,
+  .mainContent {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }

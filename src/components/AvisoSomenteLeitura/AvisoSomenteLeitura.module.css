@@ -1,0 +1,15 @@
+/* Faixa de aviso do padrão: âmbar, SEMPRE acima do que ela descreve —
+   avisar embaixo é avisar depois que a pessoa já tentou editar. */
+
+.aviso {
+  grid-column: 1 / -1;
+  margin: 0 0 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--aviso);
+  border-radius: var(--raio);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+  font-size: 13.5px;
+  font-weight: 500;
+  max-width: 560px;
+}

@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { podeEmitirOc } from '../../services/supabase/auth';
 import { DataTable } from '../../components/DataTable/DataTable';
 import { Pill } from '../../components/Pill/Pill';
 import { Button } from '../../components/Button/Button';
@@ -21,15 +23,20 @@ import { downloadBlob } from '../../services/storage/download';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
-import { confirmAsync } from '../../stores/useConfirmStore';
+import { definirStatusOc, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
+import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
-  const updateOrdemCompra = useDataStore((s) => s.updateOrdemCompra);
-  const removeOrdemCompra = useDataStore((s) => s.removeOrdemCompra);
 
   const startEditing = useOcEditingStore((s) => s.startEditing);
+
+  // Espelho da permissão do banco: quem não pode gravar OC não deve ver botão
+  // que só vai tomar erro do RLS depois do clique. A trava real é do banco.
+  const perfil = useAuthStore((s) => s.perfil);
+  const gravaOk = podeEmitirOc(perfil?.papel);
+  const semPermissao = 'Seu acesso é somente leitura para ordens de compra';
 
   const histFilter = useUiStore((s) => s.histFilter);
   const setHistFilter = useUiStore((s) => s.setHistFilter);
@@ -73,20 +80,20 @@ export function HistoricoPage() {
   }
 
   function handleDuplicate(oc: OrdemCompra) {
-    const currentYear = new Date().getFullYear();
-    const yearChanged = currentYear !== data!.config.ano_corrente;
-    const nextNum = yearChanged ? 1 : data!.config.ultimo_numero_oc + 1;
+    // Cópia nova: sem número (ele nasce na emissão), sem versão (ainda não
+    // existe no banco) e sempre como rascunho.
     const duplicated: OrdemCompra = {
       ...structuredClone(oc),
       id: uid('oc'),
-      numero: `${currentYear}/${String(nextNum).padStart(3, '0')}`,
-      sequencial: nextNum,
-      ano: currentYear,
+      numero: '',
+      sequencial: 0,
+      ano: new Date().getFullYear(),
       status: 'rascunho',
       data: new Date().toISOString().slice(0, 10),
       criado_em: nowIso(),
       atualizado_em: nowIso(),
       pdf_gerado_em: '',
+      versao: 0,
     };
     startEditing(duplicated);
     setTab('nova-oc');
@@ -98,16 +105,42 @@ export function HistoricoPage() {
       const fornNome = data!.fornecedores.find((f) => f.id === oc.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
-      updateOrdemCompra({ ...oc, pdf_gerado_em: nowIso(), atualizado_em: nowIso() });
+      // Comando estreito: carimba a data e não toca em mais nada. Antes isto
+      // passava pela gravação inteira da OC, que apagava e regravava todos os
+      // itens só para anotar uma data.
+      // Quem é somente-leitura leva o PDF do mesmo jeito (é consulta, não edição),
+      // mas não tenta gravar: o banco recusaria e a tela mostraria um erro à toa.
+      if (gravaOk) {
+        await marcarPdfGerado(oc.id);
+        await recarregarDados();
+      }
       showToast('PDF regenerado.', 'success');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     }
   }
 
-  function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
-    updateOrdemCompra({ ...oc, status, atualizado_em: nowIso() });
-    showToast(`Status alterado para "${status}".`, 'success');
+  async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
+    try {
+      // Comando estreito: muda o status e nada mais. Vai com a versão que esta
+      // tela leu — se outra pessoa mexeu na OC nesse meio-tempo, o banco recusa
+      // em vez de sobrescrever o trabalho dela.
+      // Emitir daqui também é o que reserva o número, se ainda não houver.
+      const gravada = await definirStatusOc(oc.id, status, oc.versao);
+      await recarregarDados();
+      showToast(
+        status === 'emitida' && gravada.numero
+          ? `OC emitida com o número ${gravada.numero}.`
+          : `Status alterado para "${status}".`,
+        'success',
+      );
+    } catch (err) {
+      if (err instanceof ConflitoDeVersao) {
+        showToast(err.message, 'warning');
+        return;
+      }
+      showToast(`Erro ao alterar status: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
   }
 
   /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */
@@ -129,17 +162,9 @@ export function HistoricoPage() {
     showToast(`${ocs.length} OC(s) exportada(s) para CSV.`, 'success');
   }
 
-  async function handleDelete(oc: OrdemCompra) {
-    const ok = await confirmAsync({
-      title: 'Excluir Ordem de Compra',
-      message: `Excluir a OC ${oc.numero}? Esta ação não pode ser desfeita.`,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removeOrdemCompra(oc.id);
-    showToast('OC excluída.', 'success');
-  }
+  // Excluir OC não existe nesta versão (a camada de dados não apaga no banco,
+  // e o número da OC precisa continuar ocupado). Use "Cancelar" para
+  // invalidar uma OC — ela permanece no histórico, como manda o PBQP-H.
 
   // ── Columns ────────────────────────────────────────────────────────────────
 
@@ -147,7 +172,12 @@ export function HistoricoPage() {
     {
       key: 'numero',
       label: 'Número',
-      render: (o) => <strong style={{ fontFamily: 'monospace' }}>{o.numero}</strong>,
+      render: (o) =>
+        o.numero ? (
+          <strong className="doc">{o.numero}</strong>
+        ) : (
+          <span style={{ color: 'var(--texto-muted)', fontSize: 12 }}>(numera ao emitir)</span>
+        ),
     },
     { key: 'data', label: 'Data', render: (o) => formatDate(o.data) },
     {
@@ -192,7 +222,13 @@ export function HistoricoPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
           </Button>
-          <Button variant="primary" size="sm" onClick={() => setTab('nova-oc')}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setTab('nova-oc')}
+            disabled={!gravaOk}
+            title={gravaOk ? undefined : semPermissao}
+          >
             + Nova OC
           </Button>
         </div>
@@ -237,7 +273,6 @@ export function HistoricoPage() {
       {/* Tabela */}
       {ocs.length === 0 ? (
         <EmptyState
-          icon="↺"
           title="Nenhuma OC encontrada"
           description={
             data.ordens_compra.length === 0
@@ -245,7 +280,7 @@ export function HistoricoPage() {
               : 'Tente ajustar os filtros de busca.'
           }
           action={
-            data.ordens_compra.length === 0
+            data.ordens_compra.length === 0 && gravaOk
               ? { label: '+ Nova OC', onClick: () => setTab('nova-oc') }
               : undefined
           }
@@ -258,24 +293,25 @@ export function HistoricoPage() {
           emptyTitle="Nenhuma OC encontrada"
           rowActions={(o) => (
             <div style={{ display: 'flex', gap: 4 }}>
-              {o.status === 'rascunho' && (
+              {o.status === 'rascunho' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => handleEdit(o)}>Editar</Button>
               )}
-              <Button variant="ghost" size="sm" onClick={() => handleDuplicate(o)}>Duplicar</Button>
+              {gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => handleDuplicate(o)}>Duplicar</Button>
+              )}
               {o.status !== 'rascunho' && (
                 <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
               )}
-              {o.status === 'emitida' && (
-                <Button variant="ghost" size="sm" onClick={() => handleStatusChange(o, 'entregue')}>
+              {o.status === 'emitida' && gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'entregue')}>
                   ✓ Entregue
                 </Button>
               )}
-              {o.status !== 'cancelada' && (
-                <Button variant="ghost" size="sm" onClick={() => handleStatusChange(o, 'cancelada')}>
+              {o.status !== 'cancelada' && gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
                   Cancelar
                 </Button>
               )}
-              <Button variant="danger" size="sm" onClick={() => void handleDelete(o)}>Excluir</Button>
             </div>
           )}
         />

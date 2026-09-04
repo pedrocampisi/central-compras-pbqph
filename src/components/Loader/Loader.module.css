@@ -1,0 +1,44 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 20px;
+}
+.loader {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+.loader img {
+  width: 340px;
+  position: absolute;
+  left: -108px;
+  top: -12px;
+}
+.loader img:nth-child(2) {
+  visibility: hidden;
+}
+.loader.ativo img:nth-child(2) {
+  animation: martelo 960ms steps(1) infinite;
+}
+@keyframes martelo {
+  0% {
+    visibility: hidden;
+  }
+  50% {
+    visibility: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader.ativo img:nth-child(2) {
+    animation: none;
+  }
+}
+.texto {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 13.5px;
+}

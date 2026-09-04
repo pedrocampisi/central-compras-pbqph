@@ -2,10 +2,30 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/brazao1.png" />
+    <link rel="icon" type="image/png" href="/marca/mascote-rosto.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0d2b4a" />
+    <meta name="theme-color" content="#FBF3DE" />
     <title>Central de Compras PBQP-H — Campisi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Albert+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Tema antes da primeira pintura: se ficar para o React, a tela pisca
+      // clara antes de virar escura. Espelha hooks/useTema.ts.
+      (function () {
+        try {
+          var salvo = localStorage.getItem('tema');
+          if (salvo === 'escuro') document.documentElement.dataset.tema = 'escuro';
+          else if (salvo === null && matchMedia('(prefers-color-scheme: dark)').matches)
+            document.documentElement.dataset.tema = 'escuro';
+        } catch (e) {
+          /* navegador sem localStorage: fica no claro */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

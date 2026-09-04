@@ -1,6 +1,52 @@
-# Central de Compras PBQP-H — Guia para Desenvolvedores
+﻿# Central de Compras PBQP-H — Guia para Desenvolvedores
 
-> Última atualização: 2026-05-06
+> **Data:** 31/08/2026
+> **Estado:** VALE HOJE — para a branch `main`
+> **Escopo:** como rodar, mapa de arquivos e como adicionar as coisas comuns. Descreve o fluxo em **arquivo JSON** (branch `main`). **NÃO** descreve a camada de banco da `migracao-supabase` — para isso, `Agente.md` seção 0.
+
+
+## ⚠️ Leia antes: onde ficam os dados hoje
+
+Este documento foi escrito para a versão em arquivo JSON e **ainda descreve
+esse fluxo em detalhe**. Ele continua válido para a branch `main` (a que está
+no ar em produção), mas **não** para a branch `migracao-supabase`.
+
+| | `main` (produção) | `migracao-supabase` |
+|---|---|---|
+| Fonte da verdade | arquivo JSON no OneDrive | banco Supabase |
+| Entrada | sem login | login por pessoa + papel (admin/engenharia/financeiro/leitura) |
+| Gravação | Ctrl+S grava o arquivo | cada ação grava direto no banco |
+| Permissão | ninguém barra ninguém | políticas no banco (RLS); a tela só espelha |
+| Chave da IA | dentro do JSON, em texto puro | segredo do servidor (Edge Function `extrair-itens`) |
+
+Na branch de migração, a camada `services/storage/*` (handles, fileSystem,
+backups, concurrency, cache) e os hooks `useAutoSave`/`useDirtyGuard`
+**continuam no repositório mas não são chamados** — são o caminho de volta
+enquanto a virada não for aprovada. Quem for mexer lá deve ler
+`services/supabase/*` primeiro.
+
+## Padrão visual
+
+Desde 12/08/2026 a interface segue o **padrão front-end da Campisi** (direção
+"Creme", claro e escuro), cuja fonte oficial é
+`campisi-central/Padrao_Front_end/`. As regras que restringem qualquer CSS novo
+estão resumidas na seção 0.1 do `docs/Agente.md`; o resumo do resumo:
+cor só via `src/styles/tokens.css`, **um** botão laranja por tela, ícone de
+traço (nunca emoji), mascote longe de tabela e movimento só em espera. Os
+arquivos da marca ficam em `public/marca/`.
+
+O contrato de gravação da ordem de compra (uma transação só, `request_id`,
+`versao`, número na emissão) está na seção 0.2 do `docs/Agente.md`. Quem for
+mexer em `salvarOrdemCompra` lê aquilo antes.
+
+A tela de entrada com portão e animação **não existe aqui** — ela é da
+**Central**, que será a porta de entrada da equipe. O login deste aplicativo é
+só o formulário, e sai de cena quando a Central assumir a autenticação.
+
+O estado da migração e a lista de pendências estão em
+`docs/Arquivo_Morto/RELATORIO-RODADA-2-2026-08-10.md`,
+`docs/Arquivo_Morto/DEVOLUCAO-AO-AGENTE-CENTRAL-2026-08-10.md` e na perícia técnica
+`docs/Arquivo_Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`.
 
 ## Visão geral
 
@@ -34,7 +80,8 @@ pnpm preview        # serve dist/ localmente
 ### Variáveis de ambiente
 
 - **`VITE_BASE_PATH`** — opcional. Sobrescreve o `base` em build (default `/central-compras-pbqph/` em qualquer `vite build`). Use `VITE_BASE_PATH=/` para hospedar na raiz de outro domínio.
-- **OpenRouter API key** — *não* é variável de ambiente; é armazenada em `config.openrouter_api_key` dentro do JSON do usuário (configurada na aba "Configurações"). Trocar de modelo/conta é por lá. **Atenção:** chave fica em texto puro no JSON; trate o arquivo (e os backups rotativos) como dado sensível.
+- **OpenRouter API key** *(só em `main`)* — *não* é variável de ambiente; é armazenada em `config.openrouter_api_key` dentro do JSON do usuário (configurada na aba "Configurações"). Trocar de modelo/conta é por lá. **Atenção:** chave fica em texto puro no JSON; trate o arquivo (e os backups rotativos) como dado sensível. Em `migracao-supabase` essa chave não existe mais no navegador: virou segredo do servidor.
+- **`VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`** *(só em `migracao-supabase`)* — endereço e chave publicável do projeto Supabase, em `.env.local` (dev) ou nos segredos do CI (deploy). Sem as duas, `services/supabase/client.ts` lança na inicialização e o app não abre.
 
 ### URL de produção
 
@@ -93,7 +140,7 @@ pnpm preview        # serve dist/ localmente
 
 **`types.ts`** — Tipos canônicos (`Data`, `OrdemCompra`, `Item`, `Fornecedor`, `Obra`, `Ecr`, `Emitente`, `Config`, `Endereco`).
 
-**`constants.ts`** — `STATUS_OC`, `STATUS_LABEL`, `UN_PADRAO` (12 unidades), `TIPOS_EMITENTE`, `CURRENT_SCHEMA_VERSION = 3`.
+**`constants.ts`** — `STATUS_OC`, `STATUS_LABEL`, `UN_PADRAO` (12 unidades), `TIPOS_EMITENTE`, `TIPOS_PRESTADOR`, `STATUS_CRITERIO`, `CATEGORIAS_SERVICO`, `CURRENT_SCHEMA_VERSION = 5`.
 
 **`compute.ts`**
 - `computeItemTotal(item)` → `{ liquido, ipi, total }`. **Atenção: IPI é aplicado sobre o líquido, não sobre o bruto.**
@@ -110,9 +157,10 @@ pnpm preview        # serve dist/ localmente
 **`schemas/data.schema.ts`** — Zod schemas com `.default()` em todos campos (não-bloqueante).
 
 **`migrations/`**
-- `index.ts#runMigrations(raw)` lê `schema_version` e roda v1→v2 e/ou v2→v3.
+- `index.ts#runMigrations(raw)` lê `schema_version` e roda, em ordem, tudo que faltar até v5.
 - `v1-to-v2.ts` — Promove `config.emitente` (objeto) para `config.emitentes[]` (array com id `emit-legacy-01`).
 - `v2-to-v3.ts` — Popula campos ricos do ECR (`objetivo`, `escopo`, `ensaios[]`, etc.) com defaults vazios.
+- `v3-to-v4.ts` / `v4-to-v5.ts` — Prestadores de serviço e avaliações.
 
 ### `src/services/`
 
@@ -190,10 +238,11 @@ pnpm preview        # serve dist/ localmente
 
 ### Adicionar nova migração de schema
 
-1. Crie `src/domain/migrations/v3-to-v4.ts` com função pura `(raw) => raw`.
-2. Em `src/domain/migrations/index.ts` adicione `if (version < 4) data = migrateV3toV4(data);`.
-3. Bumpe `CURRENT_SCHEMA_VERSION` em `src/domain/constants.ts` para 4.
-4. Adicione caso em `tests/domain/migrations.test.ts` cobrindo subida v3→v4 e idempotência.
+1. Crie `src/domain/migrations/v5-to-v6.ts` com função pura `(raw) => raw`.
+2. Em `src/domain/migrations/index.ts` adicione `if (version < 6) data = migrateV5toV6(data);`.
+3. Bumpe `CURRENT_SCHEMA_VERSION` em `src/domain/constants.ts` para 6 (o Zod e a camada
+   do Supabase leem essa constante — não repita o número na mão).
+4. Adicione caso em `tests/domain/migrations.test.ts` cobrindo subida v5→v6 e idempotência.
 
 ### Adicionar novo status de OC
 
@@ -209,7 +258,8 @@ pnpm preview        # serve dist/ localmente
 
 ### Trocar modelo de IA
 
-Edite `MODEL` em `src/services/ai/openRouterClient.ts`. Se trocar de família (ex: GPT-4o), revise `MAX_TOKENS` e o formato do prompt em `extractItems.ts`.
+- **`main`:** edite `MODEL` em `src/services/ai/openRouterClient.ts`. Se trocar de família (ex: GPT-4o), revise `MAX_TOKENS` e o formato do prompt em `extractItems.ts`.
+- **`migracao-supabase`:** o `openRouterClient.ts` não existe mais — a chamada à IA saiu do navegador e virou a Edge Function `extrair-itens`, no repositório `campisi-central`. Modelo e chave são de lá; aqui fica só a normalização da resposta (`UN_MAP`, `normalizeItem`).
 
 ### Adicionar nova aba
 

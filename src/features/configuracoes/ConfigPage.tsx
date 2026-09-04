@@ -1,134 +1,47 @@
 /**
- * Aba Configurações — emitentes, textos, chave de API, backup.
- * Portado de renderConfig / renderEmitentesListConfig / saveConfig (CentralCompras-PBQPH.html).
+ * Aba Configurações — SOMENTE LEITURA nesta versão.
+ *
+ * A camada de dados ainda não grava configurações (emitentes, condições de
+ * pagamento, textos legais) no banco — e uma tela que aceita edição e perde
+ * tudo no reload é pior do que uma que não deixa editar. Até a gravação ser
+ * ligada, os controles ficam desabilitados e a tela diz o porquê.
+ *
+ * Os backups locais por pasta também saíram de cena: os dados agora vivem no
+ * banco (Supabase), cujo backup é responsabilidade do servidor, não de uma
+ * pasta no computador de cada um.
  */
 
-import { useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
-import { useUiStore } from '../../stores/useUiStore';
-import { EmitenteDrawer } from './EmitenteDrawer';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Field } from '../../components/Field/Field';
 import { Button } from '../../components/Button/Button';
-import { Icon } from '../../components/Icon/Icon';
-import { BACKUP_DIR_KEY } from '../../services/storage/backups';
-import { saveHandleByKey } from '../../services/storage/handles';
-import { verifyHandlePermission } from '../../services/storage/permissions';
-import { getApiKey, setApiKey } from '../../services/storage/apiKey';
-import { confirmAsync } from '../../stores/useConfirmStore';
-import type { Emitente } from '../../domain/types';
+import { AvisoSomenteLeitura } from '../../components/AvisoSomenteLeitura/AvisoSomenteLeitura';
 import styles from './ConfigPage.module.css';
 
 export function ConfigPage() {
   const data = useDataStore((s) => s.data);
-  const updateConfig = useDataStore((s) => s.updateConfig);
-  const showToast = useUiStore((s) => s.showToast);
-
-  const [emitenteDrawerOpen, setEmitenteDrawerOpen] = useState(false);
-  const [editingEmitente, setEditingEmitente] = useState<Emitente | null>(null);
-  const [newCondicao, setNewCondicao] = useState('');
-  const [showApiKey, setShowApiKey] = useState(false);
-  // Chave da IA é por dispositivo (localStorage), não vai para o JSON compartilhado.
-  const [apiKey, setApiKeyState] = useState(() => getApiKey());
 
   if (!data) return null;
 
   const cfg = data.config;
-
-  // ── Emitentes ───────────────────────────────────────────────────────────────
-
-  function openNewEmitente() {
-    setEditingEmitente(null);
-    setEmitenteDrawerOpen(true);
-  }
-
-  function openEditEmitente(e: Emitente) {
-    setEditingEmitente(e);
-    setEmitenteDrawerOpen(true);
-  }
-
-  function handleSaveEmitente(emitente: Emitente) {
-    const existing = cfg.emitentes.findIndex((e) => e.id === emitente.id);
-    const emitentes =
-      existing >= 0
-        ? cfg.emitentes.map((e) => (e.id === emitente.id ? emitente : e))
-        : [...cfg.emitentes, emitente];
-    updateConfig({ emitentes });
-  }
-
-  async function handleDeleteEmitente(id: string) {
-    if (cfg.emitentes.length <= 1) {
-      showToast('Deve haver ao menos um emitente.', 'warning');
-      return;
-    }
-    const ok = await confirmAsync({
-      title: 'Excluir emitente',
-      message: 'Excluir este emitente? OCs antigas emitidas por ele continuam no histórico.',
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    updateConfig({ emitentes: cfg.emitentes.filter((e) => e.id !== id) });
-    showToast('Emitente excluído.', 'success');
-  }
-
-  // ── Condições de pagamento ──────────────────────────────────────────────────
-
-  function addCondicao() {
-    const trimmed = newCondicao.trim();
-    if (!trimmed) return;
-    if (cfg.condicoes_pagamento.includes(trimmed)) {
-      showToast('Essa condição já existe.', 'warning');
-      return;
-    }
-    updateConfig({ condicoes_pagamento: [...cfg.condicoes_pagamento, trimmed] });
-    setNewCondicao('');
-  }
-
-  function removeCondicao(v: string) {
-    updateConfig({ condicoes_pagamento: cfg.condicoes_pagamento.filter((c) => c !== v) });
-  }
-
-  // ── Pasta de backups ────────────────────────────────────────────────────────
-
-  async function handlePickBackups() {
-    if (!('showDirectoryPicker' in window)) {
-      showToast('Seleção de pasta não suportada neste navegador.', 'warning');
-      return;
-    }
-    try {
-      const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-      const granted = await verifyHandlePermission(dirHandle, true);
-      if (!granted) {
-        showToast('Permissão de escrita negada para esta pasta.', 'warning');
-        return;
-      }
-      // Persiste o handle no IndexedDB — é daqui que writeRotatingBackup lê.
-      await saveHandleByKey(BACKUP_DIR_KEY, dirHandle);
-      updateConfig({ pasta_backups: dirHandle.name });
-      showToast(`Pasta de backups: "${dirHandle.name}"`, 'success');
-    } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        showToast('Não foi possível selecionar a pasta.', 'warning');
-      }
-    }
-  }
 
   return (
     <div className="section">
       <div className="section-header">
         <div>
           <h2>Configurações</h2>
-          <p className="section-sub">Emitentes, textos legais, integração com IA e backups.</p>
+          <p className="section-sub">Emitentes, textos legais e integração com IA.</p>
         </div>
       </div>
+
+      <AvisoSomenteLeitura oQue="as configurações" />
 
       {/* ── Emitentes ─────────────────────────────────────────────────────── */}
       <FieldGroup title="Emitentes">
         <div className={styles.emitentesList}>
           {cfg.emitentes.length === 0 && (
             <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-              Nenhum emitente cadastrado. Adicione pelo menos um para emitir OCs.
+              Nenhum emitente cadastrado no banco.
             </p>
           )}
           {cfg.emitentes.map((e, idx) => (
@@ -145,51 +58,25 @@ export function ConfigPage() {
                   {e.email_envio_nf && <> · {e.email_envio_nf}</>}
                 </div>
               </div>
-              <div className={styles.emitenteActions}>
-                <Button variant="ghost" size="sm" onClick={() => openEditEmitente(e)}>Editar</Button>
-                {idx > 0 && (
-                  <Button variant="danger" size="sm" onClick={() => void handleDeleteEmitente(e.id)}>Excluir</Button>
-                )}
-              </div>
             </div>
           ))}
         </div>
-        <Button variant="outline" size="sm" onClick={openNewEmitente} style={{ marginTop: 4 }}>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled
+          title="A camada de dados ainda não grava emitentes — edição virá numa próxima etapa"
+          style={{ marginTop: 4 }}
+        >
           + Adicionar Emitente
         </Button>
       </FieldGroup>
 
       {/* ── Integração IA ─────────────────────────────────────────────────── */}
-      <FieldGroup title="Integração com IA (OpenRouter)">
-        <div className={styles.rowFull}>
-          <input
-            className={styles.monoInput}
-            type={showApiKey ? 'text' : 'password'}
-            placeholder="sk-or-…"
-            value={apiKey}
-            onChange={(e) => {
-              setApiKeyState(e.target.value);
-              setApiKey(e.target.value);
-            }}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            data-lpignore="true"
-            data-1p-ignore="true"
-          />
-          <Button variant="ghost" size="sm" onClick={() => setShowApiKey((v) => !v)}>
-            {showApiKey ? '🙈' : '👁'}
-          </Button>
-        </div>
+      <FieldGroup title="Importação de Pedidos por IA">
         <p className={styles.hint}>
-          Chave de API do{' '}
-          <a href="https://openrouter.ai" target="_blank" rel="noreferrer" style={{ color: 'var(--navy)' }}>
-            OpenRouter
-          </a>{' '}
-          para importação de pedidos via IA. Armazenada <strong>apenas neste computador</strong> —
-          não vai para o arquivo compartilhado, OneDrive nem backups. Em outro computador,
-          informe a chave novamente.
+          A leitura de pedidos por IA agora roda no servidor, com a chave
+          guardada lá — nenhuma configuração é necessária neste computador.
         </p>
       </FieldGroup>
 
@@ -199,13 +86,6 @@ export function ConfigPage() {
           {cfg.condicoes_pagamento.map((c) => (
             <div key={c} className={styles.condicaoChip}>
               <span>{c}</span>
-              <button
-                className={styles.chipRemove}
-                onClick={() => removeCondicao(c)}
-                aria-label={`Remover ${c}`}
-              >
-                ×
-              </button>
             </div>
           ))}
           {cfg.condicoes_pagamento.length === 0 && (
@@ -216,75 +96,58 @@ export function ConfigPage() {
           <input
             className={styles.textInput}
             placeholder="Ex: 30/60/90 dias"
-            value={newCondicao}
-            onChange={(e) => setNewCondicao(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCondicao(); } }}
+            disabled
+            title="A camada de dados ainda não grava condições — edição virá numa próxima etapa"
           />
-          <Button variant="outline" size="sm" onClick={addCondicao}>Adicionar</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            title="A camada de dados ainda não grava condições — edição virá numa próxima etapa"
+          >
+            Adicionar
+          </Button>
         </div>
       </FieldGroup>
 
       {/* ── Textos legais ─────────────────────────────────────────────────── */}
-      <FieldGroup title="Textos Legais">
-        <Field
-          as="textarea"
-          label="Condições de Contratação"
-          span2
-          rows={4}
-          value={cfg.texto_condicoes_contratacao}
-          onChange={(e) => updateConfig({ texto_condicoes_contratacao: e.target.value })}
-        />
-        <Field
-          as="textarea"
-          label="Instrução para Envio de NF"
-          span2
-          rows={3}
-          value={cfg.texto_envio_nf}
-          onChange={(e) => updateConfig({ texto_envio_nf: e.target.value })}
-        />
-        <Field
-          as="textarea"
-          label="Requisito de Qualidade"
-          span2
-          rows={3}
-          value={cfg.texto_qualidade}
-          onChange={(e) => updateConfig({ texto_qualidade: e.target.value })}
-        />
-      </FieldGroup>
+      <fieldset disabled className="fieldset-reset">
+        <FieldGroup title="Textos Legais">
+          <Field
+            as="textarea"
+            label="Condições de Contratação"
+            span2
+            rows={4}
+            value={cfg.texto_condicoes_contratacao}
+            readOnly
+          />
+          <Field
+            as="textarea"
+            label="Instrução para Envio de NF"
+            span2
+            rows={3}
+            value={cfg.texto_envio_nf}
+            readOnly
+          />
+          <Field
+            as="textarea"
+            label="Requisito de Qualidade"
+            span2
+            rows={3}
+            value={cfg.texto_qualidade}
+            readOnly
+          />
+        </FieldGroup>
+      </fieldset>
 
       {/* ── Backups ───────────────────────────────────────────────────────── */}
-      <FieldGroup title="Pasta de Backups Automáticos">
-        {!cfg.pasta_backups && (
-          <div role="alert" className={styles.warnBanner}>
-            <span>⚠️</span>
-            <span>
-              Nenhuma pasta de backups selecionada. Os backups rotativos estão{' '}
-              <strong>desativados</strong> — escolha uma pasta abaixo para ativá-los.
-            </span>
-          </div>
-        )}
-        <div className={styles.rowFull}>
-          <div className={[styles.pathBox, cfg.pasta_backups ? '' : styles.pathBoxEmpty].join(' ')}>
-            {cfg.pasta_backups || 'Nenhuma pasta selecionada — backups desativados'}
-          </div>
-          <Button variant="outline" size="sm" onClick={handlePickBackups}>
-            <Icon name="folder" size={13} /> Selecionar
-          </Button>
-        </div>
+      <FieldGroup title="Backups">
         <p className={styles.hint}>
-          A cada salvamento, um snapshot timestampado é criado nesta pasta (máximo 10 backups rotativos).
+          Os dados agora ficam no banco (Supabase). O backup é feito no
+          servidor — a antiga pasta de backups locais deixou de ser usada
+          nesta versão.
         </p>
       </FieldGroup>
-
-      {/* Drawer emitentes — montado só quando aberto, para reiniciar o form */}
-      {emitenteDrawerOpen && (
-        <EmitenteDrawer
-          open
-          emitente={editingEmitente}
-          onClose={() => setEmitenteDrawerOpen(false)}
-          onSave={handleSaveEmitente}
-        />
-      )}
     </div>
   );
 }

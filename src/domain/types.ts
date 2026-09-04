@@ -125,6 +125,11 @@ export interface Item {
 
 export interface OrdemCompra {
   id: string;
+  /**
+   * Vazio enquanto a OC é rascunho: por decisão do Pedro (18/08/2026) o número
+   * do PBQP-H só nasce na EMISSÃO. Rascunho aberto e descartado não queima
+   * número, e buraco na sequência é pergunta de auditor.
+   */
   numero: string;
   sequencial: number;
   ano: number;
@@ -142,6 +147,13 @@ export interface OrdemCompra {
   criado_em: string;
   atualizado_em: string;
   pdf_gerado_em: string;
+  /**
+   * Versão que o banco tem desta OC. Sobe a cada gravação e é o que impede
+   * duas pessoas de se sobrescreverem em silêncio: mandamos a versão que
+   * lemos, e o banco recusa se ele já estiver noutra. 0 = OC que ainda não
+   * existe no banco.
+   */
+  versao: number;
 }
 
 export interface PrestadorServico {
@@ -186,7 +198,6 @@ export interface Config {
   texto_condicoes_contratacao: string;
   texto_envio_nf: string;
   texto_qualidade: string;
-  openrouter_api_key: string;
   pasta_backups: string;
 }
 

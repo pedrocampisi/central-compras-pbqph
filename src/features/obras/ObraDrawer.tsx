@@ -8,9 +8,9 @@ import { Drawer } from '../../components/Drawer/Drawer';
 import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
+import { AvisoSomenteLeitura } from '../../components/AvisoSomenteLeitura/AvisoSomenteLeitura';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
-import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
@@ -49,7 +49,6 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
   // então o estado inicial do form já reflete a obra correta.
   const [form, setForm] = useState<Obra>(() => obra ?? emptyObra());
   const [handleConnected, setHandleConnected] = useState(false);
-  const upsertObra = useDataStore((s) => s.upsertObra);
   const showToast = useUiStore((s) => s.showToast);
 
   // Verifica se já existe handle persistido para esta obra
@@ -99,32 +98,31 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
     showToast('Pasta desconectada. PDFs serão baixados pelo navegador.', 'info');
   }
 
-  function handleSave() {
-    if (!form.nome.trim()) {
-      showToast('Nome da obra é obrigatório.', 'warning');
-      return;
-    }
-    upsertObra({ ...form, atualizado_em: nowIso() });
-    showToast(obra ? 'Obra atualizada.' : 'Obra criada.', 'success');
-    onClose();
-  }
-
-  const isNew = !obra;
-
   return (
     <Drawer
       open={open}
-      title={isNew ? 'Nova Obra' : 'Editar Obra'}
+      title="Obra — somente leitura"
       onClose={onClose}
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
-          <Button variant="primary" size="sm" onClick={handleSave}>
-            {isNew ? 'Criar' : 'Salvar'}
+          <Button variant="outline" size="sm" onClick={onClose}>Fechar</Button>
+          <Button
+            variant="primary"
+            size="sm"
+            disabled
+            title="A camada de dados ainda não grava obras — edição virá numa próxima etapa"
+          >
+            Salvar
           </Button>
         </div>
       }
     >
+      <AvisoSomenteLeitura oQue="o cadastro de obras" />
+
+      {/* Campos desabilitados em bloco: a camada não grava obras nesta versão.
+          A seção "Pasta de OCs" fica FORA do fieldset de propósito — ela grava
+          no navegador (IndexedDB) e funciona de verdade. */}
+      <fieldset disabled className="fieldset-reset">
       <FieldGroup title="Identificação">
         <Field
           label="Nome da Obra"
@@ -155,6 +153,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
       <FieldGroup title="Endereço">
         <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
       </FieldGroup>
+      </fieldset>
 
       <FieldGroup title="Pasta de OCs">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, gridColumn: '1 / -1' }}>
@@ -193,6 +192,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
         </p>
       </FieldGroup>
 
+      <fieldset disabled className="fieldset-reset">
       <FieldGroup title="Observações">
         <Field
           as="textarea"
@@ -205,7 +205,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
       </FieldGroup>
 
       <FieldGroup title="Status">
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
           <input
             type="checkbox"
             checked={form.ativa}
@@ -214,6 +214,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
           Obra ativa
         </label>
       </FieldGroup>
+      </fieldset>
     </Drawer>
   );
 }

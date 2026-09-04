@@ -5,58 +5,87 @@
   flex-wrap: wrap;
 }
 
+/* ── Busca em pílula ─────────────────────────────────────────────────────── */
+.busca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 460px;
+  background: var(--painel);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pill);
+  padding: 7px 18px;
+  box-shadow: var(--sombra-suave);
+}
+.busca:focus-within {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
+}
+.buscaIcone {
+  color: var(--texto-muted);
+  flex: none;
+}
 .searchInput {
   flex: 1;
-  min-width: 220px;
-  padding: 7px 11px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 13px;
-  font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-size: 13.5px;
   outline: none;
 }
-.searchInput:focus { border-color: var(--navy); box-shadow: 0 0 0 2px rgba(29,79,124,0.12); }
+.searchInput::placeholder {
+  color: var(--texto-muted);
+}
 
+/* ── Alternador (Todos / Ativos / Inativos) ──────────────────────────────── */
 .toggleGroup {
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pill);
   overflow: hidden;
 }
-
 .toggleBtn {
-  padding: 6px 14px;
-  font-size: 12px;
+  height: 34px;
+  padding: 0 16px;
+  font-size: 12.5px;
   font-weight: 500;
   font-family: inherit;
-  background: var(--surface);
-  color: var(--text-mid);
+  background: transparent;
+  color: var(--texto-suave);
   border: none;
-  border-right: 1px solid var(--border);
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.14s;
+  transition: background var(--transicao), color var(--transicao);
 }
-.toggleBtn:last-child { border-right: none; }
-.toggleBtn:hover { background: rgba(29,79,124,0.05); }
-.toggleActive {
-  background: var(--navy);
-  color: #fff;
+.toggleBtn:hover {
+  background: var(--marca-fraca);
+}
+.toggleActive,
+.toggleActive:hover {
+  background: var(--marca-fraca);
+  color: var(--marca);
   font-weight: 600;
 }
-.toggleActive:hover { background: var(--navy); }
 
+/* ── Select de filtro ────────────────────────────────────────────────────── */
 .filterSelect {
-  padding: 7px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  font-size: 12.5px;
   font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--painel);
+  color: var(--texto);
   outline: none;
   cursor: pointer;
-  min-width: 140px;
+  min-width: 150px;
+  transition: border-color var(--transicao);
 }
-.filterSelect:focus { border-color: var(--navy); }
+.filterSelect:hover {
+  border-color: var(--marca);
+}

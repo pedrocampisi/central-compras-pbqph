@@ -4,7 +4,9 @@
  */
 
 import { z } from 'zod';
-import { STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO } from '../constants';
+import {
+  STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO, CURRENT_SCHEMA_VERSION,
+} from '../constants';
 
 // ── Endereço ────────────────────────────────────────────────────────────────
 export const EnderecoSchema = z.object({
@@ -166,6 +168,9 @@ export const OrdemCompraSchema = z.object({
   criado_em: z.string().default(''),
   atualizado_em: z.string().default(''),
   pdf_gerado_em: z.string().default(''),
+  // Versão do banco. 0 = ainda não existe lá — é o que distingue "OC nova"
+  // de "OC lida do banco" na hora de gravar.
+  versao: z.number().default(0),
 });
 
 // ── Prestador de Serviço ──────────────────────────────────────────────────
@@ -228,13 +233,12 @@ export const ConfigSchema = z.object({
   texto_condicoes_contratacao: z.string().default(''),
   texto_envio_nf: z.string().default(''),
   texto_qualidade: z.string().default(''),
-  openrouter_api_key: z.string().default(''),
   pasta_backups: z.string().default(''),
 });
 
 // ── Data raiz ──────────────────────────────────────────────────────────────
 export const DataSchema = z.object({
-  schema_version: z.number().default(4),
+  schema_version: z.number().default(CURRENT_SCHEMA_VERSION),
   version: z.number().default(1),
   app_name: z.string().default('Central de Compras PBQP-H V2 - Campisi'),
   shared_file_name: z.string().default('central-compras-data.json'),

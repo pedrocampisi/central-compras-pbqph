@@ -1,5 +1,9 @@
 # Prestadores de Serviço — Fase 2: Documentos & Alertas
 
+> **Data:** 11/05/2026
+> **Estado:** PROPOSTA — aguardando o Pedro
+> **Escopo:** esboço da fase 2 de prestadores (documentos e alertas). **NÃO** foi implementado e **NÃO** se executa.
+
 ## Status: ⏸️ Não implementado (roadmap)
 
 ## Contexto

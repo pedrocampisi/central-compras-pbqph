@@ -1,0 +1,169 @@
+/* Entrada da Central de Compras.
+ *
+ * SEM portão de boas-vindas e SEM animação de entrada: a cerimônia da marca é
+ * da Central (`Plataforma_Campisi/Central`), que é por onde a
+ * equipe entra. Aqui fica só o necessário para autenticar — e o dia em que a
+ * Central assumir o login, esta tela some.
+ *
+ * Diferente do resto do padrão, esta tela acompanha o tema normalmente: sem o
+ * vídeo, não há mais cor de fundo para casar. */
+
+.wrap {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  background: var(--fundo);
+  color: var(--texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.card {
+  background: var(--painel);
+  border-radius: var(--raio-grande);
+  box-shadow: var(--sombra-elevada);
+  padding: 40px 40px 28px;
+  width: min(420px, 92vw);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.logo {
+  width: 72px;
+  display: block;
+  margin: 0 auto 16px;
+}
+[data-tema='escuro'] .logo {
+  filter: brightness(0) invert(1) opacity(0.94);
+}
+.brandName {
+  font-family: var(--fonte-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--texto);
+}
+.brandSub {
+  color: var(--texto-suave);
+  margin: 0 0 18px;
+  font-size: 14px;
+}
+
+.field {
+  display: block;
+  text-align: left;
+}
+.field span {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--texto-suave);
+  margin: 14px 0 6px;
+}
+.field input {
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  background: var(--painel-2);
+  color: var(--texto);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  font: inherit;
+  font-size: 14.5px;
+  transition: border-color var(--transicao);
+}
+.field input:hover,
+.field input:focus {
+  border-color: var(--marca);
+}
+.field input::placeholder {
+  color: var(--texto-muted);
+}
+
+/* Única ação primária da tela. */
+.btnEntrar {
+  width: 100%;
+  height: 48px;
+  margin-top: 24px;
+  background: var(--acento);
+  color: var(--acento-texto);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border: 0;
+  border-radius: var(--raio-pill);
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.btnEntrar:hover:not(:disabled) {
+  background: var(--acento-sombra);
+}
+.btnEntrar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSecundario {
+  width: 100%;
+  height: 44px;
+  margin-top: 12px;
+  background: transparent;
+  color: var(--marca);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.btnSecundario:hover:not(:disabled) {
+  background: var(--marca-fraca);
+}
+.btnSecundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.linkBtn {
+  background: none;
+  border: 0;
+  color: var(--marca);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 4px;
+}
+.linkBtn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.erro,
+.aviso {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+.erro {
+  border: 1px solid var(--erro);
+  background: var(--erro-bg);
+  color: var(--erro);
+}
+.aviso {
+  border: 1px solid var(--aviso);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}
+
+.rodape {
+  margin: 18px 0 0;
+  font-size: 11.5px;
+  color: var(--texto-muted);
+}

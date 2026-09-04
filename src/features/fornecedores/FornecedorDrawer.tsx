@@ -11,6 +11,10 @@ import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { salvarFornecedor } from '../../services/supabase/dados';
+import { recarregarDados } from '../../services/supabase/sync';
+import { podeEditar } from '../../services/supabase/auth';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
@@ -44,9 +48,11 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   // O drawer é montado apenas quando aberto (render condicional na página),
   // então o estado inicial do form já reflete o fornecedor correto.
   const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
-  const upsertFornecedor = useDataStore((s) => s.upsertFornecedor);
+  const [salvando, setSalvando] = useState(false);
   const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
+  const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);
+  const editaOk = podeEditar(perfil?.papel);
 
   function set<K extends keyof Fornecedor>(key: K, value: Fornecedor[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -65,17 +71,23 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
     }));
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!form.razao_social.trim()) {
       showToast('Razão social é obrigatória.', 'warning');
       return;
     }
-    upsertFornecedor({
-      ...form,
-      atualizado_em: nowIso(),
-    });
-    showToast(fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor criado.', 'success');
-    onClose();
+    setSalvando(true);
+    try {
+      // Grava direto no banco; a lista é recarregada de lá em seguida.
+      await salvarFornecedor({ ...form, atualizado_em: nowIso() });
+      await recarregarDados();
+      showToast(fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor criado.', 'success');
+      onClose();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Falha ao gravar fornecedor.', 'error');
+    } finally {
+      setSalvando(false);
+    }
   }
 
   const isNew = !fornecedor;
@@ -88,7 +100,14 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
-          <Button variant="primary" size="sm" onClick={handleSave}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => void handleSave()}
+            loading={salvando}
+            disabled={!editaOk}
+            title={editaOk ? undefined : 'Seu acesso não permite editar fornecedores'}
+          >
             {isNew ? 'Criar' : 'Salvar'}
           </Button>
         </div>
@@ -149,6 +168,13 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
         <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
       </FieldGroup>
 
+      {/*
+        Voltou a ser editável em 19/08/2026: a tabela `compras.fornecedor_ecrs`
+        passou a existir, e a camada grava a diferença. Entre 12 e 19/08 este
+        bloco ficou somente-leitura de propósito — a tela dizia "salvo" e a
+        marcação sumia no reload, e mentir para quem usa é pior que não deixar
+        editar.
+      */}
       {ecrs.length > 0 && (
         <FieldGroup title="ECRs que Atende">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, gridColumn: '1 / -1' }}>
@@ -160,14 +186,14 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
                   alignItems: 'center',
                   gap: 5,
                   fontSize: 12,
-                  cursor: 'pointer',
+                  cursor: editaOk ? 'pointer' : 'not-allowed',
                   padding: '4px 8px',
-                  borderRadius: 6,
+                  borderRadius: 'var(--raio-pill)',
                   background: form.ecrs_atende.includes(ecr.id)
-                    ? 'rgba(29,79,124,0.12)'
-                    : 'var(--surface-alt)',
-                  border: `1px solid ${form.ecrs_atende.includes(ecr.id) ? 'var(--navy)' : 'var(--border)'}`,
-                  color: form.ecrs_atende.includes(ecr.id) ? 'var(--navy)' : 'var(--text)',
+                    ? 'var(--marca-fraca)'
+                    : 'var(--painel-2)',
+                  border: `1px solid ${form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--borda)'}`,
+                  color: form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--texto-suave)',
                   fontWeight: form.ecrs_atende.includes(ecr.id) ? 600 : 400,
                 }}
               >
@@ -175,6 +201,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
                   type="checkbox"
                   checked={form.ecrs_atende.includes(ecr.id)}
                   onChange={() => toggleEcr(ecr.id)}
+                  disabled={!editaOk}
                   style={{ margin: 0 }}
                 />
                 {ecr.codigo} — {ecr.nome}

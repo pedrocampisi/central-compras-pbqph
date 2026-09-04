@@ -1,0 +1,68 @@
+// Como este aplicativo vai para o ar.
+//
+// POR QUE CLOUDFLARE E NAO GITHUB PAGES. Palavra do Pedro em 02/09/2026,
+// confirmada na janela dele: tudo o mais da plataforma mora no Cloudflare, e
+// nao ha motivo para este software morar sozinho em outro lugar. A escolha
+// anterior pelo Pages era inercia -- era o que esta casa ja tinha.
+//
+// POR QUE WORKER E NAO PAGES DO CLOUDFLARE. Medido na Central em 11/08/2026:
+// a conta recusa criar projeto Pages ("user email must been verified",
+// code 8000077), enquanto o mesmo login cria KV na mesma conta. O bloqueio e
+// do produto Pages, nao da conta. E o proprio Cloudflare parou de recomendar
+// Pages para site novo, apontando Workers com assets estaticos.
+//
+// SEM `main`: nao existe codigo de servidor aqui. Este Worker so entrega os
+// arquivos de `dist/`, igual o Pages fazia. Copiado do wrangler.jsonc da
+// Central, que ja esta no ar por este caminho.
+//
+// USO
+//   pnpm run deploy   monta, CONFERE o pacote e sobe   <- e o caminho certo
+//   wrangler deploy   sobe o que estiver em dist/, sem conferir nada
+//
+// ⚠️ E' `pnpm RUN deploy`, com o `run`. `pnpm deploy` sem o `run` e um comando
+// EMBUTIDO do proprio pnpm (empacotar workspace), que nao tem nada a ver com
+// isto e nao publica nada. Medido em 03/09/2026, no primeiro ensaio.
+//
+// ⚠️ `wrangler deploy` e ato que sai desta maquina. So roda com a palavra do
+// Pedro, dita na janela dele -- nunca por carta, nunca por decisao de agente.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // O nome vira o comeco do endereco de ensaio: `compras.campisi.workers.dev`.
+  // A conta e `campisi`, entao `compras` e nao `central-compras-pbqph`: evita o
+  // redundante e ja tem a forma do endereco proprio que a gente quer.
+  "name": "compras",
+  "compatibility_date": "2026-09-02",
+
+  "assets": {
+    "directory": "./dist",
+
+    // ⚠️ Isto aqui e SEGURO, e nao necessidade -- e a diferenca importa para
+    // quem ler depois. Esta casa nao tem roteador de cliente (conferido em
+    // 02/09: nenhum `react-router` nas dependencias, a tela e uma so, com
+    // estado interno), entao hoje nao existe endereco interno para recarregar.
+    // A linha fica porque no dia em que existir, a falta dela aparece como
+    // 404 no navegador de uma pessoa, e nao aqui.
+    "not_found_handling": "single-page-application"
+  },
+
+  // O endereco proprio. Entrou em 03/09/2026, DEPOIS de o ensaio em
+  // compras.campisi.workers.dev abrir e ser medido, e com a palavra do Pedro.
+  // O Cloudflare cria o DNS e o certificado sozinho a partir daqui.
+  "routes": [{ "pattern": "compras.campisi.com.br", "custom_domain": true }],
+
+  // ⚠️ ESCOLHA EXPLICITA, e nao o padrao. Quando `routes` existe, o wrangler
+  // DESLIGA o endereco .workers.dev por conta propria e avisa no meio da saida
+  // do deploy -- a Central descobriu isso em 03/09 levando 404 por alguns
+  // minutos no endereco dela.
+  //
+  // Aqui a escolha e `false`, e de proposito: compras.campisi.workers.dev era
+  // ENSAIO, e ensaio que continua no ar vira endereco que alguem salva. Um
+  // endereco a menos para a equipe confundir com o de verdade.
+  //
+  // O corte nao machuca ninguem HOJE porque ninguem usa nenhum dos dois: a
+  // equipe so chega em compras.campisi.com.br depois de juntar os ramos e
+  // trocar os atalhos (pendencia 6). Por isso da para fazer numa publicacao
+  // so, sem janela de ninguem sem endereco.
+  "workers_dev": false
+}

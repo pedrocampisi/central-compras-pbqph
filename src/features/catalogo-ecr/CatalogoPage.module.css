@@ -1,6 +1,6 @@
 .card {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--raio);
   margin-bottom: 10px;
   background: var(--surface);
   overflow: hidden;
@@ -13,13 +13,13 @@
   cursor: pointer;
   background: var(--bg);
 }
-.head:hover { background: rgba(29, 79, 124, 0.05); }
+.head:hover { background: var(--marca-fraca); }
 .titleRow { display: flex; gap: 10px; align-items: center; }
 .code {
-  font-weight: 800;
-  color: var(--navy);
-  font-size: 13px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  color: var(--marca);
+  font-size: 13.5px;
+  font-family: var(--fonte-mono);
 }
 .name { font-weight: 600; font-size: 13px; }
 .meta { font-size: 11px; color: var(--text-muted); }
@@ -43,7 +43,7 @@
 .specs > div {
   background: var(--bg);
   padding: 10px;
-  border-radius: 6px;
+  border-radius: var(--raio-pequeno);
 }
 .specs h4 {
   margin: 0 0 6px;
@@ -58,8 +58,8 @@
   display: inline-block;
   margin-left: 6px;
   padding: 1px 6px;
-  background: rgba(29, 79, 124, 0.1);
-  border-radius: 4px;
+  background: var(--marca-fraca);
+  border-radius: var(--raio-pequeno);
   font-size: 10px;
   color: var(--navy-mid);
   font-weight: 600;

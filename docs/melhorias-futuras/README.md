@@ -1,5 +1,9 @@
 # Melhorias Futuras
 
+> **Data:** 11/05/2026
+> **Estado:** PROPOSTA — aguardando o Pedro
+> **Escopo:** índice das ideias ainda não implementadas. **NÃO** é plano aprovado, **NÃO** tem data e **NÃO** se executa sem o Pedro dizer sim.
+
 Esta pasta concentra ideias e especificações para evoluções do sistema que **ainda não foram implementadas**. Cada arquivo descreve um conjunto coerente de funcionalidades com escopo, justificativa e esboço de design — para serem retomadas quando fizer sentido.
 
 Não é código. Não é documentação oficial do produto. É um roadmap vivo, escrito em português, do que vem por aí.

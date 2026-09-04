@@ -5,6 +5,7 @@
  */
 
 import type { ReactNode, SelectHTMLAttributes } from 'react';
+import { Icon } from '../Icon/Icon';
 import styles from './ListToolbar.module.css';
 
 interface ListToolbarProps {
@@ -23,13 +24,20 @@ export function ListToolbar({
 }: ListToolbarProps) {
   return (
     <div className={styles.filterBar}>
-      <input
-        className={styles.searchInput}
-        type="search"
-        placeholder={searchPlaceholder}
-        value={searchValue}
-        onChange={(e) => onSearchChange(e.target.value)}
-      />
+      {/* Busca em pílula do padrão. Aqui ela NÃO leva botão "Buscar": estas são
+          telas de trabalho, onde a lista filtra enquanto se digita — botão só
+          na tela de entrada. */}
+      <div className={styles.busca}>
+        <Icon name="search" size={18} className={styles.buscaIcone} />
+        <input
+          className={styles.searchInput}
+          type="search"
+          placeholder={searchPlaceholder}
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          aria-label={searchPlaceholder}
+        />
+      </div>
       {children}
     </div>
   );

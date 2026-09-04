@@ -1,3 +1,7 @@
+/* Passos da Nova OC. Neutro por padrão: o passo atual usa a marca, o
+   concluído usa o verde — e nada mais é colorido, senão o verde deixa de
+   significar "pronto". */
+
 .stepper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -5,38 +9,46 @@
   margin-bottom: 18px;
 }
 .step {
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  background: var(--painel);
+  border: 1px solid var(--borda);
   display: flex;
   gap: 10px;
   align-items: center;
+  transition: border-color var(--transicao), background var(--transicao);
 }
 .num {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--border);
-  color: white;
+  background: var(--marca-fraca);
+  color: var(--texto-suave);
   display: grid;
   place-items: center;
   font-weight: 700;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 .step strong {
-  font-size: 13px;
+  font-size: 13.5px;
   display: block;
-  color: var(--text);
+  color: var(--texto);
 }
 .step span {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--texto-suave);
 }
 .active {
-  border-color: var(--navy);
-  background: rgba(29, 79, 124, 0.06);
+  border-color: var(--marca);
+  background: var(--marca-fraca);
 }
-.active .num { background: var(--navy); }
-.done .num { background: var(--green); }
+.active .num {
+  background: var(--marca);
+  color: var(--painel);
+}
+.done .num {
+  background: var(--sucesso);
+  color: #fff;
+}

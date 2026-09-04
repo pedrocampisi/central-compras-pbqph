@@ -10,15 +10,12 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
-import { confirmAsync } from '../../stores/useConfirmStore';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
 
 export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
-  const removeFornecedor = useDataStore((s) => s.removeFornecedor);
-  const showToast = useUiStore((s) => s.showToast);
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
   const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
@@ -55,26 +52,8 @@ export function FornecedoresPage() {
     setDrawerOpen(true);
   }
 
-  async function handleDelete(f: Fornecedor) {
-    // Integridade referencial: OCs do histórico apontam para o fornecedor por id.
-    const emUso = data!.ordens_compra.filter((oc) => oc.fornecedor_id === f.id).length;
-    if (emUso > 0) {
-      showToast(
-        `"${f.razao_social}" é usado em ${emUso} OC(s) do histórico. Desative-o em vez de excluir.`,
-        'warning',
-      );
-      return;
-    }
-    const ok = await confirmAsync({
-      title: 'Excluir fornecedor',
-      message: `Excluir "${f.razao_social}"? Esta ação não pode ser desfeita.`,
-      confirmLabel: 'Excluir',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    removeFornecedor(f.id);
-    showToast('Fornecedor excluído.', 'success');
-  }
+  // Excluir fornecedor não existe nesta versão (a camada de dados não apaga
+  // no banco). Para tirar um fornecedor de circulação, desative-o no drawer.
 
   const columns: Column<Fornecedor>[] = [
     {
@@ -156,7 +135,6 @@ export function FornecedoresPage() {
       {/* Tabela */}
       {filtered.length === 0 ? (
         <EmptyState
-          icon="👥"
           title="Nenhum fornecedor encontrado"
           description={
             data.fornecedores.length === 0
@@ -179,7 +157,6 @@ export function FornecedoresPage() {
           rowActions={(f) => (
             <div style={{ display: 'flex', gap: 4 }}>
               <Button variant="ghost" size="sm" onClick={() => openEdit(f)}>Editar</Button>
-              <Button variant="danger" size="sm" onClick={() => void handleDelete(f)}>Excluir</Button>
             </div>
           )}
         />

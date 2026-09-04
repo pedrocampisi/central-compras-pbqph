@@ -3,28 +3,34 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
-// GitHub Pages serves from a subpath: /central-compras-pbqph/
-// Em dev (localhost) o base é '/'. Em produção (qualquer build), aplicamos o
-// subpath do GH Pages — antes dependíamos da env GITHUB_ACTIONS, que era fácil
-// de esquecer no build manual e gerava tela branca em produção.
-// Para gerar build com base '/' (auto-host raiz), use VITE_BASE_PATH=/.
-const PROD_BASE = process.env['VITE_BASE_PATH'] ?? '/central-compras-pbqph/';
+// O endereço é a raiz, em dev e em produção.
+//
+// Já não é: até 02/09/2026 a produção saía no subendereço do GitHub Pages
+// (`/central-compras-pbqph/`), e havia uma variável de ambiente para fugir
+// dele. O Pages saiu (o Pedro mandou o aplicativo morar no Cloudflare, junto
+// com o resto da plataforma), e com ele saiu o subendereço — então some também
+// a variável, porque manivela que só tem uma posição é manivela que engana.
+//
+// A trava que impede o subendereço de voltar sem ninguém ver mora em
+// `scripts/conferir-pacote.js`, e roda no `pnpm run deploy` antes de subir.
 
-export default defineConfig(({ command }) => {
-  const base = command === 'build' ? PROD_BASE : '/';
+export default defineConfig(() => {
+  const base = '/';
   return {
   base,
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['brazao1.png', 'icons/*.png'],
+      includeAssets: ['marca/brasao.png', 'marca/mascote-rosto.png', 'icons/*.png'],
       manifest: {
         name: 'Central de Compras PBQP-H',
         short_name: 'Central Compras',
         description: 'Sistema de Ordens de Compra — Campisi PBQP-H',
-        theme_color: '#0d2b4a',
-        background_color: '#f4f6fa',
+        // Cores do padrão "Creme": a barra do sistema no celular acompanha a
+        // tela em vez de brigar com ela.
+        theme_color: '#FBF3DE',
+        background_color: '#FBF3DE',
         display: 'standalone',
         start_url: base,
         icons: [
@@ -40,6 +46,10 @@ export default defineConfig(({ command }) => {
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2,json}'],
+        // Os quadros do martelo (133 KB) ficam fora do pacote pré-carregado:
+        // só aparecem em espera acima de 250ms, e o próprio loader os busca
+        // na hora.
+        globIgnores: ['**/marca/loader-quadro-*.png'],
         // Large chunks — cache them longer
         runtimeCaching: [
           {

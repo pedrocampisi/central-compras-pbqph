@@ -1,35 +1,66 @@
+/* Aviso rápido do padrão Campisi: fixo embaixo, centralizado, some sozinho. */
+
 .container {
   position: fixed;
-  bottom: 22px;
-  left: 236px;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
   z-index: 200;
   pointer-events: none;
 }
 .toast {
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: var(--navy-dark);
-  color: white;
-  box-shadow: var(--shadow);
-  font-size: 13px;
-  max-width: 360px;
+  padding: 11px 20px;
+  border-radius: var(--raio);
+  background: var(--sucesso);
+  color: #fff;
+  box-shadow: var(--sombra-suave);
+  font-size: 13.5px;
+  font-weight: 600;
+  max-width: min(420px, 92vw);
   cursor: pointer;
   pointer-events: all;
-  animation: slideIn 0.2s ease;
+  animation: slideIn var(--transicao) ease;
 }
-.success { background: var(--green); }
-.warning { background: var(--warn); }
-.error   { background: var(--red); }
-.info    { background: var(--navy-dark); }
+[data-tema='escuro'] .toast {
+  color: #0b1a23;
+}
+.success {
+  background: var(--sucesso);
+}
+.warning {
+  background: var(--aviso);
+  color: #fff;
+}
+.error {
+  background: var(--erro);
+  color: #fff;
+}
+.info {
+  background: var(--marca);
+  color: var(--painel);
+}
+[data-tema='escuro'] .warning,
+[data-tema='escuro'] .error,
+[data-tema='escuro'] .info {
+  color: #0b1a23;
+}
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-@media (max-width: 900px) {
-  .container { left: 72px; }
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
 }

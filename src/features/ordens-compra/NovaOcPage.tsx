@@ -23,16 +23,23 @@ import { fileToImagesBase64 } from '../../services/ai/pdfToImages';
 import { extractItemsFromImages } from '../../services/ai/extractItems';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
-import { getApiKey } from '../../services/storage/apiKey';
+import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
+import { recarregarDados } from '../../services/supabase/sync';
+import { podeEditar, podeEmitirOc } from '../../services/supabase/auth';
+import { useAuthStore } from '../../stores/useAuthStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/**
+ * OC nova em edição. O número fica VAZIO de propósito: quem numera é o banco,
+ * e só na EMISSÃO — rascunho aberto e descartado não pode queimar um número do
+ * PBQP-H. Numerar no navegador produzia número repetido quando duas pessoas
+ * emitiam ao mesmo tempo.
+ */
 function buildNewOc(
-  numero: string,
-  sequencial: number,
   ano: number,
   defaultEmitenteId: string,
   defaultFornecedorId: string,
@@ -41,8 +48,9 @@ function buildNewOc(
 ): OrdemCompra {
   return {
     id: uid('oc'),
-    numero,
-    sequencial,
+    numero: '',
+    sequencial: 0,
+    versao: 0,
     ano,
     data: todayIso(),
     status: 'rascunho',
@@ -75,7 +83,6 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd }: ItemsTableProps)
   if (items.length === 0) {
     return (
       <EmptyState
-        icon="📦"
         title="Nenhum item adicionado"
         description={'Clique em "+ Adicionar Item" ou importe um pedido via IA.'}
         action={{ label: '+ Adicionar Item', onClick: onAdd }}
@@ -276,8 +283,7 @@ function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
 
 export function NovaOcPage() {
   const data = useDataStore((s) => s.data);
-  const updateConfig = useDataStore((s) => s.updateConfig);
-  const updateOrdemCompra = useDataStore((s) => s.updateOrdemCompra);
+  const perfil = useAuthStore((s) => s.perfil);
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
   const startEditing = useOcEditingStore((s) => s.startEditing);
@@ -293,6 +299,7 @@ export function NovaOcPage() {
 
   const [importing, setImporting] = useState(false);
   const [savingPdf, setSavingPdf] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
@@ -300,9 +307,7 @@ export function NovaOcPage() {
   // ── Inicialização ───────────────────────────────────────────────────────────
   // Runs once on mount. If ocEditing already exists (navigated from Histórico),
   // skip creation — the user is editing an existing OC.
-  // O número aqui é apenas uma PRÉVIA: o contador da config só é consolidado
-  // no save (commitNumero). Abrir a aba e cancelar não queima números nem
-  // marca o arquivo como dirty.
+  // OC nova nasce SEM número: o banco numera na emissão.
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -311,17 +316,13 @@ export function NovaOcPage() {
     if (!data || ocEditing) return;
 
     const currentYear = new Date().getFullYear();
-    const yearChanged = currentYear !== data.config.ano_corrente;
-    const nextNum = yearChanged ? 1 : data.config.ultimo_numero_oc + 1;
-    const numero = `${currentYear}/${String(nextNum).padStart(3, '0')}`;
-
     const defaultFornecedor = data.fornecedores.find((f) => f.ativo)?.id ?? '';
     const defaultObra = data.obras.find((o) => o.ativa)?.id ?? '';
     const defaultEmitente = data.config.emitentes[0]?.id ?? '';
     const defaultCondicao = data.config.condicoes_pagamento[0] ?? '';
 
     startEditing(
-      buildNewOc(numero, nextNum, currentYear, defaultEmitente, defaultFornecedor, defaultObra, defaultCondicao),
+      buildNewOc(currentYear, defaultEmitente, defaultFornecedor, defaultObra, defaultCondicao),
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -329,62 +330,60 @@ export function NovaOcPage() {
   // ── Save ────────────────────────────────────────────────────────────────────
 
   /**
-   * Re-checa se o número da OC ainda está livre antes de gravar.
-   * Mitiga (parcialmente) o caso de duas abas/dispositivos terem incrementado
-   * o mesmo `ultimo_numero_oc` antes do save explícito. Sem mutex de servidor
-   * isto não é à prova de tudo, mas evita a colisão mais comum.
+   * Identidade da TENTATIVA de salvamento, não da OC.
+   *
+   * O banco usa isto para ser idempotente: repetir o mesmo identificador
+   * devolve a mesma ordem de compra, sem criar outra e sem gastar outro
+   * número. Por isso ele só é descartado quando a gravação dá certo — o
+   * "tentar de novo" depois de uma falha precisa reaproveitar o mesmo.
    */
-  const ensureUniqueNumero = useCallback(
-    (oc: OrdemCompra): OrdemCompra => {
-      if (!data) return oc;
-      const conflict = data.ordens_compra.some(
-        (x) => x.id !== oc.id && x.numero === oc.numero,
-      );
-      if (!conflict) return oc;
-      const seqsDoAno = data.ordens_compra
-        .filter((x) => x.ano === oc.ano)
-        .map((x) => x.sequencial)
-        .filter((n) => Number.isFinite(n));
-      const nextSeq = (seqsDoAno.length ? Math.max(...seqsDoAno) : 0) + 1;
-      const numero = `${oc.ano}/${String(nextSeq).padStart(3, '0')}`;
-      showToast(`Número ${oc.numero} já estava em uso. Reatribuído para ${numero}.`, 'warning');
-      return { ...oc, sequencial: nextSeq, numero };
+  const tentativaRef = useRef<string | null>(null);
+  const idDaTentativa = useCallback(() => {
+    tentativaRef.current ??= crypto.randomUUID();
+    return tentativaRef.current;
+  }, []);
+
+  const avisarErro = useCallback(
+    (verbo: string, err: unknown) => {
+      // O banco já devolve a frase pronta quando outra pessoa alterou a OC —
+      // reescrevê-la só tiraria a informação de qual versão está onde.
+      if (err instanceof ConflitoDeVersao) {
+        showToast(err.message, 'warning');
+        return;
+      }
+      showToast(`Erro ao ${verbo}: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     },
-    [data, showToast],
+    [showToast],
   );
 
-  /**
-   * Consolida o número usado no contador da config — chamado apenas no save.
-   * Só cresce dentro do mesmo ano; na virada de ano, reinicia a partir da OC.
-   * OCs de anos anteriores (edição de rascunho antigo) não mexem no contador.
-   */
-  const commitNumero = useCallback(
-    (oc: OrdemCompra) => {
-      if (!data) return;
-      const { ano_corrente, ultimo_numero_oc } = data.config;
-      if (oc.ano < ano_corrente) return;
-      const base = oc.ano === ano_corrente ? ultimo_numero_oc : 0;
-      updateConfig({
-        ultimo_numero_oc: Math.max(base, oc.sequencial),
-        ano_corrente: oc.ano,
-      });
-    },
-    [data, updateConfig],
-  );
-
-  const handleSaveDraft = useCallback(() => {
+  const handleSaveDraft = useCallback(async () => {
     if (!ocEditing || !data) return;
     if (!ocEditing.fornecedor_id) { showToast('Selecione um fornecedor.', 'warning'); return; }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
-    const safe = ensureUniqueNumero(ocEditing);
-    commitNumero(safe);
-    updateOrdemCompra({ ...safe, status: 'rascunho', atualizado_em: nowIso() });
-    stopEditing();
-    showToast(`Rascunho ${safe.numero} salvo.`, 'success');
-    setTab('historico');
-  }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
+    setSavingDraft(true);
+    try {
+      // Rascunho não recebe número: ele nasce na emissão, para quem abre e
+      // desiste não queimar um número do PBQP-H.
+      const gravada = await salvarOrdemCompra(
+        { ...ocEditing, status: 'rascunho', atualizado_em: nowIso() },
+        idDaTentativa(),
+      );
+      tentativaRef.current = null;
+      await recarregarDados();
+      stopEditing();
+      showToast(
+        gravada.numero ? `Rascunho ${gravada.numero} salvo.` : 'Rascunho salvo — o número sai na emissão.',
+        'success',
+      );
+      setTab('historico');
+    } catch (err) {
+      avisarErro('salvar', err);
+    } finally {
+      setSavingDraft(false);
+    }
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
@@ -394,9 +393,26 @@ export function NovaOcPage() {
 
     setSavingPdf(true);
     try {
-      const safe = ensureUniqueNumero(ocEditing);
-      commitNumero(safe);
-      const emitida: OrdemCompra = { ...safe, status: 'emitida', atualizado_em: nowIso(), pdf_gerado_em: nowIso() };
+      // Uma operação só no banco: cabeçalho, itens e a reserva do número. Se
+      // qualquer parte falhar, nada fica gravado pela metade.
+      const gravada = await salvarOrdemCompra(
+        { ...ocEditing, status: 'emitida', atualizado_em: nowIso() },
+        idDaTentativa(),
+      );
+      tentativaRef.current = null;
+
+      // O número e a versão vêm do banco — é lá que eles nascem.
+      const emitida: OrdemCompra = {
+        ...ocEditing,
+        id: gravada.id,
+        status: gravada.status,
+        numero: gravada.numero,
+        ano: gravada.ano,
+        sequencial: gravada.sequencial,
+        versao: gravada.versao,
+        pdf_gerado_em: '',
+      };
+
       const blob = await generateOcPdfBlob(emitida, data);
       const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
       const filename = buildPdfFilename(emitida, fornNome);
@@ -418,7 +434,16 @@ export function NovaOcPage() {
       }
 
       const result = await savePdfToFile(blob, filename, obraHandle);
-      updateOrdemCompra(emitida);
+
+      // Carimbo DEPOIS de o arquivo existir. Antes ele era gravado junto com a
+      // OC, e o banco podia afirmar "PDF gerado" de um arquivo que nunca saiu.
+      try {
+        await marcarPdfGerado(gravada.id);
+      } catch {
+        /* o PDF saiu; só o carimbo falhou. Regenerar pelo Histórico resolve. */
+      }
+
+      await recarregarDados();
       stopEditing();
       if (result === 'saved') {
         showToast(`OC ${emitida.numero} emitida. PDF salvo na pasta da obra.`, 'success');
@@ -432,11 +457,11 @@ export function NovaOcPage() {
       }
       setTab('historico');
     } catch (err) {
-      showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+      avisarErro('emitir', err);
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, updateOrdemCompra, stopEditing, showToast, setTab, ensureUniqueNumero, commitNumero]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
 
   /**
    * Abre o PDF da OC em uma nova aba SEM emitir — para conferência antes
@@ -477,17 +502,12 @@ export function NovaOcPage() {
 
   const handleImportFile = useCallback(async (file: File) => {
     if (!data) return;
-    // Chave por dispositivo; fallback para o campo legado do JSON (pré-migração).
-    const apiKey = getApiKey() || data.config.openrouter_api_key;
-    if (!apiKey) {
-      showToast('Configure a chave OpenRouter em Configurações para usar a IA.', 'warning');
-      return;
-    }
+    // A extração roda no servidor (Edge Function) — nenhuma chave no navegador.
     setImporting(true);
     try {
       const images = await fileToImagesBase64(file);
       if (!images.length) { showToast('Não foi possível extrair imagens do arquivo.', 'warning'); return; }
-      const items = await extractItemsFromImages(images, data.ecrs, apiKey);
+      const items = await extractItemsFromImages(images);
       if (!items.length) { showToast('A IA não encontrou itens no arquivo.', 'warning'); return; }
       appendItems(items);
       showToast(`${items.length} item(ns) importado(s) via IA.`, 'success');
@@ -503,13 +523,18 @@ export function NovaOcPage() {
   if (!data || !ocEditing) {
     return (
       <div className="section">
-        <EmptyState icon="+" title="Inicializando…" description="Preparando nova ordem de compra." />
+        <EmptyState title="Inicializando…" description="Preparando nova ordem de compra." />
       </div>
     );
   }
 
   const fornecedoresAtivos = data.fornecedores.filter((f) => f.ativo);
   const obrasAtivas = data.obras.filter((o) => o.ativa);
+
+  // Permissões: o banco (RLS) recusa de qualquer forma; aqui só evitamos que
+  // a pessoa preencha o formulário inteiro para tomar o erro no fim.
+  const editaOk = podeEditar(perfil?.papel);
+  const emiteOk = podeEmitirOc(perfil?.papel);
 
   return (
     <div className="section">
@@ -521,17 +546,35 @@ export function NovaOcPage() {
               ? 'Editar OC'
               : 'Nova Ordem de Compra'}
           </h2>
-          <p className="section-sub">OC Nº {ocEditing.numero}</p>
+          <p className="section-sub">
+            OC Nº {ocEditing.numero || '— (numera ao emitir)'}
+          </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
           <Button variant="ghost" size="sm" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
             <Icon name="eye" size={13} /> Visualizar
           </Button>
-          <Button variant="secondary" size="sm" onClick={handleSaveDraft}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => void handleSaveDraft()}
+            loading={savingDraft}
+            disabled={!editaOk}
+            title={editaOk ? undefined : 'Seu acesso não permite salvar OCs'}
+          >
             <Icon name="save" size={13} /> Salvar Rascunho
           </Button>
-          <Button variant="primary" size="sm" onClick={() => void handleEmitir()} loading={savingPdf}>
+          {/* Atalho do topo em secundário de propósito: o laranja desta tela
+              é o "Emitir OC" do rodapé, depois dos totais. */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void handleEmitir()}
+            loading={savingPdf}
+            disabled={!emiteOk}
+            title={emiteOk ? undefined : 'Seu acesso não permite emitir OCs'}
+          >
             <Icon name="file-text" size={13} /> Emitir OC + PDF
           </Button>
         </div>
@@ -658,10 +701,22 @@ export function NovaOcPage() {
         <Button variant="ghost" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
           <Icon name="eye" size={13} /> Visualizar PDF
         </Button>
-        <Button variant="secondary" onClick={handleSaveDraft}>
+        <Button
+          variant="secondary"
+          onClick={() => void handleSaveDraft()}
+          loading={savingDraft}
+          disabled={!editaOk}
+          title={editaOk ? undefined : 'Seu acesso não permite salvar OCs'}
+        >
           <Icon name="save" size={13} /> Salvar Rascunho
         </Button>
-        <Button variant="primary" onClick={() => void handleEmitir()} loading={savingPdf}>
+        <Button
+          variant="primary"
+          onClick={() => void handleEmitir()}
+          loading={savingPdf}
+          disabled={!emiteOk}
+          title={emiteOk ? undefined : 'Seu acesso não permite emitir OCs'}
+        >
           <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
         </Button>
       </div>

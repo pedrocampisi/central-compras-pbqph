@@ -3,6 +3,10 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.33.3",
+  "engines": {
+    "node": ">=24"
+  },
   "description": "Central de Compras PBQP-H — Campisi (refatorado React + Vite + TS + PWA)",
   "scripts": {
     "dev": "vite",
@@ -12,9 +16,13 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json,md}\"",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
+    "conferir": "node scripts/conferir-documentos.js",
+    "conferir:pacote": "node scripts/conferir-pacote.js",
+    "deploy": "pnpm build && pnpm conferir:pacote && wrangler deploy",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.2",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "openai": "^4.76.0",
@@ -43,6 +51,7 @@
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",
     "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wrangler": "4.128.0"
   }
 }

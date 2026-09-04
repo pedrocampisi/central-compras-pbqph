@@ -1,7 +1,110 @@
-# Agente.md — Central de Compras PBQP-H
+﻿# Agente.md — Central de Compras PBQP-H
 
-> Última atualização: 2026-05-06
+> **Data:** 02/09/2026
+> **Estado:** VALE HOJE
+> **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
+
 > Público: IA de manutenção. Densidade máxima, zero prosa.
+
+## 0. Duas branches, dois contratos — leia antes de usar este arquivo
+
+As seções 1–8 descrevem a arquitetura **da branch `main`** (JSON via File
+System Access API, sem login). Na branch `migracao-supabase` valem estas
+diferenças; onde houver conflito, o que está aqui na seção 0 vence:
+
+| Assunto | `main` | `migracao-supabase` |
+|---|---|---|
+| Fonte da verdade | `services/storage/fileSystem.ts` | `services/supabase/dados.ts` (`carregarDados`, `salvarOrdemCompra`, `definirStatusOc`, `marcarPdfGerado`, `salvarFornecedor`) |
+| Auth | inexistente | `services/supabase/auth.ts` — `perfilAtual()`, `podeEditar()`, `podeEmitirOc()`; espelho do RLS, não a trava |
+| Bootstrap | cache → handle → seed | sessão → `perfilAtual` → `recarregarDados` → realtime (`assinarMudancas`) |
+| Persistência | Ctrl+S → `saveData` | cada ação grava direto; `useAutoSave`/`useDirtyGuard` **não montados** |
+| Numeração OC | `config.ultimo_numero_oc` no navegador | do banco, e **só na emissão** — dentro de `salvar_oc` / `definir_status_oc`. Rascunho fica sem número |
+| IA | `services/ai/openRouterClient.ts` (chave no JSON) | Edge Function `extrair-itens` (chave no servidor); `openRouterClient.ts` não existe |
+| Env | — | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (client.ts lança sem elas) |
+| Stores | +`useFileHandleStore` | +`useAuthStore`; `useDataStore.data` é populado só a partir do banco |
+| Schema version | 4 | 5 — `CURRENT_SCHEMA_VERSION` é a única fonte (Zod e `dados.ts` importam) |
+
+Telas deliberadamente somente-leitura na branch de migração (a camada não
+grava): obras, prestadores, avaliações e configurações. Padrão:
+`<AvisoSomenteLeitura>` + campos `disabled`. Regra que originou isso: a tela
+não pode dizer "salvo" e perder no reload. *(Os ECRs do fornecedor saíram desta
+lista em 19/08: ganharam tabela no banco e voltaram a ser editáveis.)*
+
+## 0.1 Padrão visual (direção "Creme") — regras que valem para todo CSS daqui
+
+Fonte oficial: `00_Diretrizes_e_padroes/Padrao_Front_end/` (`DESIGN.md`,
+`tokens.css`, `template-base.html`, `template-login.html`). Aplicado aqui em
+12/08/2026. **O motivo de cada regra está nas decisões 14, 15 e 16 do
+[`PLANEJAMENTO.md`](PLANEJAMENTO.md)** — aqui fica só a regra.
+
+- `src/styles/tokens.css` é a **única fonte de cor/sombra/raio/fonte**. Nada de
+  hex solto em módulo — o bloco de apelidos no fim traduz os nomes antigos
+  (`--navy`, `--bg`, `--text`…) para os novos; em código novo use os oficiais
+  (`--marca`, `--fundo`, `--texto`, `--acento`…). · **decisão 14**
+- Tema escuro: `data-tema="escuro"` no `<html>`, por script inline no
+  `index.html` **antes da primeira pintura**; `hooks/useTema.ts` só lê e
+  alterna. Escolha manual manda e fica salva; sem escolha, segue o sistema.
+  · **decisão 14**
+- **Uma ação primária (laranja) por tela.** `<Button variant="primary">` é o
+  laranja; qualquer segundo botão é `outline`. Em Nova OC o laranja é o
+  "Emitir OC" do rodapé — o atalho do topo é secundário. · **decisão 15**
+- **Ícone é `<Icon>` (traço 1.6), nunca emoji.** · **decisão 15**
+- Selo (`<Pill>`) é **neutro por padrão**; verde/vermelho só quando a
+  informação for mesmo situação. · **decisão 15**
+- **Mascote longe de dado.** `<EmptyState>` mostra o mascote quando o vazio é a
+  tela; dentro de cartão que convive com números, use `compacto`.
+  · **decisão 15**
+- **Movimento só em espera e no login.** `<Loader>` (martelo) é o único
+  permitido nas telas de trabalho, e só aparece depois de 250ms. · **decisão 16**
+- **Sem portão de boas-vindas e sem animação de entrada neste aplicativo.** Por
+  isso `public/marca/` não tem `anim-entrada.mp4`, `anim-poster-final.png` nem
+  `efeito-entrada.mp3` — a fonte deles, se um dia precisar, é
+  `00_Diretrizes_e_padroes/Padrao_Front_end/assets/`. E os quadros do martelo
+  ficam **fora do pré-carregamento** do service worker (`globIgnores` no
+  `vite.config.ts`). · **decisão 16**
+- Documentos, códigos e chaves em `var(--fonte-mono)`; números de tabela em
+  `font-variant-numeric: tabular-nums`.
+
+## 0.2 Contrato de gravação da OC — leia antes de mexer em `salvarOrdemCompra`
+
+Vigente desde 18–19/08/2026. Quem manda é o banco; o cliente só obedece.
+**Por que o contrato tem esta forma: decisão 17 do
+[`PLANEJAMENTO.md`](PLANEJAMENTO.md)** — aqui fica só o contrato.
+
+```
+compras.salvar_oc(p jsonb) → a linha inteira de compras.ordens_compra
+compras.definir_status_oc(p_oc_id uuid, p_status compras.status_oc, p_versao integer) → a linha
+compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
+```
+
+- **Uma chamada, uma transação.** Cabeçalho e itens juntos. Não volte a gravar
+  cabeçalho e itens em requisições separadas.
+- **`request_id` é obrigatório** e é a identidade da TENTATIVA, não da OC.
+  Repetido, devolve a mesma OC. Gere um por tentativa e **reaproveite no
+  retry** — em `NovaOcPage` isso é o `tentativaRef`, descartado só quando a
+  gravação dá certo.
+- **`versao` é obrigatória ao atualizar.** Conflito volta como
+  `serialization_failure` (código `40001`), que a camada converte em
+  `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
+  reescreva.
+- **Os três casos de cada campo do `cabecalho`:** chave ausente = não mexe;
+  chave com valor = grava; **chave com `null` = APAGA**. Exceções declaradas,
+  que continuam em `coalesce` (null mantém): `data`, `status`, `frete`,
+  `outras_despesas`, `desconto_material`.
+- **`itens` ausente ≠ `itens: []`.** Ausente não mexe nos itens; lista vazia
+  apaga todos. A tela edita a lista inteira, então manda sempre.
+- **Status e PDF têm comando estreito.** Trocar status não regrava itens;
+  `marcar_pdf_gerado` não mexe na versão e é chamado **depois** de o arquivo
+  existir.
+
+Dívida conhecida: `docs/Arquivo_Morto/PERICIA-BANCO-DE-DADOS-SUPABASE-2026-08-10.md`. O
+P0-01 (gravação não-transacional) foi fechado em 18–19/08. Segue aberto o
+P0-02 (CI que reconstrói o banco e testes de RLS), que é trabalho do
+`campisi-central`.
+
+⚠️ **Nada disso foi provado na tela ainda:** ninguém emitiu OC por este
+aplicativo depois da troca. O contrato foi conferido campo a campo por leitura
+no banco, o que é outra coisa.
 
 ## 1. Stack e dependências
 
@@ -69,7 +172,7 @@ computeOcTotals(oc: OrdemCompra): {
 ### `domain/migrations/index.ts`
 ```ts
 runMigrations(raw: unknown): unknown
-// Lê schema_version (default 1). Roda v1→v2 e/ou v2→v3 conforme.
+// Lê schema_version (default 1). Roda em ordem tudo que faltar até v5.
 // Não valida com Zod — apenas migra. Validação é em normalizeData.
 ```
 
@@ -193,7 +296,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 
 | Constante | Arquivo | Valor | Impacto se alterada |
 |---|---|---|---|
-| `CURRENT_SCHEMA_VERSION` | `domain/constants.ts` | 3 | Bump exige criar `vN-to-vN+1.ts` em `domain/migrations/` e registrar no `index.ts` |
+| `CURRENT_SCHEMA_VERSION` | `domain/constants.ts` | 5 | Bump exige criar `vN-to-vN+1.ts` em `domain/migrations/` e registrar no `index.ts`. `data.schema.ts` e `services/supabase/dados.ts` importam a constante — não duplicar o número |
 | `DEBOUNCE_MS` | `hooks/useAutoSave.ts` | 800 | Auto-save mais rápido/lento; só toca cache, não JSON |
 | `MAX_BACKUPS` | `services/storage/backups.ts` | 10 | Disco; FIFO |
 | `MAX_PDF_PAGES` | `services/ai/pdfToImages.ts` | 5 | Páginas enviadas à IA; afeta tokens |
@@ -207,7 +310,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 | `CACHE_KEY` | `services/storage/cache.ts` | `central-compras-cache-v1` | Mudar perde cache |
 | `STATUS_OC` | `domain/constants.ts` | `['rascunho','emitida','entregue','cancelada']` | Serialização — mudar exige migration |
 | `UN_PADRAO` | idem | 12 unidades | UN_MAP em `extractItems.ts` mapeia variações p/ esses valores |
-| `base` | `vite.config.ts` | `/central-compras-pbqph/` em qualquer build (`command === 'build'`), `/` em dev. Override por `VITE_BASE_PATH`. | Mudar nome do repo no GH exige atualizar (ou exportar `VITE_BASE_PATH`) |
+| `base` | `vite.config.ts` | `/` sempre, em dev e em build | Era `/central-compras-pbqph/` (subendereço do GitHub Pages) até 02/09/2026. O Pages saiu, o subendereço morreu e a variável `VITE_BASE_PATH` saiu junto. `scripts/conferir-pacote.js` impede o subendereço de voltar sem ninguém ver |
 
 ## 5. Fluxo de dados (rastreio do `data`)
 
@@ -226,7 +329,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 ## 6. Regras de negócio implícitas
 
 - **Numeração de OC:** `${ano}/${seq.padStart(3,'0')}`. Se `new Date().getFullYear() !== data.config.ano_corrente`, **reseta o sequencial para 1** e atualiza `ano_corrente`. Increment ocorre em `NovaOcPage` ao iniciar nova OC (não ao salvar). Sem lock real — `NovaOcPage#ensureUniqueNumero` re-checa colisão no momento do `Salvar Rascunho`/`Emitir` e reatribui `max(sequencial)+1` se necessário (mitigação parcial; conflitos cruzando dispositivos só são detectados no save explícito do JSON, não em tempo real).
-- **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto. ERPs comuns fazem outro caminho.
+- **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto — parece defeito e não é: **decisão 18**. Não "conserte".
 - **Total geral:** `Σ sub - Σ desc + Σ IPI + frete + outras_despesas - desconto_material`.
 - **Hierarquia de emitente:** `oc.emitente_id` → `config.emitentes[0]` → `config.emitente` legado.
 - **Conflito:** comparação ISO string (`"2026-05-06T..."`). Funciona porque ISO é lexicograficamente ordenável. Falha de leitura remota = não bloqueia (assume ok).
@@ -250,7 +353,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 | Trocar modelo de IA | `services/ai/openRouterClient.ts#MODEL` (e revisar `MAX_TOKENS` se trocar família) |
 | Mudar layout do PDF | `services/pdf/generateOcPdf.ts` (paridade visual com legado em `legacy/CentralCompras-PBQPH.html` linhas 1637-1830) |
 | Nova feature/aba | criar `src/features/<nome>/` + adicionar em `App.tsx#NAV_*` + `TabId` em `useUiStore` + render condicional no shell |
-| Mudar URL prod | `vite.config.ts#base` + `start.bat` (URL hardcoded) + `.github/workflows/deploy.yml` |
+| Mudar URL prod | `wrangler.jsonc#routes` (endereço próprio) + `start.bat` (URL hardcoded) + `SUBENDERECO_MORTO` em `scripts/conferir-pacote.js` se o nome antigo mudar. O `base` do Vite **não** entra mais nessa lista: ele é `/` e fica |
 | Novo schema Zod | `domain/schemas/data.schema.ts` (sem throw — todos os campos têm `.default()`) |
 
 ## 8. Inconsistências conhecidas (avisos)
@@ -262,6 +365,6 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 - PDF worker assume path `/assets/pdfjs/pdf.worker.min.mjs` no build; alterar `assetsDir` do Vite quebra OCR de PDFs importados.
 - `OpenRouter API key` é gravada em texto puro em `config.openrouter_api_key` no JSON — input em `ConfigPage` já mascara (password) e desativa autocomplete/spellcheck/gerenciadores de senha; tratar arquivo (e backups) como sensível.
 - ~~`DashboardPage.tsx` e `CatalogoPage.tsx` têm comentários `TODO Fase 7`.~~ **Resolvido:** comentários atualizados; implementações estavam completas.
-- ~~Build local sem env `GITHUB_ACTIONS` gera `dist/` com base `/`.~~ **Resolvido:** `vite.config.ts` agora deriva o base de `command === 'build'` (qualquer build → `/central-compras-pbqph/`); override via `VITE_BASE_PATH=/`.
+- ~~Build local sem env `GITHUB_ACTIONS` gera `dist/` com base `/`.~~ **Sem objeto desde 02/09/2026:** o subendereço saiu com o GitHub Pages, o base é `/` em todo build, e não há mais nada que possa divergir.
 - Auto-save (`useAutoSave`, 800ms) **só grava no localStorage** — perceptível para o operador. Persistência no JSON só ocorre via Ctrl+S / botão Salvar.
 - Backups: dependem de pasta escolhida em Configurações. Quando ausente, `ConfigPage` agora mostra um banner amarelo de aviso explícito acima do seletor.

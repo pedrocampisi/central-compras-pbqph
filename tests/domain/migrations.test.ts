@@ -24,7 +24,7 @@ describe('runMigrations', () => {
       },
     };
     const result = runMigrations(v1) as Record<string, unknown>;
-    expect(result['schema_version']).toBe(4);
+    expect(result['schema_version']).toBe(5);
 
     const cfg = result['config'] as Record<string, unknown>;
     expect(Array.isArray(cfg['emitentes'])).toBe(true);
@@ -70,7 +70,7 @@ describe('runMigrations', () => {
       ecrs: [{ id: 1, nome: 'Cimento', normas: [], documentos_obrigatorios: [] }],
     };
     const result = runMigrations(v2) as Record<string, unknown>;
-    expect(result['schema_version']).toBe(4);
+    expect(result['schema_version']).toBe(5);
 
     const ecrs = result['ecrs'] as Record<string, unknown>[];
     expect(ecrs[0]?.['objetivo']).toBeDefined();
@@ -96,7 +96,7 @@ describe('runMigrations', () => {
       ecrs: [{ id: 1, objetivo: 'Recepcionar cimento com qualidade' }],
     };
     const result = runMigrations(v3) as Record<string, unknown>;
-    expect(result['schema_version']).toBe(4);
+    expect(result['schema_version']).toBe(5);
 
     // Campos preexistentes preservados
     const ecrs = result['ecrs'] as Record<string, unknown>[];
@@ -109,7 +109,7 @@ describe('runMigrations', () => {
     expect((result['avaliacoes_prestadores'] as unknown[]).length).toBe(0);
   });
 
-  it('não altera dados já em v4', () => {
+  it('migra v4 → v5 preservando os demais dados', () => {
     const v4: Record<string, unknown> = {
       schema_version: 4,
       config: { emitentes: [{ id: 'e1', razao_social: 'Campisi', tipo: 'PJ' }] },
@@ -118,19 +118,36 @@ describe('runMigrations', () => {
       avaliacoes_prestadores: [],
     };
     const result = runMigrations(v4) as Record<string, unknown>;
-    expect(result['schema_version']).toBe(4);
+    expect(result['schema_version']).toBe(5);
     const prest = result['prestadores_servico'] as Record<string, unknown>[];
     expect(prest[0]?.['razao_social']).toBe('Eletricista X');
   });
 
-  it('encadeia v1 → v2 → v3 → v4 automaticamente', () => {
+  it('migra v4 → v5 removendo config.openrouter_api_key', () => {
+    const v4: Record<string, unknown> = {
+      schema_version: 4,
+      config: {
+        emitentes: [],
+        openrouter_api_key: 'sk-or-chave-antiga-que-nao-deve-sobreviver',
+        pasta_backups: 'Backups',
+      },
+    };
+    const result = runMigrations(v4) as Record<string, unknown>;
+    expect(result['schema_version']).toBe(5);
+    const cfg = result['config'] as Record<string, unknown>;
+    expect('openrouter_api_key' in cfg).toBe(false);
+    // O resto da config sobrevive intacto
+    expect(cfg['pasta_backups']).toBe('Backups');
+  });
+
+  it('encadeia v1 → v2 → v3 → v4 → v5 automaticamente', () => {
     const v1: Record<string, unknown> = {
       // sem schema_version = implicitamente v1
       config: { emitente: { razao_social: 'Campisi', tipo: 'PJ' } },
       ecrs: [{ id: 1, nome: 'Cimento' }],
     };
     const result = runMigrations(v1) as Record<string, unknown>;
-    expect(result['schema_version']).toBe(4);
+    expect(result['schema_version']).toBe(5);
     // emitentes migrado
     const cfg = result['config'] as Record<string, unknown>;
     expect((cfg['emitentes'] as unknown[]).length).toBe(1);
@@ -165,7 +182,7 @@ describe('Round-trip com fixture de produção', () => {
     const normalized = normalizeData(migrated);
     // Não deve lançar ZodError
     const parsed = DataSchema.parse(normalized);
-    expect(parsed.schema_version).toBe(4);
+    expect(parsed.schema_version).toBe(5);
     // Novos arrays presentes após migração
     expect(Array.isArray(parsed.prestadores_servico)).toBe(true);
     expect(Array.isArray(parsed.avaliacoes_prestadores)).toBe(true);
