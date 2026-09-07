@@ -249,6 +249,76 @@ documento nenhum**, porque quem lê para de acreditar no resto.
 
 ---
 
+### 9. Conferência da UI de 07/09 — a lista, e a porta que barra 9 de cada 10 telas
+
+*Minha, esperando triagem do `CTO`.* Medida em 07/09/2026 no navegador embutido, a pedido do
+Pedro. **Conferido e não consertado**: a casa está pausada.
+
+⚠️ **A porta, e ela é o item principal.** Este aplicativo inteiro fica atrás de um login, então o
+que dá para conferir sozinha é **uma tela**: a de entrada. Obras, fornecedores, catálogo, emissão
+de OC e o PDF **não foram vistos**. Não uso a conta de ninguém, e criar conta de ensaio mexe na
+autenticação de produção, que não é desta casa. **O caminho:** o Pedro entra (é a pendência 1
+dele) e deixa a janela aberta — aí eu percorro tela a tela sem nunca ver a senha.
+
+**QUEBRA**
+
+```
+   (a) erro no console a cada carregamento: Unexpected token '<'
+       /registerSW.js responde 200 com HTML em vez de JavaScript
+       reproduzir: abrir o site, abrir o console. Aparece sozinho
+       -> ja' e' a pendencia 7
+```
+
+**FUNCIONA MAL**
+
+```
+   (b) "Primeiro acesso" e "Esqueci minha senha" dizem a MESMA frase:
+       "Informe seu e-mail para receber o link de redefinicao."
+       Quem clica em "primeiro acesso" NUNCA TEVE SENHA -- nao ha' o que
+       redefinir. E' a pessoa insegura do primeiro dia lendo a frase de
+       outra situacao. E e' para esse botao que a pagina de aviso a manda
+       reproduzir: abrir o site, clicar em "Primeiro acesso" sem preencher
+
+   (c) depois dessa mensagem NAO HA' O QUE APERTAR: a tela mantem o campo
+       Senha e a acao laranja continua escrita "Entrar". A pessoa e' mandada
+       informar o e-mail e nao recebe botao de enviar
+       reproduzir: a mesma de (b)
+```
+
+⚠️ **Não medido, de propósito:** o caminho com o e-mail preenchido. Apertar dispara **e-mail de
+verdade para uma pessoa de verdade**, e isso é ato que sai da máquina. É buraco declarado, não é
+"está tudo bem".
+
+**DESIGN**
+
+```
+   (d) alvo de toque pequeno: "Esqueci minha senha" tem 29px de altura em
+       375px de largura. O confortavel e' 44. Os outros dois estao certos
+   (e) a letra do rodape e' a menor da tela: 11.5px (o contraste esta' bom)
+   (f) a pagina nao tem marco <main>. Tem <h1> e lang="pt-BR" corretos
+```
+
+**O QUE ESTÁ CERTO, medido — porque lista só de defeito mente sobre o conjunto**
+
+```
+   contraste ............ todos >= 5.93 (o exigido e' 4.5)
+   foco pelo teclado .... visivel, contorno de 1.6px com folga
+   gerenciador de senha . autocomplete username / current-password corretos
+   celular 375px ........ sem transbordo; cartao de 327px, margens iguais
+   envio vazio .......... "Informe e-mail e senha." -- claro e imediato
+   uma acao laranja ..... uma so'; icone desenhado, sem emoji
+```
+
+🔑 **Duas medições minhas que estavam ERRADAS, e quase viraram defeito falso.** `focus()` por
+código disse que **não há indicação de foco** — apertando Tab de verdade, o contorno está lá. E
+clicar por código lendo a tela na mesma linha disse que **o botão não responde** — a mensagem
+aparece depois que a tela se redesenha. **A lição 31 pelas duas pontas:** o instrumento errado não
+só esconde defeito, ele **inventa** defeito.
+
+Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
+
+---
+
 ## ✅ Fechadas (registro)
 
 ### O ref do banco não é segredo — a régua estava errada, e quem a checou fui eu — 04/09/2026
