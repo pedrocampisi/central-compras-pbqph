@@ -1,6 +1,6 @@
 # Ordem de Compra
 
-> **Data:** 01/09/2026
+> **Data:** 07/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que é **só** do Ordem de Compra e por onde a IA começa. **NÃO** contém as leis (moram no `Padrao_Ouro/`) nem a arquitetura (mora em `docs/Agente.md`).
 
@@ -37,6 +37,13 @@ Este arquivo guarda **só o que é específico do Ordem de Compra**. Em conflito
 
 ## ⚠️ Duas versões convivendo — leia antes de mexer em qualquer coisa
 
+> ⏹️ **A VIRADA ACONTECEU EM 04/09/2026 — leia isto antes da tabela abaixo.**
+> Os ramos foram juntados: **a `main` é hoje a versão com banco, login e permissão**, que é a que
+> está no ar em `compras.campisi.com.br`. O ramo `migracao-supabase` está **aposentado**: ele fica
+> no repositório, ninguém empurra mais nada nele, e **quem chegar novo trabalha na `main`**
+> (decisão 29). A comparação "duas versões" abaixo virou **história**: ela conta como era até
+> 04/09, e não é mais instrução. A coluna `main` de ontem descreve um programa que ninguém usa.
+
 ```
    main                              migracao-supabase
    ────                              ─────────────────
@@ -44,7 +51,7 @@ Este arquivo guarda **só o que é específico do Ordem de Compra**. Em conflito
    sem login                         com login e permissão
    número da OC no navegador         número da OC vem do banco
    chave de IA no arquivo            chave de IA no servidor
-   É O QUE A EQUIPE USA HOJE         A VIRADA É APROVAÇÃO DO PEDRO
+   ATE 04/09: o que a equipe usava    HOJE ISTO E' A MAIN, E ESTA' NO AR
 ```
 
 **`docs/Agente.md` seção 0 é a tradução completa entre as duas.** Onde houver conflito com o

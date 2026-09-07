@@ -1,6 +1,6 @@
 # Central de Compras PBQP-H — Campisi Engenharia
 
-> **Data:** 20/08/2026
+> **Data:** 07/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** a porta do humano — o que o programa faz, como rodar e as duas versões que convivem. **NÃO** descreve arquitetura nem código: para isso, `docs/`.
 
@@ -16,14 +16,22 @@ que já fechou. Se você é uma IA de manutenção, o arquivo denso é
 
 ## Duas versões ao mesmo tempo — não confunda
 
+> ⏹️ **A VIRADA ACONTECEU EM 04/09/2026 — leia isto antes da tabela abaixo.**
+> Os ramos foram juntados: **a `main` é hoje a versão com banco, login e permissão**, que é a que
+> está no ar em `compras.campisi.com.br`. O ramo `migracao-supabase` está **aposentado**: ele fica
+> no repositório, ninguém empurra mais nada nele, e **quem chegar novo trabalha na `main`**
+> (decisão 29). A comparação "duas versões" abaixo virou **história**: ela conta como era até
+> 04/09, e não é mais instrução. A coluna `main` de ontem descreve um programa que ninguém usa.
+
 | | `main` | `migracao-supabase` |
 |---|---|---|
 | É o que está no ar? | **sim**, é a que a empresa usa | não, ainda não liberada |
 | Onde ficam os dados | um arquivo JSON no OneDrive | banco Supabase |
 | Entrada | sem login | login por pessoa, com papéis |
 
-O trabalho novo acontece na `migracao-supabase`. **Não envie nada para a `main`
-sem aprovação do Pedro** — ela é o que está em produção.
+~~O trabalho novo acontece na `migracao-supabase`.~~ **Desde 04/09/2026 o trabalho novo acontece
+na `main`.** O que continua valendo é a metade que importa: **não envie nada para a `main` sem
+aprovação do Pedro** — ela é o que está em produção.
 
 ⚠️ **A publicação mudou de casa em 02/09/2026** (palavra do Pedro): este
 aplicativo vai para o **Cloudflare**, junto com o resto da plataforma, e o

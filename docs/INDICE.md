@@ -1,11 +1,18 @@
 # Índice — o que vale hoje
 
-> **Data:** 02/09/2026
+> **Data:** 07/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** a porta de `docs/` — o que vale hoje e onde está. **NÃO** lista cartas (a gaveta é a verdade, Decisão 7) nem o que já fechou (`Arquivo_Morto/INDICE.md`).
 
-**Projeto:** Central de Compras PBQP-H (Ordem de Compra) · branch de trabalho
-`migracao-supabase` · **atualizado em 28/08/2026**
+**Projeto:** Central de Compras PBQP-H (Ordem de Compra) · branch de trabalho **`main`** ·
+**atualizado em 07/09/2026**
+
+> ⏹️ **`migracao-supabase` está aposentado desde 04/09/2026** — juntado à `main`, mantido no
+> repositório e sem receber nada mais. Ramo declarado morto não atrapalha; ramo que ninguém sabe
+> se está vivo, sim (decisão 29).
+>
+> ⏸️ **A casa está pausada desde 04/09/2026**, palavra do Pedro, sem prazo: nada de trabalho novo.
+> Ver o topo de [`PENDENCIAS.md`](PENDENCIAS.md).
 
 > Este índice responde **"o que vale hoje?"**. O que já fechou está em
 > [`Arquivo_Morto/INDICE.md`](Arquivo_Morto/INDICE.md), que responde

@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 03/09/2026
+> **Data:** 07/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -12,6 +12,24 @@ fim.
 **O número de um item não é reaproveitado quando ele fecha.** Some da lista e deixa o buraco: as
 cartas já enviadas apontam para o número, e carta enviada não se corrige. Buraco na numeração é
 mais barato que carta apontando para o item errado.
+
+---
+
+## ⏸️ Esta casa está pausada — palavra do Pedro em 04/09/2026
+
+> *"quero pausar a ordem de compra por enquanto e focar na central financeira"*
+
+**Sem prazo declarado, então vale até ele dizer o contrário.** O que a pausa faz:
+
+```
+   PARA ....... abrir trabalho novo, adiantar pendencia, propor construcao
+   PARA ....... a pendencia 7 (PWA) saiu de 06/09. NAO comece
+   FICA ....... tudo o que ja' esta' feito: a virada empurrada, o aviso no ar,
+                o ramo aposentado. Nada se desfaz
+   CONTINUA ... responder carta que chegar. Pausa nao e' silencio
+```
+
+A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu.
 
 ---
 
@@ -159,7 +177,8 @@ no endereço próprio; o endereço `compras.campisi.com.br` **não muda**, muda 
    ✅ 3  produção: compras.campisi.com.br NO AR ···· 03/09, palavra do Pedro
             HTTPS válido, DNS na Cloudflare, e o endereço de ensaio
             desligado de propósito (`workers_dev: false`) — decisão 26
-      4  a virada: juntar os ramos
+   ✅ 4  a virada: os ramos juntados ············ 04/09, palavra do Pedro
+            zero conflitos, CI verde na main, e nada mudou para quem usa
    ✅ 5  o endereço velho passou a avisar ············ 03/09, palavra do Pedro
             "pode trocar, tem ninguém usando ainda" — ver o registro nas Fechadas
       6  trocar as cópias do atalho nas máquinas (arrumação, e não mais risco)
@@ -186,9 +205,55 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 ---
 
 
-### 8. O endereço do banco de produção está no repositório público desde 08/08/2026
+---
 
-*Achado em 04/09/2026, conferindo o diff da virada antes de empurrar — e é a conferência que
+### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
+
+*Minha.* Achado em 03/09, no primeiro ensaio no ar. ⏸️ **A data de 06/09 caiu com a pausa da
+casa** (04/09, palavra do Pedro): não é atraso, é escopo. Volta quando ele mandar.
+
+O `index.html` pede dois arquivos que **a montagem não gera**:
+
+**Pista nova, medida em 04/09 na montagem da virada:** não é o PWA inteiro que falta. A montagem
+**gera** `sw.js` e `workbox-*.js` (29 arquivos em cache declarados), mas **não** gera os dois que
+o `index.html` pede. O gerador roda e entrega metade — o que aponta para configuração, e não para
+o gerador estar desligado. Começar por aí em 06/09.
+
+```
+   dist/manifest.webmanifest   FALTA        dist/sw.js            existe
+   dist/registerSW.js          FALTA        dist/workbox-*.js     existe
+```
+
+**Não é regressão da mudança para o Cloudflare** — medido: o site publicado no GitHub Pages
+responde **404 nos dois**. O que mudou foi só o disfarce: no Cloudflare, o
+`not_found_handling: single-page-application` devolve **200 com o `index.html` dentro**, e o
+navegador estoura `Unexpected token '<'` no console de quem abre.
+
+**O que isso custa hoje, na prática:** o aplicativo **não é instalável** e **não abre offline** —
+as duas coisas que o `Fluxo.md` promete ao operador ("aplicativo web instalável como PWA",
+"depois o PWA roda offline"). O `sw.js` existe mas ninguém o registra, porque quem registrava era
+o `registerSW.js` que não existe.
+
+**A hipótese, que é hipótese e não medição:** o `vite-plugin-pwa` (0.21) não emite esses dois
+arquivos sob o Vite desta casa (8.x) — a injeção no `index.html` acontece, a emissão não. Conferir
+antes de mexer; pode ser configuração, pode ser incompatibilidade de versão.
+
+**Enquanto não fecha, está trancado por escrito:** a quarta trava do `scripts/conferir-pacote.js`
+confere que tudo que o `index.html` pede existe, e estes dois estão numa **lista de exceções
+declaradas**, impressa a cada execução com o número desta pendência ao lado. Fechar esta pendência
+inclui **apagar as duas linhas de exceção** — se elas ficarem, a trava continua avisando.
+
+⚠️ **E tem uma decisão junto, que não é só técnica:** ou o PWA passa a funcionar, ou o `Fluxo.md`
+para de prometer que funciona. **Documento que promete o que o programa não faz é pior que
+documento nenhum**, porque quem lê para de acreditar no resto.
+
+---
+
+## ✅ Fechadas (registro)
+
+### O ref do banco não é segredo — a régua estava errada, e quem a checou fui eu — 04/09/2026
+
+✅ **Fechada em 04/09/2026 pelo `CTO`, sem ir à mesa do Pedro.** Achada em 04/09/2026, conferindo o diff da virada antes de empurrar — e é a conferência que
 achou, não a sorte.*
 
 O valor está escrito em **um** documento arquivado,
@@ -230,48 +295,28 @@ deixar como está e saber por quê, ou reescrever a história de propósito, sab
 
 ---
 
-### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
-
-*Minha, para a retomada de **06/09/2026**.* Achado em 03/09, no primeiro ensaio no ar.
-
-O `index.html` pede dois arquivos que **a montagem não gera**:
-
-**Pista nova, medida em 04/09 na montagem da virada:** não é o PWA inteiro que falta. A montagem
-**gera** `sw.js` e `workbox-*.js` (29 arquivos em cache declarados), mas **não** gera os dois que
-o `index.html` pede. O gerador roda e entrega metade — o que aponta para configuração, e não para
-o gerador estar desligado. Começar por aí em 06/09.
+✅ **COMO FECHOU, e não fechei eu.** Levei o achado ao `CTO` junto com a notícia de que eu tinha
+**batido a condição de parada dele e não parado**. Ele foi **medir em vez de arbitrar**:
 
 ```
-   dist/manifest.webmanifest   FALTA        dist/sw.js            existe
-   dist/registerSW.js          FALTA        dist/workbox-*.js     existe
+   RLS ligado ........................ 45 de 45 tabelas
+   grants de tabela ao `anon` ........ 0
+   funcoes que o anon pode executar .. 21, e as que aceitam argumento abrem
+                                       com um teste sobre auth.uid()
 ```
 
-**Não é regressão da mudança para o Cloudflare** — medido: o site publicado no GitHub Pages
-responde **404 nos dois**. O que mudou foi só o disfarce: no Cloudflare, o
-`not_found_handling: single-page-application` devolve **200 com o `index.html` dentro**, e o
-navegador estoura `Unexpected token '<'` no console de quem abre.
+**Com o ref e a chave publicável na mão não se abre nada.** A régua que eu cumpria estava errada
+no motivo, e regra com motivo fraco morre no primeiro que checa o motivo. Virou a **decisão 28**,
+que emenda a 6.
 
-**O que isso custa hoje, na prática:** o aplicativo **não é instalável** e **não abre offline** —
-as duas coisas que o `Fluxo.md` promete ao operador ("aplicativo web instalável como PWA",
-"depois o PWA roda offline"). O `sw.js` existe mas ninguém o registra, porque quem registrava era
-o `registerSW.js` que não existe.
+**Reescrever histórico: não**, e a decisão é dele. Não há o que proteger, `force-push` em
+repositório público quebra o clone de quem tiver um, e a CTO-D49 proíbe. O documento de 08/08
+fica como está.
 
-**A hipótese, que é hipótese e não medição:** o `vite-plugin-pwa` (0.21) não emite esses dois
-arquivos sob o Vite desta casa (8.x) — a injeção no `index.html` acontece, a emissão não. Conferir
-antes de mexer; pode ser configuração, pode ser incompatibilidade de versão.
+Carta: [`Arquivo_Morto/Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md`](Arquivo_Morto/Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md)
 
-**Enquanto não fecha, está trancado por escrito:** a quarta trava do `scripts/conferir-pacote.js`
-confere que tudo que o `index.html` pede existe, e estes dois estão numa **lista de exceções
-declaradas**, impressa a cada execução com o número desta pendência ao lado. Fechar esta pendência
-inclui **apagar as duas linhas de exceção** — se elas ficarem, a trava continua avisando.
-
-⚠️ **E tem uma decisão junto, que não é só técnica:** ou o PWA passa a funcionar, ou o `Fluxo.md`
-para de prometer que funciona. **Documento que promete o que o programa não faz é pior que
-documento nenhum**, porque quem lê para de acreditar no resto.
 
 ---
-
-## ✅ Fechadas (registro)
 
 ### O endereço velho parou de servir o programa e passou a avisar — 03/09/2026
 

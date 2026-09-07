@@ -1,12 +1,24 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 02/09/2026
+> **Data:** 07/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
 > Público: IA de manutenção. Densidade máxima, zero prosa.
 
 ## 0. Duas branches, dois contratos — leia antes de usar este arquivo
+
+> ⏹️ **A VIRADA ACONTECEU EM 04/09/2026 — leia isto antes da tabela abaixo.**
+> Os ramos foram juntados: **a `main` é hoje a versão com banco, login e permissão**, que é a que
+> está no ar em `compras.campisi.com.br`. O ramo `migracao-supabase` está **aposentado**: ele fica
+> no repositório, ninguém empurra mais nada nele, e **quem chegar novo trabalha na `main`**
+> (decisão 29). A comparação "duas versões" abaixo virou **história**: ela conta como era até
+> 04/09, e não é mais instrução. A coluna `main` de ontem descreve um programa que ninguém usa.
+
+> **Como ler esta seção agora:** a coluna `migracao-supabase` é **a arquitetura de hoje, na
+> `main`**. A coluna `main` é o programa antigo, de arquivo JSON, que não está no ar em lugar
+> nenhum. Trocar os títulos das colunas é conserto de verdade e **não foi feito**, porque a casa
+> está pausada desde 04/09 — está anotado, e não escondido.
 
 As seções 1–8 descrevem a arquitetura **da branch `main`** (JSON via File
 System Access API, sem login). Na branch `migracao-supabase` valem estas
