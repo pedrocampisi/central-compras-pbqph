@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 07/09/2026
+> **Data:** 14/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -23,7 +23,8 @@ mais barato que carta apontando para o item errado.
 
 ```
    PARA ....... abrir trabalho novo, adiantar pendencia, propor construcao
-   PARA ....... a pendencia 7 (PWA) saiu de 06/09. NAO comece
+   PARA ....... (a pendencia 7, o PWA, saiu desta lista em 14/09: palavra do Pedro,
+                so' para ela. Esta' feita e espera publicacao)
    FICA ....... tudo o que ja' esta' feito: a virada empurrada, o aviso no ar,
                 o ramo aposentado. Nada se desfaz
    CONTINUA ... responder carta que chegar. Pausa nao e' silencio
@@ -207,46 +208,6 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 7. O PWA nunca funcionou em produção — e o `Fluxo.md` promete que funciona
-
-*Minha.* Achado em 03/09, no primeiro ensaio no ar. ⏸️ **A data de 06/09 caiu com a pausa da
-casa** (04/09, palavra do Pedro): não é atraso, é escopo. Volta quando ele mandar.
-
-O `index.html` pede dois arquivos que **a montagem não gera**:
-
-**Pista nova, medida em 04/09 na montagem da virada:** não é o PWA inteiro que falta. A montagem
-**gera** `sw.js` e `workbox-*.js` (29 arquivos em cache declarados), mas **não** gera os dois que
-o `index.html` pede. O gerador roda e entrega metade — o que aponta para configuração, e não para
-o gerador estar desligado. Começar por aí em 06/09.
-
-```
-   dist/manifest.webmanifest   FALTA        dist/sw.js            existe
-   dist/registerSW.js          FALTA        dist/workbox-*.js     existe
-```
-
-**Não é regressão da mudança para o Cloudflare** — medido: o site publicado no GitHub Pages
-responde **404 nos dois**. O que mudou foi só o disfarce: no Cloudflare, o
-`not_found_handling: single-page-application` devolve **200 com o `index.html` dentro**, e o
-navegador estoura `Unexpected token '<'` no console de quem abre.
-
-**O que isso custa hoje, na prática:** o aplicativo **não é instalável** e **não abre offline** —
-as duas coisas que o `Fluxo.md` promete ao operador ("aplicativo web instalável como PWA",
-"depois o PWA roda offline"). O `sw.js` existe mas ninguém o registra, porque quem registrava era
-o `registerSW.js` que não existe.
-
-**A hipótese, que é hipótese e não medição:** o `vite-plugin-pwa` (0.21) não emite esses dois
-arquivos sob o Vite desta casa (8.x) — a injeção no `index.html` acontece, a emissão não. Conferir
-antes de mexer; pode ser configuração, pode ser incompatibilidade de versão.
-
-**Enquanto não fecha, está trancado por escrito:** a quarta trava do `scripts/conferir-pacote.js`
-confere que tudo que o `index.html` pede existe, e estes dois estão numa **lista de exceções
-declaradas**, impressa a cada execução com o número desta pendência ao lado. Fechar esta pendência
-inclui **apagar as duas linhas de exceção** — se elas ficarem, a trava continua avisando.
-
-⚠️ **E tem uma decisão junto, que não é só técnica:** ou o PWA passa a funcionar, ou o `Fluxo.md`
-para de prometer que funciona. **Documento que promete o que o programa não faz é pior que
-documento nenhum**, porque quem lê para de acreditar no resto.
-
 ---
 
 ### 9. Conferência da UI de 07/09 — a lista, e a porta que barra 9 de cada 10 telas
@@ -266,7 +227,8 @@ dele) e deixa a janela aberta — aí eu percorro tela a tela sem nunca ver a se
    (a) erro no console a cada carregamento: Unexpected token '<'
        /registerSW.js responde 200 com HTML em vez de JavaScript
        reproduzir: abrir o site, abrir o console. Aparece sozinho
-       -> ja' e' a pendencia 7
+       -> era a pendencia 7. CONSERTADA em 14/09 (decisao 30); some do ar
+          na proxima publicacao, que e' palavra do Pedro
 ```
 
 **FUNCIONA MAL**
@@ -315,11 +277,66 @@ clicar por código lendo a tela na mesma linha disse que **o botão não respond
 aparece depois que a tela se redesenha. **A lição 31 pelas duas pontas:** o instrumento errado não
 só esconde defeito, ele **inventa** defeito.
 
-Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
+Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Arquivo_Morto/Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
 
 ---
 
 ## ✅ Fechadas (registro)
+
+### O PWA passou a ser gerado — o gerador não conhecia o Vite da casa — 14/09/2026
+
+*Minha.* Achado em 03/09, no primeiro ensaio no ar. ⏸️ **A data de 06/09 caiu com a pausa da
+casa** (04/09, palavra do Pedro): não é atraso, é escopo. Volta quando ele mandar.
+
+O `index.html` pede dois arquivos que **a montagem não gera**:
+
+**Pista nova, medida em 04/09 na montagem da virada:** não é o PWA inteiro que falta. A montagem
+**gera** `sw.js` e `workbox-*.js` (29 arquivos em cache declarados), mas **não** gera os dois que
+o `index.html` pede. O gerador roda e entrega metade — o que aponta para configuração, e não para
+o gerador estar desligado. Começar por aí em 06/09.
+
+```
+   dist/manifest.webmanifest   FALTA        dist/sw.js            existe
+   dist/registerSW.js          FALTA        dist/workbox-*.js     existe
+```
+
+**Não é regressão da mudança para o Cloudflare** — medido: o site publicado no GitHub Pages
+responde **404 nos dois**. O que mudou foi só o disfarce: no Cloudflare, o
+`not_found_handling: single-page-application` devolve **200 com o `index.html` dentro**, e o
+navegador estoura `Unexpected token '<'` no console de quem abre.
+
+**O que isso custa hoje, na prática:** o aplicativo **não é instalável** e **não abre offline** —
+as duas coisas que o `Fluxo.md` promete ao operador ("aplicativo web instalável como PWA",
+"depois o PWA roda offline"). O `sw.js` existe mas ninguém o registra, porque quem registrava era
+o `registerSW.js` que não existe.
+
+**A hipótese, que é hipótese e não medição:** o `vite-plugin-pwa` (0.21) não emite esses dois
+arquivos sob o Vite desta casa (8.x) — a injeção no `index.html` acontece, a emissão não. Conferir
+antes de mexer; pode ser configuração, pode ser incompatibilidade de versão.
+
+**Enquanto não fecha, está trancado por escrito:** a quarta trava do `scripts/conferir-pacote.js`
+confere que tudo que o `index.html` pede existe, e estes dois estão numa **lista de exceções
+declaradas**, impressa a cada execução com o número desta pendência ao lado. Fechar esta pendência
+inclui **apagar as duas linhas de exceção** — se elas ficarem, a trava continua avisando.
+
+⚠️ **E tem uma decisão junto, que não é só técnica:** ou o PWA passa a funcionar, ou o `Fluxo.md`
+para de prometer que funciona. **Documento que promete o que o programa não faz é pior que
+documento nenhum**, porque quem lê para de acreditar no resto.
+
+---
+
+✅ **FECHADA EM 14/09/2026, com a palavra do Pedro ("pode dar o aceita no pwa").** A causa não era
+configuração: o `vite-plugin-pwa` 0.21.2 declara aceitar Vite até o 6, e a casa roda o 8 — ele emitia
+o `sw.js` e engolia os outros dois em silêncio. Subiu para 1.3.0, fixado. **As duas exceções da trava
+sumiram**, a trava foi **sabotada** e mordeu (código de saída 1, restaurada byte a byte), e na tela:
+console limpo, e a página abre **com o servidor desligado** (`deliveryType: cache-storage`).
+**Ainda não está no ar** — publicar é palavra do Pedro. Decisão 30.
+
+A pausa da casa também mudou o aviso lá em cima: *"PARA a pendência 7"* deixou de valer para ela
+em 14/09, e só para ela.
+
+
+---
 
 ### O ref do banco não é segredo — a régua estava errada, e quem a checou fui eu — 04/09/2026
 

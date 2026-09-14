@@ -145,16 +145,14 @@ function oSubenderecoMortoNaoVoltou(arquivos) {
  * arquivo que o `index.html` pede EXISTE no pacote?
  */
 const EXCECOES_DECLARADAS = new Map([
-  // Defeito ANTIGO, não regressão: medido em 03/09/2026, o site publicado no
-  // GitHub Pages (ramo `main`) também devolve 404 nos dois. O PWA desta casa
-  // nunca funcionou em produção. A hipótese é o `vite-plugin-pwa` não emitir
-  // os arquivos sob o Vite desta casa — o `sw.js` sai, estes dois não.
+  // VAZIO DE PROPÓSITO, desde 14/09/2026. Até então havia duas exceções aqui:
+  // `/manifest.webmanifest` e `/registerSW.js`, a pendência 7 — o gerador de
+  // PWA (vite-plugin-pwa 0.21) só conhecia Vite até o 6, e sob o Vite 8 desta
+  // casa emitia o `sw.js` e engolia estes dois em silêncio. O conserto foi
+  // subir o gerador para a 1.3.0, que conhece o Vite 8. As duas linhas
+  // sumiram, como prometido: exceção escrita é dívida que se cobra.
   //
-  // Ficam aqui de propósito, VISÍVEIS, em vez de a trava ser fraca: é a
-  // pendência 7, e no dia em que ela fechar estas duas linhas somem. Exceção
-  // escrita é dívida que se cobra; trava frouxa é dívida que some.
-  ['/manifest.webmanifest', 'pendência 7 — o PWA não é gerado (defeito antigo)'],
-  ['/registerSW.js', 'pendência 7 — o PWA não é gerado (defeito antigo)'],
+  // O Map fica, vazio, para a próxima exceção nascer com nome, motivo e data.
 ]);
 
 function tudoQueOIndicePedeExiste() {

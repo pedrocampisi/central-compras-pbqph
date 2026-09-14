@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 07/09/2026
+> **Data:** 14/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -1313,4 +1313,68 @@ cura é a declaração, e não o apagamento.
 **CONSEQUÊNCIA**
 Está escrito no `INDICE.md` e no `CLAUDE.md` da casa, com data. Se um dia a lista de ramos
 incomodar de verdade, aí é decisão com motivo, e o `CTO` revê.
+
+---
+
+## Decisão 30 — o PWA nunca funcionou porque o gerador não conhecia o Vite da casa · 14/09/2026
+
+**A PALAVRA**
+Do Pedro, em 14/09, repassada pelo `CTO` (D388) e batendo com o que ele disse na janela desta
+casa: *"pode dar o aceita no pwa"*. **Só o PWA** — o resto da pausa de 04/09 continua. Publicar
+continua sendo palavra dele aqui.
+
+**O QUE ESTAVA ACONTECENDO, medido e não suposto**
+
+```
+   o Vite da casa .................. 8.0.10
+   o gerador de PWA instalado ...... vite-plugin-pwa 0.21.2
+                                     declara aceitar Vite 3, 4, 5 e 6. Nao o 8
+   o gerador de hoje ............... 1.3.0, declara aceitar ate o 8
+```
+
+O gerador antigo rodava **pela metade** no Vite 8: a parte que escreve o `sw.js` e o `workbox-*.js`
+funcionava, e a parte que entrega o `manifest.webmanifest` e o `registerSW.js` ao pacote **falhava em
+silêncio** — sem erro, sem aviso. Ninguém reclamou porque **não era erro, era ausência**. A pista de
+04/09 ("o gerador roda e entrega metade — aponta para configuração") estava certa na direção e errada
+no alvo: não era a configuração desta casa, era a **versão** do gerador.
+
+**O CONSERTO, e é uma linha**
+`vite-plugin-pwa` sobe para `1.3.0`, **fixado** (sem `^`, como o `wrangler`). Nenhuma mudança na
+configuração, nenhuma no código do produto.
+
+**Um efeito colateral que eu não procurava:** a montagem caiu de **6,6 s para 0,9 s**. O gerador
+antigo gastava 80% do tempo da montagem brigando com o Vite, e o Vite dizia isso num aviso que
+ninguém lia (`PLUGIN_TIMINGS`).
+
+**A TRAVA MUDOU JUNTO, e foi sabotada como a regra nova manda (CTO-D297)**
+As duas exceções declaradas em `scripts/conferir-pacote.js` — *"faltam, e é a pendência 7"* —
+**sumiram**, como estava prometido no dia em que nasceram: exceção escrita é dívida que se cobra. E
+a trava foi quebrada de propósito para provar que não é enfeite:
+
+```
+   1. o que quebrei ...... apaguei dist/manifest.webmanifest do pacote
+                           (exatamente o que o gerador velho fazia)
+   2. o que ela disse .... [ FALHA] tudo que o index.html pede existe
+                           o index.html pede 1 arquivo(s) que NAO estao no pacote:
+                           · /manifest.webmanifest
+                           codigo de saida 1 -> a subida PARA
+   3. desfeita ........... byte a byte, hash igual; 4 passaram, codigo de saida 0
+```
+
+**A PROVA NA TELA, que é a que dá nome à pendência**
+Pacote servido localmente: **console limpo** (o `Unexpected token '<'` sumiu); service worker
+registrado e ativo; manifesto entregue como `application/manifest+json`. Depois **desliguei o
+servidor** e recarreguei: a página abriu inteira — título, formulário, botões — e o navegador mesmo
+disse de onde veio: `deliveryType: "cache-storage"`. Nove de dez recursos do cache do service
+worker; o décimo é a folha de fontes do Google, que veio do cache comum do navegador.
+
+**O QUE NÃO FOI FEITO, de propósito**
+Publicar. O site no ar continua com o defeito até o Pedro dizer. E o `Fluxo.md` continua descrevendo
+a versão de arquivo em vários trechos (JSON no OneDrive, File System Access API) — é conserto de
+verdade, e a pausa vale para ele.
+
+**DESCARTADO**
+Consertar por configuração (`injectRegister`, `manifestFilename`, etc.) sem subir a versão: seria
+ajustar manivela num aparelho que não conhece a máquina. Subir a versão é o conserto; o resto seria
+tapar.
 
