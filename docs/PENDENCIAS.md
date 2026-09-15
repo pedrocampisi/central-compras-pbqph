@@ -24,7 +24,7 @@ mais barato que carta apontando para o item errado.
 ```
    PARA ....... abrir trabalho novo, adiantar pendencia, propor construcao
    PARA ....... (a pendencia 7, o PWA, saiu desta lista em 14/09: palavra do Pedro,
-                so' para ela. Esta' feita e espera publicacao)
+                so' para ela. Feita e NO AR na mesma noite)
    FICA ....... tudo o que ja' esta' feito: a virada empurrada, o aviso no ar,
                 o ramo aposentado. Nada se desfaz
    CONTINUA ... responder carta que chegar. Pausa nao e' silencio
@@ -227,8 +227,8 @@ dele) e deixa a janela aberta — aí eu percorro tela a tela sem nunca ver a se
    (a) erro no console a cada carregamento: Unexpected token '<'
        /registerSW.js responde 200 com HTML em vez de JavaScript
        reproduzir: abrir o site, abrir o console. Aparece sozinho
-       -> era a pendencia 7. CONSERTADA em 14/09 (decisao 30); some do ar
-          na proxima publicacao, que e' palavra do Pedro
+       -> era a pendencia 7. CONSERTADA e NO AR em 14/09 (decisao 30):
+          console limpo, medido depois de publicar
 ```
 
 **FUNCIONA MAL**
@@ -330,7 +330,7 @@ configuração: o `vite-plugin-pwa` 0.21.2 declara aceitar Vite até o 6, e a ca
 o `sw.js` e engolia os outros dois em silêncio. Subiu para 1.3.0, fixado. **As duas exceções da trava
 sumiram**, a trava foi **sabotada** e mordeu (código de saída 1, restaurada byte a byte), e na tela:
 console limpo, e a página abre **com o servidor desligado** (`deliveryType: cache-storage`).
-**Ainda não está no ar** — publicar é palavra do Pedro. Decisão 30.
+**No ar desde a mesma noite**, com a palavra dele (*"empurra e publica"*): os três arquivos respondem com o tipo certo e o console está limpo. Decisão 30.
 
 A pausa da casa também mudou o aviso lá em cima: *"PARA a pendência 7"* deixou de valer para ela
 em 14/09, e só para ela.

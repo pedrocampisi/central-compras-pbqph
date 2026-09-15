@@ -1378,3 +1378,10 @@ Consertar por configuração (`injectRegister`, `manifestFilename`, etc.) sem su
 ajustar manivela num aparelho que não conhece a máquina. Subir a versão é o conserto; o resto seria
 tapar.
 
+**PUBLICADO NA MESMA NOITE, com a palavra do Pedro nesta janela** (*"empurra e publica"*). O
+`pnpm run deploy` passou pela trava (4 de 4) e subiu; a lista do que o Cloudflare recebeu como
+**novo** é a assinatura do conserto: `/registerSW.js`, `/sw.js`, `/manifest.webmanifest`. Medido
+no ar: os três respondem 200 com o tipo certo (`application/manifest+json`, `text/javascript`),
+console limpo, service worker registrado. E o endereço velho continua avisando — medir os dois é a
+régua.
+

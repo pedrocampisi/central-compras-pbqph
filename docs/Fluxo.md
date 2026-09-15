@@ -34,13 +34,11 @@ sistema antigo**. O estado da migração está em
 
 ## O que o sistema faz
 
-> ⚠️ **O modo instalável foi consertado no repositório em 14/09/2026 e ainda NÃO está no ar.**
-> Medido em 03/09: os dois arquivos que fazem o aplicativo ser instalável e abrir sem internet não
-> eram gerados pela montagem — o gerador era de uma geração anterior ao Vite da casa e falhava
-> em silêncio. Com o gerador novo, medido em 14/09: console limpo, e a página abre **com o
-> servidor desligado**, servida do cache. **Vale no ar a partir da próxima publicação**, que é
-> palavra do Pedro. Até lá, este documento continua sem prometer offline. Ver `PLANEJAMENTO.md`,
-> decisão 30.
+> ✅ **O modo instalável está no ar desde 14/09/2026, à noite.** Até então nunca tinha funcionado
+> em produção: o gerador era de uma geração anterior ao Vite da casa e falhava em silêncio. Medido
+> no ar depois de publicar: console limpo, manifesto e service worker entregues com o tipo certo.
+> Medido antes, no pacote local: a página abre **com o servidor desligado**, servida do cache. Ver
+> `PLANEJAMENTO.md`, decisão 30.
 
 A Central de Compras é um aplicativo web que ajuda a Campisi a **criar, controlar e imprimir ordens de compra** dentro do padrão PBQP-H. Você cadastra fornecedores, obras, emitentes (a empresa que assina a OC) e usa o catálogo de 20 categorias ECR para classificar os itens. Cria a OC, digita os itens (ou deixa a IA extrair de um PDF do Sigescom), gera o PDF padrão Campisi e salva tudo num único arquivo JSON na sua pasta do OneDrive. O PDF vai pra pasta da obra; uma cópia rotativa do JSON inteiro vai para uma pasta de backups.
 
@@ -118,7 +116,7 @@ flowchart TD
 
 **Responsável:** `index.html` → `src/main.tsx` → `src/App.tsx`.
 
-**O que precisa para funcionar:** conexão de internet **sempre, até a próxima publicação** (o modo offline foi consertado em 14/09 e ainda não subiu — decisão 30) e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
+**O que precisa para funcionar:** conexão de internet para entrar e gravar; **a tela abre sem internet** desde 14/09 (decisão 30), mas o banco não e navegador Chromium (Chrome, Edge, Brave). Firefox/Safari não funcionam por causa da File System Access API.
 
 **O que pode dar errado:** se o Service Worker do PWA está com versão antiga em cache, você pode ver a tela de antes. Solução: `Ctrl+Shift+R` para forçar atualização. Se o navegador for Firefox/Safari, o app abre mas a parte de salvar arquivo não funciona.
 

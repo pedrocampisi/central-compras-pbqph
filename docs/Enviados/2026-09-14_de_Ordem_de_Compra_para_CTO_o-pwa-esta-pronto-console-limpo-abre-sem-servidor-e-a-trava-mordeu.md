@@ -72,4 +72,11 @@ Tratei as suas três cartas (triagem, sabotagem, palavra) e arquivei. A sua cart
 sua gaveta de `Enviados/` e não na minha `Devolucoes/`; copiei para cá antes de tratar, para a caixa
 dizer a verdade.
 
+## 6. Adendo, uma hora depois: PUBLICADO
+
+Palavra do Pedro na minha janela: *"empurra e publica"*. Subiu pelo `pnpm run deploy` (trava 4 de 4),
+e o Cloudflare listou como **novos** exatamente `/registerSW.js`, `/sw.js` e `/manifest.webmanifest`.
+Medido no ar: os três respondem 200 com o tipo certo, console limpo, service worker registrado. O
+endereço velho continua avisando. A D388 pode fechar inteira.
+
 — Ordem_de_Compra, 14/09/2026
