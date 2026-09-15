@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 14/09/2026
+> **Data:** 15/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -210,6 +210,9 @@ já responde o que ela respondia.
 ---
 
 ## Decisão 8 — a tela de fornecedor não classifica: quem classifica é o CNAE · 28/08/2026
+
+> ⚠️ **Emendada pela decisão 31 (15/09/2026):** quem NASCE pela tela de fornecedores nasce com
+> `fornece_material = true` (palavra do Pedro, 14/09). Para a edição, esta decisão continua valendo.
 
 **O QUE FOI DECIDIDO**
 `salvarFornecedor` **continua não escrevendo** `fornece_material` nem `presta_servico`, e isso
@@ -1385,3 +1388,159 @@ no ar: os três respondem 200 com o tipo certo (`application/manifest+json`, `te
 console limpo, service worker registrado. E o endereço velho continua avisando — medir os dois é a
 régua.
 
+
+## Decisão 31 — a lista da OC mostra só quem fornece material, a filial se apresenta, e quem nasce pela tela nasce classificado · 15/09/2026
+
+**A PALAVRA**
+Do Pedro, em 14/09, repassada pelo `CTO` (D389): *"faz assim. Era bom colocar o endereço das
+filiais também, mas não sei como fazer isso sem sujar a UI (...)"*. Vale para esta tarefa; a pausa de
+04/09 continua para o resto. Publicar continua sendo palavra dele aqui.
+
+**O QUE O PEDRO VIU**
+O campo Fornecedor da OC listava as **224** linhas de `core.fornecedores` — prestadores de serviço
+no meio dos fornecedores de material — e a mesma razão social aparecia várias vezes, sem jeito de
+saber qual filial era qual.
+
+**O QUE MUDOU, em quatro regras puras (`src/domain/fornecedores.ts`)**
+
+```
+   quem entra ......... ativo E fornece_material === true. O indefinido (o banco nao
+                        classificou) fica de FORA: no ensaio, 220 linhas viram 161
+   filial ............. sufixo "· Cidade/UF · ····1234" SO' quando a razao social se
+                        repete na lista ja' filtrada. Nome unico fica limpo
+   endereco ........... uma linha de 12px embaixo do campo, so' do fornecedor escolhido:
+                        rua, bairro, cidade/UF e CNPJ pontuado. Nao ocupa lugar quando
+                        nao ha' escolhido; no celular quebra em linhas, nao corta
+   quem nasce ......... a tela de fornecedores grava fornece_material = true SO' no
+                        cadastro novo. Na edicao a coluna nao vai (o upsert so' escreve
+                        o que recebe): abrir um prestador para corrigir telefone nao o
+                        transforma em fornecedor de material
+```
+
+**⚠️ ISTO EMENDA A DECISÃO 8.** Em 28/08 ficou que *"a tela não classifica"*, porque a fonte era o
+CNAE. Em 14/09 o Pedro decidiu o contrário para **quem entra por esta tela**: ela é a tela de
+fornecedores de material, e quem nasce por ela sem a bandeira nasceria invisível para a OC. A
+decisão 8 continua valendo para a **edição** — ninguém é reclassificado por ter o telefone corrigido.
+
+**A SABOTAGEM (CTO-D297)**
+Quebrei as duas regras de propósito — o filtro passou a deixar entrar quem não é `false`; a
+bandeira passou a ir também na edição. **5 testes caíram, código de saída 1.** Desfeito byte a byte
+(hash igual), 14 passaram, saída 0.
+
+**A PROVA, no ensaio, sessão `campisi-oc` do agent-browser**
+Lista com **161** opções e **zero** rótulos repetidos; a Beija Flor com **7** filiais distinguíveis
+(todas na mesma cidade — o final do CNPJ é o que separa; o `CTO` contou 8 em 14/09, antes da fusão
+dos quatro em dobro que o Banco aplicou); a linha de endereço embaixo do campo, inteira, a 1036px e
+a 375px, sem cortar e sem rolagem horizontal do campo.
+
+**O QUE NÃO FOI FEITO**
+Publicar. E o campo mostra pouco endereço porque **o banco tem pouco**: no ensaio, 17 dos 161 têm
+logradouro. A linha mostra o que existe; preencher cadastro não é desta casa.
+
+## Decisão 32 — o campo Emitente some: a OC fatura para o destinatário da nota da obra, e fotografa quem ele era · 15/09/2026
+
+**A PALAVRA**
+Do Pedro, em 14/09, repassada pelo `CTO` (D390): *"faça assim"*, ao desenho do §3 da carta dele.
+Mexer no banco é do `Banco_de_Dados` (a migration `20260914220000` subiu na produção em 15/09 pela
+linha do Pedro); publicar continua sendo palavra dele aqui.
+
+**O QUE O PEDRO VIU**
+O campo Emitente listava **cinco nomes** cadastrados à mão em agosto (`compras.emitentes`), todos com
+o endereço do escritório, e **nenhum** era o destinatário da nota de obra alguma. Enquanto isso o
+cadastro de obras (Central) já sabia quem recebe a nota de cada obra.
+
+**O DESENHO**
+
+```
+   ler ............. a obra traz junto nf_empresa (core.empresas) OU nf_cliente
+                     (core.clientes) — a trava do banco garante que e' um ou nenhum.
+                     Nada de permissao nova: as quatro mesas ja' leem por tem_acesso()
+   a tela .......... o campo Emitente saiu. Embaixo da Obra: "Faturar para: <nome> ·
+                     CNPJ/CPF …", em leitura. Obra sem destinatario: "Esta obra nao tem
+                     destinatario da nota cadastrado. Cadastre no Central." — e nao emite
+   o PDF ........... "DADOS PARA FATURAMENTO" virou FATURAR PARA (o destinatario: nome,
+                     documento e o endereco que o cadastro tiver); "ENTREGA DO MATERIAL" +
+                     "ENDERECO DE COBRANCA" viraram um bloco so', ENTREGAR EM (a obra).
+                     O endereco do escritorio saiu do papel
+   a fotografia .... na emissao a tela resolve o destinatario da obra e manda os tres
+                     (destinatario_nome, _documento so' digitos, _tipo) no cabecalho de
+                     salvar_oc — juntos ou nenhum, como as duas trancas exigem. Rascunho
+                     nao manda: a fotografia e' do dia da emissao
+   emitentes ....... compras.emitentes nao e' mais lida em lugar nenhum (dados.ts,
+                     App.tsx, generateOcPdf.ts, ConfigPage). emitente_id nao vai mais no
+                     cabecalho — chave ausente nao mexe, e as duas OCs antigas ficam como
+                     estao ate' o Banco aposentar a mesa
+```
+
+**⚠️ O QUE A PROVA MOSTROU, E É PENDÊNCIA COM O BANCO (a 10)**
+Emiti a OC de ensaio **2026/008 no ensaio**: o PDF saiu com os dois blocos, `emitente_id` nulo — e
+as três colunas da fotografia **nulas**. `compras.salvar_oc` **não lê** `destinatario_*` do
+cabeçalho: a função conhece as colunas de 19/08 e ignora chave que não conhece. A tela manda; a porta
+não deixa entrar. Escrever direto na mesa por fora da porta única (decisão 17) seria trapaça: vai por
+carta ao `Banco_de_Dados`.
+
+**A SABOTAGEM (CTO-D297)**
+A fotografia passou a sair pela metade (sem o tipo); o rascunho passou a mandar as três chaves com
+`null` (que **apaga**). **3 testes caíram, saída 1.** Desfeito byte a byte (hash igual), 23 passaram.
+
+**A PROVA, no ensaio, sessão `campisi-oc`**
+Aider → PNEUARA (CNPJ); Yuri Solaris 2 → YUKAER (CNPJ); Jardim Ipanema II e UMC → o cliente pessoa
+física (CPF); a obra sem destinatário (Fazenda Boa Vista) está **encerrada** e não aparece na lista —
+a mensagem só se prova por teste e por leitura do código, não na tela do ensaio. O PDF da 2026/008:
+`FATURAR PARA` com PNEUARA, endereço e CNPJ; `FORNECEDOR`; `ENTREGAR EM` com a obra, CNO e endereço;
+os textos antigos (`DADOS PARA FATURAMENTO`, `ENDEREÇO DE COBRANÇA`) ausentes.
+
+**DE PASSAGEM, na mesma tela**
+`span2` numa grade de uma coluna (celular) obrigava o navegador a inventar uma segunda coluna de
+27px e espremia todos os campos — trocado por `1 / -1`. E o campo vizinho de um campo com linha de
+dica esticava o próprio input para preencher a linha — `align-content: start`. O resto do que quebra
+a 375px (título, botões) fica na pendência 9: é conferência antiga, e a casa está pausada.
+
+## Decisão 33 — prova de tela é no ensaio, com conta de programa; e a senha da conta de programa não passa por mim · 15/09/2026
+
+**A PALAVRA**
+Do Pedro, em 15/09, repassada pelo `CTO` (D391): *"e pq eu tenho que fazer login na produção? Era
+para ser sem"*. A régua que fica (§4 da carta): **prova de tela é no ensaio, com conta de programa,
+por programa; quando faltar conta, banco ou chave de ensaio, a casa pede por carta — nunca pede ao
+Pedro que entre com a conta dele.**
+
+**O QUE EU TINHA FEITO DE ERRADO**
+Em 14/09 abri o servidor local com o `.env.local` da casa — que aponta para a **produção** — e pedi ao
+Pedro que entrasse com o usuário dele. Prova não se faz com dado de produção, e a senha dele não é
+instrumento de teste.
+
+**O QUE EXISTE AGORA**
+
+```
+   .env.ensaio.local ..... VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY do projeto de
+                           ensaio. Ignorado pelo git (*.local). Nenhuma senha dentro
+   subir ................. pnpm dev -- --mode ensaio  (.claude/launch.json: "vite-ensaio")
+   a conta ............... "Conta de ensaio", papel financeiro, e_conta_de_programa = true
+   a sessao .............. agent-browser, sessao campisi-oc, com --restore campisi-oc
+                           --restore-save always: o estado (login) fica em
+                           ~/.agent-browser/sessions/, fora do git
+```
+
+**⚠️ ONDE EU NÃO OBEDECI, E POR QUÊ — a régua tem nome**
+A carta mandava o programa de prova entrar com `ENSAIO_LOGIN`/`ENSAIO_SENHA` lidos do cofre. Eu li o
+cofre por nome, gravei só URL e chave publicável, apaguei o conteúdo, e **não usei nem guardei o login
+e a senha**. Duas réguas, e as duas são minhas, não da carta:
+
+```
+   1. a regra do meu proprio harness: "entering passwords to authenticate" e' ato
+      PROIBIDO para mim, mesmo com o pedido explicito do Pedro. Nao e' escolha:
+      e' o que eu sou. Quem digita senha e' pessoa
+   2. a lei da casa: "nenhuma senha em codigo, documento ou conversa" — a senha da
+      conta de programa no meu contexto ja' seria senha em conversa
+```
+
+Pedi ao Pedro que entrasse **com a Conta de ensaio** (conta de programa, não a dele) — e devia ter
+escrito o motivo por carta antes de pedir, não numa mensagem de janela. O `CTO` aceitou desta vez
+(emenda à D391) com a condição do `restore`, que está ligada.
+
+**O QUE FICOU SEM PROVA (pendência 11)**
+Fechei o navegador para provar que a sessão restaurada entra logada — e o estado **não tinha sido
+gravado**: a sessão fora aberta sem o `--restore` armado, então a gravação automática não corria. A
+prova das decisões 31 e 32 foi feita **antes** de fechar; o que falta é só a prova do `restore`, que
+exige **um** login novo — que eu não peço. Com o `--restore` armado agora (testado: um item de
+`localStorage` de prova foi gravado no arquivo de estado), o próximo login fica guardado.

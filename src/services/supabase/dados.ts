@@ -19,12 +19,15 @@
  */
 
 import type {
-  AvaliacaoPrestador, Data, Ecr, Emitente, Endereco, Fornecedor, Item, Obra,
+  AvaliacaoPrestador, Data, Ecr, Fornecedor, Item, Obra,
   OrdemCompra, PrestadorServico,
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
+import {
+  cabecalhoDaOc, destinatarioDaLinhaDaObra, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco,
+} from './linhas';
 
 // ---------------------------------------------------------------------------
 // Conversões entre o formato do banco (colunas planas) e o do app (objetos)
@@ -32,53 +35,27 @@ import { traduzirErroDoBanco } from './erros';
 
 const vazio = (v: unknown): string => (v == null ? '' : String(v));
 
-function paraEndereco(l: Record<string, unknown>): Endereco {
-  return {
-    logradouro: vazio(l['logradouro']),
-    numero: vazio(l['numero']),
-    complemento: vazio(l['complemento']),
-    bairro: vazio(l['bairro']),
-    cidade: vazio(l['cidade']),
-    uf: vazio(l['uf']),
-    cep: vazio(l['cep']),
-  };
-}
-
-function deEndereco(e: Partial<Endereco> | undefined) {
-  return {
-    logradouro: e?.logradouro || null,
-    numero: e?.numero || null,
-    complemento: e?.complemento || null,
-    bairro: e?.bairro || null,
-    cidade: e?.cidade || null,
-    uf: e?.uf ? e.uf.toUpperCase().slice(0, 2) : null,
-    cep: e?.cep ? e.cep.replace(/\D/g, '') || null : null,
-  };
-}
-
-/** CPF/CNPJ entram no banco só com dígitos — é o que impede o mesmo cadastro
- *  entrar duas vezes com pontuação diferente. */
-const soDigitos = (v: string | undefined): string | null => {
-  const d = (v ?? '').replace(/\D/g, '');
-  return d.length === 11 || d.length === 14 ? d : null;
-};
-
 // ---------------------------------------------------------------------------
 // Leitura
 // ---------------------------------------------------------------------------
 
 export async function carregarDados(): Promise<Data> {
-  const [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals, fornEcrs] = await Promise.all([
+  const [forn, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs] = await Promise.all([
     core().from('fornecedores').select('*').order('razao_social'),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
-    // imóvel vem junto porque é dele que saem endereço e responsável.
+    // imóvel vem junto porque é dele que saem endereço e responsável; o
+    // destinatário da nota (empresa OU cliente, trava do banco) vem junto
+    // porque é dele que a OC fatura — a OC não escolhe, lê (CTO-D390).
     core()
       .from('intervencoes')
-      .select('id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*)')
+      .select(
+        'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
+        'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
+        'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
+      )
       .order('descricao_curta'),
     compras().from('ecrs').select('*, materiais(*)').order('id'),
     compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
-    compras().from('emitentes').select('*').order('padrao', { ascending: false }),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
     compras().from('prestadores_servico').select('*').order('razao_social'),
     compras().from('avaliacoes_prestadores').select('*').order('data_avaliacao'),
@@ -87,7 +64,7 @@ export async function carregarDados(): Promise<Data> {
     compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id'),
   ]);
 
-  for (const r of [forn, obras, ecrs, ocs, emits, cfgNum, prest, avals, fornEcrs]) {
+  for (const r of [forn, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
   }
 
@@ -112,7 +89,10 @@ export async function carregarDados(): Promise<Data> {
     seeded_at: '',
     last_saved: new Date().toISOString(),
     config: {
-      emitentes: (emits.data ?? []).map(paraEmitente),
+      // `compras.emitentes` não é mais lida (CTO-D390, 15/09/2026): o
+      // destinatário da nota vem da obra. A lista fica vazia até o banco
+      // aposentar a mesa e o campo sair do formato de dados.
+      emitentes: [],
       endereco_cobranca: paraEndereco({}),
       ultimo_numero_oc: numeracaoAno?.['ultimo_sequencial'] ?? 0,
       ano_corrente: anoCorrente,
@@ -126,7 +106,10 @@ export async function carregarDados(): Promise<Data> {
     fornecedores: (forn.data ?? []).map((l) =>
       paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? []),
     ),
-    obras: (obras.data ?? []).map(paraObra),
+    // O `as`: o leitor de tipos do cliente não entende a dica de chave
+    // estrangeira (`empresas!intervencoes_nf_empresa_id_fkey`) e devolve um
+    // tipo de erro em vez de linhas. A consulta é a mesma; só o tipo é dito.
+    obras: ((obras.data ?? []) as unknown as Record<string, unknown>[]).map(paraObra),
     ecrs: (ecrs.data ?? []).map(paraEcr),
     ordens_compra: (ocs.data ?? []).map(paraOc),
     prestadores_servico: (prest.data ?? []).map(paraPrestador),
@@ -148,6 +131,10 @@ function paraFornecedor(l: Record<string, unknown>, ecrsAtende: number[] = []): 
     ecrs_atende: [...ecrsAtende].sort((a, b) => a - b),
     observacoes: vazio(l['observacoes']),
     ativo: l['ativo'] !== false,
+    // `null` no banco vira `undefined` aqui, e não `false`: "não disse" e
+    // "disse que não" são coisas diferentes, e a lista da OC só aceita `true`.
+    fornece_material: typeof l['fornece_material'] === 'boolean' ? l['fornece_material'] : undefined,
+    presta_servico: typeof l['presta_servico'] === 'boolean' ? l['presta_servico'] : undefined,
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
   };
@@ -160,6 +147,7 @@ function paraObra(l: Record<string, unknown>): Obra {
     nome: vazio(l['descricao_curta']) || vazio(im['nome_referencia']),
     cei: vazio(im['cadastro_imobiliario']),
     endereco: paraEndereco(im),
+    destinatario: destinatarioDaLinhaDaObra(l),
     telefone: vazio(im['proprietario_telefone']),
     responsavel: vazio(im['conferido_por']),
     observacoes: vazio(im['observacoes']),
@@ -223,6 +211,7 @@ function paraOc(l: Record<string, unknown>): OrdemCompra {
     obra_id: vazio(l['intervencao_id']),
     condicao_pagamento: vazio(l['condicao_pagamento']),
     emitente_id: vazio(l['emitente_id']),
+    destinatario: fotografiaDaLinhaDaOc(l),
     itens,
     frete: Number(l['frete']) || 0,
     outras_despesas: Number(l['outras_despesas']) || 0,
@@ -232,27 +221,6 @@ function paraOc(l: Record<string, unknown>): OrdemCompra {
     atualizado_em: vazio(l['atualizado_em']),
     pdf_gerado_em: vazio(l['pdf_gerado_em']),
     versao: Number(l['versao']) || 0,
-  };
-}
-
-function paraEmitente(l: Record<string, unknown>): Emitente {
-  const tels = (l['telefones'] as string[]) ?? [];
-  const tipo = (l['tipo'] as Emitente['tipo']) ?? 'PJ';
-  const documento = vazio(l['documento']);
-  return {
-    id: String(l['id']),
-    tipo,
-    razao_social: vazio(l['razao_social']),
-    nome_fantasia: vazio(l['nome_fantasia']),
-    // O banco guarda um `documento` só; o app separa por tipo de pessoa.
-    // Sem este desvio, um emitente PF (ex.: o padrão atual) ficava sem CPF e a
-    // interface exibia "Configure o emitente" com 5 emitentes cadastrados.
-    cnpj: tipo === 'PJ' ? documento : undefined,
-    cpf: tipo === 'PF' ? documento : undefined,
-    ie: vazio(l['inscricao_estadual']),
-    email_envio_nf: vazio(l['email_envio_nf']),
-    telefones: [tels[0] ?? '', tels[1] ?? ''],
-    endereco: paraEndereco(l),
   };
 }
 
@@ -310,19 +278,7 @@ function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
 // ---------------------------------------------------------------------------
 
 export async function salvarFornecedor(f: Fornecedor): Promise<string> {
-  const { data, error } = await core().from('fornecedores').upsert({
-    ...(f.id && !f.id.startsWith('forn-') ? { id: f.id } : {}),
-    razao_social: f.razao_social,
-    nome_fantasia: f.nome_fantasia || null,
-    documento: soDigitos(f.cnpj),
-    inscricao_estadual: f.ie || null,
-    email: f.email || null,
-    telefones: (f.telefones ?? []).filter(Boolean),
-    contato_responsavel: f.contato_responsavel || null,
-    ...deEndereco(f.endereco),
-    observacoes: f.observacoes || null,
-    ativo: f.ativo !== false,
-  })
+  const { data, error } = await core().from('fornecedores').upsert(linhaDoFornecedor(f))
     .select('id')
     .single();
   if (error) {
@@ -422,23 +378,9 @@ export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Pro
 
   const payload: Record<string, unknown> = {
     request_id: requestId,
-    cabecalho: {
-      data: oc.data,
-      status: oc.status,
-      intervencao_id: oc.obra_id || null,
-      fornecedor_id: oc.fornecedor_id || null,
-      emitente_id: oc.emitente_id || null,
-      // Desde 19/08/2026 o contrato distingue os três casos: chave ausente não
-      // mexe no campo, chave com valor grava, chave com null APAGA. Por isso
-      // mandamos null quando a pessoa esvaziou o campo — é o que faz o apagar
-      // realmente pegar. (Antes null significava "não mexa", e apagar uma
-      // observação a trazia de volta no reload.)
-      condicao_pagamento: oc.condicao_pagamento || null,
-      frete: oc.frete ?? 0,
-      outras_despesas: oc.outras_despesas ?? 0,
-      desconto_material: oc.desconto_material ?? 0,
-      observacoes: oc.observacoes || null,
-    },
+    // Os três casos de cada chave (ausente / valor / null) e a fotografia do
+    // destinatário estão explicados em `cabecalhoDaOc` — que é testável sem banco.
+    cabecalho: cabecalhoDaOc(oc),
     // Mandamos a lista SEMPRE: a tela edita os itens como um todo. Omitir a
     // chave significaria "não mexa nos itens", e lista vazia significa
     // "apague todos" — são pedidos diferentes no contrato do banco.

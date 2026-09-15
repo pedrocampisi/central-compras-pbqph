@@ -246,16 +246,6 @@ export default function App() {
     );
   }
 
-  // ── Emitente banner ────────────────────────────────────────────────────────
-
-  const emitentes = data?.config.emitentes ?? [];
-  const principal = emitentes[0];
-  const showBanner =
-    !!data &&
-    (!principal ||
-      !principal.razao_social ||
-      (principal.tipo === 'PF' ? !principal.cpf : !principal.cnpj));
-
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -367,19 +357,6 @@ export default function App() {
                 onClick={() => void handleRecarregar()}
               >
                 Tentar de novo
-              </button>
-            </div>
-          )}
-
-          {showBanner && (
-            <div className={styles.banner}>
-              <span>Configure o emitente principal para emitir OCs.</span>
-              <button
-                className="btn-secondary"
-                style={{ padding: '5px 12px', fontSize: 12 }}
-                onClick={() => setTab('config')}
-              >
-                Configurar agora
               </button>
             </div>
           )}

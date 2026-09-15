@@ -4,25 +4,50 @@
     {
       "name": "vite-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": [
+        "dev"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "vite-ensaio",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev",
+        "--mode",
+        "ensaio"
+      ],
       "port": 5173
     },
     {
       "name": "vite-lan",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev", "--host"],
+      "runtimeArgs": [
+        "dev",
+        "--host"
+      ],
       "port": 5173
     },
     {
       "name": "vite-preview-prod",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["preview", "--port", "5173", "--strictPort"],
+      "runtimeArgs": [
+        "preview",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
       "port": 5173
     },
     {
       "name": "vite-preview-4173",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["preview", "--port", "4173", "--strictPort"],
+      "runtimeArgs": [
+        "preview",
+        "--port",
+        "4173",
+        "--strictPort"
+      ],
       "port": 4173
     }
   ]

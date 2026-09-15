@@ -41,8 +41,29 @@ export interface Fornecedor {
   ecrs_atende: number[];
   observacoes: string;
   ativo: boolean;
+  // As duas bandeiras do banco (`core.fornecedores`). Quem fornece material
+  // entra na lista da OC; quem só presta serviço, não. Opcionais porque o
+  // formato antigo de arquivo (migrations/) não as conhece — e `undefined`
+  // é diferente de `false`: a primeira é "o banco não disse", a segunda é
+  // "o banco disse que não".
+  fornece_material?: boolean;
+  presta_servico?: boolean;
   criado_em: string;
   atualizado_em: string;
+}
+
+/**
+ * Quem recebe a nota fiscal de uma obra — a empresa (`nf_empresa_id`) ou o
+ * cliente (`nf_cliente_id`) que o cadastro da obra aponta, no Central. A OC
+ * não escolhe: lê (CTO-D390, 14/09/2026).
+ */
+export interface Destinatario {
+  nome: string;
+  /** Só dígitos: 11 (pf) ou 14 (pj) — o grão do banco. */
+  documento: string;
+  tipo: 'pf' | 'pj';
+  /** O que o cadastro tiver; pode vir vazio para pessoa física. */
+  endereco: Endereco;
 }
 
 export interface Obra {
@@ -50,6 +71,8 @@ export interface Obra {
   nome: string;
   cei: string;
   endereco: Endereco;
+  /** Ausente = a obra não tem destinatário da nota cadastrado; ela não emite OC. */
+  destinatario?: Destinatario;
   telefone: string;
   responsavel: string;
   observacoes: string;
@@ -138,7 +161,18 @@ export interface OrdemCompra {
   fornecedor_id: string;
   obra_id: string;
   condicao_pagamento: string;
+  /**
+   * Da lista antiga `compras.emitentes`, que a OC não lê mais desde 15/09/2026
+   * (CTO-D390). Fica só para as OCs emitidas antes, até o banco aposentar a
+   * coluna. Novas OCs nascem com ela vazia.
+   */
   emitente_id: string;
+  /**
+   * A FOTOGRAFIA do destinatário da nota no dia da emissão: valor, não
+   * ponteiro. A obra diz quem É o destinatário hoje; isto diz quem ERA. Vazio
+   * em rascunho e nas OCs anteriores a 14/09/2026.
+   */
+  destinatario?: Destinatario;
   itens: Item[];
   frete: number;
   outras_despesas: number;

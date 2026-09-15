@@ -1,8 +1,8 @@
 /**
  * Aba Configurações — SOMENTE LEITURA nesta versão.
  *
- * A camada de dados ainda não grava configurações (emitentes, condições de
- * pagamento, textos legais) no banco — e uma tela que aceita edição e perde
+ * A camada de dados ainda não grava configurações (condições de pagamento,
+ * textos legais) no banco — e uma tela que aceita edição e perde
  * tudo no reload é pior do que uma que não deixa editar. Até a gravação ser
  * ligada, os controles ficam desabilitados e a tela diz o porquê.
  *
@@ -30,46 +30,19 @@ export function ConfigPage() {
       <div className="section-header">
         <div>
           <h2>Configurações</h2>
-          <p className="section-sub">Emitentes, textos legais e integração com IA.</p>
+          <p className="section-sub">Textos legais e integração com IA.</p>
         </div>
       </div>
 
       <AvisoSomenteLeitura oQue="as configurações" />
 
-      {/* ── Emitentes ─────────────────────────────────────────────────────── */}
-      <FieldGroup title="Emitentes">
-        <div className={styles.emitentesList}>
-          {cfg.emitentes.length === 0 && (
-            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-              Nenhum emitente cadastrado no banco.
-            </p>
-          )}
-          {cfg.emitentes.map((e, idx) => (
-            <div key={e.id} className={styles.emitenteCard}>
-              <div className={styles.emitenteInfo}>
-                <div className={styles.emitenteTop}>
-                  <strong>{e.razao_social}</strong>
-                  {idx === 0 && (
-                    <span className={styles.principalBadge}>Principal</span>
-                  )}
-                </div>
-                <div className={styles.emitenteSub}>
-                  {e.tipo === 'PJ' ? `CNPJ: ${e.cnpj || '—'}` : `CPF: ${e.cpf || '—'}`}
-                  {e.email_envio_nf && <> · {e.email_envio_nf}</>}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled
-          title="A camada de dados ainda não grava emitentes — edição virá numa próxima etapa"
-          style={{ marginTop: 4 }}
-        >
-          + Adicionar Emitente
-        </Button>
+      {/* ── Destinatário da nota ───────────────────────────────────────────── */}
+      <FieldGroup title="Destinatário da nota">
+        <p className={styles.hint}>
+          Quem recebe a nota fiscal de cada OC é o destinatário cadastrado na
+          obra, no Central — a OC lê e fotografa na emissão. A lista de
+          emitentes desta tela saiu em 15/09/2026; não há o que configurar aqui.
+        </p>
       </FieldGroup>
 
       {/* ── Integração IA ─────────────────────────────────────────────────── */}

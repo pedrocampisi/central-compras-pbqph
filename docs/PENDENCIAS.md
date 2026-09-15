@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 14/09/2026
+> **Data:** 15/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -24,7 +24,10 @@ mais barato que carta apontando para o item errado.
 ```
    PARA ....... abrir trabalho novo, adiantar pendencia, propor construcao
    PARA ....... (a pendencia 7, o PWA, saiu desta lista em 14/09: palavra do Pedro,
-                so' para ela. Feita e NO AR na mesma noite)
+                so' para ela. Feita e NO AR na mesma noite. Em 14-15/09 ele liberou
+                mais duas, pelo CTO: a lista de fornecedores da OC (D389) e o
+                destinatario da nota (D390) -- feitas, provadas no ensaio, NAO
+                publicadas: decisoes 31 a 33)
    FICA ....... tudo o que ja' esta' feito: a virada empurrada, o aviso no ar,
                 o ramo aposentado. Nada se desfaz
    CONTINUA ... responder carta que chegar. Pausa nao e' silencio
@@ -278,6 +281,47 @@ aparece depois que a tela se redesenha. **A lição 31 pelas duas pontas:** o in
 só esconde defeito, ele **inventa** defeito.
 
 Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Arquivo_Morto/Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
+
+---
+
+### 10. A fotografia do destinatário não entra: `salvar_oc` não lê as três chaves
+
+*Com o `Banco_de_Dados`, por carta de 15/09/2026.* A tela manda `destinatario_nome`,
+`destinatario_documento` e `destinatario_tipo` no `cabecalho` de `compras.salvar_oc` na emissão
+(decisão 32) — e a função **ignora** chave que não conhece: ela é a de 19/08, anterior às colunas.
+
+**Medido no ensaio:** a OC 2026/008, emitida pela tela em 15/09 com a obra Aider, saiu com as três
+colunas **nulas**. O PDF está certo (os blocos vêm da obra); a fotografia — quem ERA o destinatário
+no dia — não fica gravada. Enquanto isso, a OC antiga reimpressa mostra o destinatário de HOJE da
+obra, não o do dia da emissão.
+
+**O que não faço:** escrever direto em `compras.ordens_compra` depois do `salvar_oc`. É a porta única
+da decisão 17 — quem manda é o banco, e o cliente só obedece.
+
+**Fecha quando:** o Banco fizer `salvar_oc` (inserção e atualização) aceitar as três chaves com os
+três casos do contrato (ausente não mexe, valor grava, `null` apaga — os três juntos), e eu emitir
+outra OC de ensaio e ler as colunas preenchidas.
+
+### 11. A sessão `campisi-oc` restaurada ainda não provou que entra logada
+
+*Meu, e precisa de um login que eu não peço.* Condição do `CTO` (emenda à D391): a sessão do
+agent-browser guarda o estado (login) com `restore`, para o Pedro digitar a Conta de ensaio **uma vez
+só**. Está ligada e testada com um item de `localStorage` de prova — mas o login que ele fez em 15/09
+foi **perdido**, por erro meu: a sessão fora aberta sem o `--restore` armado, e eu fechei o navegador
+para provar a restauração antes de conferir que o estado estava gravado.
+
+**O que prova o item:** com a sessão aberta por
+`agent-browser --session campisi-oc --restore campisi-oc --restore-save always`, alguém entra com a
+Conta de ensaio; eu fecho a janela (`close`), reabro com os mesmos parâmetros, e a tela é a lista, não
+o login. Até lá, prova de tela nova nesta casa **para**: eu reporto por carta em vez de pedir login.
+
+### 12. A tela de OC quebra a 375px fora dos campos: título e botões
+
+*Meu, quando a pausa acabar.* Visto em 15/09 na prova das decisões 31 e 32, dentro do ensaio:
+o título "Nova Ordem de Compra" quebra palavra por palavra e a fila de botões (Cancelar · Visualizar
+· Salvar Rascunho · Emitir) transborda a 375px, com rolagem horizontal dentro do `main`. Os
+**campos** estão certos (uma coluna, sem cortar) depois das duas linhas de CSS da decisão 32. É a
+continuação da pendência 9 — que só tinha visto a tela de entrada — para a primeira tela de dentro.
 
 ---
 
@@ -607,6 +651,9 @@ Era a pendência aberta em 28/08 (o upsert não escrever `fornece_material` nem 
 **Fechou por decisão do Pedro, sem uma linha de código:** a classificação vem do CNAE, não da
 tela. Deixar nulo era a resposta certa desde sempre — agora tem decisão por trás em vez de ser
 acidente. Ver `PLANEJAMENTO.md`, decisão 8.
+
+> ⚠️ **Emendado em 15/09/2026 (decisão 31):** quem NASCE pela tela grava `fornece_material = true`;
+> a edição continua não classificando ninguém.
 
 ### As duas recusas do banco pararam de subir cruas na tela — 28/08/2026
 

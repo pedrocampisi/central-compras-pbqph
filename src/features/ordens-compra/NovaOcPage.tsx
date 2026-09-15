@@ -30,6 +30,10 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
+import { enderecoResumido, fornecedoresParaOc, rotuloDoFornecedor } from '../../domain/fornecedores';
+import {
+  MENSAGEM_OBRA_SEM_DESTINATARIO, destinatarioDaObra, rotuloFaturarPara,
+} from '../../domain/destinatario';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -41,7 +45,6 @@ import styles from './NovaOcPage.module.css';
  */
 function buildNewOc(
   ano: number,
-  defaultEmitenteId: string,
   defaultFornecedorId: string,
   defaultObraId: string,
   defaultCondicao: string,
@@ -54,7 +57,9 @@ function buildNewOc(
     ano,
     data: todayIso(),
     status: 'rascunho',
-    emitente_id: defaultEmitenteId,
+    // Sem emitente desde 15/09/2026 (CTO-D390): quem fatura é o destinatário
+    // da nota da obra, lido na hora e fotografado na emissão.
+    emitente_id: '',
     fornecedor_id: defaultFornecedorId,
     obra_id: defaultObraId,
     condicao_pagamento: defaultCondicao,
@@ -316,14 +321,14 @@ export function NovaOcPage() {
     if (!data || ocEditing) return;
 
     const currentYear = new Date().getFullYear();
-    const defaultFornecedor = data.fornecedores.find((f) => f.ativo)?.id ?? '';
+    // O pré-escolhido tem de ser alguém que ESTÁ na lista: se viesse da tabela
+    // inteira, o primeiro ativo podia ser um prestador de serviço, e o campo
+    // nasceria apontando para uma opção que não existe.
+    const defaultFornecedor = fornecedoresParaOc(data.fornecedores)[0]?.id ?? '';
     const defaultObra = data.obras.find((o) => o.ativa)?.id ?? '';
-    const defaultEmitente = data.config.emitentes[0]?.id ?? '';
     const defaultCondicao = data.config.condicoes_pagamento[0] ?? '';
 
-    startEditing(
-      buildNewOc(currentYear, defaultEmitente, defaultFornecedor, defaultObra, defaultCondicao),
-    );
+    startEditing(buildNewOc(currentYear, defaultFornecedor, defaultObra, defaultCondicao));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -391,12 +396,18 @@ export function NovaOcPage() {
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
+    // Obra sem destinatário da nota não emite: não há para quem faturar, e a
+    // OC não inventa — o cadastro é do Central (CTO-D390).
+    const destinatario = destinatarioDaObra(data.obras.find((o) => o.id === ocEditing.obra_id));
+    if (!destinatario) { showToast(MENSAGEM_OBRA_SEM_DESTINATARIO, 'warning'); return; }
+
     setSavingPdf(true);
     try {
-      // Uma operação só no banco: cabeçalho, itens e a reserva do número. Se
-      // qualquer parte falhar, nada fica gravado pela metade.
+      // Uma operação só no banco: cabeçalho, itens, a reserva do número e a
+      // fotografia do destinatário (quem ERA no dia da emissão). Se qualquer
+      // parte falhar, nada fica gravado pela metade.
       const gravada = await salvarOrdemCompra(
-        { ...ocEditing, status: 'emitida', atualizado_em: nowIso() },
+        { ...ocEditing, status: 'emitida', destinatario, atualizado_em: nowIso() },
         idDaTentativa(),
       );
       tentativaRef.current = null;
@@ -404,6 +415,7 @@ export function NovaOcPage() {
       // O número e a versão vêm do banco — é lá que eles nascem.
       const emitida: OrdemCompra = {
         ...ocEditing,
+        destinatario,
         id: gravada.id,
         status: gravada.status,
         numero: gravada.numero,
@@ -528,8 +540,14 @@ export function NovaOcPage() {
     );
   }
 
-  const fornecedoresAtivos = data.fornecedores.filter((f) => f.ativo);
+  // Só quem fornece material, e ativo. Filial aparece com cidade e final do
+  // CNPJ quando a razão social se repete — regra em domain/fornecedores.ts.
+  const fornecedoresAtivos = fornecedoresParaOc(data.fornecedores);
+  const fornecedorEscolhido = fornecedoresAtivos.find((f) => f.id === ocEditing.fornecedor_id);
   const obrasAtivas = data.obras.filter((o) => o.ativa);
+  // O destinatário da nota é da obra: a tela mostra em leitura, não escolhe.
+  const obraEscolhida = data.obras.find((o) => o.id === ocEditing.obra_id);
+  const destinatarioDaObraEscolhida = destinatarioDaObra(obraEscolhida);
 
   // Permissões: o banco (RLS) recusa de qualquer forma; aqui só evitamos que
   // a pessoa preencha o formulário inteiro para tomar o erro no fim.
@@ -588,10 +606,11 @@ export function NovaOcPage() {
           required
           value={ocEditing.fornecedor_id}
           onChange={(e) => updateField('fornecedor_id', e.target.value)}
+          hint={enderecoResumido(fornecedorEscolhido)}
         >
           <option value="">Selecione…</option>
           {fornecedoresAtivos.map((f) => (
-            <option key={f.id} value={f.id}>{f.razao_social}</option>
+            <option key={f.id} value={f.id}>{rotuloDoFornecedor(f, fornecedoresAtivos)}</option>
           ))}
         </Field>
 
@@ -601,6 +620,11 @@ export function NovaOcPage() {
           required
           value={ocEditing.obra_id}
           onChange={(e) => updateField('obra_id', e.target.value)}
+          hint={
+            obraEscolhida
+              ? rotuloFaturarPara(destinatarioDaObraEscolhida) || MENSAGEM_OBRA_SEM_DESTINATARIO
+              : undefined
+          }
         >
           <option value="">Selecione…</option>
           {obrasAtivas.map((o) => (
@@ -625,17 +649,6 @@ export function NovaOcPage() {
           <option value="">Selecione…</option>
           {data.config.condicoes_pagamento.map((c) => (
             <option key={c} value={c}>{c}</option>
-          ))}
-        </Field>
-
-        <Field
-          as="select"
-          label="Emitente"
-          value={ocEditing.emitente_id}
-          onChange={(e) => updateField('emitente_id', e.target.value)}
-        >
-          {data.config.emitentes.map((e) => (
-            <option key={e.id} value={e.id}>{e.razao_social}</option>
           ))}
         </Field>
 

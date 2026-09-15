@@ -1,6 +1,6 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 07/09/2026
+> **Data:** 15/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
@@ -99,6 +99,10 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   `serialization_failure` (código `40001`), que a camada converte em
   `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
   reescreva.
+- **O `cabecalho` é montado por `linhas.ts#cabecalhoDaOc`** (puro, testado). Desde 15/09 ele
+  leva `destinatario_nome`, `destinatario_documento` (só dígitos) e `destinatario_tipo`
+  **juntos, e só quando a OC carrega a fotografia** (na emissão); e **não leva mais**
+  `emitente_id`. ⚠️ `salvar_oc` ainda **ignora** as três chaves — pendência 10, com o Banco.
 - **Os três casos de cada campo do `cabecalho`:** chave ausente = não mexe;
   chave com valor = grava; **chave com `null` = APAGA**. Exceções declaradas,
   que continuam em `coalesce` (null mantém): `data`, `status`, `frete`,
@@ -343,7 +347,13 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 - **Numeração de OC:** `${ano}/${seq.padStart(3,'0')}`. Se `new Date().getFullYear() !== data.config.ano_corrente`, **reseta o sequencial para 1** e atualiza `ano_corrente`. Increment ocorre em `NovaOcPage` ao iniciar nova OC (não ao salvar). Sem lock real — `NovaOcPage#ensureUniqueNumero` re-checa colisão no momento do `Salvar Rascunho`/`Emitir` e reatribui `max(sequencial)+1` se necessário (mitigação parcial; conflitos cruzando dispositivos só são detectados no save explícito do JSON, não em tempo real).
 - **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto — parece defeito e não é: **decisão 18**. Não "conserte".
 - **Total geral:** `Σ sub - Σ desc + Σ IPI + frete + outras_despesas - desconto_material`.
-- **Hierarquia de emitente:** `oc.emitente_id` → `config.emitentes[0]` → `config.emitente` legado.
+- **Destinatário da nota (desde 15/09/2026, decisão 32):** é o da OBRA — `obra.destinatario`, lido
+  de `core.intervencoes.nf_empresa_id`/`nf_cliente_id` junto com a obra. A tela mostra em leitura
+  ("Faturar para"), não escolhe; obra sem destinatário não emite. O PDF imprime `oc.destinatario`
+  (a fotografia gravada na emissão) e, sem ela, o da obra hoje — `domain/destinatario.ts`.
+  `compras.emitentes` **não é mais lida**; `config.emitentes` é `[]` e `oc.emitente_id` só existe
+  nas OCs anteriores a 14/09. (Na versão de arquivo, história: `oc.emitente_id` →
+  `config.emitentes[0]` → `config.emitente` legado.)
 - **Conflito:** comparação ISO string (`"2026-05-06T..."`). Funciona porque ISO é lexicograficamente ordenável. Falha de leitura remota = não bloqueia (assume ok).
 - **Auto-save vs save explícito:** auto-save **nunca** escreve no JSON, só localStorage. Para persistir no OneDrive precisa Ctrl+S.
 - **Backups:** best-effort silencioso. Se a pasta não foi escolhida em Configurações, simplesmente não escreve.

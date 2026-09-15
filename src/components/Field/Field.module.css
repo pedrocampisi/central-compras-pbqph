@@ -2,9 +2,18 @@
   display: grid;
   gap: 4px;
   min-width: 0;
+  /* Quando um vizinho da mesma linha tem a linha de dica embaixo (endereço do
+     fornecedor, "Faturar para" da obra), a linha da grade fica mais alta —
+     e sem isto o campo sem dica esticava o próprio input para preencher o
+     espaço. O campo encosta no topo e fica do seu tamanho. */
+  align-content: start;
 }
 .field.wide { grid-column: 1 / -1; }
-.field.span2 { grid-column: span 2; }
+/* "Duas colunas" quer dizer "as duas que existem": em tela estreita a grade
+   tem UMA coluna, e `span 2` obrigava o navegador a inventar a segunda —
+   uma faixa de 27px que espremia todos os campos da linha (medido a 375px
+   em 15/09/2026). `1 / -1` ocupa o que houver, sem inventar. */
+.field.span2 { grid-column: 1 / -1; }
 
 .field label {
   font-size: 12.5px;

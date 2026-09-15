@@ -9,8 +9,9 @@ import jsPDF from 'jspdf';
 // para CommonJS, e a interop falha no bundle minificado de produção
 // com erro "(0, Et.default) is not a function".
 import autoTable from 'jspdf-autotable/es';
-import type { Data, Emitente, Endereco, OrdemCompra } from '../../domain/types';
+import type { Data, Destinatario, OrdemCompra } from '../../domain/types';
 import { computeItemTotal, computeOcTotals } from '../../domain/compute';
+import { destinatarioParaImpressao, documentoRotulado, formatarDocumento } from '../../domain/destinatario';
 import { formatBrl, formatDate } from '../../domain/format';
 import { drawBox, addrLine } from './helpers';
 import { downloadBlob } from '../storage/download';
@@ -28,14 +29,9 @@ function safeStr(v: unknown): string {
   return v != null ? String(v) : '';
 }
 
-function emitenteDoc(e: Partial<Emitente> | undefined): string {
-  if (!e) return '';
-  return e.tipo === 'PF' ? `CPF: ${e.cpf ?? ''}` : `CNPJ: ${e.cnpj ?? ''}`;
-}
-
-function emitenteIE(e: Partial<Emitente> | undefined): string {
-  if (!e || e.tipo === 'PF') return '';
-  return `IE: ${e.ie ?? ''}`;
+/** "CNPJ: 00.000.000/0000-00" ou "CPF: 000.000.000-00" — vazio sem destinatário. */
+function destinatarioDoc(d: Destinatario | undefined): string {
+  return d ? documentoRotulado(d).replace(/^(CNPJ|CPF) /, '$1: ') : '';
 }
 
 const LOGO_PATH = `${import.meta.env.BASE_URL}brazao1.png`;
@@ -98,16 +94,12 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   const doc = new jsPDF({ unit: 'mm', format: 'a4' }) as JsPDFWithAutoTable;
   const logoDataUrl = await loadCampisiLogo();
 
-  // Resolução de emitente, fornecedor e obra
-  const emitentes = data.config.emitentes ?? [];
-  const e: Partial<Emitente> | undefined =
-    (oc.emitente_id ? emitentes.find((x) => x.id === oc.emitente_id) : undefined) ??
-    emitentes[0] ??
-    data.config.emitente;
-
-  const cob: Partial<Endereco> = data.config.endereco_cobranca ?? {};
+  // Resolução de destinatário, fornecedor e obra. O destinatário da nota é
+  // o da OBRA (a fotografia gravada na emissão, ou o que a obra aponta hoje)
+  // — não há mais lista de emitentes (CTO-D390, 15/09/2026).
   const f = data.fornecedores.find((x) => x.id === oc.fornecedor_id);
   const ob = data.obras.find((x) => x.id === oc.obra_id);
+  const d = destinatarioParaImpressao(oc, data.obras);
   const totals = computeOcTotals(oc);
 
   const pw = doc.internal.pageSize.getWidth();
@@ -163,27 +155,25 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   doc.line(margin, y + 8, pw - margin, y + 8);
   y += 13;
 
-  // ── Dados para Faturamento ─────────────────────────────────────────────────
+  // ── Faturar para ───────────────────────────────────────────────────────────
+  // Quem recebe a nota: o destinatário cadastrado na obra. Nome, documento e
+  // o endereço que o cadastro tiver (pessoa física pode não ter).
   doc.setDrawColor(180);
   doc.setLineWidth(0.2);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin, y, pw - 2 * margin, 32);
-  doc.text('DADOS PARA FATURAMENTO', margin + 2, y + 4);
+  drawBox(doc, margin, y, pw - 2 * margin, 24);
+  doc.text('FATURAR PARA', margin + 2, y + 4);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Razão Social: ${safeStr(e?.razao_social)}`, margin + 2, y + 8);
-  doc.text(emitenteDoc(e), margin + 2, y + 12);
-  doc.text(emitenteIE(e), margin + 70, y + 12);
-  doc.text(`Endereço: ${addrLine(e?.endereco)}`, margin + 2, y + 16);
-  doc.text(`Bairro: ${safeStr(e?.endereco?.bairro)}`, margin + 2, y + 20);
-  doc.text(`Cidade: ${safeStr(e?.endereco?.cidade)}`, margin + 70, y + 20);
-  doc.text(`UF: ${safeStr(e?.endereco?.uf)}`, margin + 120, y + 20);
-  doc.text(`CEP: ${safeStr(e?.endereco?.cep)}`, margin + 140, y + 20);
-  doc.text(`E-mail: ${safeStr(e?.email_envio_nf)}`, margin + 2, y + 24);
-  doc.text(`Telefone: ${safeStr(e?.telefones?.[0])}`, margin + 2, y + 28);
-  doc.text(`Celular: ${safeStr(e?.telefones?.[1])}`, margin + 70, y + 28);
-  doc.text(`Data: ${formatDate(oc.data)}`, margin + 120, y + 28);
-  y += 34;
+  doc.text(`Razão Social / Nome: ${safeStr(d?.nome)}`, margin + 2, y + 8);
+  doc.text(destinatarioDoc(d), margin + 2, y + 12);
+  doc.text(`Data: ${formatDate(oc.data)}`, margin + 120, y + 12);
+  doc.text(`Endereço: ${addrLine(d?.endereco)}`, margin + 2, y + 16);
+  doc.text(`Bairro: ${safeStr(d?.endereco?.bairro)}`, margin + 2, y + 20);
+  doc.text(`Cidade: ${safeStr(d?.endereco?.cidade)}`, margin + 70, y + 20);
+  doc.text(`UF: ${safeStr(d?.endereco?.uf)}`, margin + 120, y + 20);
+  doc.text(`CEP: ${safeStr(d?.endereco?.cep)}`, margin + 140, y + 20);
+  y += 26;
 
   // ── Condição de Pagamento ──────────────────────────────────────────────────
   doc.setFont('helvetica', 'bold');
@@ -197,7 +187,8 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   doc.text('FORNECEDOR', margin + 2, y + 4);
   doc.setFont('helvetica', 'normal');
   doc.text(`Razão Social: ${safeStr(f?.razao_social)}`, margin + 2, y + 8);
-  doc.text(`CNPJ: ${safeStr(f?.cnpj)}`, margin + 2, y + 12);
+  // O banco guarda o CNPJ só em dígitos; no papel ele sai pontuado.
+  doc.text(`CNPJ: ${f?.cnpj ? formatarDocumento(f.cnpj, 'pj') : ''}`, margin + 2, y + 12);
   doc.text(`IE: ${safeStr(f?.ie)}`, margin + 70, y + 12);
   doc.text(`Endereço: ${addrLine(f?.endereco)}`, margin + 2, y + 16);
   doc.text(`Bairro: ${safeStr(f?.endereco?.bairro)}`, margin + 2, y + 20);
@@ -208,42 +199,22 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   doc.text(`E-mail: ${safeStr(f?.email)}`, margin + 70, y + 24);
   y += 28;
 
-  // ── Entrega + Cobrança (lado a lado) ──────────────────────────────────────
-  const halfW = (pw - 2 * margin - 2) / 2;
+  // ── Entregar em ────────────────────────────────────────────────────────────
+  // O endereço da obra. O "endereço de cobrança" do escritório saiu junto com
+  // os emitentes: a cobrança é para quem fatura, e está no bloco de cima.
   doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin, y, halfW, 26);
-  doc.text('ENTREGA DO MATERIAL', margin + 2, y + 4);
+  drawBox(doc, margin, y, pw - 2 * margin, 22);
+  doc.text('ENTREGAR EM', margin + 2, y + 4);
   doc.setFont('helvetica', 'normal');
   doc.text(`Obra: ${safeStr(ob?.nome)}`, margin + 2, y + 8);
-  doc.text(`CEI: ${safeStr(ob?.cei)}`, margin + 2, y + 12);
-  doc.text(`End.: ${addrLine(ob?.endereco)}`, margin + 2, y + 16);
-  doc.text(
-    `${safeStr(ob?.endereco?.bairro)} · ${safeStr(ob?.endereco?.cidade)}/${safeStr(ob?.endereco?.uf)} · CEP ${safeStr(ob?.endereco?.cep)}`,
-    margin + 2,
-    y + 20,
-  );
-  doc.text(`Telefone: ${safeStr(ob?.telefone)}`, margin + 2, y + 24);
-
-  doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin + halfW + 2, y, halfW, 26);
-  doc.text('ENDEREÇO DE COBRANÇA', margin + halfW + 4, y + 4);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`End.: ${addrLine(cob)}`, margin + halfW + 4, y + 8);
-  doc.text(`Bairro: ${safeStr(cob.bairro)}`, margin + halfW + 4, y + 12);
-  doc.text(`Cidade: ${safeStr(cob.cidade)} · UF ${safeStr(cob.uf)}`, margin + halfW + 4, y + 16);
-  doc.text(`CEP: ${safeStr(cob.cep)}`, margin + halfW + 4, y + 20);
-  y += 28;
-
-  // ── Linha de envio de NF ───────────────────────────────────────────────────
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  drawBox(doc, margin, y, pw - 2 * margin, 6);
-  doc.text(
-    `${data.config.texto_envio_nf ?? ''} ${safeStr(e?.email_envio_nf)}`,
-    margin + 2,
-    y + 4,
-  );
-  y += 8;
+  doc.text(`CNO/CEI: ${safeStr(ob?.cei)}`, margin + 120, y + 8);
+  doc.text(`Endereço: ${addrLine(ob?.endereco)}`, margin + 2, y + 12);
+  doc.text(`Bairro: ${safeStr(ob?.endereco?.bairro)}`, margin + 2, y + 16);
+  doc.text(`Cidade: ${safeStr(ob?.endereco?.cidade)}`, margin + 70, y + 16);
+  doc.text(`UF: ${safeStr(ob?.endereco?.uf)}`, margin + 120, y + 16);
+  doc.text(`CEP: ${safeStr(ob?.endereco?.cep)}`, margin + 140, y + 16);
+  doc.text(`Telefone: ${safeStr(ob?.telefone)}`, margin + 2, y + 20);
+  y += 24;
 
   // ── Tabela de itens ────────────────────────────────────────────────────────
   const head = [['Item', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit', 'IPI%', 'Desc%', 'Total', 'Prazo']];
