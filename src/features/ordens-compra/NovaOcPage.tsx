@@ -321,14 +321,13 @@ export function NovaOcPage() {
     if (!data || ocEditing) return;
 
     const currentYear = new Date().getFullYear();
-    // O pré-escolhido tem de ser alguém que ESTÁ na lista: se viesse da tabela
-    // inteira, o primeiro ativo podia ser um prestador de serviço, e o campo
-    // nasceria apontando para uma opção que não existe.
-    const defaultFornecedor = fornecedoresParaOc(data.fornecedores)[0]?.id ?? '';
-    const defaultObra = data.obras.find((o) => o.ativa)?.id ?? '';
+    // Fornecedor e obra nascem em "Selecione…", de propósito (CTO, 15/09/2026):
+    // a tela velha marcava o primeiro da lista, e quem não reparasse emitia para
+    // o fornecedor errado — e, desde a D390, faturava para o destinatário da obra
+    // errada. Escolher é ato da pessoa; a validação já recusa emitir sem os dois.
     const defaultCondicao = data.config.condicoes_pagamento[0] ?? '';
 
-    startEditing(buildNewOc(currentYear, defaultFornecedor, defaultObra, defaultCondicao));
+    startEditing(buildNewOc(currentYear, '', '', defaultCondicao));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

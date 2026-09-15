@@ -1501,6 +1501,13 @@ os textos antigos (`DADOS PARA FATURAMENTO`, `ENDEREÇO DE COBRANÇA`) ausentes.
 dica esticava o próprio input para preencher a linha — `align-content: start`. O resto do que quebra
 a 375px (título, botões) fica na pendência 9: é conferência antiga, e a casa está pausada.
 
+**E UMA PERGUNTA DO `CTO` NA AVALIAÇÃO (12h1x), que virou conserto:** a Nova OC abria com o
+**primeiro fornecedor e a primeira obra já marcados** — comportamento da tela velha (o
+`data.fornecedores.find(ativo)` de agosto), não desta decisão. Quem não reparasse emitia para o
+fornecedor errado e, desde hoje, faturava para o destinatário da obra errada. Agora os dois nascem em
+"Selecione…" (a validação já recusa emitir sem os dois); medido na sessão `campisi-oc` depois do
+conserto: `Fornecedor = ""`, `Obra = ""`, nenhuma linha de dica até a pessoa escolher.
+
 ## Decisão 33 — prova de tela é no ensaio, com conta de programa; e a senha da conta de programa não passa por mim · 15/09/2026
 
 **A PALAVRA**
