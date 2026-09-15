@@ -284,37 +284,6 @@ Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-par
 
 ---
 
-### 10. A fotografia do destinatário não entra: `salvar_oc` não lê as três chaves
-
-*Com o `Banco_de_Dados`, por carta de 15/09/2026.* A tela manda `destinatario_nome`,
-`destinatario_documento` e `destinatario_tipo` no `cabecalho` de `compras.salvar_oc` na emissão
-(decisão 32) — e a função **ignora** chave que não conhece: ela é a de 19/08, anterior às colunas.
-
-**Medido no ensaio:** a OC 2026/008, emitida pela tela em 15/09 com a obra Aider, saiu com as três
-colunas **nulas**. O PDF está certo (os blocos vêm da obra); a fotografia — quem ERA o destinatário
-no dia — não fica gravada. Enquanto isso, a OC antiga reimpressa mostra o destinatário de HOJE da
-obra, não o do dia da emissão.
-
-**O que não faço:** escrever direto em `compras.ordens_compra` depois do `salvar_oc`. É a porta única
-da decisão 17 — quem manda é o banco, e o cliente só obedece.
-
-**Fecha quando:** o Banco fizer `salvar_oc` (inserção e atualização) aceitar as três chaves com os
-três casos do contrato (ausente não mexe, valor grava, `null` apaga — os três juntos), e eu emitir
-outra OC de ensaio e ler as colunas preenchidas.
-
-### 11. A sessão `campisi-oc` restaurada ainda não provou que entra logada
-
-*Meu, e precisa de um login que eu não peço.* Condição do `CTO` (emenda à D391): a sessão do
-agent-browser guarda o estado (login) com `restore`, para o Pedro digitar a Conta de ensaio **uma vez
-só**. Está ligada e testada com um item de `localStorage` de prova — mas o login que ele fez em 15/09
-foi **perdido**, por erro meu: a sessão fora aberta sem o `--restore` armado, e eu fechei o navegador
-para provar a restauração antes de conferir que o estado estava gravado.
-
-**O que prova o item:** com a sessão aberta por
-`agent-browser --session campisi-oc --restore campisi-oc --restore-save always`, alguém entra com a
-Conta de ensaio; eu fecho a janela (`close`), reabro com os mesmos parâmetros, e a tela é a lista, não
-o login. Até lá, prova de tela nova nesta casa **para**: eu reporto por carta em vez de pedir login.
-
 ### 12. A tela de OC quebra a 375px fora dos campos: título e botões
 
 *Meu, quando a pausa acabar.* Visto em 15/09 na prova das decisões 31 e 32, dentro do ensaio:
@@ -326,6 +295,24 @@ continuação da pendência 9 — que só tinha visto a tela de entrada — para
 ---
 
 ## ✅ Fechadas (registro)
+
+### A porta fotografa sozinha, e a OC provou do outro lado — 15/09/2026
+
+Era a pendência 10 (aberta e fechada no mesmo dia). O Banco fez `salvar_oc` (`20260915110000`, no
+ensaio) tirar a fotografia **sozinha**, pela obra, na emissão — e ignorar as três chaves se a tela
+mandar. A tela parou de mandá-las. **Prova cruzada no ensaio:** a OC **2026/009**, emitida pela tela
+para Yuri Solaris 2, voltou com `destinatario_nome`, `_documento` (14 dígitos) e `_tipo = pj`
+**iguais ao cadastro da obra**; a 2026/008 continua nula (a emissão dela já passou). A obra encerrada
+sem destinatário, batendo na porta: recusa `P0001` com a frase, **nenhuma OC gravada e nenhum número
+queimado** (contador em 9 antes e depois). Falta a linha do Pedro para a produção — é do Banco.
+
+### A sessão `campisi-oc` restaurada entra logada — 15/09/2026
+
+Era a pendência 11. Com a janela aberta por `agent-browser --session campisi-oc --restore campisi-oc
+--restore-save always`, o Pedro entrou **uma** vez com a Conta de ensaio (11h5x); o arquivo de estado
+foi de 811 para 2924 bytes, com a sessão do Supabase dentro; fechei a janela, reabri com o mesmo
+comando, e a tela era o **Dashboard**, com a conta de programa logada, sem ninguém digitar. **Ninguém
+pede login para prova nesta casa de novo** — se o estado expirar, é carta.
 
 ### O PWA passou a ser gerado — o gerador não conhecia o Vite da casa — 14/09/2026
 

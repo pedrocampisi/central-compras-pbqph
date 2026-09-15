@@ -49,21 +49,6 @@ export function rotuloFaturarPara(d: Destinatario | undefined): string {
 }
 
 /**
- * O que a OC leva para o banco na emissão: a fotografia, nas três colunas de
- * `compras.ordens_compra`, ou nada — as duas trancas do banco exigem os três
- * juntos ou nenhum, e o documento só em dígitos.
- */
-export function fotografiaDoDestinatario(
-  d: Destinatario | undefined,
-): { destinatario_nome: string; destinatario_documento: string; destinatario_tipo: 'pf' | 'pj' } | undefined {
-  if (!d) return undefined;
-  const documento = soDigitos(d.documento);
-  const nome = d.nome.trim();
-  if (!nome || !documento) return undefined;
-  return { destinatario_nome: nome, destinatario_documento: documento, destinatario_tipo: d.tipo };
-}
-
-/**
  * Quem vai no PDF como "Faturar para": a fotografia gravada na OC, se ela já
  * foi emitida com uma; senão, o que a obra aponta hoje (rascunho, prévia).
  *

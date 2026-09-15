@@ -100,9 +100,9 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
   reescreva.
 - **O `cabecalho` é montado por `linhas.ts#cabecalhoDaOc`** (puro, testado). Desde 15/09 ele
-  leva `destinatario_nome`, `destinatario_documento` (só dígitos) e `destinatario_tipo`
-  **juntos, e só quando a OC carrega a fotografia** (na emissão); e **não leva mais**
-  `emitente_id`. ⚠️ `salvar_oc` ainda **ignora** as três chaves — pendência 10, com o Banco.
+  **não leva mais** `emitente_id`, e **não leva** a fotografia do destinatário: quem a tira é a
+  própria porta, pela obra, na emissão (`20260915110000`) — a tela só lê as três colunas de volta
+  (`oc.destinatario`) para o PDF.
 - **Os três casos de cada campo do `cabecalho`:** chave ausente = não mexe;
   chave com valor = grava; **chave com `null` = APAGA**. Exceções declaradas,
   que continuam em `coalesce` (null mantém): `data`, `status`, `frete`,

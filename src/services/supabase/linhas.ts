@@ -8,7 +8,6 @@
  * aparece ou não na lista da OC.
  */
 import type { Destinatario, Endereco, Fornecedor, OrdemCompra } from '../../domain/types';
-import { fotografiaDoDestinatario } from '../../domain/destinatario';
 
 const vazio = (v: unknown): string => (v == null ? '' : String(v));
 
@@ -69,10 +68,10 @@ export function fotografiaDaLinhaDaOc(l: Record<string, unknown>): Destinatario 
  * mandamos null quando a pessoa esvaziou o campo — é o que faz o apagar
  * realmente pegar.
  *
- * A fotografia do destinatário (CTO-D390) vai SÓ quando a OC a carrega — na
- * emissão a tela resolve o destinatário da obra e o pendura na OC. Rascunho
- * não leva as chaves: a fotografia é do dia da emissão, e as duas trancas do
- * banco (os três juntos ou nenhum) não aceitam metade.
+ * A fotografia do destinatário (CTO-D390) NÃO vai daqui: desde a
+ * `20260915110000` é a própria porta que a tira, pela obra, na emissão — e
+ * ignora as três chaves se a tela as mandar. A tela só resolve o destinatário
+ * para mostrar ("Faturar para") e para o PDF; quem grava é o banco.
  */
 export function cabecalhoDaOc(oc: OrdemCompra): Record<string, unknown> {
   return {
@@ -87,7 +86,6 @@ export function cabecalhoDaOc(oc: OrdemCompra): Record<string, unknown> {
     outras_despesas: oc.outras_despesas ?? 0,
     desconto_material: oc.desconto_material ?? 0,
     observacoes: oc.observacoes || null,
-    ...(fotografiaDoDestinatario(oc.destinatario) ?? {}),
   };
 }
 

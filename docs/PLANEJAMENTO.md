@@ -1472,7 +1472,12 @@ cadastro de obras (Central) já sabia quem recebe a nota de cada obra.
                      estao ate' o Banco aposentar a mesa
 ```
 
-**⚠️ O QUE A PROVA MOSTROU, E É PENDÊNCIA COM O BANCO (a 10)**
+**✅ FECHADO NO MESMO DIA (11h2x–12h1x):** o Banco fez a porta fotografar **sozinha** na emissão
+(`20260915110000`, ensaio) e ignorar as três chaves; a tela parou de mandá-las. Prova cruzada: a
+2026/009 do ensaio voltou com os três iguais ao cadastro da obra; a obra encerrada sem destinatário
+foi recusada pela porta com a frase, sem OC e sem número queimado. O parágrafo abaixo é história.
+
+**⚠️ O QUE A PROVA MOSTROU, E ERA PENDÊNCIA COM O BANCO (a 10)**
 Emiti a OC de ensaio **2026/008 no ensaio**: o PDF saiu com os dois blocos, `emitente_id` nulo — e
 as três colunas da fotografia **nulas**. `compras.salvar_oc` **não lê** `destinatario_*` do
 cabeçalho: a função conhece as colunas de 19/08 e ignora chave que não conhece. A tela manda; a porta
@@ -1538,7 +1543,11 @@ Pedi ao Pedro que entrasse **com a Conta de ensaio** (conta de programa, não a 
 escrito o motivo por carta antes de pedir, não numa mensagem de janela. O `CTO` aceitou desta vez
 (emenda à D391) com a condição do `restore`, que está ligada.
 
-**O QUE FICOU SEM PROVA (pendência 11)**
+**✅ PROVADO ÀS 12h0x, no mesmo dia:** com o `restore` armado antes do login, o Pedro entrou uma vez;
+o estado foi gravado (811 → 2924 bytes, a sessão do Supabase dentro); fechei e reabri a janela e a
+tela era o Dashboard, logado. O parágrafo abaixo é história.
+
+**O QUE FICOU SEM PROVA (pendência 11, fechada)**
 Fechei o navegador para provar que a sessão restaurada entra logada — e o estado **não tinha sido
 gravado**: a sessão fora aberta sem o `--restore` armado, então a gravação automática não corria. A
 prova das decisões 31 e 32 foi feita **antes** de fechar; o que falta é só a prova do `restore`, que

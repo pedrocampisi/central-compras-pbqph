@@ -5,7 +5,6 @@ import {
   destinatarioParaImpressao,
   documentoRotulado,
   formatarDocumento,
-  fotografiaDoDestinatario,
   rotuloFaturarPara,
 } from '../../src/domain/destinatario';
 import type { Destinatario, Endereco, Obra } from '../../src/domain/types';
@@ -70,22 +69,6 @@ describe('documento — o grão do banco de um lado, a leitura da pessoa do outr
   it('a linha da tela: "Faturar para: Nome · CNPJ …", e vazia sem destinatário', () => {
     expect(rotuloFaturarPara(empresa)).toBe('Faturar para: Pneus Fictícios Ltda · CNPJ 12.345.678/0001-95');
     expect(rotuloFaturarPara(undefined)).toBe('');
-  });
-});
-
-describe('fotografiaDoDestinatario — o que vai para as três colunas', () => {
-  it('os três juntos, documento só em dígitos', () => {
-    expect(fotografiaDoDestinatario({ ...empresa, documento: '12.345.678/0001-95' })).toEqual({
-      destinatario_nome: 'Pneus Fictícios Ltda',
-      destinatario_documento: '12345678000195',
-      destinatario_tipo: 'pj',
-    });
-  });
-
-  it('sem destinatário, ou pela metade, não vai NADA — a tranca do banco recusa metade', () => {
-    expect(fotografiaDoDestinatario(undefined)).toBeUndefined();
-    expect(fotografiaDoDestinatario({ ...empresa, nome: '  ' })).toBeUndefined();
-    expect(fotografiaDoDestinatario({ ...empresa, documento: '' })).toBeUndefined();
   });
 });
 

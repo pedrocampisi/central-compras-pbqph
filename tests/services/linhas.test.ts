@@ -102,35 +102,25 @@ describe('fotografiaDaLinhaDaOc — as três colunas de volta para o app', () =>
   });
 });
 
-describe('cabecalhoDaOc — a fotografia vai SÓ quando a OC a carrega', () => {
-  it('rascunho: as três chaves ficam AUSENTES (ausente = não mexe; null apagaria)', () => {
-    const c = cabecalhoDaOc(oc({}));
-    expect('destinatario_nome' in c).toBe(false);
-    expect('destinatario_documento' in c).toBe(false);
-    expect('destinatario_tipo' in c).toBe(false);
-    expect(c['intervencao_id']).toBe('o1');
-  });
-
-  it('emitente_id não vai mais — nem como null (null apagaria o das OCs antigas)', () => {
-    expect('emitente_id' in cabecalhoDaOc(oc({ emitente_id: 'antigo' }))).toBe(false);
-  });
-
-  it('emissão com destinatário: os três juntos, documento só em dígitos', () => {
+describe('cabecalhoDaOc — o que vai e o que não vai', () => {
+  it('as três chaves da fotografia NÃO vão: quem fotografa é a porta (20260915110000)', () => {
     const c = cabecalhoDaOc(
       oc({
         status: 'emitida',
         destinatario: {
-          nome: 'Pneus Fictícios Ltda', documento: '12.345.678/0001-95', tipo: 'pj',
+          nome: 'Pneus Fictícios Ltda', documento: '12345678000195', tipo: 'pj',
           endereco: { logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: '', cep: '' },
         },
       }),
     );
-    expect(c).toMatchObject({
-      status: 'emitida',
-      destinatario_nome: 'Pneus Fictícios Ltda',
-      destinatario_documento: '12345678000195',
-      destinatario_tipo: 'pj',
-    });
+    expect('destinatario_nome' in c).toBe(false);
+    expect('destinatario_documento' in c).toBe(false);
+    expect('destinatario_tipo' in c).toBe(false);
+    expect(c).toMatchObject({ status: 'emitida', intervencao_id: 'o1' });
+  });
+
+  it('emitente_id não vai mais — nem como null (null apagaria o das OCs antigas)', () => {
+    expect('emitente_id' in cabecalhoDaOc(oc({ emitente_id: 'antigo' }))).toBe(false);
   });
 
   it('campo esvaziado vai como null — é o que faz o apagar pegar (contrato de 19/08)', () => {
