@@ -26,8 +26,8 @@ mais barato que carta apontando para o item errado.
    PARA ....... (a pendencia 7, o PWA, saiu desta lista em 14/09: palavra do Pedro,
                 so' para ela. Feita e NO AR na mesma noite. Em 14-15/09 ele liberou
                 mais duas, pelo CTO: a lista de fornecedores da OC (D389) e o
-                destinatario da nota (D390) -- feitas, provadas no ensaio, NAO
-                publicadas: decisoes 31 a 33)
+                destinatario da nota (D390) -- feitas, provadas no ensaio e NO AR
+                desde 15/09 12h4x, palavra dele: decisoes 31 a 33)
    FICA ....... tudo o que ja' esta' feito: a virada empurrada, o aviso no ar,
                 o ramo aposentado. Nada se desfaz
    CONTINUA ... responder carta que chegar. Pausa nao e' silencio

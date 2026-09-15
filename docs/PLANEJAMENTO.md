@@ -1433,8 +1433,15 @@ Lista com **161** opções e **zero** rótulos repetidos; a Beija Flor com **7**
 dos quatro em dobro que o Banco aplicou); a linha de endereço embaixo do campo, inteira, a 1036px e
 a 375px, sem cortar e sem rolagem horizontal do campo.
 
+**PUBLICADO NA MESMA TARDE (12h4x), palavra do Pedro na minha janela: *"Empurra e publica"*.**
+Medido depois de publicar, sem entrar: o pacote no ar traz `Faturar para`, `FATURAR PARA`,
+`ENTREGAR EM`, a dica de chave `intervencoes_nf_empresa_id_fkey` e `fornece_material`; **zero**
+`DADOS PARA FATURAMENTO` e zero `Configure o emitente`; aponta para o projeto de **produção** (o do
+`.env.local`) e tem **zero** referências ao de ensaio. Manifesto, `registerSW.js` e `sw.js`
+continuam 200 com o tipo certo.
+
 **O QUE NÃO FOI FEITO**
-Publicar. E o campo mostra pouco endereço porque **o banco tem pouco**: no ensaio, 17 dos 161 têm
+O campo mostra pouco endereço porque **o banco tem pouco**: no ensaio, 17 dos 161 têm
 logradouro. A linha mostra o que existe; preencher cadastro não é desta casa.
 
 ## Decisão 32 — o campo Emitente some: a OC fatura para o destinatário da nota da obra, e fotografa quem ele era · 15/09/2026
@@ -1471,6 +1478,10 @@ cadastro de obras (Central) já sabia quem recebe a nota de cada obra.
                      cabecalho — chave ausente nao mexe, e as duas OCs antigas ficam como
                      estao ate' o Banco aposentar a mesa
 ```
+
+**PUBLICADO NA MESMA TARDE (12h4x)** junto com a decisão 31 — ver a medição lá. ⚠️ Na produção a
+fotografia só passa a ser gravada quando o Banco subir a `20260915110000` lá (linha do Pedro, na
+janela do Banco); até lá a OC nova sai com o PDF certo e as três colunas vazias — não quebra nada.
 
 **✅ FECHADO NO MESMO DIA (11h2x–12h1x):** o Banco fez a porta fotografar **sozinha** na emissão
 (`20260915110000`, ensaio) e ignorar as três chaves; a tela parou de mandá-las. Prova cruzada: a
