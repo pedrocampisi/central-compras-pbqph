@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 15/09/2026
+> **Data:** 21/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -1479,9 +1479,12 @@ cadastro de obras (Central) já sabia quem recebe a nota de cada obra.
                      estao ate' o Banco aposentar a mesa
 ```
 
-**PUBLICADO NA MESMA TARDE (12h4x)** junto com a decisão 31 — ver a medição lá. ⚠️ Na produção a
-fotografia só passa a ser gravada quando o Banco subir a `20260915110000` lá (linha do Pedro, na
-janela do Banco); até lá a OC nova sai com o PDF certo e as três colunas vazias — não quebra nada.
+**PUBLICADO NA MESMA TARDE (12h4x)** junto com a decisão 31 — ver a medição lá. **A porta subiu
+à produção às 14h47 do mesmo dia** (`20260915110000`, linha do Pedro na janela do Banco; carta do
+Banco de 14h5x, lida em 21/09): `teste_destinatario_da_oc` 15/15 na produção, 181 = 181. Desde
+então toda OC emitida na produção nasce com a fotografia — a próxima OC de verdade é a prova
+cruzada de lá. ~~Na produção a fotografia só passa a ser gravada quando o Banco subir a
+`20260915110000` lá; até lá a OC nova sai com o PDF certo e as três colunas vazias.~~ (vencido)
 
 **✅ FECHADO NO MESMO DIA (11h2x–12h1x):** o Banco fez a porta fotografar **sozinha** na emissão
 (`20260915110000`, ensaio) e ignorar as três chaves; a tela parou de mandá-las. Prova cruzada: a

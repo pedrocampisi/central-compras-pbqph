@@ -1,6 +1,6 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 15/09/2026
+> **Data:** 21/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
@@ -101,8 +101,11 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   reescreva.
 - **O `cabecalho` é montado por `linhas.ts#cabecalhoDaOc`** (puro, testado). Desde 15/09 ele
   **não leva mais** `emitente_id`, e **não leva** a fotografia do destinatário: quem a tira é a
-  própria porta, pela obra, na emissão (`20260915110000`) — a tela só lê as três colunas de volta
-  (`oc.destinatario`) para o PDF.
+  própria porta, pela obra, na emissão (`20260915110000`, no ensaio e na produção desde 15/09) —
+  a tela só lê as três colunas de volta (`oc.destinatario`) para o PDF. O contrato também expõe
+  `compras.destinatario_da_obra(p_obra)` (leitura); a tela **não a chama**, porque já traz o
+  destinatário junto com a obra (`nf_empresa`/`nf_cliente` no select de `core.intervencoes`). Se
+  essa leitura sair do contrato um dia, a função é o caminho.
 - **Os três casos de cada campo do `cabecalho`:** chave ausente = não mexe;
   chave com valor = grava; **chave com `null` = APAGA**. Exceções declaradas,
   que continuam em `coalesce` (null mantém): `data`, `status`, `frete`,
