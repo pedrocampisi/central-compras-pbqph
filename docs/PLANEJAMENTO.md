@@ -1628,3 +1628,20 @@ byte a byte, hash igual; 118 verdes; typecheck e build verdes.
 **O QUE NÃO FOI PROVADO:** a tela no ensaio. A sessão `campisi-oc` guardada em 15/09 venceu: ao
 abrir, o app tentou renovar a sessão, o banco recusou e a tela voltou ao login. Não peço login ao
 Pedro para prova (decisão 33). Pendência 13.
+
+**PUBLICADO NA MESMA NOITE (20h2x), pela emenda 3, depois da avaliação do `CTO` (D536).** Ele
+conferiu por fora (137 → 138, sai ninguém), leu o código e as permissões (a escrita na mãe tem a
+mesma regra da escrita na filial) e manteve a escolha "mãe `false` + cadastro novo = filial `true`"
+— a mesma conta do `aprovar_candidato`. A prova de tela não segurou: a mudança não altera a cara da
+tela, só quais linhas chegam, e isso está medido.
+
+```
+   antes ......... GET anônimo na vista (Accept-Profile: core) -> 42501, nao PGRST205:
+                   o servidor conhece a vista e o anonimo nao le
+   saiu do ar .... ba1c9806-198c-4be8-b3d9-18a5138de1b5 (15/09) — O DESFAZER
+   entrou ........ ce7f479e-0020-4982-8066-fd0adec5f9dc
+   medido depois . bundle index-OAdc4UF9.js: fornecedor_resolvido 1, empresa_raiz 2, ref da
+                   producao presente, ref do ensaio 0; /, manifesto, registerSW.js, sw.js: 200
+```
+Voltar é publicar a `ba1c9806…` pelo `wrangler rollback`. A fumaça logada é do Pedro, quando ele
+abrir a OC.

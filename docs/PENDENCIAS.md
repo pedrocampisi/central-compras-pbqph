@@ -296,10 +296,12 @@ continuação da pendência 9 — que só tinha visto a tela de entrada — para
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
 Supabase dentro) não entrou: o app tentou renovar a sessão, o banco recusou, a tela voltou ao login,
-e o `restore-save` gravou o estado já sem sessão (786 bytes). **Não peço login ao Pedro** (decisão
-33, régua do `CTO`). O caminho é da conta de programa entrar por programa, sem senha passar por mim
-— isso não existe hoje, e decidir se existe é do `CTO`. Até lá a prova de tela das mudanças é a
-avaliação do `CTO` no ensaio.
+e o `restore-save` gravou o estado já sem sessão (786 bytes). **Não peço login ao Pedro** para uma
+prova (decisão 33, régua do `CTO`). **Resposta do `CTO` (D536, 25/09):** a conta que entra por programa
+**não vai existir** — um programa que lê a senha e entra é o agente entrando por outro caminho. O
+caminho é o Pedro entrar **uma vez** com a Conta de ensaio, com o `restore` armado **antes**, quando
+ele sentar para outra coisa. Não segura publicação que não muda a cara da tela (a da decisão 34 não
+segurou).
 
 ---
 
