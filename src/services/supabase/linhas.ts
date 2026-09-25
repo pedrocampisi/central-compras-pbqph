@@ -115,18 +115,75 @@ export function ehFornecedorNovo(f: Pick<Fornecedor, 'id'>): boolean {
 }
 
 /**
+ * Material e serviço como valem para a OC: os de `core.fornecedor_resolvido`
+ * — o da filial, ou o da empresa-mãe quando a filial está em branco (CTO-D501:
+ * a classificação é da empresa; a filial que difere vence).
+ *
+ * A linha crua de `core.fornecedores` NÃO entra nesta conta, de propósito: uma
+ * filial em branco cuja mãe diz "vende material" ficaria de fora da OC, e uma
+ * filial em branco cuja mãe diz que não ficaria de fora por acaso, não por
+ * regra (CTO-D519, L7). Sem linha resolvida, nada — "não disse" continua sendo
+ * `undefined`, e a lista da OC só aceita `true`.
+ */
+export function bandeirasResolvidas(
+  crua: Record<string, unknown>,
+  resolvidoPorId: ReadonlyMap<string, Record<string, unknown>>,
+): Pick<Fornecedor, 'fornece_material' | 'presta_servico'> {
+  const resolvida = resolvidoPorId.get(String(crua['id']));
+  const b = (v: unknown) => (typeof v === 'boolean' ? v : undefined);
+  return {
+    fornece_material: b(resolvida?.['fornece_material']),
+    presta_servico: b(resolvida?.['presta_servico']),
+  };
+}
+
+/** A raiz do CNPJ (8 primeiros dígitos) — a empresa-mãe. CPF e vazio: nenhuma. */
+export function raizDoDocumento(documento: string | undefined): string | null {
+  const d = (documento ?? '').replace(/\D/g, '');
+  return d.length === 14 ? d.slice(0, 8) : null;
+}
+
+/**
+ * Onde o "fornece material" de um cadastro NOVO é gravado (CTO-D519, E4).
+ *
+ * A mesma regra de `core.aprovar_candidato` desde a D516 — a mãe aprende o
+ * que não sabia, e a filial nova só guarda o que DIFERE dela:
+ *
+ *   mãe em branco (null) .... a mãe aprende `true`; a filial fica em branco
+ *   mãe já diz true ......... nada na mãe; a filial fica em branco (herda)
+ *   mãe diz false ........... nada na mãe; a filial diz `true` (difere, vence)
+ *   sem mãe (undefined) ..... CPF, sem documento, ou raiz que o banco não
+ *                             conhece: tudo na filial, como sempre
+ *
+ * A tela nunca muda uma mãe que já sabe: dizer `false` é resposta do Pedro
+ * (D524), e uma filial nova não a desfaz para a empresa inteira.
+ */
+export function classificacaoDoCadastroNovo(
+  maeFornece: boolean | null | undefined,
+): { ensinarMae: boolean; materialDaFilial: true | null } {
+  if (maeFornece === null) return { ensinarMae: true, materialDaFilial: null };
+  if (maeFornece === true) return { ensinarMae: false, materialDaFilial: null };
+  return { ensinarMae: false, materialDaFilial: true };
+}
+
+/**
  * A linha de `core.fornecedores` que o upsert grava.
  *
- * `fornece_material: true` entra SÓ no cadastro novo. Esta tela é a de
- * fornecedores de material — quem nasce por ela fornece material, e sem a
- * bandeira ele nasceria invisível para a OC (decisão do Pedro, 14/09/2026).
+ * `fornece_material` entra SÓ no cadastro novo, com o valor que
+ * `classificacaoDoCadastroNovo` decidiu (`true` quando não há mãe, `null`
+ * quando quem sabe é a mãe). Esta tela é a de fornecedores de material —
+ * quem nasce por ela fornece material, e sem a bandeira (na filial ou na mãe)
+ * ele nasceria invisível para a OC (decisão do Pedro, 14/09/2026).
  *
  * Na EDIÇÃO a coluna não vai: o upsert só escreve as colunas que recebe, e
  * omitir é o que impede esta tela de carimbar `true` num prestador de
  * serviço que alguém abriu só para corrigir um telefone. A tela não
  * reclassifica ninguém — só batiza quem ela mesma cria.
  */
-export function linhaDoFornecedor(f: Fornecedor): Record<string, unknown> {
+export function linhaDoFornecedor(
+  f: Fornecedor,
+  materialDaFilial: true | null = true,
+): Record<string, unknown> {
   const novo = ehFornecedorNovo(f);
   return {
     ...(novo ? {} : { id: f.id }),
@@ -140,6 +197,6 @@ export function linhaDoFornecedor(f: Fornecedor): Record<string, unknown> {
     ...deEndereco(f.endereco),
     observacoes: f.observacoes || null,
     ativo: f.ativo !== false,
-    ...(novo ? { fornece_material: true } : {}),
+    ...(novo ? { fornece_material: materialDaFilial } : {}),
   };
 }

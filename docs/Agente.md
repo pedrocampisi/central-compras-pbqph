@@ -1,6 +1,6 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 21/09/2026
+> **Data:** 25/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
@@ -99,6 +99,11 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   `serialization_failure` (código `40001`), que a camada converte em
   `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
   reescreva.
+- **Material e serviço do fornecedor vêm de `core.fornecedor_resolvido`** (a filial, ou a
+  empresa-mãe `core.empresa_raiz` quando a filial está em branco), juntados pelo id em
+  `linhas.ts#bandeirasResolvidas` — nunca da filial crua (CTO-D519). O **cadastro novo** ensina a
+  mãe quando ela está em branco e deixa a filial em branco (`classificacaoDoCadastroNovo`, a mesma
+  regra de `core.aprovar_candidato`); a edição não manda a coluna. Decisão 34.
 - **O `cabecalho` é montado por `linhas.ts#cabecalhoDaOc`** (puro, testado). Desde 15/09 ele
   **não leva mais** `emitente_id`, e **não leva** a fotografia do destinatário: quem a tira é a
   própria porta, pela obra, na emissão (`20260915110000`, no ensaio e na produção desde 15/09) —

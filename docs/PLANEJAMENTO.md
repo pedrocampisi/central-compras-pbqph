@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 21/09/2026
+> **Data:** 25/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -1574,3 +1574,57 @@ gravado**: a sessão fora aberta sem o `--restore` armado, então a gravação a
 prova das decisões 31 e 32 foi feita **antes** de fechar; o que falta é só a prova do `restore`, que
 exige **um** login novo — que eu não peço. Com o `--restore` armado agora (testado: um item de
 `localStorage` de prova foi gravado no arquivo de estado), o próximo login fica guardado.
+
+---
+
+## Decisão 34 — a OC lê a classificação da EMPRESA, e o cadastro novo ensina a mãe · 25/09/2026
+
+**A ORDEM**
+Cartas do `CTO` D519 (16h4x) e D535 (20h0x), de 25/09. A regra vem da D501 do Banco: a **empresa**
+(`core.empresa_raiz`, a raiz de 8 dígitos do CNPJ) é a mãe e guarda a classificação; a **filial**
+(`core.fornecedores`) só guarda o que difere, e a filial que difere vence. O banco já entrega isso
+pronto em `core.fornecedor_resolvido` (vista `security_invoker`).
+
+**O QUE MUDOU (`src/services/supabase/linhas.ts` e `dados.ts`)**
+
+```
+   L7 · quem entra .... a lista da OC filtra pelo fornece_material de
+                        core.fornecedor_resolvido, juntado pelo id, e nunca pelo da
+                        filial crua. Endereco, telefone e o resto continuam vindo da
+                        filial (a vista nao tem logradouro nem bairro)
+   E4 · quem nasce .... cadastro novo com CNPJ: le a mae. Mae em branco -> a mae
+                        aprende true e a filial fica em branco. Mae ja diz true ->
+                        filial em branco (herda). Mae diz false -> a mae NAO e'
+                        desmentida; a filial diz true (difere). Sem mae (CPF, sem
+                        documento): tudo na filial, como antes. E' a mesma regra de
+                        core.aprovar_candidato desde a D516
+```
+
+A mãe é escrita **antes** da filial, e só se continua em branco (`.is('fornece_material', null)`):
+se a filial falhar depois, a mãe ficou sabendo o que uma pessoa disse; na ordem inversa, a filial
+nasceria em branco com a mãe sem saber — invisível para a OC. Raiz que o banco não conhece continua
+recusada pela chave estrangeira de 26/08: empresa nasce com apelido dado por gente, na aprovação,
+não por esta tela.
+
+**⚠️ ISTO EMENDA A DECISÃO 31** na regra "quem nasce": o `true` deixa de ir sempre na filial.
+
+**AS MEDIDAS, na produção e só lendo (lei 3: "o banco da produção só leitura: para ordem já dada
+por carta"), 25/09 20h05**
+
+```
+   escolha da OC pela filial crua ........ 137
+   escolha da OC pela leitura resolvida .. 138
+   entra .................................. 1: filial da Imperio das Tintas (Uberlandia/MG),
+                                            filial em branco, mae true
+   sai .................................... 0
+   maes (core.empresa_raiz) ............... 114 true · 22 false · 52 em branco
+   ensaio ................................. 137 -> 138, a mesma filial, 0 saem
+```
+
+**A SABOTAGEM (CTO-D297)** — L7: a função passou a ler a linha crua → 2 vermelhos, saída 1. E4: a
+mãe em branco deixou de aprender e a filial voltou a levar `true` → 1 vermelho, saída 1. Restaurado
+byte a byte, hash igual; 118 verdes; typecheck e build verdes.
+
+**O QUE NÃO FOI PROVADO:** a tela no ensaio. A sessão `campisi-oc` guardada em 15/09 venceu: ao
+abrir, o app tentou renovar a sessão, o banco recusou e a tela voltou ao login. Não peço login ao
+Pedro para prova (decisão 33). Pendência 13.

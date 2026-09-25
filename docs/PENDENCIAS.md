@@ -292,6 +292,15 @@ o título "Nova Ordem de Compra" quebra palavra por palavra e a fila de botões 
 **campos** estão certos (uma coluna, sem cortar) depois das duas linhas de CSS da decisão 32. É a
 continuação da pendência 9 — que só tinha visto a tela de entrada — para a primeira tela de dentro.
 
+### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
+
+*Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
+Supabase dentro) não entrou: o app tentou renovar a sessão, o banco recusou, a tela voltou ao login,
+e o `restore-save` gravou o estado já sem sessão (786 bytes). **Não peço login ao Pedro** (decisão
+33, régua do `CTO`). O caminho é da conta de programa entrar por programa, sem senha passar por mim
+— isso não existe hoje, e decidir se existe é do `CTO`. Até lá a prova de tela das mudanças é a
+avaliação do `CTO` no ensaio.
+
 ---
 
 ## ✅ Fechadas (registro)

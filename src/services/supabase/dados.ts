@@ -26,7 +26,8 @@ import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
-  cabecalhoDaOc, destinatarioDaLinhaDaObra, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco,
+  bandeirasResolvidas, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
+  ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco, raizDoDocumento,
 } from './linhas';
 
 // ---------------------------------------------------------------------------
@@ -40,8 +41,12 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 // ---------------------------------------------------------------------------
 
 export async function carregarDados(): Promise<Data> {
-  const [forn, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs] = await Promise.all([
+  const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs] = await Promise.all([
     core().from('fornecedores').select('*').order('razao_social'),
+    // Material e serviço RESOLVIDOS (a filial, ou a mãe quando a filial está em
+    // branco): é por eles que a lista da OC filtra desde a CTO-D519. O resto
+    // do cadastro (endereço, telefones) continua vindo da filial, acima.
+    core().from('fornecedor_resolvido').select('id, fornece_material, presta_servico'),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável; o
     // destinatário da nota (empresa OU cliente, trava do banco) vem junto
@@ -64,7 +69,7 @@ export async function carregarDados(): Promise<Data> {
     compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id'),
   ]);
 
-  for (const r of [forn, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs]) {
+  for (const r of [forn, fornResolvido, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
   }
 
@@ -76,6 +81,11 @@ export async function carregarDados(): Promise<Data> {
     const lista = ecrsPorFornecedor.get(id) ?? [];
     lista.push(Number(l['ecr_id']));
     ecrsPorFornecedor.set(id, lista);
+  }
+
+  const resolvidoPorId = new Map<string, Record<string, unknown>>();
+  for (const l of (fornResolvido.data ?? []) as Record<string, unknown>[]) {
+    resolvidoPorId.set(String(l['id']), l);
   }
 
   const anoCorrente = new Date().getFullYear();
@@ -104,7 +114,7 @@ export async function carregarDados(): Promise<Data> {
       pasta_backups: '',
     },
     fornecedores: (forn.data ?? []).map((l) =>
-      paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? []),
+      paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? [], resolvidoPorId),
     ),
     // O `as`: o leitor de tipos do cliente não entende a dica de chave
     // estrangeira (`empresas!intervencoes_nf_empresa_id_fkey`) e devolve um
@@ -117,7 +127,11 @@ export async function carregarDados(): Promise<Data> {
   };
 }
 
-function paraFornecedor(l: Record<string, unknown>, ecrsAtende: number[] = []): Fornecedor {
+function paraFornecedor(
+  l: Record<string, unknown>,
+  ecrsAtende: number[] = [],
+  resolvidoPorId: ReadonlyMap<string, Record<string, unknown>> = new Map(),
+): Fornecedor {
   return {
     id: String(l['id']),
     razao_social: vazio(l['razao_social']),
@@ -131,10 +145,10 @@ function paraFornecedor(l: Record<string, unknown>, ecrsAtende: number[] = []): 
     ecrs_atende: [...ecrsAtende].sort((a, b) => a - b),
     observacoes: vazio(l['observacoes']),
     ativo: l['ativo'] !== false,
-    // `null` no banco vira `undefined` aqui, e não `false`: "não disse" e
-    // "disse que não" são coisas diferentes, e a lista da OC só aceita `true`.
-    fornece_material: typeof l['fornece_material'] === 'boolean' ? l['fornece_material'] : undefined,
-    presta_servico: typeof l['presta_servico'] === 'boolean' ? l['presta_servico'] : undefined,
+    // Os RESOLVIDOS, não os crus da filial (CTO-D519). `null` vira `undefined`:
+    // "não disse" e "disse que não" são coisas diferentes, e a lista da OC só
+    // aceita `true`.
+    ...bandeirasResolvidas(l, resolvidoPorId),
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
   };
@@ -278,7 +292,8 @@ function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
 // ---------------------------------------------------------------------------
 
 export async function salvarFornecedor(f: Fornecedor): Promise<string> {
-  const { data, error } = await core().from('fornecedores').upsert(linhaDoFornecedor(f))
+  const materialDaFilial = ehFornecedorNovo(f) ? await ensinarAMae(f) : true;
+  const { data, error } = await core().from('fornecedores').upsert(linhaDoFornecedor(f, materialDaFilial))
     .select('id')
     .single();
   if (error) {
@@ -293,6 +308,46 @@ export async function salvarFornecedor(f: Fornecedor): Promise<string> {
   const id = String((data as Record<string, unknown>)['id']);
   await salvarEcrsDoFornecedor(id, f.ecrs_atende ?? []);
   return id;
+}
+
+/**
+ * Cadastro NOVO: se a empresa-mãe (`core.empresa_raiz`) ainda não sabe se
+ * vende material, ela aprende agora, e a filial fica em branco (CTO-D519, E4
+ * — a regra de `classificacaoDoCadastroNovo`). Devolve o que vai na filial.
+ *
+ * Mãe antes de filial, de propósito: se a filial falhar depois, a mãe ficou
+ * sabendo uma coisa que uma pessoa disse e que é verdade; na ordem inversa, a
+ * filial nasceria em branco com a mãe sem saber — invisível para a OC.
+ *
+ * Raiz que o banco não conhece: a filial não entra (a chave estrangeira de
+ * 26/08 recusa), e a empresa nasce com apelido dado por gente, na aprovação
+ * — não por esta tela.
+ */
+async function ensinarAMae(f: Fornecedor): Promise<true | null> {
+  const raiz = raizDoDocumento(f.cnpj);
+  let mae: boolean | null | undefined;
+  if (raiz) {
+    const { data, error } = await core()
+      .from('empresa_raiz')
+      .select('fornece_material')
+      .eq('raiz', raiz)
+      .maybeSingle();
+    if (error) throw new Error(`Falha ao ler a empresa do fornecedor: ${error.message}`);
+    const linha = data as Record<string, unknown> | null;
+    mae = linha ? (typeof linha['fornece_material'] === 'boolean' ? linha['fornece_material'] : null) : undefined;
+  }
+
+  const decisao = classificacaoDoCadastroNovo(mae);
+  if (decisao.ensinarMae && raiz) {
+    // `.is(null)`: só escreve se continua em branco — nunca sobre o que alguém disse.
+    const { error } = await core()
+      .from('empresa_raiz')
+      .update({ fornece_material: true })
+      .eq('raiz', raiz)
+      .is('fornece_material', null);
+    if (error) throw new Error(`Falha ao gravar a classificação da empresa: ${error.message}`);
+  }
+  return decisao.materialDaFilial;
 }
 
 /**

@@ -18,6 +18,10 @@ import { formatarDocumento } from './destinatario';
  * classificou) fica de fora de propósito: é o caso da linha sem bandeira
  * nenhuma e de qualquer cadastro que um dia entre sem passar pela tela desta
  * casa. Deixar o indefinido entrar seria repetir a lista suja com outro nome.
+ *
+ * Desde 25/09/2026 (CTO-D519) o `fornece_material` que chega aqui é o
+ * RESOLVIDO — o da filial, ou o da empresa-mãe quando a filial está em branco.
+ * Quem resolve é o banco; esta regra não sabe que mãe existe, e não precisa.
  */
 export function fornecedoresParaOc(todos: Fornecedor[]): Fornecedor[] {
   return todos.filter((f) => f.ativo && f.fornece_material === true);

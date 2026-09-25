@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bandeirasResolvidas,
   cabecalhoDaOc,
+  classificacaoDoCadastroNovo,
   destinatarioDaLinhaDaObra,
   ehFornecedorNovo,
   fotografiaDaLinhaDaOc,
   linhaDoFornecedor,
+  raizDoDocumento,
 } from '../../src/services/supabase/linhas';
+import { fornecedoresParaOc } from '../../src/domain/fornecedores';
 import type { Fornecedor, OrdemCompra } from '../../src/domain/types';
 
 function forn(p: Partial<Fornecedor> & { id: string }): Fornecedor {
@@ -128,5 +132,66 @@ describe('cabecalhoDaOc — o que vai e o que não vai', () => {
     expect(c['observacoes']).toBeNull();
     expect(c['condicao_pagamento']).toBeNull();
     expect(c['fornecedor_id']).toBeNull();
+  });
+});
+
+// ── A mãe e a filial (CTO-D519) ──────────────────────────────────────────────
+
+describe('bandeirasResolvidas — a lista da OC lê a classificação resolvida (L7)', () => {
+  const resolvidas = (id: string, fornece_material: boolean | null) =>
+    new Map([[id, { id, fornece_material }]]);
+
+  it('filial em branco com a mãe dizendo "vende material" ENTRA na OC', () => {
+    // O caso medido na produção em 25/09: uma filial da Império das Tintas.
+    const crua = { id: 'filial', fornece_material: null };
+    const f = forn({ id: 'filial', ...bandeirasResolvidas(crua, resolvidas('filial', true)) });
+    expect(fornecedoresParaOc([f]).map((x) => x.id)).toEqual(['filial']);
+  });
+
+  it('o que vale é a resolvida, nunca a crua: filial crua true, resolvida false, fica fora', () => {
+    const crua = { id: 'filial', fornece_material: true };
+    const f = forn({ id: 'filial', ...bandeirasResolvidas(crua, resolvidas('filial', false)) });
+    expect(fornecedoresParaOc([f])).toEqual([]);
+  });
+
+  it('a junção é pelo id: a resolvida de outra filial não serve', () => {
+    const crua = { id: 'a', fornece_material: null };
+    expect(bandeirasResolvidas(crua, resolvidas('b', true)).fornece_material).toBeUndefined();
+  });
+
+  it('sem linha resolvida, nada — "não disse" não vira sim nem não', () => {
+    expect(bandeirasResolvidas({ id: 'x' }, new Map())).toEqual({
+      fornece_material: undefined, presta_servico: undefined,
+    });
+    expect(bandeirasResolvidas({ id: 'x' }, resolvidas('x', null)).fornece_material).toBeUndefined();
+  });
+});
+
+describe('classificacaoDoCadastroNovo — onde o cadastro novo grava o material (E4)', () => {
+  it('mãe em branco: a mãe aprende, a filial fica em branco', () => {
+    expect(classificacaoDoCadastroNovo(null)).toEqual({ ensinarMae: true, materialDaFilial: null });
+  });
+
+  it('mãe já diz que vende: a filial herda, ninguém escreve na mãe', () => {
+    expect(classificacaoDoCadastroNovo(true)).toEqual({ ensinarMae: false, materialDaFilial: null });
+  });
+
+  it('mãe diz que NÃO vende: a mãe não é desmentida; a filial difere e diz true', () => {
+    expect(classificacaoDoCadastroNovo(false)).toEqual({ ensinarMae: false, materialDaFilial: true });
+  });
+
+  it('sem mãe (CPF, sem documento, raiz desconhecida): tudo na filial, como antes', () => {
+    expect(classificacaoDoCadastroNovo(undefined)).toEqual({ ensinarMae: false, materialDaFilial: true });
+  });
+
+  it('a filial em branco vai como null na linha — e a edição continua sem a coluna', () => {
+    expect(linhaDoFornecedor(forn({ id: '' }), null)['fornece_material']).toBeNull();
+    expect('fornece_material' in linhaDoFornecedor(forn({ id: 'uuid' }), null)).toBe(false);
+  });
+
+  it('raizDoDocumento: 8 dígitos do CNPJ, nada para CPF ou vazio', () => {
+    expect(raizDoDocumento('11.111.111/0001-11')).toBe('11111111');
+    expect(raizDoDocumento('123.456.789-09')).toBeNull();
+    expect(raizDoDocumento('')).toBeNull();
   });
 });
