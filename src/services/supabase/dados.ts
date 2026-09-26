@@ -26,7 +26,7 @@ import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
-  bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
+  COLUNAS_DA_FORNECEDORES, bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
   ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco, raizDoDocumento,
 } from './linhas';
 
@@ -42,7 +42,9 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 
 export async function carregarDados(): Promise<Data> {
   const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs] = await Promise.all([
-    core().from('fornecedores').select('*').order('razao_social'),
+    // Só as colunas que a OC usa, nunca o `*` (CTO-D551): a classificação e o
+    // costume vêm da resolvida, logo abaixo.
+    core().from('fornecedores').select(COLUNAS_DA_FORNECEDORES.join(', ')).order('razao_social'),
     // Material e serviço RESOLVIDOS (a filial, ou a mãe quando a filial está em
     // branco): é por eles que a lista da OC filtra desde a CTO-D519. O resto
     // do cadastro (endereço, telefones) continua vindo da filial, acima.
@@ -113,7 +115,10 @@ export async function carregarDados(): Promise<Data> {
       // A chave da IA não existe mais no formato de dados: passou para o servidor.
       pasta_backups: '',
     },
-    fornecedores: (forn.data ?? []).map((l) =>
+    // O `as`: a lista de colunas é montada de `COLUNAS_DA_FORNECEDORES`, e o
+    // leitor de tipos do cliente só entende texto escrito no lugar. O pedido é
+    // o mesmo; só o tipo é dito.
+    fornecedores: ((forn.data ?? []) as unknown as Record<string, unknown>[]).map((l) =>
       paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? [], resolvidoPorId),
     ),
     // O `as`: o leitor de tipos do cliente não entende a dica de chave

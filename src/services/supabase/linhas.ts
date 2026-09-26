@@ -11,6 +11,24 @@ import type { Destinatario, Endereco, Fornecedor, OrdemCompra } from '../../doma
 
 const vazio = (v: unknown): string => (v == null ? '' : String(v));
 
+/**
+ * As colunas que a OC lê da `core.fornecedores` CRUA — e nenhuma outra (CTO-D551).
+ *
+ * Até 26/09/2026 o pedido era `select=*`, igual ao do código de antes da D519:
+ * no log da API os dois eram o mesmo pedido, e a porta de limpeza do Banco
+ * (D548) não tinha como saber se ainda havia OC velha lendo a classificação e
+ * o costume da crua. A classificação (material/serviço) e o costume vêm da
+ * `fornecedor_resolvido`; daqui, só o cadastro que a tela mostra e grava. A
+ * escrita (`linhaDoFornecedor`) grava estas mesmas colunas, mais o
+ * `fornece_material` do cadastro novo, que não vem da leitura.
+ */
+export const COLUNAS_DA_FORNECEDORES = [
+  'id', 'razao_social', 'nome_fantasia', 'documento', 'inscricao_estadual',
+  'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'cep',
+  'telefones', 'email', 'contato_responsavel', 'observacoes', 'ativo',
+  'criado_em', 'atualizado_em',
+] as const;
+
 export function paraEndereco(l: Record<string, unknown>): Endereco {
   return {
     logradouro: vazio(l['logradouro']),

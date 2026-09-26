@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  COLUNAS_DA_FORNECEDORES,
   bandeirasResolvidas,
   cabecalhoDaOc,
   classificacaoDoCadastroNovo,
@@ -11,6 +12,7 @@ import {
   raizDoDocumento,
 } from '../../src/services/supabase/linhas';
 import { fornecedoresParaOc } from '../../src/domain/fornecedores';
+import { readFileSync } from 'node:fs';
 import type { Fornecedor, OrdemCompra } from '../../src/domain/types';
 
 function forn(p: Partial<Fornecedor> & { id: string }): Fornecedor {
@@ -133,6 +135,44 @@ describe('cabecalhoDaOc — o que vai e o que não vai', () => {
     expect(c['observacoes']).toBeNull();
     expect(c['condicao_pagamento']).toBeNull();
     expect(c['fornecedor_id']).toBeNull();
+  });
+});
+
+// ── O pedido à fornecedores crua: as colunas, nunca o * (CTO-D551) ────────────
+
+describe('COLUNAS_DA_FORNECEDORES — a OC pede só o que usa da crua', () => {
+  const PROIBIDAS = [
+    'fornece_material', 'presta_servico', 'categoria_servico',
+    'prazo_vencimento_dias', 'prazo_boleto_dias', 'emite_boleto', 'cobranca_direta',
+  ];
+  const lista: readonly string[] = COLUNAS_DA_FORNECEDORES;
+
+  it('sem o * e sem a classificação nem o costume (que vêm da resolvida)', () => {
+    expect(lista).not.toContain('*');
+    for (const c of PROIBIDAS) expect(lista).not.toContain(c);
+  });
+
+  it('o pedido de verdade usa a lista — e nenhum pedido à fornecedores pede *', () => {
+    const dados = readFileSync('src/services/supabase/dados.ts', 'utf-8');
+    expect(dados).toMatch(/from\('fornecedores'\)\s*\.select\(COLUNAS_DA_FORNECEDORES\.join\(', '\)\)/);
+    expect(dados).not.toMatch(/from\('fornecedores'\)\s*\.select\(\s*['"`][^'"`]*\*/);
+  });
+
+  it('tudo o que o mapeador lê da linha crua está na lista (senão, some da tela calado)', () => {
+    const dados = readFileSync('src/services/supabase/dados.ts', 'utf-8');
+    const ini = dados.indexOf('function paraFornecedor(');
+    const corpo = dados.slice(ini, dados.indexOf('\n}\n', ini));
+    const lidas = [...corpo.matchAll(/\bl\['(\w+)'\]/g)].map((m) => m[1]!);
+    const doEndereco = ['logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'cep'];
+    expect(lidas.length).toBeGreaterThan(5);
+    for (const c of [...new Set([...lidas, ...doEndereco])]) expect(lista).toContain(c);
+  });
+
+  it('nenhuma escrita grava coluna que a OC não lê — só o fornece_material do cadastro novo', () => {
+    const existente = Object.keys(linhaDoFornecedor(forn({ id: 'f1' })));
+    for (const c of existente) expect(lista).toContain(c);
+    const novo = Object.keys(linhaDoFornecedor(forn({ id: '' }))).filter((c) => !lista.includes(c));
+    expect(novo).toEqual(['fornece_material']);
   });
 });
 
