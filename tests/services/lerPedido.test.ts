@@ -11,16 +11,13 @@ vi.mock('../../src/services/supabase/client', () => ({
 import { ErroDaImportacao, lerPedido, type DepsDaLeitura } from '../../src/services/ai/lerPedido';
 import { extractItemsFromImages } from '../../src/services/ai/extractItems';
 import type { Item } from '../../src/domain/types';
-import type { ResultadoDaLeitura } from '../../src/services/ai/extractItems';
-
-const VAZIO: ResultadoDaLeitura = { itens: [], confira: {}, ignoradas: [] };
 
 const pdf = (nome: string) => new File(['%PDF'], nome, { type: 'application/pdf' });
 const png = (nome = 'image.png') => new File(['png'], nome, { type: 'image/png' });
 
 /** Páginas por nome de arquivo; imagem = 1. Cada página vira "nome#n". */
 function depsFalsas(paginasPorNome: Record<string, number> = {}) {
-  const enviar = vi.fn<(imagens: string[]) => Promise<ResultadoDaLeitura>>(async () => VAZIO);
+  const enviar = vi.fn<(imagens: string[]) => Promise<Item[]>>(async () => []);
   const desenhar = vi.fn();
   const abrir = vi.fn<DepsDaLeitura['abrir']>(async (f, tipo) => {
     const n = tipo === 'imagem' ? 1 : (paginasPorNome[f.name] ?? 1);
@@ -79,7 +76,7 @@ describe('D554 — mais de 5 páginas não chega ao servidor', () => {
   });
 
   it('o arquivo que desenha mais páginas do que contou também não passa', async () => {
-    const enviar = vi.fn(async () => VAZIO);
+    const enviar = vi.fn(async () => [] as Item[]);
     const deps: DepsDaLeitura = {
       abrir: async () => ({ paginas: 1, imagens: async () => ['1', '2', '3', '4', '5', '6'] }),
       enviar,
@@ -111,12 +108,12 @@ describe('D554 — vários arquivos de uma vez viram UMA leitura, como páginas'
 
   it('exatamente 5 páginas passa; o que o servidor devolve é o que volta', async () => {
     const item = { descricao: 'Cimento' } as Item;
-    d.enviar.mockResolvedValueOnce({ itens: [item], confira: {}, ignoradas: [] });
-    await expect(lerPedido([pdf('pedido.pdf'), png(), png()], d.deps)).resolves.toEqual({ itens: [item], confira: {}, ignoradas: [] });
+    d.enviar.mockResolvedValueOnce([item]);
+    await expect(lerPedido([pdf('pedido.pdf'), png(), png()], d.deps)).resolves.toEqual([item]);
   });
 
   it('arquivo que não abre: a mensagem diz qual, e nada é enviado', async () => {
-    const enviar = vi.fn(async () => VAZIO);
+    const enviar = vi.fn(async () => [] as Item[]);
     const deps: DepsDaLeitura = { abrir: async () => { throw new Error('corrompido'); }, enviar };
     await expect(lerPedido([pdf('quebrado.pdf')], deps)).rejects.toThrow('Não foi possível abrir "quebrado.pdf"');
     expect(enviar).not.toHaveBeenCalled();

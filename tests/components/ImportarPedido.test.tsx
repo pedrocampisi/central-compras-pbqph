@@ -11,7 +11,7 @@ vi.mock('../../src/services/supabase/client', () => ({
 
 // A leitura é FALSA na tela: o que se prova aqui é por onde o arquivo entra.
 // Que tipo errado e página demais não saem do navegador está em lerPedido.test.
-const lerPedido = vi.fn<(arquivos: File[]) => Promise<unknown>>(async () => ({ itens: [], confira: {}, ignoradas: [] }));
+const lerPedido = vi.fn<(arquivos: File[]) => Promise<unknown[]>>(async () => []);
 vi.mock('../../src/services/ai/lerPedido', async (original) => ({
   ...(await original<typeof import('../../src/services/ai/lerPedido')>()),
   lerPedido: (arquivos: File[]) => lerPedido(arquivos),
@@ -39,7 +39,7 @@ function colar(alvo: EventTarget, arquivos: File[]) {
 let clique: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
   lerPedido.mockReset();
-  lerPedido.mockResolvedValue({ itens: [], confira: {}, ignoradas: [] });
+  lerPedido.mockResolvedValue([]);
   clique = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => {});
 });
 afterEach(() => clique.mockRestore());
@@ -169,9 +169,9 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
   });
 
   it('com o campo aberto: colar lê; os itens entram, o campo fecha, e Esc não reabre nada', async () => {
-    lerPedido.mockResolvedValueOnce({ confira: {}, ignoradas: [], itens: [
+    lerPedido.mockResolvedValueOnce([
       { id: 'i1', descricao: 'Cimento CP-II', observacao: '', quantidade: 10, unidade: 'sc', preco_unit: 30, ipi_pct: 0, desc_pct: 0, ecr_id: null },
-    ] });
+    ]);
     render(<NovaOcPage />);
     await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
     const print = png();

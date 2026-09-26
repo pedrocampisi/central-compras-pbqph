@@ -1931,3 +1931,20 @@ página quebre linha. 5 sabotagens, todas mordendo. 213 verdes.
 **PUBLICADO:** saiu `801205e9-2fa2-4678-8764-3d14ac57b97d` (a D554, O DESFAZER); entrou
 `69e5921a-275e-489e-8f02-f1673d7b2f30`, versão `20260926183826-b0f84a2`. O CSS servido traz as três
 regras.
+
+## Decisão 41 — a D557 vai para um ramo à parte, e o `main` volta a ser o que está no ar · 26/09/2026
+
+**POR QUÊ (CTO-D559):** o Pedro deixou as melhorias de IA para depois. A D557 estava construída e
+empurrada no `main` (`320dd21`), sem publicar. A próxima publicação de outra coisa não pode levar a
+caixa de texto junto.
+
+**O QUE MUDOU:** o ramo `d557-lista-em-texto` aponta para `320dd21` e está empurrado. No `main`, um
+commit de **reversão**, e não um empurrão forçado: história pública não se reescreve. Depois dele,
+`src/` e `tests/` do `main` são iguais, byte a byte pelo git, aos de `55ab597`, que é o código no ar
+(`69e5921a`). A carta da D557 fica em `Devolucoes/`, em espera (pendência 14).
+
+**O QUE A REVERSÃO ACHOU:** com `core.autocrlf=true`, os arquivos reescritos voltaram com CRLF, e
+um teste da D551 (`tests/services/linhas.test.ts`) ficou vermelho em código idêntico. Ele achava o
+fim de `paraFornecedor` por `'\n}\n'`; com CRLF não achava, e lia até o fim do arquivo. Qualquer
+clone novo nesta máquina já quebrava. Agora o teste troca CRLF por LF antes de procurar. Sabotado
+(uma coluna lida tirada da lista): 2 vermelhos, hash igual. 213 verdes, os mesmos da D555.

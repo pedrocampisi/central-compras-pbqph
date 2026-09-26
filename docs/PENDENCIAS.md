@@ -231,6 +231,28 @@ segurou).
 
 ---
 
+### 14. ⏸️ D557 — colar a lista de materiais em texto e a IA organiza · **em espera (D559)**
+
+*Aberta em 26/09/2026.* Palavra do Pedro, pelo `CTO` (D559): *"essas melhorias aí da IA, da
+pesquisa, anote em pendências para ser feito depois"*. **Volta só por carta do `CTO`.**
+
+**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit `320dd21`, empurrado. **Fora do
+`main`** (desfeita nele por um commit de reversão, sem reescrever história — decisão 41). A carta
+da D557 fica em `Devolucoes/`, porque não foi cumprida.
+
+**Pronto no ramo:** a caixa de texto e o "Organizar com IA" no campo da D554; o Ctrl+V que decide
+pelo que veio; itens somados; aviso com itens e linhas ignoradas; as ignoradas na tela até fechar;
+o "confira" fora do Item (nunca vai ao `salvar_oc` nem ao PDF); a falha não apaga o texto; a frase
+do servidor como veio. 247 testes; 10 sabotagens mordendo; conferido na tela a 375/768/1024/1440
+com servidor falso. O servidor já está na produção (`extrair-itens` v4, do `Banco_de_Dados`), e o
+contrato dele bate com o do ramo.
+
+**Falta, quando voltar:** trazer o ramo para o `main` do dia (conflito provável em `NovaOcPage`),
+rodar tudo de novo, publicar pelo PowerShell, medir por fora e escrever a carta com as linhas de
+exemplo para o Pedro. Anotar nela o limite de **2.000 caracteres** do servidor.
+
+---
+
 ## ✅ Fechadas (registro)
 
 ### A pendência 9 (b–f) e a 12: o primeiro acesso e a Nova OC a 375px — 26/09/2026

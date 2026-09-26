@@ -16,7 +16,6 @@ import { normalizeItem } from '../../domain/normalize';
 import { UN_PADRAO } from '../../domain/constants';
 import { supabase } from '../supabase/client';
 import { MAX_PAGINAS, mensagemDePaginas } from '../../domain/importacao';
-import { ErroDaImportacao } from './lerPedido';
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -53,47 +52,6 @@ interface RawExtractedItem {
   ipi_pct?: unknown;
   desc_pct?: unknown;
   ecr_id?: unknown;
-  /** Só na leitura de texto (D557): a dúvida da IA sobre esta linha. */
-  confira?: unknown;
-}
-
-/**
- * O que uma leitura devolve para a tela (CTO-D557).
- *
- * `confira` fica FORA do item, num mapa pelo id: o item vai para o banco
- * (`salvar_oc`) e para o PDF, e a dúvida da IA não pode ir junto. Como o
- * `Item` nem tem onde guardá-la, ela não chega lá nem por descuido.
- */
-export interface ResultadoDaLeitura {
-  itens: Item[];
-  confira: Record<string, string>;
-  /** As linhas que a IA não transformou em item, como vieram. */
-  ignoradas: string[];
-}
-
-/** A resposta do servidor → o resultado da tela. Pura, para o teste. */
-export function paraResultado(payload: unknown): ResultadoDaLeitura {
-  const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown };
-  const rawItems = (Array.isArray(p.itens) ? p.itens : []) as RawExtractedItem[];
-  const confira: Record<string, string> = {};
-  const itens = rawItems.map((it) => {
-    const item = normalizeItem({
-      ecr_id: it.ecr_id != null && Number(it.ecr_id) ? Number(it.ecr_id) : null,
-      descricao: String(it.descricao ?? '').trim(),
-      observacao: String(it.observacao ?? '').trim(),
-      quantidade: Number(it.quantidade) || 0,
-      unidade: normalizeUnit(it.unidade),
-      preco_unit: Number(it.preco_unit) || 0,
-      ipi_pct: Number(it.ipi_pct) || 0,
-      desc_pct: Number(it.desc_pct) || 0,
-    });
-    const duvida = typeof it.confira === 'string' ? it.confira.trim() : '';
-    if (duvida) confira[item.id] = duvida;
-    return item;
-  });
-  const ignoradas = (Array.isArray(p.ignoradas) ? p.ignoradas : [])
-    .filter((l): l is string => typeof l === 'string' && l.trim() !== '');
-  return { itens, confira, ignoradas };
 }
 
 // ── Erros da função do servidor, em português ─────────────────────────────────
@@ -115,22 +73,18 @@ function mensagemErro(status: number): string {
   }
 }
 
-// ── A chamada ─────────────────────────────────────────────────────────────────
+// ── Extração ──────────────────────────────────────────────────────────────────
 
-/** A mensagem que o servidor mandou, em português (`{ "erro": "…" }`), ou nada. */
-async function erroDoServidor(resp: Response): Promise<string> {
-  try {
-    const corpo = (await resp.json()) as { erro?: unknown };
-    return typeof corpo.erro === 'string' ? corpo.erro.trim() : '';
-  } catch {
-    return '';
-  }
-}
+/**
+ * Envia as imagens (data URLs JPEG) para a função do servidor e devolve os
+ * itens já normalizados, prontos para entrar na OC.
+ */
+export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<Item[]> {
+  if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
+  // Nunca cortar em silêncio (CTO-D554): `lerPedido` já barrou antes, e esta
+  // é a última porta — página demais não sai do navegador.
+  if (imagesDataUrls.length > MAX_PAGINAS) throw new Error(mensagemDePaginas(imagesDataUrls.length));
 
-async function chamarExtrairItens(
-  corpo: { imagens: string[] } | { texto: string },
-  mensagem: (status: number, doServidor: string) => string,
-): Promise<ResultadoDaLeitura> {
   const url = import.meta.env['VITE_SUPABASE_URL'] as string;
 
   const { data: sess } = await supabase.auth.getSession();
@@ -146,45 +100,24 @@ async function chamarExtrairItens(
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(corpo),
+    body: JSON.stringify({ imagens: imagesDataUrls }),
   });
 
-  if (!resp.ok) {
-    const doServidor = await erroDoServidor(resp);
-    const texto = mensagem(resp.status, doServidor);
-    // A frase do próprio servidor vai para a tela como veio, sem prefixo (D557).
-    throw texto === doServidor ? new ErroDaImportacao(texto) : new Error(texto);
-  }
+  if (!resp.ok) throw new Error(mensagemErro(resp.status));
 
-  return paraResultado(await resp.json());
-}
+  const payload = (await resp.json()) as { itens?: RawExtractedItem[] };
+  const rawItems = Array.isArray(payload.itens) ? payload.itens : [];
 
-// ── Extração ──────────────────────────────────────────────────────────────────
-
-/**
- * Envia as imagens (data URLs JPEG) para a função do servidor e devolve os
- * itens já normalizados, prontos para entrar na OC.
- */
-export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<ResultadoDaLeitura> {
-  if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
-  // Nunca cortar em silêncio (CTO-D554): `lerPedido` já barrou antes, e esta
-  // é a última porta — página demais não sai do navegador.
-  if (imagesDataUrls.length > MAX_PAGINAS) throw new Error(mensagemDePaginas(imagesDataUrls.length));
-  // As mensagens da imagem ficam as de sempre; só o 400 (novo, D557: grande
-  // demais) traz a do servidor.
-  return chamarExtrairItens({ imagens: imagesDataUrls }, (status, doServidor) =>
-    status === 400 && doServidor ? doServidor : mensagemErro(status),
-  );
-}
-
-/**
- * A lista de materiais em texto, do jeito que a pessoa colou (CTO-D557). Os
- * limites e os erros são do servidor, e a mensagem dele vai para a tela como
- * veio; sem ela, a do status.
- */
-export async function organizarTexto(texto: string): Promise<ResultadoDaLeitura> {
-  if (texto.trim() === '') throw new Error('Cole a lista de materiais na caixa de texto.');
-  return chamarExtrairItens({ texto }, (status, doServidor) =>
-    doServidor || (status === 422 ? 'A IA não encontrou itens neste texto.' : mensagemErro(status)),
+  return rawItems.map((it) =>
+    normalizeItem({
+      ecr_id: it.ecr_id != null && Number(it.ecr_id) ? Number(it.ecr_id) : null,
+      descricao: String(it.descricao ?? '').trim(),
+      observacao: String(it.observacao ?? '').trim(),
+      quantidade: Number(it.quantidade) || 0,
+      unidade: normalizeUnit(it.unidade),
+      preco_unit: Number(it.preco_unit) || 0,
+      ipi_pct: Number(it.ipi_pct) || 0,
+      desc_pct: Number(it.desc_pct) || 0,
+    }),
   );
 }

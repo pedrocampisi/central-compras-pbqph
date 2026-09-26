@@ -101,67 +101,7 @@
   .soCelular {
     display: inline;
   }
-  /* O respiro sai dos lados e vai para cima (o X mora lá): a caixa da lista
-     é onde se cola do WhatsApp, e a 375px cada pixel de largura conta. */
   .zona {
-    padding: 44px 14px 16px;
+    padding: 22px 40px 18px;
   }
-}
-
-/* ── A lista em texto (CTO-D557) ──────────────────────────────────────────── */
-.lista {
-  width: 100%;
-  max-width: 560px;
-  margin-top: 10px;
-  padding-top: 14px;
-  border-top: 1px solid var(--borda);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.rotuloDaLista {
-  align-self: flex-start;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--texto-suave);
-}
-.caixa {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 110px;
-  padding: 8px 10px;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio-pequeno);
-  background: var(--painel);
-  color: var(--texto);
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 1.45;
-  resize: vertical;
-  outline: none;
-}
-.caixa:focus {
-  border-color: var(--marca);
-  box-shadow: 0 0 0 3px var(--marca-fraca);
-}
-
-.ignoradas {
-  width: 100%;
-  max-width: 560px;
-  margin-top: 4px;
-  padding: 10px 12px;
-  border-radius: var(--raio-pequeno);
-  background: var(--aviso-bg);
-  color: var(--aviso);
-  font-size: 12.5px;
-  text-align: left;
-}
-.ignoradas ul {
-  margin: 6px 0 0;
-  padding-left: 18px;
-  color: var(--texto);
-}
-.ignoradas li {
-  overflow-wrap: anywhere;
 }
