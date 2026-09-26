@@ -1881,3 +1881,34 @@ esta trava, o campo sumiria da tela calado); a escrita grava o costume (1). 173 
 (`?select=*&order=razao_social.asc`): 4 vezes, a última às 14:39:50Z; nenhuma depois da publicação.
 O pedido novo da OC ainda não aparecia — ninguém abriu a OC depois das 16:02Z. Os outros 23 pedidos
 à `fornecedores` do dia são de outro programa (outra lista, sem `order`).
+
+## Decisão 39 — o Importar Pedido (IA) abre um campo, e página demais não é lida · 26/09/2026
+
+**POR QUÊ (CTO-D554, palavra do Pedro):** o botão ia direto para a pasta, e o Pedro quer arrastar,
+colar um print com Ctrl+V ou escolher. Na mesma passada apareceram dois cortes calados:
+`pdfToImages.ts` lia só as 5 primeiras páginas do PDF, e `extractItems.ts` cortava em 10 imagens
+antes do `fetch`. Um pedido de 6 páginas virava uma OC com itens a menos, sem aviso.
+
+**O QUE MUDOU:**
+- `domain/importacao.ts`, regra pura: os tipos (PDF, JPG, PNG), `MAX_PAGINAS = 5`, as mensagens e
+  `foraDeCampoDeTexto`, que decide para onde vão o Ctrl+V e o Esc.
+- `services/ai/lerPedido.ts`: confere o tipo, abre e SOMA as páginas, só então desenha, e faz uma
+  chamada só. As dependências entram por parâmetro, para o teste provar que `enviar` não é chamado.
+- `abrirArquivo` separa contar de desenhar.
+- `extractItems` recusa mais de 5 (não corta).
+- `CampoDeImportacao.tsx`: as três portas. Com a OC vazia, ocupa o lugar do "Nenhum item
+  adicionado"; enquanto lê, fecha as portas; o erro fica escrito no campo.
+- Servidor, modelo, prompt e normalização não mudaram (`extrair-itens` na versão 3).
+
+**A CAIXA "FORA DO CENTRO":** está centrada no conteúdo, ao pixel, a 375/768/1024/1180/1440. O
+vazio à esquerda é a lateral, e não mexi. A medição achou 3 px de rolagem lateral a 375 (o botão
+Importar); os botões agora quebram linha. Achou também o painel Totais transbordando 49 px a 375, que
+é de antes e ficou anotado na carta, sem mexer.
+
+**AS TRAVAS:** 6 sabotagens, todas mordendo, hash igual. Duas ficaram verdes na primeira rodada: uma
+por sabotagem mal feita, refeita como o código antigo era; outra porque faltava o teste "passou do
+limite, nada é desenhado", que entrou. 207 verdes.
+
+**PUBLICADO:** saiu `e7e22b41-2714-4e4c-bcfd-08702547e1da` (a D551, O DESFAZER); entrou
+`801205e9-2fa2-4678-8764-3d14ac57b97d`, versão `20260926182529-6e20dc3`. Medido por fora: os textos
+do campo no pacote; `if(e.length>5)throw` antes do `fetch`; nenhum `slice(0,10)` nem `Math.min`.
