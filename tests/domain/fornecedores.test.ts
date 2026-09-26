@@ -9,7 +9,10 @@ import {
   opcoesDeEmpresa,
   ordemDoCnpj,
   rotuloDaFilial,
+  travaDaFilial,
+  EMITIR_BLOQUEADA,
 } from '../../src/domain/fornecedores';
+import { readFileSync } from 'node:fs';
 import { filtrarOpcoes } from '../../src/domain/pesquisa';
 import type { Fornecedor } from '../../src/domain/types';
 
@@ -220,6 +223,37 @@ describe('a empresa e a filial (CTO-D542) — a pessoa lê o apelido, e a filial
     expect(ordemDoCnpj('22222222000155')).toBe(1);
     expect(ordemDoCnpj('')).toBeNull();
     expect(ordemDoCnpj('12345678901')).toBeNull();
+  });
+});
+
+describe('a filial bloqueada salva, mas não emite (CTO-D545)', () => {
+  const bloqueada = forn({ id: 'b', fornece_material: true, bloqueado_para_compra_nova: true });
+  const livre = forn({ id: 'l', fornece_material: true });
+
+  it('emitir com a bloqueada é recusado, e a mensagem diz o motivo e o que fazer', () => {
+    expect(travaDaFilial(bloqueada, 'emitir')).toBe(EMITIR_BLOQUEADA);
+    expect(EMITIR_BLOQUEADA).toBe('Esta filial está bloqueada para compra nova. Escolha outra filial para emitir.');
+  });
+
+  it('salvar rascunho com a bloqueada passa — quem abriu uma OC antiga não perde o que digitou', () => {
+    expect(travaDaFilial(bloqueada, 'salvar')).toBe('');
+  });
+
+  it('a filial livre emite e salva; sem fornecedor, a trava não é quem fala', () => {
+    expect(travaDaFilial(livre, 'emitir')).toBe('');
+    expect(travaDaFilial(livre, 'salvar')).toBe('');
+    expect(travaDaFilial(undefined, 'emitir')).toBe('');
+  });
+
+  it('as portas passam pela trava: Salvar, Emitir (Nova OC) e emitir pelo Histórico', () => {
+    const nova = readFileSync('src/features/ordens-compra/NovaOcPage.tsx', 'utf-8');
+    const hist = readFileSync('src/features/ordens-compra/HistoricoPage.tsx', 'utf-8');
+    const salvar = nova.slice(nova.indexOf('const handleSaveDraft'), nova.indexOf('const handleEmitir'));
+    const emitir = nova.slice(nova.indexOf('const handleEmitir'));
+    expect(salvar).toMatch(/travaDaFilial\([^;]*'salvar'\)/);
+    expect(emitir.slice(0, emitir.indexOf('salvarOrdemCompra'))).toMatch(/travaDaFilial\([^;]*'emitir'\)/);
+    const status = hist.slice(hist.indexOf('async function handleStatusChange'));
+    expect(status.slice(0, status.indexOf('definirStatusOc'))).toMatch(/travaDaFilial\([^;]*'emitir'\)/);
   });
 });
 

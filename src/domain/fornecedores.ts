@@ -42,6 +42,20 @@ export function entraNaOc(f: Fornecedor): boolean {
   return f.ativo && f.fornece_material === true && f.bloqueado_para_compra_nova !== true;
 }
 
+export const EMITIR_BLOQUEADA =
+  'Esta filial está bloqueada para compra nova. Escolha outra filial para emitir.';
+
+/**
+ * A trava da filial bloqueada (CTO-D545): o rascunho SALVA — quem abriu uma OC
+ * antiga não perde o que digitou —, mas não EMITE. O `bloqueado_para_compra_nova`
+ * marca CNPJ baixado na Receita, e nenhum gatilho do banco o lê: se a tela não
+ * travar, ninguém trava. Devolve a mensagem da recusa, ou '' quando pode.
+ */
+export function travaDaFilial(f: Fornecedor | undefined, acao: 'salvar' | 'emitir'): string {
+  if (acao === 'emitir' && f?.bloqueado_para_compra_nova === true) return EMITIR_BLOQUEADA;
+  return '';
+}
+
 /** Por que uma filial está fora da lista da Nova OC hoje ('' = não está). */
 export function motivoForaDaOc(f: Fornecedor): string {
   if (f.bloqueado_para_compra_nova === true) return 'bloqueada para compra nova';

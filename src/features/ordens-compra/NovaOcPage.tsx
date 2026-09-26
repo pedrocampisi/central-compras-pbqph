@@ -33,7 +33,7 @@ import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 import {
   agruparPorEmpresa, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
-  motivoForaDaOc, opcoesDeEmpresa, opcoesDeObra, rotuloDaFilial,
+  motivoForaDaOc, opcoesDeEmpresa, opcoesDeObra, rotuloDaFilial, travaDaFilial,
 } from '../../domain/fornecedores';
 import {
   MENSAGEM_OBRA_SEM_DESTINATARIO, destinatarioDaObra, rotuloFaturarPara,
@@ -375,6 +375,11 @@ export function NovaOcPage() {
   const handleSaveDraft = useCallback(async () => {
     if (!ocEditing || !data) return;
     if (!ocEditing.fornecedor_id) { showToast(faltaFornecedor(ocEditing.id), 'warning'); return; }
+    {
+      // A filial bloqueada SALVA: quem abriu uma OC antiga não perde o que digitou (D545).
+      const trava = travaDaFilial(data.fornecedores.find((f) => f.id === ocEditing.fornecedor_id), 'salvar');
+      if (trava) { showToast(trava, 'warning'); return; }
+    }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
@@ -404,6 +409,11 @@ export function NovaOcPage() {
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
     if (!ocEditing.fornecedor_id) { showToast(faltaFornecedor(ocEditing.id), 'warning'); return; }
+    {
+      // A filial bloqueada NÃO emite — o banco não recusa, a trava é aqui (D545).
+      const trava = travaDaFilial(data.fornecedores.find((f) => f.id === ocEditing.fornecedor_id), 'emitir');
+      if (trava) { showToast(trava, 'warning'); return; }
+    }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 

@@ -28,7 +28,7 @@ import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
 import {
-  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
+  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra, travaDaFilial,
 } from '../../domain/fornecedores';
 import { normalizarBusca } from '../../domain/pesquisa';
 
@@ -151,6 +151,11 @@ export function HistoricoPage() {
   }
 
   async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
+    // A filial bloqueada não emite, por nenhuma porta (D545).
+    if (status === 'emitida') {
+      const trava = travaDaFilial(data!.fornecedores.find((f) => f.id === oc.fornecedor_id), 'emitir');
+      if (trava) { showToast(trava, 'warning'); return; }
+    }
     try {
       // Comando estreito: muda o status e nada mais. Vai com a versão que esta
       // tela leu — se outra pessoa mexeu na OC nesse meio-tempo, o banco recusa
