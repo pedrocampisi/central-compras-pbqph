@@ -1717,3 +1717,71 @@ acesso volta (1); o campo Senha volta no primeiro acesso (1). 149 verdes, lint, 
 foram vistas numa página de prova temporária com a tela real e dados inventados (apagada depois);
 a prova no ar é a conferência do Pedro. Quem ainda tem o pacote de 25/09 (sem o vigia) sai dele
 com Ctrl+Shift+R, ou abrindo o endereço duas vezes; daqui para a frente, sai sozinho.
+
+---
+
+## Decisão 36 — o fornecedor da OC por empresa, e a filial depois · 26/09/2026
+
+**A PALAVRA** — do Pedro, na janela do `CTO`, 26/09 perto das 11h, com a foto da lista de
+Fornecedor da Nova OC aberta (CTO-D542): *"essa forma como as filiais estão aparecendo da OC não
+está legal. Melhore"*. A foto: "BEIJA FLOR COMERCIO DE TINTAS LTDA · UBERLANDIA/MG · ····NNNN" oito
+vezes seguidas, e a ArcelorMittal com a razão social escrita de dois jeitos.
+
+**O QUE MUDOU:**
+
+```
+   a lista ........ uma linha por EMPRESA, pelo apelido; o grupo e' o empresa_id do banco
+                    (nunca a raiz do CNPJ calculada na tela — D504). Linha menor: "N filiais ·
+                    cidades", ou a cidade quando ha' uma so'. Apelido repetido (duas raizes,
+                    a mesma marca) leva a razao social; se ainda empatar, a raiz do CNPJ
+   a filial ....... so' quando ha' mais de uma: campo "Filial", lista simples. Cidade; na mesma
+                    cidade, a rua (e o bairro); sem rua, "matriz" ou "filial nº N" (a ordem do
+                    CNPJ, numeracao da Receita). Grupo com duas razoes sociais: a da filial.
+                    Os 4 ultimos digitos SAIRAM de tudo
+   bloqueada ...... fora da Nova OC; dentro do Historico
+   rascunho ....... a filial gravada que hoje estaria fora continua na lista, marcada com o
+                    motivo, e a pista diz "Atencao: …". A tela nao troca sozinha
+   Historico ...... o filtro e' por empresa (todas as filiais); a busca livre acha tambem pelo
+                    apelido e pelo fantasia (antes, so' razao social: "imperio" nao achava nada)
+   a OC ........... continua gravando a FILIAL; a pista embaixo do campo continua com a razao
+                    social, o endereco e o CNPJ inteiro; o PDF nao mudou
+```
+
+**DUAS ESCOLHAS QUE A CARTA NÃO FEZ, E EU FIZ:**
+1. **A cidade sem gritar.** O cadastro tem "UBERLANDIA" e "Uberlandia" para a mesma cidade: a
+   tela compara sem caixa e mostra "Uberlandia/MG" (primeira letra maiúscula, "de/da/do"
+   minúsculos). Sem isso, a Império mostraria "Uberlandia/MG e UBERLANDIA/MG".
+2. **A mesma razão social escrita de dois jeitos não conta como duas.** "ARCELORMITTAL BRASIL S.A."
+   e "ArcelorMittal Brasil S/A" são comparadas sem caixa, acento, pontuação e espaço. Sem isso, a
+   ArcelorMittal levaria a razão social em cada filial à toa — as cidades já as distinguem.
+
+**MEDIDO NA PRODUÇÃO, SÓ LENDO (26/09, ~11h2x):** na lista da Nova OC entram 136 filiais de 113
+empresas (a carta contou 138 de 114: as 2 bloqueadas saem, e a segunda "Império" — duas filiais,
+ambas bloqueadas — sai inteira). 13 empresas com mais de uma filial; a maior, a Império, com 9.
+Na Nova OC só a Triângulo Cercas tem o apelido em duas empresas; no Histórico, a Império também.
+**Apelidos com cara de razão social na lista da Nova OC: 32 de 113** — 30 com a forma jurídica
+no nome (LTDA, S/A, EIRELI, ME, EPP) e 2 sem ela, mas com cara de razão ("…LTD" cortado e
+"…CIA BRASILEIRA DE BRICOLAGEM"). É dado, não tela: mostrados como vêm.
+
+**AS TRAVAS (CTO-D297):** 7 sabotagens, todas mordendo (saída 1), restauradas com hash igual —
+(a) o agrupamento perde filiais (5 vermelhos); (b) a filial volta a levar os 4 últimos dígitos (2);
+(c) a bloqueada volta para a Nova OC (1); (d) a empresa de filial única deixa de escolher a filial
+(1); (e1) o apelido repetido perde a razão social (1); (e2) some o último desempate (1); (f) a
+leitura do banco ignora o bloqueio (2). 163 verdes, lint, tipos, build, `conferir:pacote` 5/5.
+
+**PUBLICADO, direto na produção (palavra do Pedro, como na D541):**
+
+```
+   saiu do ar .... 0439a829-6134-4031-a37a-b2be33ffa2fc (26/09 13h50 UTC) — O DESFAZER
+   entrou ........ 44c083c6-7e3b-486f-b431-098b815e3691, versao 20260926142722-10a9c7d
+   medido depois . /versao.txt 200 text/plain com a versao; bundle index-BCZkmivK.js com a
+                   versao, empresa_id, bloqueado_para_compra_nova, "Selecione a filial",
+                   "filial nº", e NENHUM "····"; ref da producao presente, do ensaio 0; sw.js
+                   sem versao.txt; /, manifesto, registerSW.js, sw.js 200. As seis colunas que
+                   a tela le da vista: legiveis por authenticated (has_column_privilege)
+```
+
+**O QUE NÃO FOI VISTO:** a tela logada, com os dados de verdade. A Nova OC e o Histórico foram
+vistos a 375px numa página de prova temporária com a tela real e dados inventados (apagada depois),
+pelo teclado; a prova no ar é a conferência do Pedro. Quem estiver com a aba aberta recebe a versão
+nova sozinho, pelo vigia da decisão 35.

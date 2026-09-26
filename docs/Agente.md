@@ -102,6 +102,13 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
 - **Obra e Fornecedor se escolhem com pesquisa** (`components/CampoPesquisavel`, regra em
   `domain/pesquisa.ts`): Nova OC e filtros do Histórico. Os outros campos de escolha continuam
   `<select>` de propósito (palavra do Pedro, D541); há teste que falha se isso mudar.
+- **O Fornecedor da OC é a EMPRESA, e a filial vem depois** (`agruparPorEmpresa`,
+  `opcoesDeEmpresa`, `rotuloDaFilial`, `escolherEmpresa` em `domain/fornecedores.ts`): a lista
+  mostra o apelido, agrupado pelo `empresa_id` da `fornecedor_resolvido` (nunca pela raiz do CNPJ
+  calculada na tela); com mais de uma filial aparece o campo Filial (lista simples), que distingue
+  por cidade, rua, "matriz"/"filial nº N" — nunca pelos 4 últimos dígitos. A filial bloqueada
+  (`bloqueado_para_compra_nova`) fica fora da Nova OC e dentro do Histórico, que filtra por empresa.
+  A OC continua gravando a FILIAL (`fornecedor_id`). Decisão 36.
 - **A tela confere a própria versão** (`services/versao.ts`, regra em `domain/versao.ts`): o build
   grava `AAAAMMDDhhmmss-commit` no pacote e em `/versao.txt` (fora do precache); ao abrir e ao
   voltar o foco, se mudou, recarrega — menos com OC em edição (avisa). Publicação que anda junto
