@@ -1785,3 +1785,18 @@ leitura do banco ignora o bloqueio (2). 163 verdes, lint, tipos, build, `conferi
 vistos a 375px numa página de prova temporária com a tela real e dados inventados (apagada depois),
 pelo teclado; a prova no ar é a conferência do Pedro. Quem estiver com a aba aberta recebe a versão
 nova sozinho, pelo vigia da decisão 35.
+
+**EMENDA D545 (26/09, ~11h4x) — a filial bloqueada SALVA, mas NÃO EMITE.** O CTO aceitou a D542 e
+as duas escolhas de nome (a cidade sem gritar; S.A. = S/A), e mudou a terceira: emitir para filial
+bloqueada, não. Nenhum gatilho de `compras.ordens_compra` lê o bloqueio (medido por ele), então a
+trava é da tela: `travaDaFilial` em `domain/fornecedores.ts`, chamada pelo Salvar e pelo Emitir da
+Nova OC e pela mudança de status do Histórico (que hoje não oferece "emitir", mas aceitaria). A
+mensagem: *"Esta filial está bloqueada para compra nova. Escolha outra filial para emitir."* Salvar
+rascunho continua: quem abriu uma OC antiga não perde o que digitou. **4 sabotagens**, todas
+mordendo (1 vermelho cada), hash igual: emitir passa; salvar é recusado; o Emitir da Nova OC deixa
+de chamar a trava; o Histórico deixa de travar. 167 verdes. Vista numa página de prova (rascunho com
+a bloqueada, Emitir pelo teclado): a mensagem aparece e nenhuma chamada sai para o banco.
+**Publicado:** saiu `44c083c6-7e3b-486f-b431-098b815e3691` (O DESFAZER), entrou
+`5dfddad2-b6cb-4003-895d-05f02e341fc1`, versão `20260926143520-d00101a`; o pacote servido
+(`index-15vAzhdx.js`) tem a versão e a mensagem, "····" 0, ref do ensaio 0. Os 32 apelidos: o CTO
+pergunta ao Pedro; esta casa não manda nada.

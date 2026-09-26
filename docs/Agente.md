@@ -108,7 +108,8 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   calculada na tela); com mais de uma filial aparece o campo Filial (lista simples), que distingue
   por cidade, rua, "matriz"/"filial nº N" — nunca pelos 4 últimos dígitos. A filial bloqueada
   (`bloqueado_para_compra_nova`) fica fora da Nova OC e dentro do Histórico, que filtra por empresa.
-  A OC continua gravando a FILIAL (`fornecedor_id`). Decisão 36.
+  A OC continua gravando a FILIAL (`fornecedor_id`). A bloqueada gravada num rascunho salva, mas
+  **não emite** (`travaDaFilial`; o banco não recusa, a trava é da tela). Decisão 36 e emenda D545.
 - **A tela confere a própria versão** (`services/versao.ts`, regra em `domain/versao.ts`): o build
   grava `AAAAMMDDhhmmss-commit` no pacote e em `/versao.txt` (fora do precache); ao abrir e ao
   voltar o foco, se mudou, recarrega — menos com OC em edição (avisa). Publicação que anda junto
