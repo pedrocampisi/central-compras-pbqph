@@ -128,15 +128,22 @@
 
 .totalsPanel {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
+/* Os 320px são o mínimo SÓ quando cabem (CTO-D555). A 375px o conteúdo tem
+   271px: com o mínimo fixo, a grade (alinhada à direita) passava 49px para a
+   esquerda, por baixo da lateral, e os sete rótulos saíam cortados — sem
+   rolagem de lado para denunciar, porque transbordo à esquerda não rola.
+   Agora ela encolhe até a largura do conteúdo, e o rótulo longo quebra linha. */
 .totalsGrid {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 6px 20px;
   align-items: center;
-  min-width: 320px;
+  min-width: min(320px, 100%);
+  max-width: 100%;
   font-size: 13px;
 }
 
@@ -191,8 +198,12 @@
 
 /* ── Footer actions ────────────────────────────────────────────────────────── */
 
+/* Fila alinhada à direita QUEBRA linha (CTO-D555): sem quebra, a 375px
+   Cancelar, Visualizar PDF e Salvar Rascunho ficavam inteiros à esquerda da
+   tela, por baixo da lateral — fora de alcance, e sem rolagem que mostrasse. */
 .footerActions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
   padding-top: 8px;
