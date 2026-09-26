@@ -1852,3 +1852,32 @@ rascunho troca a filial gravada (1); o campo Filial volta (1); e, de novo, a tra
 Filial; a ArcelorMittal, a matriz de Belo Horizonte; a empresa sem matriz, a de menor ordem; o
 rascunho com a bloqueada abre com ela, o Emitir recusa com a mensagem nova, e escolher a Império de
 novo passa para a matriz. O PDF imprime a filial gravada (`generateOcPdf.ts:100`) — não visto aberto.
+
+---
+
+## Decisão 38 — a OC pede à `fornecedores` crua só as colunas que usa, nunca o `*` · 26/09/2026
+
+**POR QUÊ (CTO-D551):** a porta de limpeza do Banco (D548) só aplica na produção uma limpeza de dado
+lido se o log da API das últimas 24h não tiver pedido pelo caminho velho. A OC pedia
+`core.fornecedores?select=*`, o mesmo pedido do código de antes da D519: no log, os dois eram iguais,
+e a porta recusaria para sempre.
+
+**O QUE MUDOU:** `COLUNAS_DA_FORNECEDORES` (`services/supabase/linhas.ts`) — as 19 colunas que o
+mapeador lê (cadastro e endereço, `ativo`, datas). Fora ficam a classificação e o costume (que vêm da
+`fornecedor_resolvido`) e mais 17 que a OC não lê da crua (dados bancários, CPF, CNAE, origem, raiz,
+o bloqueio — este vem da resolvida…).
+A escrita (`linhaDoFornecedor`) grava só colunas da lista, mais o `fornece_material` do cadastro novo.
+As 19 conferidas legíveis por `authenticated` na produção antes de publicar (`has_column_privilege`).
+
+**AS TRAVAS:** 5 sabotagens, todas mordendo, hash igual — o pedido volta a `*` (1); a lista ganha o
+`*` (1); a lista volta a pedir o costume (1); a lista perde uma coluna que o mapeador lê (2 — sem
+esta trava, o campo sumiria da tela calado); a escrita grava o costume (1). 173 verdes.
+
+**PUBLICADO:** saiu `6e7e6284-fd4c-4fea-b170-a4173e7c2fe0` (a D549, O DESFAZER); entrou
+`e7e22b41-2714-4e4c-bcfd-08702547e1da`, versão `20260926160215-723a35b`. O pacote servido pede
+`.from('fornecedores').select(<lista>.join(', '))`.
+
+**NO LOG (edge_logs, 26/09 12h–16h0x UTC):** o pedido velho da OC tem assinatura própria
+(`?select=*&order=razao_social.asc`): 4 vezes, a última às 14:39:50Z; nenhuma depois da publicação.
+O pedido novo da OC ainda não aparecia — ninguém abriu a OC depois das 16:02Z. Os outros 23 pedidos
+à `fornecedores` do dia são de outro programa (outra lista, sem `order`).
