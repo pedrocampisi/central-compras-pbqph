@@ -1,0 +1,107 @@
+/* O campo do "Importar Pedido (IA)" (CTO-D554). Moldura tracejada: é lugar de
+ * soltar arquivo, não um cartão. Cores só dos tokens. */
+
+.zona {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 44px 22px;
+  border: 1.5px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--painel-2);
+  text-align: center;
+  outline: none;
+  transition:
+    border-color var(--transicao),
+    background var(--transicao);
+}
+.zona:focus-visible {
+  box-shadow: 0 0 0 3px var(--marca-fraca);
+}
+.arrastando {
+  border-color: var(--marca);
+  background: var(--marca-fraca);
+}
+
+.fechar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--raio-pequeno);
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+.fechar:hover:not(:disabled) {
+  background: var(--marca-fraca);
+  color: var(--marca);
+}
+.fechar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.icone {
+  color: var(--marca);
+  display: inline-flex;
+}
+
+.titulo {
+  color: var(--texto);
+  font-family: var(--fonte-display);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nota {
+  max-width: 460px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+
+.lendo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+/* O Loader traz o próprio respiro, largo demais para dentro do campo. */
+.espera > * {
+  padding: 8px 0 0;
+}
+
+.erro {
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  max-width: 520px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  color: var(--erro);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Arrastar e colar são coisa de computador. No celular, o campo fala só do
+ * "Escolher arquivo", que já abre a câmera ou a galeria. */
+.soCelular {
+  display: none;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .soComputador {
+    display: none;
+  }
+  .soCelular {
+    display: inline;
+  }
+  .zona {
+    padding: 22px 40px 18px;
+  }
+}

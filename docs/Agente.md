@@ -292,9 +292,19 @@ buildPdfFilename(oc, fornNome): string
 
 ### `services/ai/`
 ```ts
+// D554: o botão "Importar Pedido (IA)" abre um CAMPO (features/ordens-compra/
+// CampoDeImportacao.tsx) — arrastar, Ctrl+V (print ou arquivo, só com o campo
+// aberto e o cursor fora de campo de texto) ou "Escolher arquivo". Regras puras
+// em domain/importacao.ts: tipos PDF/JPG/PNG, MAX_PAGINAS=5 pelo TOTAL do que
+// entrou, mensagens. Passou do limite ou tipo errado: nada é lido, nada sai.
+
+// lerPedido.ts
+lerPedido(arquivos: File[], deps?): Promise<Item[]>
+// tipo → abre e SOMA as páginas → só então desenha → UMA chamada ao servidor
+
 // pdfToImages.ts
-fileToImagesBase64(file: File): Promise<string[]>  // dataURLs JPEG
-// limites: MAX_PDF_PAGES=5, RENDER_SCALE=1.6, JPEG_QUALITY=0.75
+abrirArquivo(file, tipo): Promise<{ paginas, imagens() }>  // conta antes de desenhar
+// RENDER_SCALE=1.6, JPEG_QUALITY=0.75; nenhum corte silencioso de página
 
 // openRouterClient.ts
 callOpenRouter(apiKey, messages): Promise<string>
@@ -340,7 +350,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 | `CURRENT_SCHEMA_VERSION` | `domain/constants.ts` | 5 | Bump exige criar `vN-to-vN+1.ts` em `domain/migrations/` e registrar no `index.ts`. `data.schema.ts` e `services/supabase/dados.ts` importam a constante — não duplicar o número |
 | `DEBOUNCE_MS` | `hooks/useAutoSave.ts` | 800 | Auto-save mais rápido/lento; só toca cache, não JSON |
 | `MAX_BACKUPS` | `services/storage/backups.ts` | 10 | Disco; FIFO |
-| `MAX_PDF_PAGES` | `services/ai/pdfToImages.ts` | 5 | Páginas enviadas à IA; afeta tokens |
+| `MAX_PAGINAS` | `domain/importacao.ts` | 5 | Páginas por leitura, somando tudo o que entrou; acima, nada é lido (D554). O teto de tokens do servidor (8000) foi feito para ele |
 | `RENDER_SCALE` | idem | 1.6 | Qualidade vs custo de tokens |
 | `JPEG_QUALITY` | idem | 0.75 | OCR vs tamanho |
 | `MAX_TOKENS` | `services/ai/openRouterClient.ts` | 4000 | Truncamento de resposta |

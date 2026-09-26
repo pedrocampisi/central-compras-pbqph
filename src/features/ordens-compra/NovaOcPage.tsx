@@ -20,8 +20,8 @@ import { uid } from '../../domain/id';
 import { UN_PADRAO } from '../../domain/constants';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
-import { fileToImagesBase64 } from '../../services/ai/pdfToImages';
-import { extractItemsFromImages } from '../../services/ai/extractItems';
+import { ErroDaImportacao, lerPedido } from '../../services/ai/lerPedido';
+import { CampoDeImportacao } from './CampoDeImportacao';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
 import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
@@ -86,10 +86,13 @@ interface ItemsTableProps {
   onUpdate: (id: string, partial: Partial<Item>) => void;
   onRemove: (id: string) => void;
   onAdd: () => void;
+  semVazio?: boolean;
 }
 
-function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd }: ItemsTableProps) {
+function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsTableProps) {
   if (items.length === 0) {
+    // Com o campo de importação aberto, é ele que ocupa o lugar do vazio.
+    if (semVazio) return null;
     return (
       <EmptyState
         title="Nenhum item adicionado"
@@ -306,11 +309,13 @@ export function NovaOcPage() {
   const showToast = useUiStore((s) => s.showToast);
   const setTab = useUiStore((s) => s.setActiveTab);
 
+  // O botão "Importar Pedido (IA)" abre um campo, não a pasta (CTO-D554).
+  const [importAberto, setImportAberto] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [importErro, setImportErro] = useState('');
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
 
   // ── Inicialização ───────────────────────────────────────────────────────────
@@ -525,23 +530,28 @@ export function NovaOcPage() {
 
   // ── AI Import ───────────────────────────────────────────────────────────────
 
-  const handleImportFile = useCallback(async (file: File) => {
-    if (!data) return;
-    // A extração roda no servidor (Edge Function) — nenhuma chave no navegador.
+  // Os arquivos que entraram de uma vez viram UMA leitura (lerPedido): tipo
+  // errado e página demais param antes do servidor, e o aviso fica no campo.
+  const handleImportFiles = useCallback(async (arquivos: File[]) => {
+    if (!data || importing) return;
     setImporting(true);
+    setImportErro('');
     try {
-      const images = await fileToImagesBase64(file);
-      if (!images.length) { showToast('Não foi possível extrair imagens do arquivo.', 'warning'); return; }
-      const items = await extractItemsFromImages(images);
-      if (!items.length) { showToast('A IA não encontrou itens no arquivo.', 'warning'); return; }
+      const items = await lerPedido(arquivos);
+      if (!items.length) { setImportErro('A IA não encontrou itens no arquivo. Tente uma imagem mais nítida.'); return; }
       appendItems(items);
+      setImportAberto(false);
       showToast(`${items.length} item(ns) importado(s) via IA.`, 'success');
     } catch (err) {
-      showToast(`Erro na importação: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+      setImportErro(
+        err instanceof ErroDaImportacao
+          ? err.message
+          : `Erro na importação: ${err instanceof Error ? err.message : 'Erro desconhecido'}`,
+      );
     } finally {
       setImporting(false);
     }
-  }, [data, appendItems, showToast]);
+  }, [data, importing, appendItems, showToast]);
 
   // ── Render guard ────────────────────────────────────────────────────────────
 
@@ -705,29 +715,29 @@ export function NovaOcPage() {
             onUpdate={updateItem}
             onRemove={removeItem}
             onAdd={addItem}
+            semVazio={importAberto}
           />
+          {importAberto && (
+            <div className={styles.campoImportacao}>
+              <CampoDeImportacao
+                lendo={importing}
+                erro={importErro}
+                onArquivos={(arquivos) => void handleImportFiles(arquivos)}
+                onFechar={() => { setImportAberto(false); setImportErro(''); }}
+              />
+            </div>
+          )}
           <div className={styles.itemsActions}>
             <Button variant="outline" size="sm" onClick={addItem}>+ Adicionar Item</Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              loading={importing}
-              title="Importar itens de um pedido PDF via IA"
+              onClick={() => { setImportAberto(true); setImportErro(''); }}
+              disabled={importAberto}
+              title="Importar os itens de um pedido (PDF, foto ou print) pela IA"
             >
               <Icon name="sparkles" size={13} /> Importar Pedido (IA)
             </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handleImportFile(file);
-                e.target.value = ''; // reset so same file can be re-selected
-              }}
-            />
           </div>
         </div>
       </FieldGroup>

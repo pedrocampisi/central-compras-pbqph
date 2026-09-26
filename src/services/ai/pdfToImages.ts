@@ -1,32 +1,30 @@
 /**
- * Converte um arquivo (PDF ou imagem) em lista de data URLs JPEG.
- * Usado como etapa de pré-processamento para a extração de itens via IA.
+ * Abre um arquivo do pedido (PDF ou imagem) e o transforma em data URLs JPEG,
+ * uma por página — o formato que a função `extrair-itens` recebe.
  * Portado de CentralCompras-PBQPH.html linhas 2404-2431.
  *
- * Limitação: máximo 5 páginas de PDF para controlar custo de tokens.
+ * Desde a D554 abrir e desenhar são dois passos: primeiro se conta as páginas
+ * de TUDO o que entrou (`lerPedido`), e só se desenha quando a soma cabe no
+ * limite. Antes, o PDF de 6 páginas perdia a sexta aqui mesmo, em silêncio.
  */
 
-const MAX_PDF_PAGES = 5;
+import type { TipoDoArquivo } from '../../domain/importacao';
+
 const RENDER_SCALE = 1.6;
 const JPEG_QUALITY = 0.75;
 
-/**
- * Retorna uma lista de data URLs JPEG — uma por página de PDF, ou uma para imagem.
- * Aceita: image/*, application/pdf, arquivos .pdf sem MIME.
- */
-export async function fileToImagesBase64(file: File): Promise<string[]> {
-  // ── Imagem direta ──────────────────────────────────────────────────────────
-  if (file.type.startsWith('image/')) {
-    const dataUrl = await readAsDataUrl(file);
-    return [dataUrl];
-  }
+export interface ArquivoAberto {
+  /** Quantas páginas este arquivo vai ocupar na leitura (imagem = 1). */
+  paginas: number;
+  /** Desenha TODAS as páginas — o limite já foi conferido por quem chama. */
+  imagens: () => Promise<string[]>;
+}
 
-  // ── PDF ────────────────────────────────────────────────────────────────────
-  if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
-    return renderPdfPages(file);
+export async function abrirArquivo(file: File, tipo: TipoDoArquivo): Promise<ArquivoAberto> {
+  if (tipo === 'imagem') {
+    return { paginas: 1, imagens: async () => [await readAsDataUrl(file)] };
   }
-
-  throw new Error('Formato não suportado. Use PDF ou imagem (JPEG, PNG, WebP).');
+  return abrirPdf(file);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -40,7 +38,7 @@ function readAsDataUrl(file: File): Promise<string> {
   });
 }
 
-async function renderPdfPages(file: File): Promise<string[]> {
+async function abrirPdf(file: File): Promise<ArquivoAberto> {
   // Import dinâmico de pdfjs-dist (evita bundle enorme no carregamento inicial)
   const pdfjsLib = await import('pdfjs-dist');
 
@@ -53,26 +51,27 @@ async function renderPdfPages(file: File): Promise<string[]> {
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
-  const pageCount = Math.min(pdf.numPages, MAX_PDF_PAGES);
-  const images: string[] = [];
+  const imagens = async (): Promise<string[]> => {
+    const out: string[] = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const viewport = page.getViewport({ scale: RENDER_SCALE });
 
-  for (let p = 1; p <= pageCount; p++) {
-    const page = await pdf.getPage(p);
-    const viewport = page.getViewport({ scale: RENDER_SCALE });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Não foi possível criar contexto 2D.');
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Não foi possível criar contexto 2D.');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      out.push(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
 
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    images.push(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
+      // Limpa o canvas para liberar memória
+      page.cleanup();
+    }
+    return out;
+  };
 
-    // Limpa o canvas para liberar memória
-    page.cleanup();
-  }
-
-  return images;
+  return { paginas: pdf.numPages, imagens };
 }

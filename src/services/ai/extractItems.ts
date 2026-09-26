@@ -15,8 +15,7 @@ import type { Item } from '../../domain/types';
 import { normalizeItem } from '../../domain/normalize';
 import { UN_PADRAO } from '../../domain/constants';
 import { supabase } from '../supabase/client';
-
-const MAX_IMAGENS = 10;
+import { MAX_PAGINAS, mensagemDePaginas } from '../../domain/importacao';
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -82,6 +81,9 @@ function mensagemErro(status: number): string {
  */
 export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<Item[]> {
   if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
+  // Nunca cortar em silêncio (CTO-D554): `lerPedido` já barrou antes, e esta
+  // é a última porta — página demais não sai do navegador.
+  if (imagesDataUrls.length > MAX_PAGINAS) throw new Error(mensagemDePaginas(imagesDataUrls.length));
 
   const url = import.meta.env['VITE_SUPABASE_URL'] as string;
 
@@ -98,7 +100,7 @@ export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ imagens: imagesDataUrls.slice(0, MAX_IMAGENS) }),
+    body: JSON.stringify({ imagens: imagesDataUrls }),
   });
 
   if (!resp.ok) throw new Error(mensagemErro(resp.status));

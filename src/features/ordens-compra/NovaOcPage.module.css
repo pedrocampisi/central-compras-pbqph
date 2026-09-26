@@ -107,10 +107,21 @@
 }
 .removeBtn:hover { background: var(--erro-bg); color: var(--erro); }
 
+/* Quebra entre os botões: a 375px o "Importar Pedido (IA)" passava 3px da
+   borda e a tela ganhava rolagem de lado (medido na D554). */
 .itemsActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
+}
+
+/* O campo do Importar Pedido (IA) — CTO-D554. */
+.campoImportacao {
+  margin-top: 10px;
+}
+.campoImportacao:first-child {
+  margin-top: 0;
 }
 
 /* ── Totals panel ──────────────────────────────────────────────────────────── */
