@@ -1,3 +1,20 @@
+/* ── Topo: título e fila de botões (pendência 12, CTO-D541) ────────────────
+   Medido a 375px em 15/09/2026: a fila de quatro botões era um flex sem
+   quebra — transbordava para o lado e espremia o título até ele quebrar
+   palavra por palavra. Agora o título pede uma largura mínima razoável e a
+   fila desce para a linha de baixo, quebrando entre botões, nunca dentro. */
+
+.tituloDoTopo {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.acoesDoTopo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* ── Items table ──────────────────────────────────────────────────────────── */
 
 .tableWrap {

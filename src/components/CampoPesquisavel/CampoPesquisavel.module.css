@@ -1,0 +1,111 @@
+/* A lista de escolha que aceita texto (Obra e Fornecedor). Cores, raio e
+   sombra vêm todos de tokens.css; as duas variantes copiam a medida do
+   controle que substituem (o select do formulário e o do filtro). */
+
+.caixa {
+  position: relative;
+  min-width: 0;
+}
+
+.lupa {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--texto-muted);
+  pointer-events: none;
+}
+
+.entrada {
+  width: 100%;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  color: var(--texto);
+  font-family: inherit;
+  text-overflow: ellipsis;
+  transition: border-color var(--transicao);
+}
+.entrada:hover,
+.entrada:focus {
+  border-color: var(--marca);
+  outline: none;
+}
+.entrada:focus-visible {
+  box-shadow: 0 0 0 3px var(--marca-fraca);
+}
+.entrada::placeholder {
+  color: var(--texto-suave);
+}
+
+/* Mesma medida do input/select de Field.module.css */
+.campo .entrada {
+  padding: 9px 12px 9px 32px;
+  background: var(--painel-2);
+  font-size: 13.5px;
+}
+
+/* Mesma medida do .filterSelect de ListToolbar.module.css */
+.filtro {
+  min-width: 190px;
+}
+.filtro .entrada {
+  height: 34px;
+  padding: 0 10px 0 30px;
+  background: var(--painel);
+  font-size: 12.5px;
+}
+.filtro .lupa {
+  left: 10px;
+}
+
+.lista {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  min-width: 220px;
+  max-height: min(300px, 50vh);
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--painel);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-elevada);
+}
+
+.opcao {
+  display: grid;
+  gap: 1px;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--texto);
+}
+.ativa {
+  background: var(--marca-fraca);
+}
+.escolhida .rotulo {
+  font-weight: 600;
+  color: var(--marca);
+}
+.opcaoVazia {
+  color: var(--texto-suave);
+}
+
+.rotulo {
+  overflow-wrap: anywhere;
+}
+.detalhe {
+  font-size: 11.5px;
+  color: var(--texto-suave);
+}
+
+.nada {
+  padding: 10px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}

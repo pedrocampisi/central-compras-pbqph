@@ -26,6 +26,29 @@ interface SelectFieldProps extends FieldBaseProps, SelectHTMLAttributes<HTMLSele
 
 export type FieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps;
 
+/**
+ * A casca do campo — rótulo em cima, dica embaixo — em volta de um controle
+ * que não é input, select nem textarea (a lista com pesquisa, D541). O
+ * `htmlFor` liga o rótulo ao controle, para o leitor de tela e para o clique.
+ */
+export function FieldShell({
+  label, hint, wide, span2, required, htmlFor, children,
+}: FieldBaseProps & { htmlFor: string; children: ReactNode }) {
+  const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
+    .filter(Boolean)
+    .join(' ');
+  return (
+    <div className={cls}>
+      <label htmlFor={htmlFor}>
+        {label}
+        {required && <span className={styles.required}>*</span>}
+      </label>
+      {children}
+      {hint && <span className={styles.hint}>{hint}</span>}
+    </div>
+  );
+}
+
 export function Field({ label, hint, wide, span2, required, as: As = 'input', ...rest }: FieldProps) {
   const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)

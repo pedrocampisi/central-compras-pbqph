@@ -8,7 +8,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
-import { Field } from '../../components/Field/Field';
+import { Field, FieldShell } from '../../components/Field/Field';
+import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -30,7 +31,9 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
-import { enderecoResumido, fornecedoresParaOc, rotuloDoFornecedor } from '../../domain/fornecedores';
+import {
+  enderecoResumido, fornecedoresParaOc, opcoesDeFornecedor, opcoesDeObra,
+} from '../../domain/fornecedores';
 import {
   MENSAGEM_OBRA_SEM_DESTINATARIO, destinatarioDaObra, rotuloFaturarPara,
 } from '../../domain/destinatario';
@@ -557,7 +560,7 @@ export function NovaOcPage() {
     <div className="section">
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="section-header">
-        <div>
+        <div className={styles.tituloDoTopo}>
           <h2>
             {ocEditing.status === 'rascunho' && ocEditing.criado_em !== ocEditing.atualizado_em
               ? 'Editar OC'
@@ -567,7 +570,7 @@ export function NovaOcPage() {
             OC Nº {ocEditing.numero || '— (numera ao emitir)'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className={styles.acoesDoTopo}>
           <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
           <Button variant="ghost" size="sm" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
             <Icon name="eye" size={13} /> Visualizar
@@ -599,37 +602,37 @@ export function NovaOcPage() {
 
       {/* ── Identificação ────────────────────────────────────────────────── */}
       <FieldGroup title="Identificação da OC">
-        <Field
-          as="select"
-          label="Fornecedor"
-          required
-          value={ocEditing.fornecedor_id}
-          onChange={(e) => updateField('fornecedor_id', e.target.value)}
-          hint={enderecoResumido(fornecedorEscolhido)}
-        >
-          <option value="">Selecione…</option>
-          {fornecedoresAtivos.map((f) => (
-            <option key={f.id} value={f.id}>{rotuloDoFornecedor(f, fornecedoresAtivos)}</option>
-          ))}
-        </Field>
+        {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas. */}
+        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={enderecoResumido(fornecedorEscolhido)}>
+          <CampoPesquisavel
+            id="oc-fornecedor"
+            required
+            rotuloVazio="Selecione…"
+            opcoes={opcoesDeFornecedor(fornecedoresAtivos)}
+            valor={ocEditing.fornecedor_id}
+            onEscolher={(v) => updateField('fornecedor_id', v)}
+          />
+        </FieldShell>
 
-        <Field
-          as="select"
+        <FieldShell
           label="Obra"
           required
-          value={ocEditing.obra_id}
-          onChange={(e) => updateField('obra_id', e.target.value)}
+          htmlFor="oc-obra"
           hint={
             obraEscolhida
               ? rotuloFaturarPara(destinatarioDaObraEscolhida) || MENSAGEM_OBRA_SEM_DESTINATARIO
               : undefined
           }
         >
-          <option value="">Selecione…</option>
-          {obrasAtivas.map((o) => (
-            <option key={o.id} value={o.id}>{o.nome}</option>
-          ))}
-        </Field>
+          <CampoPesquisavel
+            id="oc-obra"
+            required
+            rotuloVazio="Selecione…"
+            opcoes={opcoesDeObra(obrasAtivas)}
+            valor={ocEditing.obra_id}
+            onEscolher={(v) => updateField('obra_id', v)}
+          />
+        </FieldShell>
 
         <Field
           label="Data"

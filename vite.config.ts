@@ -2,6 +2,32 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
+import type { Plugin } from 'vite';
+
+// O carimbo da versão (CTO-D541): "AAAAMMDDhhmmss-commit", em UTC. Vai para
+// dentro do pacote (`__VERSAO_DO_PACOTE__`) e para /versao.txt, que a tela lê
+// fora do cache do service worker para saber se ainda é a versão do ar.
+// `.txt` de propósito: o precache pega js/css/html/png/svg/woff2/json, e este
+// arquivo NÃO pode ficar guardado — ele é a pergunta "o que está no ar agora?".
+function carimboDaVersao(): string {
+  const quando = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+  let commit = 'semgit';
+  try {
+    commit = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().toLowerCase();
+  } catch { /* fora do git: o carimbo continua valendo pela hora */ }
+  return `${quando}-${commit}`;
+}
+
+function gravarVersao(versao: string): Plugin {
+  return {
+    name: 'gravar-versao',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'versao.txt', source: versao });
+    },
+  };
+}
 
 // O endereço é a raiz, em dev e em produção.
 //
@@ -16,10 +42,15 @@ import path from 'node:path';
 
 export default defineConfig(() => {
   const base = '/';
+  const versao = carimboDaVersao();
   return {
   base,
+  define: {
+    __VERSAO_DO_PACOTE__: JSON.stringify(versao),
+  },
   plugins: [
     react(),
+    gravarVersao(versao),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['marca/brasao.png', 'marca/mascote-rosto.png', 'icons/*.png'],

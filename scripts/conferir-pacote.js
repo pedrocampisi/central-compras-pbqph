@@ -196,6 +196,32 @@ function tudoQueOIndicePedeExiste() {
   return [true, recado];
 }
 
+/**
+ * CTO-D541 (26/09/2026): a tela confere a própria versão contra /versao.txt,
+ * e recarrega quando o ar mudou. Isso só funciona se (1) o arquivo existe,
+ * (2) a versão dentro do pacote é a MESMA do arquivo e (3) o service worker
+ * NÃO o guarda — se guardasse, a pergunta "o que está no ar?" seria respondida
+ * pelo cache, e o cliente velho continuaria velho achando que está em dia.
+ */
+function aVersaoDoArPodeSerLida(arquivos) {
+  const versao = texto(join(PACOTE, 'versao.txt')).trim();
+  if (!/^\d{14}-[0-9a-z]+$/.test(versao)) {
+    return [false, 'não há `versao.txt` no pacote, ou ele não tem o formato AAAAMMDDhhmmss-commit'];
+  }
+  // Entre aspas, apóstrofos OU crases: medido em 26/09, o minificador escreve
+  // a constante entre crases, e a primeira versão desta pergunta (só aspas)
+  // reprovou um pacote certo.
+  const literal = new RegExp(`[\`'"]${versao}[\`'"]`);
+  const dentro = arquivos.filter((c) => c.endsWith('.js') && literal.test(texto(c))).length;
+  if (!dentro) {
+    return [false, `a versão ${versao} não está dentro de nenhum .js — a tela e o arquivo discordariam sempre`];
+  }
+  if (texto(join(PACOTE, 'sw.js')).includes('versao.txt')) {
+    return [false, 'o `versao.txt` entrou no precache do service worker — a tela leria a versão do cache'];
+  }
+  return [true, `versão ${versao}: no arquivo, em ${dentro} .js, e fora do precache`];
+}
+
 // ---------------------------------------------------------------------------
 
 function main() {
@@ -210,6 +236,7 @@ function main() {
     ['o pacote aponta para a raiz', () => apontaParaARaiz()],
     ['o subendereço morto não voltou', () => oSubenderecoMortoNaoVoltou(arquivos)],
     ['tudo que o index.html pede existe', () => tudoQueOIndicePedeExiste()],
+    ['a versão do ar pode ser lida', () => aVersaoDoArPodeSerLida(arquivos)],
   ];
 
   let reprovadas = 0;

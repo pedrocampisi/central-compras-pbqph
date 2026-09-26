@@ -48,6 +48,9 @@ export interface Fornecedor {
   // "o banco disse que não".
   fornece_material?: boolean;
   presta_servico?: boolean;
+  /** O nome curto da EMPRESA (`core.empresa_raiz.apelido`), o que o Pedro usa
+   *  ("Império das Tintas" para a filial da Beija Flor). Só para a pesquisa. */
+  empresa_apelido?: string;
   criado_em: string;
   atualizado_em: string;
 }

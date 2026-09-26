@@ -8,8 +8,9 @@
  * empresa (a Beija Flor Tintas tem 8 CNPJs) apareciam como oito linhas
  * iguais. Lógica pura, sem React e sem banco, para ser testada sozinha.
  */
-import type { Fornecedor } from './types';
+import type { Fornecedor, Obra } from './types';
 import { formatarDocumento } from './destinatario';
+import { normalizarBusca, type OpcaoPesquisavel } from './pesquisa';
 
 /**
  * Quem entra na lista da OC: ativo E fornece material.
@@ -72,4 +73,31 @@ export function enderecoResumido(f: Fornecedor | undefined): string {
   // O banco guarda só dígitos; a pessoa lê com a pontuação.
   const cnpj = f.cnpj ? `CNPJ ${formatarDocumento(f.cnpj, 'pj')}` : '';
   return [ruaComplemento, e.bairro, cidade, cnpj].filter(Boolean).join(' · ');
+}
+
+/**
+ * As opções da escolha de fornecedor, prontas para a pesquisa (CTO-D541).
+ *
+ * O rótulo é o de sempre (`rotuloDoFornecedor`). A pesquisa acha também pela
+ * razão social, pelo fantasia e pelo apelido da empresa — e o apelido aparece
+ * como linha menor quando o rótulo não o contém: sem ela, digitar "Império" e
+ * ver "Beija Flor Comércio de Tintas" pareceria engano.
+ */
+export function opcoesDeFornecedor(lista: Fornecedor[]): OpcaoPesquisavel[] {
+  return lista.map((f) => {
+    const rotulo = rotuloDoFornecedor(f, lista);
+    const apelido = (f.empresa_apelido ?? '').trim();
+    const mostraApelido = apelido && !normalizarBusca(rotulo).includes(normalizarBusca(apelido));
+    return {
+      valor: f.id,
+      rotulo,
+      detalhe: mostraApelido ? apelido : undefined,
+      termos: [f.razao_social, f.nome_fantasia, apelido].filter(Boolean),
+    };
+  });
+}
+
+/** As opções da escolha de obra: o nome que a tela mostra. */
+export function opcoesDeObra(lista: Obra[]): OpcaoPesquisavel[] {
+  return lista.map((o) => ({ valor: o.id, rotulo: o.nome }));
 }

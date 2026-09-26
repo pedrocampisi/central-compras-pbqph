@@ -26,6 +26,8 @@ import type { StatusOc } from '../../domain/constants';
 import { definirStatusOc, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
+import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
+import { opcoesDeFornecedor, opcoesDeObra } from '../../domain/fornecedores';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -250,24 +252,23 @@ export function HistoricoPage() {
           <option value="entregue">Entregue</option>
           <option value="cancelada">Cancelada</option>
         </FilterSelect>
-        <FilterSelect
-          value={histFilter.fornecedor}
-          onChange={(e) => setHistFilter({ fornecedor: e.target.value })}
-        >
-          <option value="">Todos fornecedores</option>
-          {data.fornecedores.map((f) => (
-            <option key={f.id} value={f.id}>{f.razao_social}</option>
-          ))}
-        </FilterSelect>
-        <FilterSelect
-          value={histFilter.obra}
-          onChange={(e) => setHistFilter({ obra: e.target.value })}
-        >
-          <option value="">Todas obras</option>
-          {data.obras.map((o) => (
-            <option key={o.id} value={o.id}>{o.nome}</option>
-          ))}
-        </FilterSelect>
+        {/* Fornecedor e Obra aceitam texto (CTO-D541); o status continua lista. */}
+        <CampoPesquisavel
+          variante="filtro"
+          ariaLabel="Filtrar por fornecedor"
+          rotuloVazio="Todos fornecedores"
+          opcoes={opcoesDeFornecedor(data.fornecedores)}
+          valor={histFilter.fornecedor}
+          onEscolher={(v) => setHistFilter({ fornecedor: v })}
+        />
+        <CampoPesquisavel
+          variante="filtro"
+          ariaLabel="Filtrar por obra"
+          rotuloVazio="Todas obras"
+          opcoes={opcoesDeObra(data.obras)}
+          valor={histFilter.obra}
+          onEscolher={(v) => setHistFilter({ obra: v })}
+        />
       </ListToolbar>
 
       {/* Tabela */}

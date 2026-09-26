@@ -4,6 +4,7 @@ import path from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
+  define: { __VERSAO_DO_PACOTE__: JSON.stringify('20260101000000-teste') },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

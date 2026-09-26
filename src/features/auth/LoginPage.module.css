@@ -85,7 +85,8 @@
 /* Única ação primária da tela. */
 .btnEntrar {
   width: 100%;
-  height: 48px;
+  min-height: 48px;
+  padding: 8px 16px;
   margin-top: 24px;
   background: var(--acento);
   color: var(--acento-texto);
@@ -105,9 +106,12 @@
   cursor: not-allowed;
 }
 
+/* Altura MÍNIMA, não fixa: a 375px "Primeiro acesso — definir minha senha"
+   quebra em duas linhas, e em 44px fixos as duas ficavam espremidas. */
 .btnSecundario {
   width: 100%;
-  height: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
   margin-top: 12px;
   background: transparent;
   color: var(--marca);
@@ -127,7 +131,11 @@
   cursor: not-allowed;
 }
 
+/* Alvo de toque de 44px (pendência 9 d): era 29px, pequeno para o dedo no
+   celular. A altura cresce sem mudar a aparência — o texto continua link. */
 .linkBtn {
+  align-self: center;
+  min-height: 44px;
   background: none;
   border: 0;
   color: var(--marca);
@@ -135,8 +143,8 @@
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 16px;
-  padding: 4px;
+  margin-top: 8px;
+  padding: 0 12px;
 }
 .linkBtn:hover:not(:disabled) {
   text-decoration: underline;
@@ -162,8 +170,9 @@
   color: var(--aviso);
 }
 
+/* 12.5px (pendência 9 e): era 11.5px, a menor letra da tela. */
 .rodape {
-  margin: 18px 0 0;
-  font-size: 11.5px;
+  margin: 14px 0 0;
+  font-size: 12.5px;
   color: var(--texto-muted);
 }
