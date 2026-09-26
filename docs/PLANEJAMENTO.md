@@ -1912,3 +1912,22 @@ limite, nada é desenhado", que entrou. 207 verdes.
 **PUBLICADO:** saiu `e7e22b41-2714-4e4c-bcfd-08702547e1da` (a D551, O DESFAZER); entrou
 `801205e9-2fa2-4678-8764-3d14ac57b97d`, versão `20260926182529-6e20dc3`. Medido por fora: os textos
 do campo no pacote; `if(e.length>5)throw` antes do `fetch`; nenhum `slice(0,10)` nem `Math.min`.
+
+## Decisão 40 — a Nova OC cabe a 375 px: fila alinhada à direita quebra linha · 26/09/2026
+
+**POR QUÊ (CTO-D555):** a medida da D554 achou o Totais a 375 px com `min-width: 320px` num conteúdo
+de 271. Alinhado à direita, ele passava 49 px para a esquerda, por baixo da lateral, e cortava os
+sete rótulos. Transbordo para a esquerda não rola, e por isso some calado. A mesma régua achou o
+rodapé pior: Cancelar, Visualizar PDF e Salvar Rascunho ficavam inteiros fora da tela.
+
+**O QUE MUDOU:** `.totalsGrid` com `min-width: min(320px, 100%)`, `max-width: 100%` e a coluna dos
+rótulos em `minmax(0, 1fr)`; `.totalsPanel` e `.footerActions` com `flex-wrap: wrap`. Nas larguras de
+768 para cima, nada muda.
+
+**A TRAVA:** `tests/components/NovaOc375.test.ts` lê as regras, porque o jsdom não mede tela. Ela
+cobre o mínimo da grade e a sobra para o rótulo, e exige que TODA fila `flex` + `flex-end` do CSS da
+página quebre linha. 5 sabotagens, todas mordendo. 213 verdes.
+
+**PUBLICADO:** saiu `801205e9-2fa2-4678-8764-3d14ac57b97d` (a D554, O DESFAZER); entrou
+`69e5921a-275e-489e-8f02-f1673d7b2f30`, versão `20260926183826-b0f84a2`. O CSS servido traz as três
+regras.
