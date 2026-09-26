@@ -102,14 +102,16 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
 - **Obra e Fornecedor se escolhem com pesquisa** (`components/CampoPesquisavel`, regra em
   `domain/pesquisa.ts`): Nova OC e filtros do Histórico. Os outros campos de escolha continuam
   `<select>` de propósito (palavra do Pedro, D541); há teste que falha se isso mudar.
-- **O Fornecedor da OC é a EMPRESA, e a filial vem depois** (`agruparPorEmpresa`,
-  `opcoesDeEmpresa`, `rotuloDaFilial`, `escolherEmpresa` em `domain/fornecedores.ts`): a lista
+- **O Fornecedor da OC é a EMPRESA, e a filial NÃO se escolhe** (`agruparPorEmpresa`,
+  `opcoesDeEmpresa`, `filialPrincipal`, `escolherEmpresa` em `domain/fornecedores.ts`): a lista
   mostra o apelido, agrupado pelo `empresa_id` da `fornecedor_resolvido` (nunca pela raiz do CNPJ
-  calculada na tela); com mais de uma filial aparece o campo Filial (lista simples), que distingue
-  por cidade, rua, "matriz"/"filial nº N" — nunca pelos 4 últimos dígitos. A filial bloqueada
-  (`bloqueado_para_compra_nova`) fica fora da Nova OC e dentro do Histórico, que filtra por empresa.
-  A OC continua gravando a FILIAL (`fornecedor_id`). A bloqueada gravada num rascunho salva, mas
-  **não emite** (`travaDaFilial`; o banco não recusa, a trava é da tela). Decisão 36 e emenda D545.
+  calculada na tela), sem os 4 últimos dígitos. A OC grava sozinha a filial PRINCIPAL — a matriz
+  (ordem 0001) se ela pode receber OC, senão a de menor ordem; bloqueada ou inativa nunca. Quem
+  decide a loja é o vendedor, e a nota diz qual foi (palavra do Pedro, D549). A pista embaixo do
+  campo diz o que vai no PDF. A filial bloqueada fica fora da Nova OC e dentro do Histórico, que
+  filtra por empresa. O rascunho antigo abre com a filial gravada; se ela está bloqueada, salva mas
+  **não emite** (`travaDaFilial`; o banco não recusa), e escolher a empresa de novo passa a OC para
+  a principal. Decisões 36 e 37, emenda D545.
 - **A tela confere a própria versão** (`services/versao.ts`, regra em `domain/versao.ts`): o build
   grava `AAAAMMDDhhmmss-commit` no pacote e em `/versao.txt` (fora do precache); ao abrir e ao
   voltar o foco, se mudou, recarrega — menos com OC em edição (avisa). Publicação que anda junto

@@ -1800,3 +1800,55 @@ a bloqueada, Emitir pelo teclado): a mensagem aparece e nenhuma chamada sai para
 `5dfddad2-b6cb-4003-895d-05f02e341fc1`, versão `20260926143520-d00101a`; o pacote servido
 (`index-15vAzhdx.js`) tem a versão e a mensagem, "····" 0, ref do ensaio 0. Os 32 apelidos: o CTO
 pergunta ao Pedro; esta casa não manda nada.
+
+---
+
+## Decisão 37 — a OC escolhe só a empresa, e grava a filial principal · 26/09/2026
+
+**A PALAVRA** — do Pedro, na janela do `CTO`, 26/09 perto das 12h5x (CTO-D549): *"essa parada da
+filial na ordem de compra vai dar muita dor de cabeça para os meus engenheiros. Pq eles pedem o
+material para o vendedor e ele que faz o manejo para qual loja vai sair o material […] As vezes só
+deixamos a matriz"*. O CTO mediu na Central_Financeiro: dos lançamentos de empresas com mais de uma
+filial, 13 vieram de filial e 4 da matriz, e 2 empresas faturaram por mais de uma loja — a loja não
+se sabe na hora da OC, quem diz é a nota. Matriz e filiais são a mesma pessoa jurídica.
+
+**O QUE MUDOU** (substitui o item 3 da decisão 36; o resto dela fica):
+
+```
+   o campo Filial ... SAIU, com o aviso "Selecione a filial do fornecedor.", o rotulo da filial
+                      (cidade/rua/matriz/filial nº) e as travas deles
+   a OC grava ....... a filial PRINCIPAL da empresa, sozinha (filialPrincipal): a matriz (ordem
+                      0001) se pode receber OC; senao a de menor ordem; bloqueada ou inativa nunca
+   a pista .......... diz o que vai no PDF: "Na OC: razao · endereco · CNPJ inteiro"
+   rascunho antigo .. abre com a filial gravada, sem trocar. Escolher a mesma empresa de novo
+                      mantem a gravada SE ela ainda pode receber OC; senao passa para a principal
+   o Historico ...... nao mudou
+```
+
+**UMA COISA QUE A CARTA NÃO COBRIA:** a mensagem da D545 ("Escolha outra filial para emitir")
+mandava fazer o que a tela deixou de permitir. Virou *"Esta filial está bloqueada para compra nova.
+Escolha a empresa de novo no campo Fornecedor: a OC passa para a filial principal."* — e é o que
+acontece, pela regra acima.
+
+**MEDIDO NA PRODUÇÃO, SÓ LENDO:** 13 empresas com mais de uma filial na Nova OC; 12 gravam a matriz,
+1 (Gomes e Filhos) não tem a matriz na lista e grava a filial nº 2. 11 empresas de filial única têm
+como única filial uma que não é matriz — gravam ela, como antes.
+
+**AS TRAVAS (CTO-D297):** 5 sabotagens, todas mordendo (saída 1), restauradas com hash igual — a
+matriz deixa de ser a preferida (5 vermelhos); a bloqueada/inativa pode ser a principal (2); o
+rascunho troca a filial gravada (1); o campo Filial volta (1); e, de novo, a trava da D545 (1).
+169 verdes, lint, tipos, build, `conferir:pacote` 5/5.
+
+**PUBLICADO, direto na produção:**
+
+```
+   saiu do ar .... 5dfddad2-b6cb-4003-895d-05f02e341fc1 (a D545) — O DESFAZER
+   entrou ........ 6e7e6284-fd4c-4fea-b170-a4173e7c2fe0, versao 20260926155708-94ecf78
+   medido depois . bundle index-DBmfkjx5.js: a versao, "Na OC: ", a mensagem nova 1;
+                   "Selecione a filial", "oc-filial", "filial nº", "····" 0; ref do ensaio 0
+```
+
+**VISTO** numa página de prova a 375px, pelo teclado (apagada): a Império grava a matriz, sem campo
+Filial; a ArcelorMittal, a matriz de Belo Horizonte; a empresa sem matriz, a de menor ordem; o
+rascunho com a bloqueada abre com ela, o Emitir recusa com a mensagem nova, e escolher a Império de
+novo passa para a matriz. O PDF imprime a filial gravada (`generateOcPdf.ts:100`) — não visto aberto.
