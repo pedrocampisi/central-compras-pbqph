@@ -8,7 +8,7 @@ import {
   motivoForaDaOc,
   opcoesDeEmpresa,
   ordemDoCnpj,
-  rotuloDaFilial,
+  filialPrincipal,
   travaDaFilial,
   EMITIR_BLOQUEADA,
 } from '../../src/domain/fornecedores';
@@ -148,34 +148,8 @@ describe('a empresa e a filial (CTO-D542) — a pessoa lê o apelido, e a filial
     expect(filtrarOpcoes(opcoes, 'triangulo').map((o) => o.valor).sort()).toEqual(['E-CER1', 'E-CER2']);
   });
 
-  it('a filial: a cidade; na mesma cidade sem rua, "matriz" ou "filial nº N"; e a razão social quando o grupo junta duas', () => {
-    const g = agruparPorEmpresa(lista).find((x) => x.chave === 'E-IMP')!;
-    expect(g.filiais.map((f) => rotuloDaFilial(f, g.filiais))).toEqual([
-      'Araguari/MG · BEIJA FLOR COMERCIO DE TINTAS LTDA',
-      'Uberlandia/MG · matriz · IMPERIO DAS TINTAS LTDA',
-      'Uberlandia/MG · filial nº 27 · BEIJA FLOR COMERCIO DE TINTAS LTDA',
-      'Uberlandia/MG · filial nº 48 · BEIJA FLOR COMERCIO DE TINTAS LTDA',
-    ]);
-  });
-
-  it('a ArcelorMittal: o mesmo nome escrito de dois jeitos não conta como duas razões sociais', () => {
-    const g = agruparPorEmpresa(lista).find((x) => x.chave === 'E-ARC')!;
-    expect(g.filiais.map((f) => rotuloDaFilial(f, g.filiais))).toEqual(['Belo Horizonte/MG', 'Uberlandia/MG']);
-  });
-
-  it('a rua desempata a mesma cidade, e aí o número da filial nem aparece', () => {
-    const r1 = filial('r1', 'E-R', 'R', 'R LTDA', '12121212000100', end('Uberlândia', 'MG', 'Av. Rondon Pacheco', '100', 'Centro'));
-    const r2 = filial('r2', 'E-R', 'R', 'R LTDA', '12121212000200', end('UBERLÂNDIA', 'MG', 'Rua Goiás', '9'));
-    expect(rotuloDaFilial(r1, [r1, r2])).toBe('Uberlândia/MG · Av. Rondon Pacheco, 100 · Centro');
-    expect(rotuloDaFilial(r2, [r1, r2])).toBe('Uberlândia/MG · Rua Goiás, 9');
-  });
-
-  it('(b) nenhum rótulo — de empresa ou de filial — leva os quatro últimos dígitos do CNPJ', () => {
-    const grupos = agruparPorEmpresa(lista);
-    const textos = [
-      ...opcoesDeEmpresa(grupos).map((o) => `${o.rotulo} ${o.detalhe ?? ''}`),
-      ...grupos.flatMap((g) => g.filiais.map((f) => rotuloDaFilial(f, g.filiais))),
-    ];
+  it('(b) nenhuma linha da lista leva os quatro últimos dígitos do CNPJ', () => {
+    const textos = opcoesDeEmpresa(agruparPorEmpresa(lista)).map((o) => `${o.rotulo} ${o.detalhe ?? ''}`);
     for (const f of lista) {
       const final = f.cnpj.slice(-4);
       for (const t of textos) expect(t.replace(/\D/g, ' ')).not.toMatch(new RegExp(`\\b\\d*${final}\\b`));
@@ -191,26 +165,63 @@ describe('a empresa e a filial (CTO-D542) — a pessoa lê o apelido, e a filial
     const doHistorico = agruparPorEmpresa(todos);
     expect(doHistorico[0]?.filiais.map((f) => f.id).sort()).toEqual(['i1', 'i27']);
   });
+});
 
-  it('a filial gravada no rascunho que hoje estaria fora continua na lista, e diz o porquê', () => {
-    const bloqueada = { ...imp27, bloqueado_para_compra_nova: true };
-    const daOc = fornecedoresParaOc([imp1, bloqueada], 'i27');
-    expect(daOc.map((f) => f.id)).toEqual(['i1', 'i27']);
-    expect(rotuloDaFilial(bloqueada, daOc)).toContain('bloqueada para compra nova');
-    expect(motivoForaDaOc(imp1)).toBe('');
+describe('a OC escolhe só a empresa, e grava a filial principal (CTO-D549)', () => {
+  const end = (cidade: string, uf = 'MG') => ({ logradouro: '', numero: '', complemento: '', bairro: '', cidade, uf, cep: '' });
+  const filial = (id: string, cnpj: string, extra: Partial<Fornecedor> = {}) =>
+    forn({ id, empresa_id: 'E-IMP', empresa_apelido: 'Império das Tintas', razao_social: 'X LTDA', cnpj,
+      fornece_material: true, endereco: end('UBERLANDIA'), ...extra });
+  const matriz = filial('m', '22222222000155');
+  const f27 = filial('f27', '22222222002741');
+  const f48 = filial('f48', '22222222004813');
+  const fA = filial('fA', '22222222000520', { endereco: end('ARAGUARI') });
+  const grupo = (...fs: Fornecedor[]) => agruparPorEmpresa(fs)[0];
+
+  it('empresa com a matriz na lista: grava a matriz', () => {
+    expect(escolherEmpresa(grupo(f48, fA, matriz, f27), '')).toBe('m');
+    expect(filialPrincipal(grupo(f48, matriz)!)?.id).toBe('m');
   });
 
-  it('(d) a empresa com uma filial só escolhe a filial sozinha', () => {
-    const [zap] = agruparPorEmpresa([zapi]);
-    expect(escolherEmpresa(zap, '')).toEqual({ fornecedorId: 'z1', empresaEsperando: '' });
+  it('empresa sem a matriz na lista: grava a de menor ordem (a cidade não conta)', () => {
+    expect(escolherEmpresa(grupo(f48, f27, fA), '')).toBe('fA');
+    expect(escolherEmpresa(grupo(f48, f27), '')).toBe('f27');
   });
 
-  it('com mais de uma filial, a empresa espera a filial — e a já escolhida da mesma empresa fica', () => {
-    const imp = agruparPorEmpresa(lista).find((g) => g.chave === 'E-IMP');
-    expect(escolherEmpresa(imp, '')).toEqual({ fornecedorId: '', empresaEsperando: 'E-IMP' });
-    expect(escolherEmpresa(imp, 'z1')).toEqual({ fornecedorId: '', empresaEsperando: 'E-IMP' });
-    expect(escolherEmpresa(imp, 'i48')).toEqual({ fornecedorId: 'i48', empresaEsperando: '' });
-    expect(escolherEmpresa(undefined, 'i48')).toEqual({ fornecedorId: '', empresaEsperando: '' });
+  it('matriz bloqueada ou inativa não é escolhida: vai a próxima', () => {
+    const bloqueada = { ...matriz, bloqueado_para_compra_nova: true };
+    const inativa = { ...matriz, ativo: false };
+    expect(escolherEmpresa(grupo(bloqueada, f48, f27), '')).toBe('f27');
+    expect(escolherEmpresa(grupo(inativa, f48), '')).toBe('f48');
+  });
+
+  it('empresa de uma filial só: grava ela', () => {
+    expect(escolherEmpresa(grupo(f48), '')).toBe('f48');
+  });
+
+  it('rascunho com outra filial gravada: escolher a mesma empresa não troca', () => {
+    expect(escolherEmpresa(grupo(matriz, f27, f48), 'f48')).toBe('f48');
+    // A filial de OUTRA empresa não conta: vai a principal desta.
+    expect(escolherEmpresa(grupo(matriz, f27), 'z1')).toBe('m');
+  });
+
+  it('rascunho com filial bloqueada: abre com ela, e escolher a empresa de novo passa para a principal', () => {
+    const bloqueada = { ...f27, bloqueado_para_compra_nova: true };
+    const daOc = fornecedoresParaOc([matriz, bloqueada], 'f27');
+    expect(daOc.map((f) => f.id)).toEqual(['m', 'f27']);
+    expect(motivoForaDaOc(bloqueada)).toBe('bloqueada para compra nova');
+    expect(escolherEmpresa(grupo(...daOc), 'f27')).toBe('m');
+  });
+
+  it('nenhuma filial que possa receber OC: nenhum fornecedor; sem empresa, nenhum', () => {
+    expect(escolherEmpresa(grupo({ ...matriz, bloqueado_para_compra_nova: true }), '')).toBe('');
+    expect(escolherEmpresa(undefined, 'm')).toBe('');
+  });
+
+  it('a ArcelorMittal (duas cidades): a matriz', () => {
+    const bh = forn({ id: 'a1', empresa_id: 'E-ARC', cnpj: '33333333000100', fornece_material: true, endereco: end('BELO HORIZONTE') });
+    const udi = forn({ id: 'a3', empresa_id: 'E-ARC', cnpj: '33333333000372', fornece_material: true, endereco: end('Uberlandia') });
+    expect(escolherEmpresa(grupo(udi, bh), '')).toBe('a1');
   });
 
   it('a cidade sai sem gritar: "UBERLANDIA" vira "Uberlandia", "de" fica minúsculo, a UF maiúscula', () => {
@@ -232,7 +243,10 @@ describe('a filial bloqueada salva, mas não emite (CTO-D545)', () => {
 
   it('emitir com a bloqueada é recusado, e a mensagem diz o motivo e o que fazer', () => {
     expect(travaDaFilial(bloqueada, 'emitir')).toBe(EMITIR_BLOQUEADA);
-    expect(EMITIR_BLOQUEADA).toBe('Esta filial está bloqueada para compra nova. Escolha outra filial para emitir.');
+    expect(EMITIR_BLOQUEADA).toBe(
+      'Esta filial está bloqueada para compra nova. Escolha a empresa de novo no campo Fornecedor: ' +
+        'a OC passa para a filial principal.',
+    );
   });
 
   it('salvar rascunho com a bloqueada passa — quem abriu uma OC antiga não perde o que digitou', () => {

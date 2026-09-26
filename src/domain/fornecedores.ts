@@ -43,7 +43,8 @@ export function entraNaOc(f: Fornecedor): boolean {
 }
 
 export const EMITIR_BLOQUEADA =
-  'Esta filial está bloqueada para compra nova. Escolha outra filial para emitir.';
+  'Esta filial está bloqueada para compra nova. Escolha a empresa de novo no campo Fornecedor: ' +
+  'a OC passa para a filial principal.';
 
 /**
  * A trava da filial bloqueada (CTO-D545): o rascunho SALVA — quem abriu uma OC
@@ -86,9 +87,13 @@ export function enderecoResumido(f: Fornecedor | undefined): string {
 // estão aparecendo da OC não está legal. Melhore". A lista mostrava uma linha
 // por filial — "BEIJA FLOR COMERCIO DE TINTAS LTDA · UBERLANDIA/MG · ····NNNN"
 // oito vezes seguidas. Agora a pessoa escolhe a empresa pelo nome que ela usa
-// (o apelido), e só depois, se houver mais de uma, a filial — pelo que a filial
-// é (cidade, rua, matriz), nunca pelos quatro últimos dígitos do CNPJ, que
-// levam o dígito verificador e não dizem nada a ninguém.
+// (o apelido), e nunca vê os quatro últimos dígitos do CNPJ, que levam o
+// dígito verificador e não dizem nada a ninguém.
+//
+// A filial NÃO se escolhe (CTO-D549, também 26/09): houve um campo "Filial" por
+// uma hora, e o Pedro o tirou — "eles pedem o material para o vendedor e ele
+// que faz o manejo para qual loja vai sair". A OC grava a filial principal
+// (`filialPrincipal`); a nota fiscal diz de que loja saiu.
 // ---------------------------------------------------------------------------
 
 export interface EmpresaDaLista {
@@ -129,13 +134,6 @@ export function cidadeUf(f: Fornecedor): string {
   return [cidade, uf].filter(Boolean).join('/');
 }
 
-/** Rua e número, e o bairro quando houver — o que desempata na mesma cidade. */
-function ruaDa(f: Fornecedor): string {
-  const e = f.endereco;
-  const rua = [e?.logradouro?.trim(), e?.numero?.trim()].filter(Boolean).join(', ');
-  return [rua, e?.bairro?.trim()].filter(Boolean).join(' · ');
-}
-
 /**
  * O número de ordem do CNPJ: os quatro dígitos depois da barra (0001 é a
  * matriz). É a numeração da Receita, e se lê. Sem CNPJ, nenhum.
@@ -145,10 +143,6 @@ export function ordemDoCnpj(cnpj: string | undefined): number | null {
   if (d.length !== 14) return null;
   const n = Number(d.slice(8, 12));
   return n > 0 ? n : null;
-}
-
-function nomeDaOrdem(n: number): string {
-  return n === 1 ? 'matriz' : `filial nº ${n}`;
 }
 
 /**
@@ -252,56 +246,35 @@ export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
 }
 
 /**
- * Como a filial aparece no campo "Filial", entre as irmãs da mesma empresa:
- *   1. a cidade/UF;
- *   2. se uma irmã está na mesma cidade, a rua e o número (e o bairro);
- *   3. se ainda empata (as duas sem rua), "matriz" ou "filial nº N";
- *   4. se a empresa junta duas razões sociais, a razão social da filial;
- *   5. se a filial está fora da lista hoje (a gravada no rascunho), o porquê.
- * Os quatro últimos dígitos do CNPJ nunca: não dizem nada a quem escolhe.
- * Quando o Banco preencher as ruas em branco (D543), o "filial nº N" some
- * sozinho, porque a rua passa a desempatar.
+ * A filial que a OC grava quando a pessoa escolhe só a empresa (CTO-D549):
+ *   1. a MATRIZ (a ordem 0001 do CNPJ), se ela pode receber OC;
+ *   2. senão, a de MENOR ordem que pode;
+ *   3. bloqueada ou inativa nunca (`entraNaOc`).
+ * A palavra do Pedro: quem decide de que loja sai o material é o vendedor, e a
+ * nota diz qual foi. A matriz e as filiais são a mesma pessoa jurídica: a OC
+ * endereçada à matriz vale para a empresa. Nenhuma que possa: `undefined`.
  */
-export function rotuloDaFilial(f: Fornecedor, irmas: Fornecedor[]): string {
-  const cidade = cidadeUf(f);
-  const partes = [cidade || f.razao_social.trim()];
-
-  const mesmaCidade = irmas.filter(
-    (o) => o.id !== f.id && normalizarBusca(cidadeUf(o)) === normalizarBusca(cidade),
-  );
-  if (mesmaCidade.length > 0) {
-    const rua = ruaDa(f);
-    if (rua) partes.push(rua);
-    const empata = mesmaCidade.some((o) => normalizarBusca(ruaDa(o)) === normalizarBusca(rua));
-    const n = ordemDoCnpj(f.cnpj);
-    if (empata && n !== null) partes.push(nomeDaOrdem(n));
-  }
-
-  if (razoesDistintas(irmas).length > 1) partes.push(f.razao_social.trim());
-  const fora = motivoForaDaOc(f);
-  if (fora) partes.push(fora);
-  return partes.join(' · ');
+export function filialPrincipal(grupo: EmpresaDaLista): Fornecedor | undefined {
+  const ordem = (f: Fornecedor) => ordemDoCnpj(f.cnpj) ?? Number.POSITIVE_INFINITY;
+  return grupo.filiais
+    .filter(entraNaOc)
+    .reduce<Fornecedor | undefined>((melhor, f) => (!melhor || ordem(f) < ordem(melhor) ? f : melhor), undefined);
 }
 
 /**
- * O que acontece ao escolher uma empresa na Nova OC:
- *   - nenhuma → nenhum fornecedor;
- *   - uma filial só → ela, e o campo Filial nem aparece;
- *   - mais de uma → a filial já escolhida continua, se for desta empresa;
- *     senão nenhuma, e a empresa fica esperando a filial.
+ * O que a OC grava ao escolher uma empresa na Nova OC (CTO-D549 — não há mais
+ * campo Filial):
+ *   - nenhuma empresa → nenhum fornecedor;
+ *   - a filial já gravada é desta empresa e ainda pode receber OC → ela fica
+ *     (o rascunho antigo não troca sozinho);
+ *   - senão → a filial principal. É também a saída do rascunho com filial
+ *     bloqueada: escolher a empresa de novo passa a OC para a principal.
  */
-export function escolherEmpresa(
-  grupo: EmpresaDaLista | undefined,
-  fornecedorAtual: string,
-): { fornecedorId: string; empresaEsperando: string } {
-  if (!grupo) return { fornecedorId: '', empresaEsperando: '' };
-  if (grupo.filiais.length === 1) {
-    return { fornecedorId: grupo.filiais[0]!.id, empresaEsperando: '' };
-  }
-  if (grupo.filiais.some((f) => f.id === fornecedorAtual)) {
-    return { fornecedorId: fornecedorAtual, empresaEsperando: '' };
-  }
-  return { fornecedorId: '', empresaEsperando: grupo.chave };
+export function escolherEmpresa(grupo: EmpresaDaLista | undefined, fornecedorAtual: string): string {
+  if (!grupo) return '';
+  const atual = grupo.filiais.find((f) => f.id === fornecedorAtual);
+  if (atual && entraNaOc(atual)) return atual.id;
+  return filialPrincipal(grupo)?.id ?? '';
 }
 
 /** As opções da escolha de obra: o nome que a tela mostra. */

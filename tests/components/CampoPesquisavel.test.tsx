@@ -92,7 +92,8 @@ describe('só Obra e Fornecedor têm pesquisa (palavra do Pedro: "os outros não
     expect(nova).toMatch(/<select[\s\S]*?UN_PADRAO/);
     expect(nova).toMatch(/as="select"\s+label="Condição de Pagamento"/);
     expect(hist).toMatch(/<FilterSelect[\s\S]*?Todos os status/);
-    // A Filial (D542) é lista simples: são no máximo onze.
-    expect(nova).toMatch(/<select\s+id="oc-filial"/);
+    // O campo Filial da D542 saiu (D549): a OC escolhe só a empresa.
+    expect(nova).not.toContain('oc-filial');
+    expect(nova).not.toMatch(/label="Filial"/);
   });
 });
