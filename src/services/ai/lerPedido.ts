@@ -9,7 +9,7 @@
  * que `enviar` nunca é chamado nos dois casos.
  */
 
-import type { Item } from '../../domain/types';
+import type { ResultadoDaLeitura } from './extractItems';
 import {
   MAX_PAGINAS,
   mensagemDePaginas,
@@ -21,7 +21,7 @@ import type { ArquivoAberto } from './pdfToImages';
 
 export interface DepsDaLeitura {
   abrir: (arquivo: File, tipo: TipoDoArquivo) => Promise<ArquivoAberto>;
-  enviar: (imagens: string[]) => Promise<Item[]>;
+  enviar: (imagens: string[]) => Promise<ResultadoDaLeitura>;
 }
 
 /** Erro que a própria importação explica — a mensagem vai inteira para a tela. */
@@ -35,7 +35,7 @@ async function depsReais(): Promise<DepsDaLeitura> {
   return { abrir: abrirArquivo, enviar: extractItemsFromImages };
 }
 
-export async function lerPedido(arquivos: File[], deps?: DepsDaLeitura): Promise<Item[]> {
+export async function lerPedido(arquivos: File[], deps?: DepsDaLeitura): Promise<ResultadoDaLeitura> {
   if (arquivos.length === 0) throw new ErroDaImportacao('Nenhum arquivo chegou.');
 
   // 1. Tipo — todos, antes de abrir qualquer um.
@@ -63,4 +63,18 @@ export async function lerPedido(arquivos: File[], deps?: DepsDaLeitura): Promise
   if (imagens.length > MAX_PAGINAS) throw new ErroDaImportacao(mensagemDePaginas(imagens.length));
 
   return d.enviar(imagens);
+}
+
+/**
+ * A lista de materiais colada em texto (CTO-D557): vai inteira, como veio —
+ * quem organiza é a IA, e os limites são do servidor. Caixa vazia não sai do
+ * navegador.
+ */
+export async function lerLista(
+  texto: string,
+  enviar?: (texto: string) => Promise<ResultadoDaLeitura>,
+): Promise<ResultadoDaLeitura> {
+  if (texto.trim() === '') throw new ErroDaImportacao('Cole a lista de materiais na caixa de texto.');
+  const e = enviar ?? (await import('./extractItems')).organizarTexto;
+  return e(texto);
 }

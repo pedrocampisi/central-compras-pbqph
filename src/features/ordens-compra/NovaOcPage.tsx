@@ -20,7 +20,9 @@ import { uid } from '../../domain/id';
 import { UN_PADRAO } from '../../domain/constants';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
-import { ErroDaImportacao, lerPedido } from '../../services/ai/lerPedido';
+import { ErroDaImportacao, lerLista, lerPedido } from '../../services/ai/lerPedido';
+import type { ResultadoDaLeitura } from '../../services/ai/extractItems';
+import { avisoDaLeitura } from '../../domain/importacao';
 import { CampoDeImportacao } from './CampoDeImportacao';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
@@ -87,9 +89,11 @@ interface ItemsTableProps {
   onRemove: (id: string) => void;
   onAdd: () => void;
   semVazio?: boolean;
+  /** A dúvida da IA por item (D557) — da tela, nunca do item. */
+  confira?: Record<string, string>;
 }
 
-function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsTableProps) {
+function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira = {} }: ItemsTableProps) {
   if (items.length === 0) {
     // Com o campo de importação aberto, é ele que ocupa o lugar do vazio.
     if (semVazio) return null;
@@ -124,8 +128,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsT
         <tbody>
           {items.map((it, idx) => {
             const { total } = computeItemTotal(it);
+            const duvida = confira[it.id];
             return (
-              <tr key={it.id}>
+              <tr key={it.id} className={duvida ? styles.linhaConfira : undefined}>
                 <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>{idx + 1}</td>
                 <td>
                   <select
@@ -146,6 +151,11 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsT
                     placeholder="Descrição do item"
                     onChange={(e) => onUpdate(it.id, { descricao: e.target.value })}
                   />
+                  {duvida && (
+                    <span className={styles.confira} title={duvida} data-confira="">
+                      <Icon name="alerta" size={12} /> Confira<span className={styles.confiraTexto}>: {duvida}</span>
+                    </span>
+                  )}
                 </td>
                 <td>
                   <input
@@ -161,6 +171,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsT
                     min={0}
                     step="any"
                     value={it.quantidade === 0 ? '' : it.quantidade}
+                    placeholder="0"
                     onChange={(e) => onUpdate(it.id, { quantidade: Number(e.target.value) || 0 })}
                   />
                 </td>
@@ -180,6 +191,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio }: ItemsT
                     min={0}
                     step="any"
                     value={it.preco_unit === 0 ? '' : it.preco_unit}
+                    placeholder="0"
                     onChange={(e) => onUpdate(it.id, { preco_unit: Number(e.target.value) || 0 })}
                   />
                 </td>
@@ -291,6 +303,13 @@ function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
   );
 }
 
+/** A mensagem de uma leitura que falhou: a da importação vai como está. */
+function mensagemDaFalha(err: unknown): string {
+  return err instanceof ErroDaImportacao
+    ? err.message
+    : `Erro na importação: ${err instanceof Error ? err.message : 'Erro desconhecido'}`;
+}
+
 // ── NovaOcPage ────────────────────────────────────────────────────────────────
 
 export function NovaOcPage() {
@@ -313,6 +332,13 @@ export function NovaOcPage() {
   const [importAberto, setImportAberto] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importErro, setImportErro] = useState('');
+  // A lista em texto (CTO-D557). O texto é da PÁGINA: a leitura que falha não o apaga.
+  const [importTexto, setImportTexto] = useState('');
+  const [importOQue, setImportOQue] = useState<'arquivo' | 'texto'>('arquivo');
+  const [importIgnoradas, setImportIgnoradas] = useState<string[]>([]);
+  // O "confira" da IA, por id do item. Fica AQUI, fora do item: o item vai ao
+  // banco e ao PDF, a dúvida não. Some ao editar a linha e ao salvar.
+  const [confira, setConfira] = useState<Record<string, string>>({});
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -389,6 +415,7 @@ export function NovaOcPage() {
         idDaTentativa(),
       );
       tentativaRef.current = null;
+      setConfira({}); // salvo: o "confira" era da tela, e some
       await recarregarDados();
       stopEditing();
       showToast(
@@ -429,6 +456,7 @@ export function NovaOcPage() {
         idDaTentativa(),
       );
       tentativaRef.current = null;
+      setConfira({}); // salvo: o "confira" era da tela, e some
 
       // O número e a versão vêm do banco — é lá que eles nascem.
       const emitida: OrdemCompra = {
@@ -530,28 +558,81 @@ export function NovaOcPage() {
 
   // ── AI Import ───────────────────────────────────────────────────────────────
 
+  const fecharImportacao = useCallback(() => {
+    setImportAberto(false);
+    setImportErro('');
+    setImportIgnoradas([]);
+  }, []);
+
+  // O fim de qualquer leitura: os itens entram SOMADOS, o aviso diz quantos
+  // entraram e quantas linhas ficaram de fora, e as ignoradas ficam à vista
+  // no campo até a pessoa fechar. Sem item nenhum, é falha: nada entra.
+  const aplicarLeitura = useCallback((r: ResultadoDaLeitura, origem: 'arquivo' | 'texto'): boolean => {
+    setImportIgnoradas(r.ignoradas);
+    if (!r.itens.length) {
+      setImportErro(origem === 'texto'
+        ? 'A IA não encontrou itens no texto.'
+        : 'A IA não encontrou itens no arquivo. Tente uma imagem mais nítida.');
+      return false;
+    }
+    appendItems(r.itens);
+    setConfira((antes) => ({ ...antes, ...r.confira }));
+    showToast(avisoDaLeitura(r.itens.length, r.ignoradas.length), 'success');
+    if (r.ignoradas.length === 0) setImportAberto(false);
+    return true;
+  }, [appendItems, showToast]);
+
   // Os arquivos que entraram de uma vez viram UMA leitura (lerPedido): tipo
   // errado e página demais param antes do servidor, e o aviso fica no campo.
   const handleImportFiles = useCallback(async (arquivos: File[]) => {
     if (!data || importing) return;
     setImporting(true);
+    setImportOQue('arquivo');
     setImportErro('');
+    setImportIgnoradas([]);
     try {
-      const items = await lerPedido(arquivos);
-      if (!items.length) { setImportErro('A IA não encontrou itens no arquivo. Tente uma imagem mais nítida.'); return; }
-      appendItems(items);
-      setImportAberto(false);
-      showToast(`${items.length} item(ns) importado(s) via IA.`, 'success');
+      aplicarLeitura(await lerPedido(arquivos), 'arquivo');
     } catch (err) {
-      setImportErro(
-        err instanceof ErroDaImportacao
-          ? err.message
-          : `Erro na importação: ${err instanceof Error ? err.message : 'Erro desconhecido'}`,
-      );
+      setImportErro(mensagemDaFalha(err));
     } finally {
       setImporting(false);
     }
-  }, [data, importing, appendItems, showToast]);
+  }, [data, importing, aplicarLeitura]);
+
+  // A lista colada em texto (D557): deu certo, a caixa esvazia; falhou, o
+  // texto fica lá para tentar de novo.
+  const handleOrganizarTexto = useCallback(async () => {
+    if (!data || importing || importTexto.trim() === '') return;
+    setImporting(true);
+    setImportOQue('texto');
+    setImportErro('');
+    setImportIgnoradas([]);
+    try {
+      if (aplicarLeitura(await lerLista(importTexto), 'texto')) setImportTexto('');
+    } catch (err) {
+      setImportErro(mensagemDaFalha(err));
+    } finally {
+      setImporting(false);
+    }
+  }, [data, importing, importTexto, aplicarLeitura]);
+
+  // Editar a linha é conferir: o aviso some. Remover também.
+  const tirarConfira = useCallback((id: string) => {
+    setConfira((antes) => {
+      if (!(id in antes)) return antes;
+      const resto = { ...antes };
+      delete resto[id];
+      return resto;
+    });
+  }, []);
+  const editarItem = useCallback((id: string, partial: Partial<Item>) => {
+    updateItem(id, partial);
+    tirarConfira(id);
+  }, [updateItem, tirarConfira]);
+  const removerItem = useCallback((id: string) => {
+    removeItem(id);
+    tirarConfira(id);
+  }, [removeItem, tirarConfira]);
 
   // ── Render guard ────────────────────────────────────────────────────────────
 
@@ -712,18 +793,24 @@ export function NovaOcPage() {
           <ItemsTable
             items={ocEditing.itens}
             ecrs={data.ecrs}
-            onUpdate={updateItem}
-            onRemove={removeItem}
+            onUpdate={editarItem}
+            onRemove={removerItem}
             onAdd={addItem}
             semVazio={importAberto}
+            confira={confira}
           />
           {importAberto && (
             <div className={styles.campoImportacao}>
               <CampoDeImportacao
                 lendo={importing}
+                oQueLe={importOQue}
                 erro={importErro}
                 onArquivos={(arquivos) => void handleImportFiles(arquivos)}
-                onFechar={() => { setImportAberto(false); setImportErro(''); }}
+                onFechar={fecharImportacao}
+                texto={importTexto}
+                onTexto={setImportTexto}
+                onOrganizar={() => void handleOrganizarTexto()}
+                ignoradas={importIgnoradas}
               />
             </div>
           )}
@@ -732,7 +819,7 @@ export function NovaOcPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setImportAberto(true); setImportErro(''); }}
+              onClick={() => { setImportAberto(true); setImportErro(''); setImportIgnoradas([]); }}
               disabled={importAberto}
               title="Importar os itens de um pedido (PDF, foto ou print) pela IA"
             >

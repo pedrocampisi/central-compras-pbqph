@@ -124,6 +124,32 @@
   margin-top: 0;
 }
 
+/* ── O "confira" da leitura de texto (CTO-D557) ──────────────────────────────
+   A linha fica marcada, e a dúvida aparece ao passar o mouse. No celular não
+   há mouse: o texto vem escrito na própria linha. É aviso da TELA — não vai ao
+   banco nem ao PDF, e some quando a pessoa edita a linha ou salva. */
+.linhaConfira {
+  background: var(--aviso-bg);
+  box-shadow: inset 3px 0 0 var(--aviso);
+}
+.linhaConfira:hover { background: var(--aviso-bg) !important; }
+.confira {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--aviso);
+  cursor: help;
+}
+.confiraTexto { display: none; font-weight: 500; }
+@media (max-width: 700px), (pointer: coarse) {
+  .confira { display: block; white-space: normal; line-height: 1.35; }
+  .confira svg { vertical-align: -2px; }
+  .confiraTexto { display: inline; }
+}
+
 /* ── Totals panel ──────────────────────────────────────────────────────────── */
 
 .totalsPanel {
