@@ -1,6 +1,6 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 25/09/2026
+> **Data:** 26/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
@@ -99,6 +99,13 @@ compras.marcar_pdf_gerado(p_oc_id uuid) → timestamptz
   `serialization_failure` (código `40001`), que a camada converte em
   `ConflitoDeVersao` — a mensagem do banco já está pronta para a tela, não
   reescreva.
+- **Obra e Fornecedor se escolhem com pesquisa** (`components/CampoPesquisavel`, regra em
+  `domain/pesquisa.ts`): Nova OC e filtros do Histórico. Os outros campos de escolha continuam
+  `<select>` de propósito (palavra do Pedro, D541); há teste que falha se isso mudar.
+- **A tela confere a própria versão** (`services/versao.ts`, regra em `domain/versao.ts`): o build
+  grava `AAAAMMDDhhmmss-commit` no pacote e em `/versao.txt` (fora do precache); ao abrir e ao
+  voltar o foco, se mudou, recarrega — menos com OC em edição (avisa). Publicação que anda junto
+  com mudança do banco depende disto: sem ele, o cliente velho fica no velho. Decisão 35.
 - **Material e serviço do fornecedor vêm de `core.fornecedor_resolvido`** (a filial, ou a
   empresa-mãe `core.empresa_raiz` quando a filial está em branco), juntados pelo id em
   `linhas.ts#bandeirasResolvidas` — nunca da filial crua (CTO-D519). O **cadastro novo** ensina a

@@ -1,6 +1,6 @@
 # Caderno de decisões — Ordem de Compra
 
-> **Data:** 25/09/2026
+> **Data:** 26/09/2026
 > **Estado:** VALE HOJE — este caderno é mantido, e cresce por baixo
 > **Escopo:** por que cada coisa desta casa é como é. **Não** descreve como as coisas estão hoje
 > (isso é o [`INDICE.md`](INDICE.md)) nem o que falta fazer (isso é
@@ -1645,3 +1645,75 @@ tela, só quais linhas chegam, e isso está medido.
 ```
 Voltar é publicar a `ba1c9806…` pelo `wrangler rollback`. A fumaça logada é do Pedro, quando ele
 abrir a OC.
+
+---
+
+## Decisão 35 — a pausa acabou para uma lista: pesquisa na Obra e no Fornecedor, a tela que confere a própria versão, o primeiro acesso e a Nova OC a 375px · 26/09/2026
+
+**A PALAVRA** — do Pedro, na janela do `CTO`, 26/09 ~10h1x, com a foto da Nova OC com a lista de
+Fornecedor vazia (CTO-D541): *"Antes de testar, vamos às melhorias e como ninguém está usando vamos
+jogar na produção direto. Cadê os fornecedores?"* e *"Quando a pessoa for selecionar tinha que ter
+uma forma de pesquisar (...) 30 obras (...) a mesma coisa com os fornecedores. Os outros não precisa
+de pesquisa."*
+
+**1. A LISTA VAZIA, E O CLIENTE VELHO.** O navegador do Pedro rodava o pacote de 15/09 (`ba1c9806`),
+guardado pelo service worker, que filtra pelo `fornece_material` cru da filial — e o cru foi a 0 às
+09h59 com a limpeza das filiais (D540 do CTO). Medido aqui, com dois pacotes servidos em sequência
+no navegador embutido:
+
+```
+   pacote de ate' hoje (registerSW.js so' registra; sem recarga)
+     aba aberta desde antes ...... fica no velho indefinidamente (1 min parada: nada)
+     1a visita depois ............ roda o VELHO; o worker novo baixa por tras, sem recarregar
+     2a visita ................... roda o novo
+   pacote novo (o vigia da versao)
+     aba aberta, volta o foco .... recarrega sozinha em < 5s, ja' no novo (1 passo)
+     visita com o velho no cache . abre o velho, confere, recarrega sozinha no novo
+```
+
+**O vigia** (`src/services/versao.ts`, regra pura em `src/domain/versao.ts`): o build grava
+`AAAAMMDDhhmmss-commit` dentro do pacote e em `/versao.txt` (fora do precache, de propósito). Ao
+abrir e a cada volta do foco (no máximo a cada 30s), a tela lê o arquivo sem cache; se mudou, pede
+ao worker o pacote novo, espera ele assumir e recarrega. **Com OC em edição não recarrega** — a OC
+mora só na memória: avisa, e troca quando a edição termina. **Sem laço:** não recarrega duas vezes
+pela mesma versão; e o que não tem o formato não é versão — medido: arquivo inexistente no
+Cloudflare volta `200 text/html` (a página inicial), e sem essa trava a tela recarregaria para
+sempre. O `conferir:pacote` ganhou a 5ª pergunta (a versão é legível, está no JS e fora do
+precache) — e ela reprovou um pacote CERTO na estreia: o minificador escreve a constante entre
+crases, e a pergunta procurava aspas. O defeito era da pergunta; consertada.
+
+**2. PESQUISA NA OBRA E NO FORNECEDOR, e só neles** (`CampoPesquisavel`, regra em
+`domain/pesquisa.ts`). Os lugares, todos: Nova OC Fornecedor e Obra; Histórico, filtros de
+fornecedor e de obra. (O `NovaAvaliacaoDrawer` tem um campo de obra, mas nenhuma tela o abre.) Acha
+por cada palavra, sem acento e sem caixa, no rótulo, na razão social, no fantasia e no **apelido da
+empresa** (`core.fornecedor_resolvido.empresa_apelido`), que aparece como linha menor quando o
+rótulo não o contém — "imperio" acha as filiais da Beija Flor. Pesquisa vazia = lista inteira com a
+opção vazia no topo. Teclado: setas, Enter, Esc, Tab. ECR, unidade, condição e status continuam
+listas (há teste que falha se mudarem).
+
+**3. O PRIMEIRO ACESSO** — pendência 9 b–f, ver Fechadas. O envio é o mesmo link do Supabase nos
+dois casos; muda o que se diz (`textosDoAcesso.ts`).
+
+**4. A NOVA OC A 375px** — pendência 12, ver Fechadas.
+
+**AS TRAVAS (CTO-D297):** 9 sabotagens, todas mordendo (saída 1) e restauradas com hash igual —
+pesquisa vazia deixa de mostrar tudo (1 vermelho); a pesquisa para de filtrar (7); apelido e
+fantasia saem (1); um campo sem pesquisa deixa de ser lista (1); a trava contra laço some (1);
+recarrega com OC em edição (1); aceita a página inicial como versão (1); a frase antiga do primeiro
+acesso volta (1); o campo Senha volta no primeiro acesso (1). 149 verdes, lint, tipos e build.
+
+**PUBLICADO, direto na produção (emenda 3 + palavra do Pedro):**
+
+```
+   saiu do ar .... ce7f479e-0020-4982-8066-fd0adec5f9dc (25/09) — O DESFAZER
+   entrou ........ 0439a829-6134-4031-a37a-b2be33ffa2fc, versao 20260926134940-beae35d
+   medido depois . /versao.txt 200 text/plain com a versao; bundle index-CDKmPNbL.js com a
+                   versao, fornecedor_resolvido, empresa_apelido, "Nada encontrado", o botao
+                   do primeiro acesso; ref da producao presente, do ensaio 0; sw.js sem
+                   versao.txt; /, manifesto, registerSW.js, sw.js 200
+```
+
+**O QUE NÃO FOI VISTO:** a tela logada, com os dados de verdade. A pesquisa e a Nova OC a 375px
+foram vistas numa página de prova temporária com a tela real e dados inventados (apagada depois);
+a prova no ar é a conferência do Pedro. Quem ainda tem o pacote de 25/09 (sem o vigia) sai dele
+com Ctrl+Shift+R, ou abrindo o endereço duas vezes; daqui para a frente, sai sozinho.

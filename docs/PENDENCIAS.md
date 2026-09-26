@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 15/09/2026
+> **Data:** 26/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** o que **esta casa** tem para fazer, na ordem em que se faz. O que espera outro
 > agente está na pasta [`Enviados/`](Enviados/); o que chegou e não foi tratado, em
@@ -15,7 +15,12 @@ mais barato que carta apontando para o item errado.
 
 ---
 
-## ⏸️ Esta casa está pausada — palavra do Pedro em 04/09/2026
+## ⏸️ Esta casa está pausada — palavra do Pedro em 04/09/2026 (com a lista de 26/09 fora dela)
+
+> ▶️ **26/09/2026 — a pausa acabou para uma lista (CTO-D541, palavra do Pedro na janela do CTO):**
+> pesquisa na Obra e no Fornecedor, o primeiro acesso (pendência 9 b–f) e a Nova OC a 375px
+> (pendência 12), **direto na produção**. Feitas e NO AR no mesmo dia (decisão 35). As
+> pendências 2, 3 e 4 continuam pausadas.
 
 > *"quero pausar a ordem de compra por enquanto e focar na central financeira"*
 
@@ -213,7 +218,33 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 9. Conferência da UI de 07/09 — a lista, e a porta que barra 9 de cada 10 telas
+### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
+
+*Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
+Supabase dentro) não entrou: o app tentou renovar a sessão, o banco recusou, a tela voltou ao login,
+e o `restore-save` gravou o estado já sem sessão (786 bytes). **Não peço login ao Pedro** para uma
+prova (decisão 33, régua do `CTO`). **Resposta do `CTO` (D536, 25/09):** a conta que entra por programa
+**não vai existir** — um programa que lê a senha e entra é o agente entrando por outro caminho. O
+caminho é o Pedro entrar **uma vez** com a Conta de ensaio, com o `restore` armado **antes**, quando
+ele sentar para outra coisa. Não segura publicação que não muda a cara da tela (a da decisão 34 não
+segurou).
+
+---
+
+## ✅ Fechadas (registro)
+
+### A pendência 9 (b–f) e a 12: o primeiro acesso e a Nova OC a 375px — 26/09/2026
+
+Fechadas pela decisão 35 (CTO-D541), NO AR na versão `0439a829` (`20260926134940-beae35d`).
+**b/c:** "Primeiro acesso" e "Esqueci minha senha" têm cada um a sua frase, e a ação laranja vira
+o botão de enviar (sem o campo Senha). **d:** "Esqueci minha senha" com 44px (era 29). **e:**
+rodapé em 12,5px (era 11,5). **f:** as três telas da porta dentro de `<main>`. **12:** o título da
+Nova OC em uma linha e a fila de botões quebrando entre botões, 0px de rolagem para o lado a 375px.
+Visto numa página de prova com a tela real e dados inventados (a tela logada não se vê daqui). O
+envio com e-mail de verdade **não foi apertado**: é do Pedro, na conferência dele. O texto antigo
+das duas pendências fica abaixo, como estava.
+
+#### (era a 9) Conferência da UI de 07/09 — a lista, e a porta que barra 9 de cada 10 telas
 
 *Minha, esperando triagem do `CTO`.* Medida em 07/09/2026 no navegador embutido, a pedido do
 Pedro. **Conferido e não consertado**: a casa está pausada.
@@ -284,7 +315,7 @@ Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-par
 
 ---
 
-### 12. A tela de OC quebra a 375px fora dos campos: título e botões
+#### (era a 12) A tela de OC quebra a 375px fora dos campos: título e botões
 
 *Meu, quando a pausa acabar.* Visto em 15/09 na prova das decisões 31 e 32, dentro do ensaio:
 o título "Nova Ordem de Compra" quebra palavra por palavra e a fila de botões (Cancelar · Visualizar
@@ -292,20 +323,6 @@ o título "Nova Ordem de Compra" quebra palavra por palavra e a fila de botões 
 **campos** estão certos (uma coluna, sem cortar) depois das duas linhas de CSS da decisão 32. É a
 continuação da pendência 9 — que só tinha visto a tela de entrada — para a primeira tela de dentro.
 
-### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
-
-*Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
-Supabase dentro) não entrou: o app tentou renovar a sessão, o banco recusou, a tela voltou ao login,
-e o `restore-save` gravou o estado já sem sessão (786 bytes). **Não peço login ao Pedro** para uma
-prova (decisão 33, régua do `CTO`). **Resposta do `CTO` (D536, 25/09):** a conta que entra por programa
-**não vai existir** — um programa que lê a senha e entra é o agente entrando por outro caminho. O
-caminho é o Pedro entrar **uma vez** com a Conta de ensaio, com o `restore` armado **antes**, quando
-ele sentar para outra coisa. Não segura publicação que não muda a cara da tela (a da decisão 34 não
-segurou).
-
----
-
-## ✅ Fechadas (registro)
 
 ### A porta fotografa sozinha, e a OC provou do outro lado — 15/09/2026
 
