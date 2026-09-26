@@ -32,7 +32,8 @@ import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import styles from './NovaOcPage.module.css';
 import {
-  enderecoResumido, fornecedoresParaOc, opcoesDeFornecedor, opcoesDeObra,
+  agruparPorEmpresa, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
+  motivoForaDaOc, opcoesDeEmpresa, opcoesDeObra, rotuloDaFilial,
 } from '../../domain/fornecedores';
 import {
   MENSAGEM_OBRA_SEM_DESTINATARIO, destinatarioDaObra, rotuloFaturarPara,
@@ -309,6 +310,14 @@ export function NovaOcPage() {
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
+  // A empresa escolhida que ainda espera a filial (D542). Presa à OC aberta:
+  // outra OC não herda a espera.
+  const [empresaEsperando, setEmpresaEsperando] = useState<{ oc: string; chave: string } | null>(null);
+  const faltaFornecedor = useCallback(
+    (ocId: string) =>
+      empresaEsperando?.oc === ocId ? 'Selecione a filial do fornecedor.' : 'Selecione um fornecedor.',
+    [empresaEsperando],
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
 
@@ -365,7 +374,7 @@ export function NovaOcPage() {
 
   const handleSaveDraft = useCallback(async () => {
     if (!ocEditing || !data) return;
-    if (!ocEditing.fornecedor_id) { showToast('Selecione um fornecedor.', 'warning'); return; }
+    if (!ocEditing.fornecedor_id) { showToast(faltaFornecedor(ocEditing.id), 'warning'); return; }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
@@ -390,11 +399,11 @@ export function NovaOcPage() {
     } finally {
       setSavingDraft(false);
     }
-  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro, faltaFornecedor]);
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
-    if (!ocEditing.fornecedor_id) { showToast('Selecione um fornecedor.', 'warning'); return; }
+    if (!ocEditing.fornecedor_id) { showToast(faltaFornecedor(ocEditing.id), 'warning'); return; }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
 
@@ -475,7 +484,7 @@ export function NovaOcPage() {
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro, faltaFornecedor]);
 
   /**
    * Abre o PDF da OC em uma nova aba SEM emitir — para conferência antes
@@ -542,10 +551,35 @@ export function NovaOcPage() {
     );
   }
 
-  // Só quem fornece material, e ativo. Filial aparece com cidade e final do
-  // CNPJ quando a razão social se repete — regra em domain/fornecedores.ts.
-  const fornecedoresAtivos = fornecedoresParaOc(data.fornecedores);
+  // Por EMPRESA, e a filial depois (D542) — regra em domain/fornecedores.ts.
+  // Entra quem fornece material, ativo e não bloqueado; a filial já gravada na
+  // OC aberta entra também, para o rascunho não trocar de fornecedor sozinho.
+  const fornecedoresAtivos = fornecedoresParaOc(data.fornecedores, ocEditing.fornecedor_id);
+  const empresas = agruparPorEmpresa(fornecedoresAtivos);
   const fornecedorEscolhido = fornecedoresAtivos.find((f) => f.id === ocEditing.fornecedor_id);
+  const chaveEscolhida = fornecedorEscolhido
+    ? chaveDaEmpresa(fornecedorEscolhido)
+    : empresaEsperando?.oc === ocEditing.id
+      ? empresaEsperando.chave
+      : '';
+  const empresaEscolhida = empresas.find((g) => g.chave === chaveEscolhida);
+  const pedeFilial = (empresaEscolhida?.filiais.length ?? 0) > 1;
+  // A pista de sempre: razão social, endereço e CNPJ inteiro da filial — embaixo
+  // do último campo do fornecedor. Fora da lista hoje, diz o porquê.
+  const pistaDoFornecedor = fornecedorEscolhido
+    ? [
+        fornecedorEscolhido.razao_social,
+        enderecoResumido(fornecedorEscolhido),
+        motivoForaDaOc(fornecedorEscolhido) ? `Atenção: ${motivoForaDaOc(fornecedorEscolhido)}` : '',
+      ].filter(Boolean).join(' · ')
+    : undefined;
+
+  function escolherEmpresaNaOc(chave: string) {
+    if (!ocEditing) return;
+    const r = escolherEmpresa(empresas.find((g) => g.chave === chave), ocEditing.fornecedor_id);
+    setEmpresaEsperando(r.empresaEsperando ? { oc: ocEditing.id, chave: r.empresaEsperando } : null);
+    if (r.fornecedorId !== ocEditing.fornecedor_id) updateField('fornecedor_id', r.fornecedorId);
+  }
   const obrasAtivas = data.obras.filter((o) => o.ativa);
   // O destinatário da nota é da obra: a tela mostra em leitura, não escolhe.
   const obraEscolhida = data.obras.find((o) => o.id === ocEditing.obra_id);
@@ -602,17 +636,46 @@ export function NovaOcPage() {
 
       {/* ── Identificação ────────────────────────────────────────────────── */}
       <FieldGroup title="Identificação da OC">
-        {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas. */}
-        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={enderecoResumido(fornecedorEscolhido)}>
+        {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas.
+            O Fornecedor é a EMPRESA; a filial vem depois, só quando há mais de
+            uma, numa lista simples — são no máximo onze (D542). */}
+        <FieldShell
+          label="Fornecedor"
+          required
+          htmlFor="oc-fornecedor"
+          hint={pedeFilial ? undefined : pistaDoFornecedor}
+        >
           <CampoPesquisavel
             id="oc-fornecedor"
             required
             rotuloVazio="Selecione…"
-            opcoes={opcoesDeFornecedor(fornecedoresAtivos)}
-            valor={ocEditing.fornecedor_id}
-            onEscolher={(v) => updateField('fornecedor_id', v)}
+            opcoes={opcoesDeEmpresa(empresas)}
+            valor={chaveEscolhida}
+            onEscolher={escolherEmpresaNaOc}
           />
         </FieldShell>
+
+        {pedeFilial && empresaEscolhida && (
+          <FieldShell label="Filial" required htmlFor="oc-filial" hint={pistaDoFornecedor}>
+            <select
+              id="oc-filial"
+              required
+              value={fornecedorEscolhido ? fornecedorEscolhido.id : ''}
+              onChange={(e) => {
+                if (e.target.value) setEmpresaEsperando(null);
+                else setEmpresaEsperando({ oc: ocEditing.id, chave: empresaEscolhida.chave });
+                updateField('fornecedor_id', e.target.value);
+              }}
+            >
+              <option value="">Selecione a filial…</option>
+              {empresaEscolhida.filiais.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {rotuloDaFilial(f, empresaEscolhida.filiais)}
+                </option>
+              ))}
+            </select>
+          </FieldShell>
+        )}
 
         <FieldShell
           label="Obra"

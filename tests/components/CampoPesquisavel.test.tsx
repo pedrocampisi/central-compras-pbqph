@@ -83,7 +83,7 @@ describe('só Obra e Fornecedor têm pesquisa (palavra do Pedro: "os outros não
   it('são exatamente quatro lugares: Nova OC (2) e os filtros do Histórico (2)', () => {
     expect(nova.match(/<CampoPesquisavel\b/g)).toHaveLength(2);
     expect(hist.match(/<CampoPesquisavel\b/g)).toHaveLength(2);
-    expect(nova).toContain('opcoesDeFornecedor(fornecedoresAtivos)');
+    expect(nova).toContain('opcoesDeEmpresa(empresas)');
     expect(nova).toContain('opcoesDeObra(obrasAtivas)');
   });
 
@@ -92,5 +92,7 @@ describe('só Obra e Fornecedor têm pesquisa (palavra do Pedro: "os outros não
     expect(nova).toMatch(/<select[\s\S]*?UN_PADRAO/);
     expect(nova).toMatch(/as="select"\s+label="Condição de Pagamento"/);
     expect(hist).toMatch(/<FilterSelect[\s\S]*?Todos os status/);
+    // A Filial (D542) é lista simples: são no máximo onze.
+    expect(nova).toMatch(/<select\s+id="oc-filial"/);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { filtrarOpcoes, normalizarBusca } from '../../src/domain/pesquisa';
-import { opcoesDeFornecedor, opcoesDeObra } from '../../src/domain/fornecedores';
+import { agruparPorEmpresa, opcoesDeEmpresa, opcoesDeObra } from '../../src/domain/fornecedores';
 import type { Fornecedor, Obra } from '../../src/domain/types';
 
 // Nomes inventados. Nenhum dado de pessoa.
@@ -50,25 +50,20 @@ describe('filtrarOpcoes — a lista filtra enquanto a pessoa digita (D541)', () 
   });
 });
 
-describe('opcoesDeFornecedor — acha pelo apelido, pela razão social e pelo fantasia', () => {
+describe('opcoesDeEmpresa — acha pelo apelido, pela razão social e pelo fantasia', () => {
   const lista = [
-    forn({ id: 'b', razao_social: 'Beija Flor Comércio de Tintas', empresa_apelido: 'Império das Tintas' }),
-    forn({ id: 'c', razao_social: 'Cimentos do Planalto Ltda', nome_fantasia: 'CimPlan' }),
+    forn({ id: 'b', empresa_id: 'E1', razao_social: 'Beija Flor Comércio de Tintas', empresa_apelido: 'Império das Tintas' }),
+    forn({ id: 'c', empresa_id: 'E2', razao_social: 'Cimentos do Planalto Ltda', nome_fantasia: 'CimPlan', empresa_apelido: 'Ciplan' }),
   ];
-  const opcoes = opcoesDeFornecedor(lista);
+  const opcoes = opcoesDeEmpresa(agruparPorEmpresa(lista));
 
-  it('pelo apelido da empresa — e o apelido aparece como linha menor', () => {
-    expect(filtrarOpcoes(opcoes, 'imperio').map((o) => o.valor)).toEqual(['b']);
-    expect(opcoes[0]?.detalhe).toBe('Império das Tintas');
+  it('o rótulo é o apelido, e a pesquisa acha por ele', () => {
+    expect(opcoes.map((o) => o.rotulo)).toEqual(['Ciplan', 'Império das Tintas']);
+    expect(filtrarOpcoes(opcoes, 'imperio').map((o) => o.valor)).toEqual(['E1']);
   });
 
-  it('pela razão social e pelo fantasia', () => {
-    expect(filtrarOpcoes(opcoes, 'beija').map((o) => o.valor)).toEqual(['b']);
-    expect(filtrarOpcoes(opcoes, 'cimplan').map((o) => o.valor)).toEqual(['c']);
-  });
-
-  it('apelido que já está no rótulo não se repete embaixo', () => {
-    const [o] = opcoesDeFornecedor([forn({ id: 'x', razao_social: 'Zapi Materiais', empresa_apelido: 'Zapi' })]);
-    expect(o?.detalhe).toBeUndefined();
+  it('pela razão social e pelo fantasia da filial', () => {
+    expect(filtrarOpcoes(opcoes, 'beija').map((o) => o.valor)).toEqual(['E1']);
+    expect(filtrarOpcoes(opcoes, 'cimplan').map((o) => o.valor)).toEqual(['E2']);
   });
 });

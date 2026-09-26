@@ -26,7 +26,7 @@ import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
-  bandeirasResolvidas, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
+  bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
   ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco, raizDoDocumento,
 } from './linhas';
 
@@ -46,7 +46,7 @@ export async function carregarDados(): Promise<Data> {
     // Material e serviço RESOLVIDOS (a filial, ou a mãe quando a filial está em
     // branco): é por eles que a lista da OC filtra desde a CTO-D519. O resto
     // do cadastro (endereço, telefones) continua vindo da filial, acima.
-    core().from('fornecedor_resolvido').select('id, fornece_material, presta_servico, empresa_apelido'),
+    core().from('fornecedor_resolvido').select('id, fornece_material, presta_servico, empresa_apelido, empresa_id, bloqueado_para_compra_nova'),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável; o
     // destinatário da nota (empresa OU cliente, trava do banco) vem junto
@@ -151,6 +151,8 @@ function paraFornecedor(
     ...bandeirasResolvidas(l, resolvidoPorId),
     // O apelido da empresa, só para a pesquisa achar pelo nome do Pedro (D541).
     empresa_apelido: vazio(resolvidoPorId.get(String(l['id']))?.['empresa_apelido']) || undefined,
+    // A empresa e o bloqueio, para a lista da OC agrupar e filtrar (D542).
+    ...empresaResolvida(l, resolvidoPorId),
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
   };

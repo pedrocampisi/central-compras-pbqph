@@ -137,6 +137,24 @@ export function bandeirasResolvidas(
   };
 }
 
+/**
+ * A empresa da filial e o bloqueio para compra nova, lidos da
+ * `core.fornecedor_resolvido` (CTO-D542). A empresa é a do BANCO — a tela não
+ * calcula raiz para agrupar. `null` vira `undefined` nos dois.
+ */
+export function empresaResolvida(
+  crua: Record<string, unknown>,
+  resolvidoPorId: ReadonlyMap<string, Record<string, unknown>>,
+): Pick<Fornecedor, 'empresa_id' | 'bloqueado_para_compra_nova'> {
+  const resolvida = resolvidoPorId.get(String(crua['id']));
+  const empresa = resolvida?.['empresa_id'];
+  const bloqueado = resolvida?.['bloqueado_para_compra_nova'];
+  return {
+    empresa_id: typeof empresa === 'string' && empresa !== '' ? empresa : undefined,
+    bloqueado_para_compra_nova: typeof bloqueado === 'boolean' ? bloqueado : undefined,
+  };
+}
+
 /** A raiz do CNPJ (8 primeiros dígitos) — a empresa-mãe. CPF e vazio: nenhuma. */
 export function raizDoDocumento(documento: string | undefined): string | null {
   const d = (documento ?? '').replace(/\D/g, '');

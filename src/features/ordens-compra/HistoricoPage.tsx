@@ -27,7 +27,10 @@ import { definirStatusOc, marcarPdfGerado, ConflitoDeVersao } from '../../servic
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
-import { opcoesDeFornecedor, opcoesDeObra } from '../../domain/fornecedores';
+import {
+  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
+} from '../../domain/fornecedores';
+import { normalizarBusca } from '../../domain/pesquisa';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -50,6 +53,26 @@ export function HistoricoPage() {
     () => new Map((data?.fornecedores ?? []).map((f) => [f.id, f.razao_social])),
     [data],
   );
+  // O filtro de fornecedor é por empresa: todas as filiais, a bloqueada também —
+  // uma OC antiga pode ser dela (D542).
+  const empresaDoFornecedor = useMemo(
+    () => new Map((data?.fornecedores ?? []).map((f) => [f.id, chaveDaEmpresa(f)])),
+    [data],
+  );
+  const fornecedorBusca = useMemo(
+    () =>
+      new Map(
+        (data?.fornecedores ?? []).map((f) => [
+          f.id,
+          normalizarBusca([f.razao_social, f.nome_fantasia, f.empresa_apelido ?? ''].join(' ')),
+        ]),
+      ),
+    [data],
+  );
+  const opcoesDeEmpresaDoFiltro = useMemo(
+    () => opcoesDeEmpresa(agruparPorEmpresa(data?.fornecedores ?? [])),
+    [data],
+  );
   const obraNome = useMemo(
     () => new Map((data?.obras ?? []).map((o) => [o.id, o.nome])),
     [data],
@@ -59,18 +82,23 @@ export function HistoricoPage() {
     if (!data) return [];
     let list = [...data.ordens_compra].sort((a, b) => (b.criado_em > a.criado_em ? 1 : -1));
     if (histFilter.search) {
-      const q = histFilter.search.toLowerCase();
+      // Pelo número, e pelo fornecedor como a pessoa o chama: razão social,
+      // fantasia ou o apelido da empresa ("imperio" acha a Beija Flor, D542).
+      const q = normalizarBusca(histFilter.search);
       list = list.filter(
         (o) =>
           o.numero.toLowerCase().includes(q) ||
-          (fornecedorNome.get(o.fornecedor_id) ?? '').toLowerCase().includes(q),
+          (fornecedorBusca.get(o.fornecedor_id) ?? '').includes(q),
       );
     }
     if (histFilter.status) list = list.filter((o) => o.status === histFilter.status);
-    if (histFilter.fornecedor) list = list.filter((o) => o.fornecedor_id === histFilter.fornecedor);
+    // Por EMPRESA (D542): escolher a Império traz as OCs de todas as filiais dela.
+    if (histFilter.fornecedor) {
+      list = list.filter((o) => empresaDoFornecedor.get(o.fornecedor_id) === histFilter.fornecedor);
+    }
     if (histFilter.obra) list = list.filter((o) => o.obra_id === histFilter.obra);
     return list;
-  }, [data, histFilter, fornecedorNome]);
+  }, [data, histFilter, fornecedorBusca, empresaDoFornecedor]);
 
   if (!data) return null;
 
@@ -257,7 +285,7 @@ export function HistoricoPage() {
           variante="filtro"
           ariaLabel="Filtrar por fornecedor"
           rotuloVazio="Todos fornecedores"
-          opcoes={opcoesDeFornecedor(data.fornecedores)}
+          opcoes={opcoesDeEmpresaDoFiltro}
           valor={histFilter.fornecedor}
           onEscolher={(v) => setHistFilter({ fornecedor: v })}
         />

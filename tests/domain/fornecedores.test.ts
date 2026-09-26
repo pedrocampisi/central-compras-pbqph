@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  agruparPorEmpresa,
+  cidadeUf,
   enderecoResumido,
-  finalDoCnpj,
+  escolherEmpresa,
   fornecedoresParaOc,
-  rotuloDoFornecedor,
+  motivoForaDaOc,
+  opcoesDeEmpresa,
+  ordemDoCnpj,
+  rotuloDaFilial,
 } from '../../src/domain/fornecedores';
+import { filtrarOpcoes } from '../../src/domain/pesquisa';
 import type { Fornecedor } from '../../src/domain/types';
 
 // Um fornecedor de mentira, com só o que estas regras olham. Nenhum dado de
@@ -62,61 +68,158 @@ describe('fornecedoresParaOc — quem entra na lista da OC', () => {
   });
 });
 
-describe('rotuloDoFornecedor — filial identificada, nome único limpo', () => {
-  const beijaFlor = (id: string, cidade: string, cnpj: string) =>
-    forn({
-      id,
-      razao_social: 'Beija Flor Tintas Ltda',
-      cnpj,
-      fornece_material: true,
-      endereco: { logradouro: '', numero: '', complemento: '', bairro: '', cidade, uf: 'DF', cep: '' },
-    });
+describe('a empresa e a filial (CTO-D542) — a pessoa lê o apelido, e a filial pelo que ela é', () => {
+  // Uma "Império" de mentira: 4 filiais, duas razões sociais, duas cidades, sem
+  // rua — como o cadastro de produção em 26/09/2026. CNPJs inventados.
+  const end = (cidade: string, uf = 'MG', logradouro = '', numero = '', bairro = '') => ({
+    logradouro, numero, complemento: '', bairro, cidade, uf, cep: '',
+  });
+  const filial = (id: string, empresa: string, apelido: string, razao: string, cnpj: string, e = end('UBERLANDIA')) =>
+    forn({ id, empresa_id: empresa, empresa_apelido: apelido, razao_social: razao, cnpj, fornece_material: true, endereco: e });
 
-  it('nome que aparece uma vez fica SÓ o nome — sem sufixo, sem sujeira', () => {
-    const unico = forn({ id: 'x', razao_social: 'Cimentos do Planalto' });
-    const lista = [unico, beijaFlor('b1', 'Brasília', '11.111.111/0001-11')];
-    expect(rotuloDoFornecedor(unico, lista)).toBe('Cimentos do Planalto');
+  const imp1 = filial('i1', 'E-IMP', 'Império das Tintas', 'IMPERIO DAS TINTAS LTDA', '22222222000155');
+  const imp27 = filial('i27', 'E-IMP', 'Império das Tintas', 'BEIJA FLOR COMERCIO DE TINTAS LTDA', '22222222002741');
+  const imp48 = filial('i48', 'E-IMP', 'Império das Tintas', 'BEIJA FLOR COMERCIO DE TINTAS LTDA', '22222222004813', end('Uberlandia'));
+  const impAra = filial('iA', 'E-IMP', 'Império das Tintas', 'BEIJA FLOR COMERCIO DE TINTAS LTDA', '22222222005200', end('ARAGUARI'));
+  const arc1 = filial('a1', 'E-ARC', 'ArcelorMittal', 'ARCELORMITTAL BRASIL S.A.', '33333333000100', end('BELO HORIZONTE'));
+  const arc3 = filial('a3', 'E-ARC', 'ArcelorMittal', 'ArcelorMittal Brasil S/A', '33333333000372', end('Uberlandia'));
+  const cerca1 = filial('c1', 'E-CER1', 'Triângulo Cercas', 'TRIANGULO CERCAS LTDA', '44444444000190');
+  const cerca2 = filial('c2', 'E-CER2', 'Triângulo Cercas', 'CERCAS DO TRIANGULO EIRELI', '55555555000110');
+  const zapi = filial('z1', 'E-ZAP', 'Zapi Distribuidora', 'ZAPI DISTRIBUIDORA LTDA', '66666666000120');
+  const lista = [zapi, imp48, cerca2, arc3, imp1, cerca1, impAra, arc1, imp27];
+
+  it('(a) cada filial cai em exatamente uma empresa, e a soma dos grupos é o tamanho da entrada', () => {
+    const grupos = agruparPorEmpresa(lista);
+    const ids = grupos.flatMap((g) => g.filiais.map((f) => f.id));
+    expect(ids).toHaveLength(lista.length);
+    expect(new Set(ids).size).toBe(lista.length);
+    expect(grupos.map((g) => g.chave).sort()).toEqual(['E-ARC', 'E-CER1', 'E-CER2', 'E-IMP', 'E-ZAP']);
   });
 
-  it('as filiais da mesma razão social ganham cidade/UF e o final do CNPJ, e ficam distinguíveis', () => {
-    const lista = [
-      beijaFlor('b1', 'Brasília', '11.111.111/0001-11'),
-      beijaFlor('b2', 'Taguatinga', '11.111.111/0002-92'),
-      beijaFlor('b3', 'Gama', '11.111.111/0003-73'),
-    ];
-    const rotulos = lista.map((f) => rotuloDoFornecedor(f, lista));
-    expect(rotulos).toEqual([
-      'Beija Flor Tintas Ltda · Brasília/DF · ····0111',
-      'Beija Flor Tintas Ltda · Taguatinga/DF · ····0292',
-      'Beija Flor Tintas Ltda · Gama/DF · ····0373',
+  it('o grupo é o empresa_id do BANCO, não a raiz do CNPJ', () => {
+    // Mesma raiz, empresas diferentes no banco: ficam separadas.
+    const x = filial('x', 'E-X', 'X', 'X LTDA', '77777777000100');
+    const y = filial('y', 'E-Y', 'Y', 'Y LTDA', '77777777000200');
+    expect(agruparPorEmpresa([x, y])).toHaveLength(2);
+    // Sem empresa no banco, a filial é uma empresa sozinha.
+    const solta = forn({ id: 's', razao_social: 'Solta Ltda', fornece_material: true });
+    expect(agruparPorEmpresa([solta])[0]?.chave).toBe('filial:s');
+  });
+
+  it('uma linha por empresa, pelo apelido, na ordem do apelido', () => {
+    const opcoes = opcoesDeEmpresa(agruparPorEmpresa(lista));
+    expect(opcoes.map((o) => o.rotulo)).toEqual([
+      'ArcelorMittal', 'Império das Tintas', 'Triângulo Cercas', 'Triângulo Cercas', 'Zapi Distribuidora',
     ]);
-    expect(new Set(rotulos).size).toBe(3);
   });
 
-  it('duas filiais na MESMA cidade continuam distinguíveis pelo CNPJ', () => {
-    const lista = [
-      beijaFlor('b1', 'Brasília', '11.111.111/0001-11'),
-      beijaFlor('b2', 'Brasília', '11.111.111/0002-92'),
+  it('a linha menor conta as filiais e diz as cidades — sem repetir a cidade escrita de dois jeitos', () => {
+    const opcoes = opcoesDeEmpresa(agruparPorEmpresa(lista));
+    expect(opcoes.find((o) => o.valor === 'E-IMP')?.detalhe).toBe('4 filiais · Araguari/MG e Uberlandia/MG');
+    expect(opcoes.find((o) => o.valor === 'E-ARC')?.detalhe).toBe('2 filiais · Belo Horizonte/MG e Uberlandia/MG');
+    expect(opcoes.find((o) => o.valor === 'E-ZAP')?.detalhe).toBe('Uberlandia/MG');
+  });
+
+  it('(e) duas empresas com o mesmo apelido nunca saem com a mesma linha inteira', () => {
+    const opcoes = opcoesDeEmpresa(agruparPorEmpresa(lista));
+    const cercas = opcoes.filter((o) => o.rotulo === 'Triângulo Cercas');
+    expect(cercas.map((o) => [o.valor, o.detalhe])).toEqual([
+      ['E-CER1', 'TRIANGULO CERCAS LTDA · Uberlandia/MG'],
+      ['E-CER2', 'CERCAS DO TRIANGULO EIRELI · Uberlandia/MG'],
+    ]);
+    const linhas = opcoes.map((o) => `${o.rotulo}|${o.detalhe}`);
+    expect(new Set(linhas).size).toBe(linhas.length);
+  });
+
+  it('(e) mesmo com a razão social e a cidade iguais, a linha não se repete', () => {
+    const g1 = filial('g1', 'E-G1', 'Gêmeas', 'GEMEAS LTDA', '88888888000100');
+    const g2 = filial('g2', 'E-G2', 'Gêmeas', 'GEMEAS LTDA', '99999999000100');
+    const linhas = opcoesDeEmpresa(agruparPorEmpresa([g1, g2])).map((o) => `${o.rotulo}|${o.detalhe}`);
+    expect(new Set(linhas).size).toBe(2);
+  });
+
+  it('a pesquisa acha a empresa pelo apelido e pela razão social ou fantasia de qualquer filial', () => {
+    const opcoes = opcoesDeEmpresa(agruparPorEmpresa(lista));
+    expect(filtrarOpcoes(opcoes, 'imperio').map((o) => o.valor)).toEqual(['E-IMP']);
+    expect(filtrarOpcoes(opcoes, 'beija flor').map((o) => o.valor)).toEqual(['E-IMP']);
+    expect(filtrarOpcoes(opcoes, 'triangulo').map((o) => o.valor).sort()).toEqual(['E-CER1', 'E-CER2']);
+  });
+
+  it('a filial: a cidade; na mesma cidade sem rua, "matriz" ou "filial nº N"; e a razão social quando o grupo junta duas', () => {
+    const g = agruparPorEmpresa(lista).find((x) => x.chave === 'E-IMP')!;
+    expect(g.filiais.map((f) => rotuloDaFilial(f, g.filiais))).toEqual([
+      'Araguari/MG · BEIJA FLOR COMERCIO DE TINTAS LTDA',
+      'Uberlandia/MG · matriz · IMPERIO DAS TINTAS LTDA',
+      'Uberlandia/MG · filial nº 27 · BEIJA FLOR COMERCIO DE TINTAS LTDA',
+      'Uberlandia/MG · filial nº 48 · BEIJA FLOR COMERCIO DE TINTAS LTDA',
+    ]);
+  });
+
+  it('a ArcelorMittal: o mesmo nome escrito de dois jeitos não conta como duas razões sociais', () => {
+    const g = agruparPorEmpresa(lista).find((x) => x.chave === 'E-ARC')!;
+    expect(g.filiais.map((f) => rotuloDaFilial(f, g.filiais))).toEqual(['Belo Horizonte/MG', 'Uberlandia/MG']);
+  });
+
+  it('a rua desempata a mesma cidade, e aí o número da filial nem aparece', () => {
+    const r1 = filial('r1', 'E-R', 'R', 'R LTDA', '12121212000100', end('Uberlândia', 'MG', 'Av. Rondon Pacheco', '100', 'Centro'));
+    const r2 = filial('r2', 'E-R', 'R', 'R LTDA', '12121212000200', end('UBERLÂNDIA', 'MG', 'Rua Goiás', '9'));
+    expect(rotuloDaFilial(r1, [r1, r2])).toBe('Uberlândia/MG · Av. Rondon Pacheco, 100 · Centro');
+    expect(rotuloDaFilial(r2, [r1, r2])).toBe('Uberlândia/MG · Rua Goiás, 9');
+  });
+
+  it('(b) nenhum rótulo — de empresa ou de filial — leva os quatro últimos dígitos do CNPJ', () => {
+    const grupos = agruparPorEmpresa(lista);
+    const textos = [
+      ...opcoesDeEmpresa(grupos).map((o) => `${o.rotulo} ${o.detalhe ?? ''}`),
+      ...grupos.flatMap((g) => g.filiais.map((f) => rotuloDaFilial(f, g.filiais))),
     ];
-    const rotulos = lista.map((f) => rotuloDoFornecedor(f, lista));
-    expect(new Set(rotulos).size).toBe(2);
+    for (const f of lista) {
+      const final = f.cnpj.slice(-4);
+      for (const t of textos) expect(t.replace(/\D/g, ' ')).not.toMatch(new RegExp(`\\b\\d*${final}\\b`));
+    }
+    expect(textos.join(' ')).not.toContain('····');
   });
 
-  it('a repetição é medida na lista FILTRADA: uma filial que só presta serviço não suja a matriz', () => {
-    const matriz = beijaFlor('b1', 'Brasília', '11.111.111/0001-11');
-    const filialDeServico = forn({
-      ...beijaFlor('b2', 'Gama', '11.111.111/0002-92'),
-      fornece_material: undefined,
-      presta_servico: true,
-    });
-    const lista = fornecedoresParaOc([matriz, filialDeServico]);
-    expect(rotuloDoFornecedor(matriz, lista)).toBe('Beija Flor Tintas Ltda');
+  it('(c) a filial bloqueada fica FORA da Nova OC e DENTRO do Histórico', () => {
+    const bloqueada = { ...imp27, bloqueado_para_compra_nova: true };
+    const todos = [imp1, bloqueada];
+    expect(fornecedoresParaOc(todos).map((f) => f.id)).toEqual(['i1']);
+    // O Histórico agrupa a tabela inteira, sem o filtro da Nova OC.
+    const doHistorico = agruparPorEmpresa(todos);
+    expect(doHistorico[0]?.filiais.map((f) => f.id).sort()).toEqual(['i1', 'i27']);
   });
 
-  it('finalDoCnpj: só os quatro últimos dígitos, e vazio quando não há CNPJ', () => {
-    expect(finalDoCnpj('11.111.111/0001-11')).toBe('····0111');
-    expect(finalDoCnpj('')).toBe('');
-    expect(finalDoCnpj(undefined)).toBe('');
+  it('a filial gravada no rascunho que hoje estaria fora continua na lista, e diz o porquê', () => {
+    const bloqueada = { ...imp27, bloqueado_para_compra_nova: true };
+    const daOc = fornecedoresParaOc([imp1, bloqueada], 'i27');
+    expect(daOc.map((f) => f.id)).toEqual(['i1', 'i27']);
+    expect(rotuloDaFilial(bloqueada, daOc)).toContain('bloqueada para compra nova');
+    expect(motivoForaDaOc(imp1)).toBe('');
+  });
+
+  it('(d) a empresa com uma filial só escolhe a filial sozinha', () => {
+    const [zap] = agruparPorEmpresa([zapi]);
+    expect(escolherEmpresa(zap, '')).toEqual({ fornecedorId: 'z1', empresaEsperando: '' });
+  });
+
+  it('com mais de uma filial, a empresa espera a filial — e a já escolhida da mesma empresa fica', () => {
+    const imp = agruparPorEmpresa(lista).find((g) => g.chave === 'E-IMP');
+    expect(escolherEmpresa(imp, '')).toEqual({ fornecedorId: '', empresaEsperando: 'E-IMP' });
+    expect(escolherEmpresa(imp, 'z1')).toEqual({ fornecedorId: '', empresaEsperando: 'E-IMP' });
+    expect(escolherEmpresa(imp, 'i48')).toEqual({ fornecedorId: 'i48', empresaEsperando: '' });
+    expect(escolherEmpresa(undefined, 'i48')).toEqual({ fornecedorId: '', empresaEsperando: '' });
+  });
+
+  it('a cidade sai sem gritar: "UBERLANDIA" vira "Uberlandia", "de" fica minúsculo, a UF maiúscula', () => {
+    expect(cidadeUf(forn({ id: 'q', endereco: end('SAO JOAO DEL REI', 'mg') }))).toBe('Sao Joao Del Rei/MG');
+    expect(cidadeUf(forn({ id: 'q', endereco: end('RIO DE JANEIRO', 'RJ') }))).toBe('Rio de Janeiro/RJ');
+  });
+
+  it('ordemDoCnpj: os quatro dígitos depois da barra; sem CNPJ, nenhum', () => {
+    expect(ordemDoCnpj('22.222.222/0027-41')).toBe(27);
+    expect(ordemDoCnpj('22222222000155')).toBe(1);
+    expect(ordemDoCnpj('')).toBeNull();
+    expect(ordemDoCnpj('12345678901')).toBeNull();
   });
 });
 

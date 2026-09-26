@@ -24,40 +24,30 @@ import { normalizarBusca, type OpcaoPesquisavel } from './pesquisa';
  * RESOLVIDO — o da filial, ou o da empresa-mãe quando a filial está em branco.
  * Quem resolve é o banco; esta regra não sabe que mãe existe, e não precisa.
  */
-export function fornecedoresParaOc(todos: Fornecedor[]): Fornecedor[] {
-  return todos.filter((f) => f.ativo && f.fornece_material === true);
-}
-
-/** Os quatro últimos dígitos do CNPJ — "····0134". Vazio se não houver CNPJ. */
-export function finalDoCnpj(cnpj: string | undefined): string {
-  const d = (cnpj ?? '').replace(/\D/g, '');
-  return d.length >= 4 ? `····${d.slice(-4)}` : '';
+export function fornecedoresParaOc(todos: Fornecedor[], manter = ''): Fornecedor[] {
+  return todos.filter((f) => entraNaOc(f) || (manter !== '' && f.id === manter));
 }
 
 /**
- * Como o fornecedor aparece na lista.
+ * A regra de uma filial só. A bloqueada para compra nova (BAIXADA na Receita,
+ * por exemplo) fica de fora desde 26/09/2026 (CTO-D542): aparecia na Nova OC
+ * porque a regra olhava só `ativo` e `fornece_material`. No Histórico ela
+ * continua, porque uma OC antiga pode ser dela.
  *
- * Só a razão social, na maioria dos casos. Quando a mesma razão social
- * aparece mais de uma vez na lista (filiais), entra um sufixo que as
- * distingue: a cidade/UF e o final do CNPJ. Os dois juntos porque cidade
- * sozinha empata (duas filiais na mesma cidade) e CNPJ sozinho não diz
- * nada a quem escolhe.
- *
- * `todos` é a lista EM QUE o fornecedor vai aparecer — a já filtrada — e
- * não a tabela inteira: uma filial que só presta serviço não deve fazer a
- * matriz ganhar sufixo numa lista em que a filial nem está.
+ * O `manter` de `fornecedoresParaOc` é a filial já gravada na OC aberta: um
+ * rascunho cuja filial hoje não entraria abre mostrando a gravada, sem trocar
+ * sozinho de fornecedor — e o rótulo dela diz que está fora.
  */
-export function rotuloDoFornecedor(f: Fornecedor, todos: Fornecedor[]): string {
-  const nome = f.razao_social.trim();
-  const repete = todos.filter((o) => o.razao_social.trim() === nome).length > 1;
-  if (!repete) return nome;
+export function entraNaOc(f: Fornecedor): boolean {
+  return f.ativo && f.fornece_material === true && f.bloqueado_para_compra_nova !== true;
+}
 
-  const partes = [nome];
-  const cidade = [f.endereco?.cidade, f.endereco?.uf].filter(Boolean).join('/');
-  if (cidade) partes.push(cidade);
-  const final = finalDoCnpj(f.cnpj);
-  if (final) partes.push(final);
-  return partes.join(' · ');
+/** Por que uma filial está fora da lista da Nova OC hoje ('' = não está). */
+export function motivoForaDaOc(f: Fornecedor): string {
+  if (f.bloqueado_para_compra_nova === true) return 'bloqueada para compra nova';
+  if (!f.ativo) return 'inativa';
+  if (f.fornece_material !== true) return 'fora da lista de material';
+  return '';
 }
 
 /**
@@ -75,26 +65,229 @@ export function enderecoResumido(f: Fornecedor | undefined): string {
   return [ruaComplemento, e.bairro, cidade, cnpj].filter(Boolean).join(' · ');
 }
 
+// ---------------------------------------------------------------------------
+// O fornecedor por EMPRESA, e a filial depois (CTO-D542, 26/09/2026)
+//
+// A palavra do Pedro, com a foto da lista aberta: "essa forma como as filiais
+// estão aparecendo da OC não está legal. Melhore". A lista mostrava uma linha
+// por filial — "BEIJA FLOR COMERCIO DE TINTAS LTDA · UBERLANDIA/MG · ····NNNN"
+// oito vezes seguidas. Agora a pessoa escolhe a empresa pelo nome que ela usa
+// (o apelido), e só depois, se houver mais de uma, a filial — pelo que a filial
+// é (cidade, rua, matriz), nunca pelos quatro últimos dígitos do CNPJ, que
+// levam o dígito verificador e não dizem nada a ninguém.
+// ---------------------------------------------------------------------------
+
+export interface EmpresaDaLista {
+  /** O `empresa_id` do banco; `filial:<id>` para quem não tem empresa. */
+  chave: string;
+  /** O nome que a lista mostra: o apelido, ou a razão social na falta dele. */
+  apelido: string;
+  /** As filiais DESTA lista, em ordem de cidade e de número da filial. */
+  filiais: Fornecedor[];
+}
+
 /**
- * As opções da escolha de fornecedor, prontas para a pesquisa (CTO-D541).
- *
- * O rótulo é o de sempre (`rotuloDoFornecedor`). A pesquisa acha também pela
- * razão social, pelo fantasia e pelo apelido da empresa — e o apelido aparece
- * como linha menor quando o rótulo não o contém: sem ela, digitar "Império" e
- * ver "Beija Flor Comércio de Tintas" pareceria engano.
+ * De que empresa é a filial. Quem diz é o BANCO (`empresa_id` da
+ * `fornecedor_resolvido`) — nunca a raiz do CNPJ calculada aqui, pelo mesmo
+ * motivo do portal (D504). Sem empresa (o cadastro recém-criado, o formato
+ * antigo de arquivo), a filial é uma empresa sozinha.
  */
-export function opcoesDeFornecedor(lista: Fornecedor[]): OpcaoPesquisavel[] {
-  return lista.map((f) => {
-    const rotulo = rotuloDoFornecedor(f, lista);
-    const apelido = (f.empresa_apelido ?? '').trim();
-    const mostraApelido = apelido && !normalizarBusca(rotulo).includes(normalizarBusca(apelido));
+export function chaveDaEmpresa(f: Fornecedor): string {
+  return f.empresa_id ? f.empresa_id : `filial:${f.id}`;
+}
+
+const MINUSCULAS = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
+
+/**
+ * "UBERLANDIA/MG" e "Uberlandia/MG" são a mesma cidade — o cadastro tem os
+ * dois jeitos. A tela mostra um só, sem gritar: cada palavra com a primeira
+ * maiúscula, "de/da/do" minúsculos, a UF em maiúsculas.
+ */
+export function cidadeUf(f: Fornecedor): string {
+  const cidade = (f.endereco?.cidade ?? '')
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((p, i) => (i > 0 && MINUSCULAS.has(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+    .join(' ');
+  const uf = (f.endereco?.uf ?? '').trim().toUpperCase();
+  return [cidade, uf].filter(Boolean).join('/');
+}
+
+/** Rua e número, e o bairro quando houver — o que desempata na mesma cidade. */
+function ruaDa(f: Fornecedor): string {
+  const e = f.endereco;
+  const rua = [e?.logradouro?.trim(), e?.numero?.trim()].filter(Boolean).join(', ');
+  return [rua, e?.bairro?.trim()].filter(Boolean).join(' · ');
+}
+
+/**
+ * O número de ordem do CNPJ: os quatro dígitos depois da barra (0001 é a
+ * matriz). É a numeração da Receita, e se lê. Sem CNPJ, nenhum.
+ */
+export function ordemDoCnpj(cnpj: string | undefined): number | null {
+  const d = (cnpj ?? '').replace(/\D/g, '');
+  if (d.length !== 14) return null;
+  const n = Number(d.slice(8, 12));
+  return n > 0 ? n : null;
+}
+
+function nomeDaOrdem(n: number): string {
+  return n === 1 ? 'matriz' : `filial nº ${n}`;
+}
+
+/**
+ * As razões sociais diferentes de um grupo. "ARCELORMITTAL BRASIL S.A." e
+ * "ArcelorMittal Brasil S/A" são o MESMO nome escrito de dois jeitos: a
+ * comparação ignora caixa, acento, pontuação e espaço.
+ */
+function razoesDistintas(filiais: Fornecedor[]): string[] {
+  const vistas = new Map<string, string>();
+  for (const f of filiais) {
+    const r = f.razao_social.trim();
+    const k = normalizarBusca(r).replace(/[^a-z0-9]/g, '');
+    if (k && !vistas.has(k)) vistas.set(k, r);
+  }
+  return [...vistas.values()];
+}
+
+/** "A", "A e B", "A, B e C". */
+function emLista(itens: string[]): string {
+  if (itens.length <= 1) return itens[0] ?? '';
+  return `${itens.slice(0, -1).join(', ')} e ${itens[itens.length - 1]}`;
+}
+
+const comparar = (a: string, b: string) =>
+  normalizarBusca(a).localeCompare(normalizarBusca(b), 'pt-BR');
+
+/**
+ * As filiais agrupadas pela empresa, na ordem do apelido (o nome que a pessoa
+ * lê). Cada filial da entrada cai em exatamente um grupo.
+ */
+export function agruparPorEmpresa(lista: Fornecedor[]): EmpresaDaLista[] {
+  const grupos = new Map<string, Fornecedor[]>();
+  for (const f of lista) {
+    const k = chaveDaEmpresa(f);
+    const g = grupos.get(k);
+    if (g) g.push(f);
+    else grupos.set(k, [f]);
+  }
+  return [...grupos.entries()]
+    .map(([chave, filiais]) => {
+      const apelido =
+        filiais.map((f) => (f.empresa_apelido ?? '').trim()).find(Boolean) ||
+        (filiais[0]?.razao_social ?? '').trim();
+      const ordenadas = [...filiais].sort(
+        (a, b) =>
+          comparar(cidadeUf(a), cidadeUf(b)) || (ordemDoCnpj(a.cnpj) ?? 0) - (ordemDoCnpj(b.cnpj) ?? 0),
+      );
+      return { chave, apelido, filiais: ordenadas };
+    })
+    .sort((a, b) => comparar(a.apelido, b.apelido) || comparar(a.chave, b.chave));
+}
+
+/**
+ * As empresas, prontas para a pesquisa. Uma linha por empresa, pelo apelido;
+ * a linha menor diz as filiais ("11 filiais · Uberlândia/MG e Araguari/MG") ou,
+ * com uma só, a cidade dela. Duas empresas com o MESMO apelido (duas raízes de
+ * CNPJ com a mesma marca) levam também a razão social na linha menor — e, se
+ * ainda assim empatarem, a raiz do CNPJ, que é a parte dele que diz a empresa.
+ * A pesquisa acha pelo apelido e pela razão social e fantasia de qualquer filial.
+ */
+export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
+  const porApelido = new Map<string, number>();
+  for (const g of grupos) {
+    const k = normalizarBusca(g.apelido);
+    porApelido.set(k, (porApelido.get(k) ?? 0) + 1);
+  }
+
+  const opcoes = grupos.map((g): OpcaoPesquisavel => {
+    const cidades = [
+      ...new Map(g.filiais.map((f) => [normalizarBusca(cidadeUf(f)), cidadeUf(f)])).values(),
+    ].filter(Boolean);
+    let detalhe =
+      g.filiais.length > 1
+        ? [`${g.filiais.length} filiais`, emLista(cidades)].filter(Boolean).join(' · ')
+        : (cidades[0] ?? '');
+    if ((porApelido.get(normalizarBusca(g.apelido)) ?? 0) > 1) {
+      detalhe = [razoesDistintas(g.filiais).join(' / '), detalhe].filter(Boolean).join(' · ');
+    }
     return {
-      valor: f.id,
-      rotulo,
-      detalhe: mostraApelido ? apelido : undefined,
-      termos: [f.razao_social, f.nome_fantasia, apelido].filter(Boolean),
+      valor: g.chave,
+      rotulo: g.apelido,
+      detalhe: detalhe || undefined,
+      termos: g.filiais
+        .flatMap((f) => [f.razao_social, f.nome_fantasia, f.empresa_apelido ?? ''])
+        .filter(Boolean),
     };
   });
+
+  // Último desempate: a linha inteira nunca se repete.
+  const linha = (o: OpcaoPesquisavel) => normalizarBusca(`${o.rotulo}|${o.detalhe ?? ''}`);
+  const vezes = new Map<string, number>();
+  for (const o of opcoes) vezes.set(linha(o), (vezes.get(linha(o)) ?? 0) + 1);
+  return opcoes.map((o, i) => {
+    if ((vezes.get(linha(o)) ?? 0) < 2) return o;
+    const g = grupos[i]!;
+    const raiz = (g.filiais[0]?.cnpj ?? '').replace(/\D/g, '').slice(0, 8);
+    const marca =
+      raiz.length === 8 ? `CNPJ ${raiz.slice(0, 2)}.${raiz.slice(2, 5)}.${raiz.slice(5)}` : g.chave;
+    return { ...o, detalhe: [o.detalhe, marca].filter(Boolean).join(' · ') };
+  });
+}
+
+/**
+ * Como a filial aparece no campo "Filial", entre as irmãs da mesma empresa:
+ *   1. a cidade/UF;
+ *   2. se uma irmã está na mesma cidade, a rua e o número (e o bairro);
+ *   3. se ainda empata (as duas sem rua), "matriz" ou "filial nº N";
+ *   4. se a empresa junta duas razões sociais, a razão social da filial;
+ *   5. se a filial está fora da lista hoje (a gravada no rascunho), o porquê.
+ * Os quatro últimos dígitos do CNPJ nunca: não dizem nada a quem escolhe.
+ * Quando o Banco preencher as ruas em branco (D543), o "filial nº N" some
+ * sozinho, porque a rua passa a desempatar.
+ */
+export function rotuloDaFilial(f: Fornecedor, irmas: Fornecedor[]): string {
+  const cidade = cidadeUf(f);
+  const partes = [cidade || f.razao_social.trim()];
+
+  const mesmaCidade = irmas.filter(
+    (o) => o.id !== f.id && normalizarBusca(cidadeUf(o)) === normalizarBusca(cidade),
+  );
+  if (mesmaCidade.length > 0) {
+    const rua = ruaDa(f);
+    if (rua) partes.push(rua);
+    const empata = mesmaCidade.some((o) => normalizarBusca(ruaDa(o)) === normalizarBusca(rua));
+    const n = ordemDoCnpj(f.cnpj);
+    if (empata && n !== null) partes.push(nomeDaOrdem(n));
+  }
+
+  if (razoesDistintas(irmas).length > 1) partes.push(f.razao_social.trim());
+  const fora = motivoForaDaOc(f);
+  if (fora) partes.push(fora);
+  return partes.join(' · ');
+}
+
+/**
+ * O que acontece ao escolher uma empresa na Nova OC:
+ *   - nenhuma → nenhum fornecedor;
+ *   - uma filial só → ela, e o campo Filial nem aparece;
+ *   - mais de uma → a filial já escolhida continua, se for desta empresa;
+ *     senão nenhuma, e a empresa fica esperando a filial.
+ */
+export function escolherEmpresa(
+  grupo: EmpresaDaLista | undefined,
+  fornecedorAtual: string,
+): { fornecedorId: string; empresaEsperando: string } {
+  if (!grupo) return { fornecedorId: '', empresaEsperando: '' };
+  if (grupo.filiais.length === 1) {
+    return { fornecedorId: grupo.filiais[0]!.id, empresaEsperando: '' };
+  }
+  if (grupo.filiais.some((f) => f.id === fornecedorAtual)) {
+    return { fornecedorId: fornecedorAtual, empresaEsperando: '' };
+  }
+  return { fornecedorId: '', empresaEsperando: grupo.chave };
 }
 
 /** As opções da escolha de obra: o nome que a tela mostra. */

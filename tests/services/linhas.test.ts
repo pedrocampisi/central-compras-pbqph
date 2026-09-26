@@ -5,6 +5,7 @@ import {
   classificacaoDoCadastroNovo,
   destinatarioDaLinhaDaObra,
   ehFornecedorNovo,
+  empresaResolvida,
   fotografiaDaLinhaDaOc,
   linhaDoFornecedor,
   raizDoDocumento,
@@ -132,6 +133,25 @@ describe('cabecalhoDaOc — o que vai e o que não vai', () => {
     expect(c['observacoes']).toBeNull();
     expect(c['condicao_pagamento']).toBeNull();
     expect(c['fornecedor_id']).toBeNull();
+  });
+});
+
+// ── A empresa e o bloqueio (CTO-D542) ────────────────────────────────────────
+
+describe('empresaResolvida — a empresa e o bloqueio vêm da resolvida, pelo id', () => {
+  const mapa = new Map([['f1', { id: 'f1', empresa_id: 'E-1', bloqueado_para_compra_nova: true }]]);
+
+  it('lê a empresa do BANCO e o bloqueio da filial', () => {
+    expect(empresaResolvida({ id: 'f1' }, mapa)).toEqual({ empresa_id: 'E-1', bloqueado_para_compra_nova: true });
+  });
+
+  it('a bloqueada lida assim fica fora da Nova OC', () => {
+    const f = forn({ id: 'f1', fornece_material: true, ...empresaResolvida({ id: 'f1' }, mapa) });
+    expect(fornecedoresParaOc([f])).toEqual([]);
+  });
+
+  it('sem linha resolvida (ou de outra filial), nada — nem empresa, nem bloqueio', () => {
+    expect(empresaResolvida({ id: 'f2' }, mapa)).toEqual({ empresa_id: undefined, bloqueado_para_compra_nova: undefined });
   });
 });
 

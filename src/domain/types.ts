@@ -51,6 +51,11 @@ export interface Fornecedor {
   /** O nome curto da EMPRESA (`core.empresa_raiz.apelido`), o que o Pedro usa
    *  ("Império das Tintas" para a filial da Beija Flor). Só para a pesquisa. */
   empresa_apelido?: string;
+  /** A EMPRESA da filial (`core.fornecedor_resolvido.empresa_id`): quem agrupa
+   *  as filiais na lista da OC é o banco, não a raiz do CNPJ (CTO-D542). */
+  empresa_id?: string;
+  /** Filial que não pode receber OC nova (BAIXADA na Receita, por exemplo). */
+  bloqueado_para_compra_nova?: boolean;
   criado_em: string;
   atualizado_em: string;
 }
