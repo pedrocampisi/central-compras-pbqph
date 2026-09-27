@@ -115,6 +115,23 @@ export const MaterialSchema = z.object({
   unidade_padrao: z.string().default('un'),
 });
 
+export const EcrItemSchema = z.object({
+  rotulo: z.string().nullable().default(null),
+  texto: z.string().default(''),
+  numerado: z.boolean().default(false),
+});
+export const EcrSecaoSchema = z.object({
+  titulo: z.string().default(''),
+  itens: z.array(EcrItemSchema).default([]),
+});
+export const EcrRevisaoSchema = z.object({
+  revisao: z.string().default(''),
+  data: z.string().nullable().default(null),
+  descricao: z.string().default(''),
+  revisado_por: z.string().default(''),
+  aprovado_por: z.string().default(''),
+});
+
 export const EcrSchema = z.object({
   id: z.number(),
   codigo: z.string().default(''),
@@ -132,6 +149,10 @@ export const EcrSchema = z.object({
   responsabilidades: z.string().default(''),
   observacoes: z.string().default(''),
   materiais: z.array(MaterialSchema).default([]),
+  revisao: z.string().nullable().default(null),
+  emitida_em: z.string().nullable().default(null),
+  secoes: z.array(EcrSecaoSchema).nullable().default(null),
+  revisoes: z.array(EcrRevisaoSchema).nullable().default(null),
 });
 
 // ── Item & OC ───────────────────────────────────────────────────────────────

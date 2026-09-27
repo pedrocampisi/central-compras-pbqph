@@ -22,6 +22,7 @@ import type {
   Data, Ecr, Fornecedor, Item, Obra, OrdemCompra,
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
+import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
@@ -38,6 +39,15 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 // ---------------------------------------------------------------------------
 // Leitura
 // ---------------------------------------------------------------------------
+
+/**
+ * As ECRs, com os materiais e o histórico de revisões (`compras.ecr_revisoes`,
+ * contrato do Banco da D588/D589 §1). Do histórico, só o que a tabela do
+ * rodapé mostra: o texto de cada revisão velha (`secoes`) fica no banco e não
+ * vem para a tela de ler. Os nomes vêm sempre das colunas `_nome`.
+ */
+const COLUNAS_DAS_ECRS =
+  '*, materiais(*), revisoes:ecr_revisoes(id, revisao, emitida_em, descricao, revisado_por_nome, aprovado_por_nome)';
 
 export async function carregarDados(): Promise<Data> {
   const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
@@ -60,7 +70,7 @@ export async function carregarDados(): Promise<Data> {
         'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
       )
       .order('descricao_curta'),
-    compras().from('ecrs').select('*, materiais(*)').order('id'),
+    compras().from('ecrs').select(COLUNAS_DAS_ECRS).order('id'),
     compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
     // Quais ECRs cada fornecedor atende. Tabela própria desde 17/08 — até
@@ -198,6 +208,11 @@ function paraEcr(l: Record<string, unknown>): Ecr {
       descricao: vazio(m['descricao']),
       unidade_padrao: vazio(m['unidade_padrao']),
     })),
+    // O texto da ECR (CTO-D586) e o histórico de revisões (CTO-D588).
+    revisao: l['revisao'] == null ? null : String(l['revisao']),
+    emitida_em: l['emitida_em'] == null ? null : String(l['emitida_em']),
+    secoes: secoesDoBanco(l['secoes']),
+    revisoes: revisoesDoBanco(l['revisoes']),
   };
 }
 

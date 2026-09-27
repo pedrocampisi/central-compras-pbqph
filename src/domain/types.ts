@@ -121,6 +121,33 @@ export interface Material {
   unidade_padrao: string;
 }
 
+/** Uma linha de uma seção da ECR (CTO-D586). */
+export interface EcrItem {
+  /** O que vem antes do primeiro ":" (até 4 palavras), ou `null`. */
+  rotulo: string | null;
+  texto: string;
+  /** A linha está na lista do documento; fora dela é nota. */
+  numerado: boolean;
+}
+
+export interface EcrSecao {
+  titulo: string;
+  itens: EcrItem[];
+}
+
+/**
+ * Uma linha do histórico de revisões da ECR, como a tabela do rodapé do
+ * documento (CTO-D588): revisão, data, descrição, quem revisou e quem aprovou.
+ */
+export interface EcrRevisao {
+  revisao: string;
+  /** AAAA-MM-DD, ou `null` se a linha não tem data. */
+  data: string | null;
+  descricao: string;
+  revisado_por: string;
+  aprovado_por: string;
+}
+
 export interface Ecr {
   id: number;
   codigo: string;
@@ -138,6 +165,22 @@ export interface Ecr {
   responsabilidades: string;
   observacoes: string;
   materiais: Material[];
+  /** A revisão vigente ("00"); `null` se a ECR ainda não foi carregada. */
+  revisao: string | null;
+  /** A data da revisão vigente (AAAA-MM-DD); `null` se ainda não carregada. */
+  emitida_em: string | null;
+  /**
+   * As cinco seções da ECR, na ordem do documento (CTO-D586). `null` se a ECR
+   * ainda não foi carregada. Os campos de antes (objetivo, escopo, normas…)
+   * ficam até a carta que tira as colunas: a tela não os lê mais.
+   */
+  secoes: EcrSecao[] | null;
+  /**
+   * O histórico de revisões, da mais antiga à vigente (CTO-D588). `null`
+   * quando o sistema não leu o histórico — a tela diz isso, e não inventa
+   * uma lista vazia.
+   */
+  revisoes: EcrRevisao[] | null;
 }
 
 export interface Item {

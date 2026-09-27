@@ -23,6 +23,7 @@ import {
   OrdemCompraSchema,
 } from './schemas/data.schema';
 import { uid } from './id';
+import { revisoesDoBanco, secoesDoBanco } from './ecr';
 import { nowIso, todayIso } from './format';
 import { STATUS_OC } from './constants';
 
@@ -228,6 +229,10 @@ export function normalizeEcr(ecr: unknown): Ecr {
       descricao: String(m['descricao'] ?? ''),
       unidade_padrao: String(m['unidade_padrao'] ?? 'un'),
     })),
+    revisao: o['revisao'] == null ? null : String(o['revisao']),
+    emitida_em: o['emitida_em'] == null ? null : String(o['emitida_em']),
+    secoes: secoesDoBanco(o['secoes']),
+    revisoes: revisoesDoBanco(o['revisoes']),
   };
   return EcrSchema.parse(raw);
 }

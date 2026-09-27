@@ -1,127 +1,169 @@
 /**
- * Aba Catálogo ECR — exibe todos os 20 ECRs com conteúdo rico.
- * Card por ECR (collapsible) com objetivo, escopo, normas, documentos
- * obrigatórios, critérios de recebimento, ensaios e materiais.
+ * Aba Catálogo ECR — as 20 ECRs em vigor (CTO-D586, com a D588: a ECR do
+ * sistema é a que vale). Cada ECR aberta mostra a revisão, as cinco seções na
+ * ordem do documento, os materiais e, no fim, o histórico de revisões. Cada
+ * ECR tem o botão do PDF (D589 §4.1), para quem vê o catálogo.
  */
 
 import { useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
-import type { Ecr } from '../../domain/types';
+import type { Ecr, EcrItem } from '../../domain/types';
+import {
+  COLUNAS_DO_HISTORICO,
+  HISTORICO,
+  MATERIAIS,
+  NENHUMA_REVISAO,
+  O_QUE_E_O_CATALOGO,
+  SEM_HISTORICO,
+  SEM_TEXTO,
+  blocosDaSecao,
+  linhaDoHistorico,
+  numeroDaSecao,
+  revisaoDaEcr,
+} from '../../domain/ecr';
+import { baixarPdfDaEcr } from '../../services/pdf/generateEcrPdf';
+import { Button } from '../../components/Button/Button';
+import { Icon } from '../../components/Icon/Icon';
 import styles from './CatalogoPage.module.css';
+
+/** A linha como o documento a escreve, com o rótulo em negrito. */
+function Linha({ item }: { item: EcrItem }) {
+  return item.rotulo ? (
+    <>
+      <strong>{item.rotulo}:</strong> {item.texto}
+    </>
+  ) : (
+    <>{item.texto}</>
+  );
+}
+
+/** O histórico de revisões, como a tabela do rodapé do documento. */
+function Historico({ ecr }: { ecr: Ecr }) {
+  return (
+    <section className={styles.historico} data-historico="">
+      <h4>{HISTORICO}</h4>
+      {!ecr.revisoes ? (
+        <p className={styles.semTexto}>{SEM_HISTORICO}</p>
+      ) : ecr.revisoes.length === 0 ? (
+        <p className={styles.semTexto}>{NENHUMA_REVISAO}</p>
+      ) : (
+        <table className={styles.tabela}>
+          <thead>
+            <tr>
+              {COLUNAS_DO_HISTORICO.map((c) => (
+                <th key={c} scope="col">
+                  {c}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ecr.revisoes.map((r, i) => (
+              <tr key={i}>
+                {linhaDoHistorico(r).map((c, j) => (
+                  <td key={j} data-coluna={COLUNAS_DO_HISTORICO[j]}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+  );
+}
 
 function EcrCard({ ecr }: { ecr: Ecr }) {
   const [open, setOpen] = useState(false);
+  const [gerando, setGerando] = useState(false);
+  const showToast = useUiStore((s) => s.showToast);
+  const revisao = revisaoDaEcr(ecr);
+
+  async function pdf() {
+    setGerando(true);
+    try {
+      await baixarPdfDaEcr(ecr);
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'erro desconhecido'}`, 'error');
+    } finally {
+      setGerando(false);
+    }
+  }
 
   return (
     <div className={styles.card}>
-      <div className={styles.head} onClick={() => setOpen((o) => !o)}>
-        <div className={styles.titleRow}>
-          <span className={styles.code}>{ecr.codigo}</span>
-          <span className={styles.name}>{ecr.nome}</span>
-          {ecr.categoria && <span className={styles.meta}>{ecr.categoria}</span>}
-        </div>
-        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{open ? '▲' : '▼'}</span>
+      <div className={styles.cabeca}>
+        <button type="button" className={styles.head} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          <Icon name="chevron" size={16} className={open ? `${styles.seta} ${styles.setaAberta}` : styles.seta} />
+          <span className={styles.titleRow}>
+            <span className={styles.code}>{ecr.codigo}</span>
+            <span className={styles.name}>{ecr.nome}</span>
+            {ecr.categoria && <span className={styles.meta}>{ecr.categoria}</span>}
+          </span>
+          {revisao && <span className={styles.revisao}>{revisao}</span>}
+        </button>
+        {ecr.secoes && (
+          <Button
+            variant="outline"
+            size="sm"
+            className={styles.pdf}
+            loading={gerando}
+            onClick={pdf}
+            aria-label={`PDF da ${ecr.codigo}`}
+          >
+            {!gerando && <Icon name="download" size={14} />}
+            PDF
+          </Button>
+        )}
       </div>
 
       {open && (
-        <div className={styles.body}>
-          {ecr.objetivo && (
-            <div className={styles.section}>
-              <h4>Objetivo</h4>
-              <p>{ecr.objetivo}</p>
-            </div>
+        <div className={styles.body} data-ecr-aberta="">
+          {ecr.secoes ? (
+            ecr.secoes.map((s, i) => (
+              <section key={i} className={styles.secao}>
+                <h4>
+                  {numeroDaSecao(i)} {s.titulo}
+                </h4>
+                {blocosDaSecao(s.itens).map((b, j) =>
+                  b.tipo === 'lista' ? (
+                    <ul key={j} className={styles.lista}>
+                      {b.itens.map((it, k) => (
+                        <li key={k}>
+                          <Linha item={it} />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p key={j} className={styles.nota}>
+                      <Linha item={b.item} />
+                    </p>
+                  ),
+                )}
+              </section>
+            ))
+          ) : (
+            <p className={styles.semTexto} data-sem-texto="">
+              {SEM_TEXTO}
+            </p>
           )}
-          {ecr.escopo && (
-            <div className={styles.section}>
-              <h4>Escopo</h4>
-              <p>{ecr.escopo}</p>
-            </div>
-          )}
-
-          <div className={styles.specs}>
-            {ecr.normas.length > 0 && (
-              <div>
-                <h4>Normas Técnicas</h4>
-                <ul>
-                  {ecr.normas.map((n, i) => (
-                    <li key={i}>
-                      {n.codigo && <strong>{n.codigo} — </strong>}
-                      {n.titulo}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {ecr.documentos_obrigatorios.length > 0 && (
-              <div>
-                <h4>Documentos Obrigatórios</h4>
-                <ul>
-                  {ecr.documentos_obrigatorios.map((d, i) => (
-                    <li key={i}>
-                      {d.nome}
-                      {d.periodicidade && (
-                        <span className={styles.tag}>{d.periodicidade}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {ecr.criterios_recebimento.length > 0 && (
-              <div>
-                <h4>Critérios de Recebimento</h4>
-                <ul>
-                  {ecr.criterios_recebimento.map((c, i) => (
-                    <li key={i}>
-                      {c.criterio}
-                      {(c.tolerancia || c.metodo) && (
-                        <span className={styles.sub}>
-                          {c.tolerancia && `Tolerância: ${c.tolerancia}`}
-                          {c.tolerancia && c.metodo && ' · '}
-                          {c.metodo && `Método: ${c.metodo}`}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {ecr.ensaios.length > 0 && (
-              <div>
-                <h4>Ensaios</h4>
-                <ul>
-                  {ecr.ensaios.map((en, i) => (
-                    <li key={i}>
-                      {en.nome}
-                      {en.periodicidade && <span className={styles.tag}>{en.periodicidade}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
 
           {ecr.materiais.length > 0 && (
-            <div className={styles.section}>
-              <h4>Materiais</h4>
+            <section className={styles.materiais} data-materiais="">
+              <h4>{MATERIAIS}</h4>
               <ul>
                 {ecr.materiais.map((m) => (
-                  <li key={m.id}>{m.descricao} <span className={styles.tag}>{m.unidade_padrao}</span></li>
+                  <li key={m.id}>
+                    {m.descricao} <span className={styles.tag}>{m.unidade_padrao}</span>
+                  </li>
                 ))}
               </ul>
-            </div>
+            </section>
           )}
 
-          {ecr.observacoes && (
-            <div className={styles.section}>
-              <h4>Observações</h4>
-              <p style={{ whiteSpace: 'pre-line' }}>{ecr.observacoes}</p>
-            </div>
-          )}
+          <Historico ecr={ecr} />
         </div>
       )}
     </div>
@@ -150,7 +192,9 @@ export function CatalogoPage() {
       <div className="section-header">
         <div>
           <h2>Catálogo ECR</h2>
-          <p className="section-sub">Especificações de Compra e Recebimento — {data.ecrs.length} ECRs</p>
+          <p className="section-sub">
+            Especificações de Compra e Recebimento — {data.ecrs.length} ECRs. {O_QUE_E_O_CATALOGO}
+          </p>
         </div>
       </div>
       <input

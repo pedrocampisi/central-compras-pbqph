@@ -67,10 +67,13 @@ export async function perfilAtual(): Promise<PerfilUsuario | null> {
  *   - OCs (compras.pode_emitir_oc) e fornecedores (fornecedores_escrita):
  *     admin | engenharia | financeiro — o financeiro foi incluído pela
  *     migration 20260810120000_financeiro_emite_oc, por decisão do Pedro.
- *   - Catálogo técnico (ECRs/materiais)
- *     (core.pode_editar_cadastro): admin | engenharia apenas. A tela
- *     correspondente está somente-leitura nesta versão, então não há
- *     botão para o financeiro clicar e tomar erro.
+ *   - Catálogo técnico (ECRs/materiais) (core.pode_editar_cadastro):
+ *     admin | engenharia | financeiro, como medido pelo CTO na produção em
+ *     27/09/2026 (D589 §2). A tela correspondente está somente-leitura nesta
+ *     versão, então não há botão para ninguém clicar e tomar erro.
+ *   - O texto da ECR (as seções, a revisão e o histórico): só o usuário do
+ *     Pedro revisa, e salvar é aprovar (D589 §1). Não é um papel: há mais de
+ *     um admin. A regra mora no banco, na função de revisar da D589 §3.
  */
 export function podeEditar(papel: Papel | null | undefined): boolean {
   return papel === 'admin' || papel === 'engenharia' || papel === 'financeiro';
