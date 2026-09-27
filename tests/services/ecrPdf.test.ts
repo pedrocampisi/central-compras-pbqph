@@ -6,6 +6,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import type jsPDF from 'jspdf';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { desenhaPdfDaEcr, paraAFonteDoPdf } from '../../src/services/pdf/generateEcrPdf';
 import { secoesDoBanco } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
@@ -120,6 +122,14 @@ describe('D589 — um texto que passa de uma página', () => {
       const palavras = junta(paraAFonteDoPdf(l.rotulo ? `${l.rotulo}: ${l.texto}` : l.texto));
       expect(tudo.split(palavras).length - 1, palavras).toBe(3);
     }
+  });
+});
+
+describe('D589 — o PDF com a marca pesa pouco', () => {
+  it('a ECR 03 com a marca de verdade fica abaixo de 300 KB (sem compressão, passava de 4 MB)', () => {
+    const png = readFileSync(join(__dirname, '../../public/brazao1.png')).toString('base64');
+    const doc = desenhaPdfDaEcr(ecr(0), `data:image/png;base64,${png}`);
+    expect((doc.output('arraybuffer') as ArrayBuffer).byteLength).toBeLessThan(300 * 1024);
   });
 });
 
