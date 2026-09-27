@@ -2081,3 +2081,29 @@ entrar, e a primeira leitura real é de uma pessoa (o CTO a vê no log da `extra
 **UM COMENTÁRIO VELHO:** o `wrangler.jsonc` ainda diz que o deploy "só roda com a palavra do Pedro, dita
 na janela dele — nunca por carta". É de antes da emenda 3 (15/09), e a lei vale mais. Não o mudei
 nesta carta; está dito ao CTO.
+
+## Decisão 47 — a moldura na tela estreita: o topo cresce, o avatar vai para cima do tema · 27/09/2026
+
+**POR QUÊ (CTO-D579):** o achado da D575 (decisão 45): com o `App` inteiro a 375, o título do topo
+quebrava em quatro linhas e passava por cima do título da página, e o avatar do rodapé do menu saía
+cortado na borda esquerda. A moldura é a mesma em todas as páginas: o defeito era do sistema inteiro no
+celular.
+
+**O QUE MUDOU (no ramo `d579-moldura-375`, `4cb6569`; NÃO publicado):** só `src/App.module.css`, só na
+regra da tela estreita.
+- A 900 px ou menos, o topo cresce com o que tem dentro (altura mínima de 68 px), e o selo "Banco
+  conectado" desce de linha quando não cabe. A 700 px ou menos, o título do topo vai a 20 px.
+- A 900 px ou menos, o rodapé do menu usa a largura toda (44 px por dentro) e põe o avatar em cima do
+  botão do tema. Lado a lado eram 76 px.
+
+**A MEDIDA:** o fotógrafo mede, no navegador de verdade, pedaço da moldura que vaza da caixa, texto da
+moldura por cima de outro texto e fora da tela pelos dois lados. Deu zero nas 12 fotos de depois. No antes
+achou, além dos dois defeitos da carta, o avatar cortado também a 768 e o selo cortado à direita no
+Dashboard a 375. A 1920 e a 1280, as 6 fotos saíram idênticas byte a byte; a 768 mudou só o rodapé do
+menu.
+
+**AS TRAVAS:** o jsdom não mede tela. `tests/components/Moldura375.test.ts` lê as regras do CSS e faz a conta
+do rodapé. 297 testes; 6 sabotagens, todas mordendo, hash igual.
+
+**O `wrangler.jsonc`:** o comentário do deploy agora cita a lei 3 (7.2, emenda 3): publicar é ato da casa
+por carta, depois da avaliação do CTO no ensaio; voltar é publicar a anterior. O arquivo faz o mesmo.
