@@ -19,23 +19,28 @@ import type { Item } from './types';
 
 export type Leitor = 'rapido' | 'certeiro';
 
-/** A tela começa no rápido; a pessoa troca com um clique. */
+/**
+ * A tela começa no rápido; a pessoa troca com um clique. O rápido é o padrão e
+ * o certeiro, a exceção (CTO-D582, palavra do Pedro em 27/09/2026: "a
+ * prioridade é o rápido").
+ */
 export const LEITOR_PADRAO: Leitor = 'rapido';
 
 export const LEITORES: Record<Leitor, { nome: string; paraQue: string; espera: string }> = {
   rapido: {
     nome: 'Rápido',
-    paraQue: 'Para o PDF do fornecedor e papel limpo.',
+    paraQue: 'Use primeiro. Serve para quase todo pedido.',
     espera: 'Leva uns segundos.',
   },
   certeiro: {
     nome: 'Certeiro',
-    paraQue: 'Para foto, papel escaneado e tabela cheia.',
+    paraQue: 'Só para papel escaneado, ou quando o rápido não der conta.',
     espera: 'Leva até 1 minuto.',
   },
 };
 
-export const DICA_DO_LEITOR = 'Foto ou papel escaneado? Use o certeiro.';
+export const DICA_DO_LEITOR =
+  'Comece pelo rápido. O certeiro é só para papel escaneado ou quando o rápido não der conta.';
 
 /**
  * Quem leu, pelo `_meta.leitor` da resposta. A função de hoje (v4) não diz —
