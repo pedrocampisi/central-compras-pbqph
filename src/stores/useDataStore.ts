@@ -8,22 +8,15 @@
 
 import { create } from 'zustand';
 import type {
-  AvaliacaoPrestador,
   Config,
   Data,
   Fornecedor,
   Obra,
   OrdemCompra,
-  PrestadorServico,
 } from '../domain/types';
 
 /** Chaves de Data que são coleções de registros com `id: string`. */
-type CollectionKey =
-  | 'ordens_compra'
-  | 'fornecedores'
-  | 'obras'
-  | 'prestadores_servico'
-  | 'avaliacoes_prestadores';
+type CollectionKey = 'ordens_compra' | 'fornecedores' | 'obras';
 
 interface DataState {
   data: Data | null;
@@ -41,10 +34,6 @@ interface DataState {
   removeFornecedor: (id: string) => void;
   upsertObra: (o: Obra) => void;
   removeObra: (id: string) => void;
-  upsertPrestador: (p: PrestadorServico) => void;
-  removePrestador: (id: string) => void;
-  upsertAvaliacao: (a: AvaliacaoPrestador) => void;
-  removeAvaliacao: (id: string) => void;
   updateConfig: (partial: Partial<Config>) => void;
 }
 
@@ -110,22 +99,6 @@ export const useDataStore = create<DataState>((set, get) => {
 
     upsertObra: (o) => upsertIn('obras', o),
     removeObra: (id) => removeIn('obras', id),
-
-    upsertPrestador: (p) => upsertIn('prestadores_servico', p),
-
-    removePrestador(id) {
-      const { data } = get();
-      if (!data) return;
-      // Remove o prestador e todas as avaliações vinculadas a ele.
-      commit({
-        ...data,
-        prestadores_servico: data.prestadores_servico.filter((x) => x.id !== id),
-        avaliacoes_prestadores: data.avaliacoes_prestadores.filter((a) => a.prestador_id !== id),
-      });
-    },
-
-    upsertAvaliacao: (a) => upsertIn('avaliacoes_prestadores', a),
-    removeAvaliacao: (id) => removeIn('avaliacoes_prestadores', id),
 
     updateConfig(partial) {
       const { data } = get();

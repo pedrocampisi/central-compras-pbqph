@@ -6,6 +6,11 @@
  *     (CONFORME / NÃO CONFORME para prazo, EPI e PES)
  *
  * Dados existentes recebem arrays vazios — sem perda nem reescrita de campos.
+ *
+ * A aba Prestadores saiu em 27/09/2026 (CTO-D585). Este passo fica, porque é
+ * um degrau da escada de formatos dos arquivos antigos (v1 → v5); o que ele
+ * acrescenta, o `normalizeData` descarta, porque o formato de dados não tem
+ * mais esses dois campos.
  */
 
 type Raw = Record<string, unknown>;

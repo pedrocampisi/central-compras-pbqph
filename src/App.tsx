@@ -14,7 +14,7 @@ import styles from './App.module.css';
 // Stores
 import { useDataStore } from './stores/useDataStore';
 import { useOcEditingStore } from './stores/useOcEditingStore';
-import { useUiStore, type TabId } from './stores/useUiStore';
+import { abaQueExiste, useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
 
 // Services
@@ -40,7 +40,6 @@ import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
 import { FornecedoresPage } from './features/fornecedores/FornecedoresPage';
 import { ObrasPage } from './features/obras/ObrasPage';
-import { PrestadoresPage } from './features/prestadores-servico/PrestadoresPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
 
@@ -58,7 +57,6 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'historico', label: 'Histórico', icon: 'history' },
   { id: 'fornecedores', label: 'Fornecedores', icon: 'users' },
   { id: 'obras', label: 'Obras', icon: 'building' },
-  { id: 'prestadores', label: 'Prestadores', icon: 'wrench' },
   { id: 'catalogo', label: 'Catálogo ECR', icon: 'clipboard' },
 ];
 
@@ -72,7 +70,6 @@ const TAB_TITLES: Record<TabId, string> = {
   historico: 'Histórico de OCs',
   fornecedores: 'Fornecedores',
   obras: 'Obras',
-  prestadores: 'Prestadores de Serviço',
   catalogo: 'Catálogo ECR',
   config: 'Configurações',
 };
@@ -99,7 +96,7 @@ function iniciais(nome: string, email: string): string {
 export default function App() {
   const data = useDataStore((s) => s.data);
 
-  const activeTab = useUiStore((s) => s.activeTab);
+  const activeTab = useUiStore((s) => abaQueExiste(s.activeTab));
   const setTab = useUiStore((s) => s.setActiveTab);
   const showToast = useUiStore((s) => s.showToast);
 
@@ -370,7 +367,6 @@ export default function App() {
               {activeTab === 'historico'     && <HistoricoPage />}
               {activeTab === 'fornecedores'  && <FornecedoresPage />}
               {activeTab === 'obras'         && <ObrasPage />}
-              {activeTab === 'prestadores'   && <PrestadoresPage />}
               {activeTab === 'catalogo'      && <CatalogoPage />}
               {activeTab === 'config'        && <ConfigPage />}
             </>

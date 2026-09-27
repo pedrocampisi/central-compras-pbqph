@@ -8,15 +8,20 @@ import type { StatusOc } from '../domain/constants';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
-export type TabId =
-  | 'dashboard'
-  | 'nova-oc'
-  | 'historico'
-  | 'fornecedores'
-  | 'obras'
-  | 'prestadores'
-  | 'catalogo'
-  | 'config';
+export const ABAS = ['dashboard', 'nova-oc', 'historico', 'fornecedores', 'obras', 'catalogo', 'config'] as const;
+export type TabId = (typeof ABAS)[number];
+
+/** A tela inicial: onde a OC abre, e para onde vai quem pede uma aba que não existe. */
+export const ABA_INICIAL: TabId = 'dashboard';
+
+/**
+ * A aba pedida, se ela existe; senão, a tela inicial. A aba "Prestadores" saiu
+ * (CTO-D585, palavra do Pedro): quem ainda pedir por ela — uma versão velha,
+ * um atalho antigo — cai na tela inicial, e nunca numa tela em branco.
+ */
+export function abaQueExiste(tab: unknown): TabId {
+  return (ABAS as readonly unknown[]).includes(tab) ? (tab as TabId) : ABA_INICIAL;
+}
 
 export type ToastTone = 'success' | 'warning' | 'error' | 'info';
 
@@ -49,12 +54,6 @@ export interface ObraFilter {
   status: AtivaFilter;
 }
 
-export interface PrestadorFilter {
-  search: string;
-  categoria: string;
-  status: AtivoFilter;
-}
-
 export interface CatalogoFilter {
   search: string;
 }
@@ -66,7 +65,6 @@ interface UiState {
   histFilter: HistFilter;
   fornFilter: FornFilter;
   obraFilter: ObraFilter;
-  prestadorFilter: PrestadorFilter;
   catalogoFilter: CatalogoFilter;
   toasts: Toast[];
 
@@ -75,7 +73,6 @@ interface UiState {
   setHistFilter: (partial: Partial<HistFilter>) => void;
   setFornFilter: (partial: Partial<FornFilter>) => void;
   setObraFilter: (partial: Partial<ObraFilter>) => void;
-  setPrestadorFilter: (partial: Partial<PrestadorFilter>) => void;
   setCatalogoFilter: (partial: Partial<CatalogoFilter>) => void;
   showToast: (message: string, tone?: ToastTone, chave?: string) => void;
   dismissToast: (id: string) => void;
@@ -84,16 +81,15 @@ interface UiState {
 let toastSeq = 0;
 
 export const useUiStore = create<UiState>((set) => ({
-  activeTab: 'dashboard',
+  activeTab: ABA_INICIAL,
   histFilter: { search: '', status: '', fornecedor: '', obra: '' },
   fornFilter: { search: '', status: 'todos' },
   obraFilter: { search: '', status: 'todas' },
-  prestadorFilter: { search: '', categoria: '', status: 'todos' },
   catalogoFilter: { search: '' },
   toasts: [],
 
   setActiveTab(tab) {
-    set({ activeTab: tab });
+    set({ activeTab: abaQueExiste(tab) });
   },
 
   setHistFilter(partial) {
@@ -106,10 +102,6 @@ export const useUiStore = create<UiState>((set) => ({
 
   setObraFilter(partial) {
     set((s) => ({ obraFilter: { ...s.obraFilter, ...partial } }));
-  },
-
-  setPrestadorFilter(partial) {
-    set((s) => ({ prestadorFilter: { ...s.prestadorFilter, ...partial } }));
   },
 
   setCatalogoFilter(partial) {

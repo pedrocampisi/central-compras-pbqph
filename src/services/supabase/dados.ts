@@ -19,8 +19,7 @@
  */
 
 import type {
-  AvaliacaoPrestador, Data, Ecr, Fornecedor, Item, Obra,
-  OrdemCompra, PrestadorServico,
+  Data, Ecr, Fornecedor, Item, Obra, OrdemCompra,
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { core, compras, supabase } from './client';
@@ -41,7 +40,7 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 // ---------------------------------------------------------------------------
 
 export async function carregarDados(): Promise<Data> {
-  const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs] = await Promise.all([
+  const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
     // Só as colunas que a OC usa, nunca o `*` (CTO-D551): a classificação e o
     // costume vêm da resolvida, logo abaixo.
     core().from('fornecedores').select(COLUNAS_DA_FORNECEDORES.join(', ')).order('razao_social'),
@@ -64,14 +63,12 @@ export async function carregarDados(): Promise<Data> {
     compras().from('ecrs').select('*, materiais(*)').order('id'),
     compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
-    compras().from('prestadores_servico').select('*').order('razao_social'),
-    compras().from('avaliacoes_prestadores').select('*').order('data_avaliacao'),
     // Quais ECRs cada fornecedor atende. Tabela própria desde 17/08 — até
     // então a tela deixava marcar e a marcação sumia no reload.
     compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id'),
   ]);
 
-  for (const r of [forn, fornResolvido, obras, ecrs, ocs, cfgNum, prest, avals, fornEcrs]) {
+  for (const r of [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
   }
 
@@ -127,8 +124,6 @@ export async function carregarDados(): Promise<Data> {
     obras: ((obras.data ?? []) as unknown as Record<string, unknown>[]).map(paraObra),
     ecrs: (ecrs.data ?? []).map(paraEcr),
     ordens_compra: (ocs.data ?? []).map(paraOc),
-    prestadores_servico: (prest.data ?? []).map(paraPrestador),
-    avaliacoes_prestadores: (avals.data ?? []).map(paraAvaliacao),
   };
 }
 
@@ -244,43 +239,6 @@ function paraOc(l: Record<string, unknown>): OrdemCompra {
     atualizado_em: vazio(l['atualizado_em']),
     pdf_gerado_em: vazio(l['pdf_gerado_em']),
     versao: Number(l['versao']) || 0,
-  };
-}
-
-function paraPrestador(l: Record<string, unknown>): PrestadorServico {
-  const tels = (l['telefones'] as string[]) ?? [];
-  return {
-    id: String(l['id']),
-    razao_social: vazio(l['razao_social']),
-    nome_fantasia: vazio(l['nome_fantasia']),
-    tipo: (l['tipo'] as PrestadorServico['tipo']) ?? 'PJ',
-    cnpj_cpf: vazio(l['documento']),
-    categoria_servico: vazio(l['categoria_servico']),
-    endereco: paraEndereco(l),
-    telefones: [tels[0] ?? '', tels[1] ?? ''],
-    email: vazio(l['email']),
-    contato_responsavel: vazio(l['contato_responsavel']),
-    observacoes: vazio(l['observacoes']),
-    ativo: l['ativo'] !== false,
-    criado_em: vazio(l['criado_em']),
-    atualizado_em: vazio(l['atualizado_em']),
-  };
-}
-
-function paraAvaliacao(l: Record<string, unknown>): AvaliacaoPrestador {
-  return {
-    id: String(l['id']),
-    prestador_id: vazio(l['prestador_id']),
-    // Mesma tradução usada nas OCs: "obra" na tela é a intervenção no banco.
-    obra_id: vazio(l['intervencao_id']),
-    data_avaliacao: vazio(l['data_avaliacao']),
-    responsavel: vazio(l['responsavel']),
-    atendeu_prazo: (l['atendeu_prazo'] as AvaliacaoPrestador['atendeu_prazo']) ?? null,
-    usou_epi: (l['usou_epi'] as AvaliacaoPrestador['usou_epi']) ?? null,
-    conforme_pes: (l['conforme_pes'] as AvaliacaoPrestador['conforme_pes']) ?? null,
-    observacoes: vazio(l['observacoes']),
-    criado_em: vazio(l['criado_em']),
-    atualizado_em: vazio(l['atualizado_em']),
   };
 }
 
