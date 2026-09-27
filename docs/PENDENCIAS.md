@@ -218,6 +218,15 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
+### 18. D586 + D588 + D589 — a tela de ler as ECRs e o PDF · **no ramo, esperando a carta do CTO para publicar**
+
+*Aberta em 27/09/2026 (decisão 53).* **Onde mora:** o ramo **`d586-ecrs-do-sgq`**, commit **`eca44c1`**, empurrado,
+**fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D586/`. **Fecha quando:** a carta do CTO mandar
+publicar (a tabela do histórico já está na produção). **Depois dela:** a tela de editar (D589 §4.2), num ramo à parte,
+com a linha "Dimensão" sem texto da ECR 02 e a ECR 04 (recusada pelo banco até a decisão do CTO) em aberto.
+
+---
+
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do

@@ -2205,3 +2205,34 @@ contra o ramo). 300 testes; tipos e lint limpos; as 4 sabotagens da D585 mordend
 ~20 s em que o endereço ainda servia a anterior): o `versao.txt` diz `…-707631c`; o pacote servido
 (`index-DR3jH4dr.js`) tem "Prestadores de Serviço", `prestadores_servico` e `avaliacoes_prestadores` 0 vezes, e
 "Catálogo ECR" continua.
+
+## Decisão 53 — a tela de ler as ECRs e o PDF de cada uma · 27/09/2026
+
+**POR QUÊ (CTO-D586, emendada pela D588; D589 §4, o primeiro passo):** palavra do Pedro — as ECRs do sistema viram as
+do documento, e depois "o verdadeiro será o dos ECR's": os `.docx` se aposentam, a ECR do sistema é a que vale, e a
+obra e o auditor a leem por um "botão de PDF em cada ECR". Só o Pedro revisa (a tela de editar é o segundo passo).
+
+**O QUE MUDOU (no ramo `d586-ecrs-do-sgq`, `eca44c1`; NÃO publicado):**
+- **A tela:** cada ECR aberta mostra as cinco seções como o documento ("01." a "05.", o quadradinho, o rótulo em
+  negrito, a nota fora da lista em destaque), "Materiais" e o histórico de revisões no fim (tabela; a 375, um bloco
+  por revisão). Saem Objetivo, Escopo, Normas, Documentos, Critérios, Ensaios e Observações (os campos ficam no banco).
+  O subtítulo proposto: "O texto em vigor de cada ECR, com o histórico de revisões no fim." A seta vira desenho,
+  sem animação.
+- **O histórico:** lido de `compras.ecr_revisoes` junto com as ECRs, pelo contrato do Banco (os nomes das colunas
+  `_nome`; a ordem da data e da chave; sem o texto das revisões velhas).
+- **O PDF:** jsPDF, como o da OC: o cabeçalho e a tabela de revisões em toda página, "Página N de M". O Word imprime
+  "01." e o quadradinho, e não "1.1" (a premissa da carta corrigida, pelo PDF exportado do próprio Word). O "mᶟ" sai
+  "m³" no PDF; a tela mostra o banco como está. A marca comprimida: 88 KB, e não 4 MB.
+- **O `auth.ts`:** o comentário velho do `pode_editar_cadastro` corrigido (D589 §4.4).
+
+**AS TRAVAS:** 342 testes (eram 300): `tests/domain/ecr.test.ts`, `tests/services/ecrPdf.test.ts` (lê o texto de
+dentro do PDF, página por página, e o peso com a marca de verdade) e `tests/components/CatalogoEcr.test.tsx`. 18
+sabotagens novas e as 55 de antes mordendo, hash igual.
+
+**AS FOTOS:** `docs/Capturas/2026-09-27_D586/` — a lista fechada, a ECR 03 e a ECR 08 abertas (inteiras), antes e
+depois, a 1920 e a 375; o histórico aberto; os dois PDFs e as páginas deles em imagem. Dados: o texto das 20 como
+está na produção (368 linhas); nomes do histórico inventados.
+
+**ACHADOS, SEM MEXER:** o PDF da OC no ar pesa 4,1 MB por OC, pela mesma marca sem compressão (a D586 §5 diz que
+ele não muda; fica para carta do CTO). A ECR 02 tem uma linha com rótulo "Dimensão" e texto vazio — a `revisar_ecr`
+recusaria toda revisão da ECR 02 que a mantivesse (vai para a tela de editar).
