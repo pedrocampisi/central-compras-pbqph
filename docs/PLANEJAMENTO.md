@@ -1974,7 +1974,34 @@ com o do papel.
 
 **AS FOTOS:** saíram por protocolo do Chrome (CDP), com a largura por emulação: a janela do Chrome
 tem largura mínima, e a primeira leva de 375 saiu cortada à direita por causa do fotógrafo, não da
-tela. Servidor falso dentro da página, com respostas escritas à mão no formato da v5 — a v5 não
-estava no ensaio, e chamada de verdade pede sessão, que eu não tenho (pendência 13).
+tela. Servidor falso dentro da página, com respostas escritas à mão no formato da v5. O ensaio já
+tem o código dos dois leitores (o contador de versão de lá diz 4; conferido só lendo), mas chamada
+de verdade pede sessão, que eu não tenho (pendência 13).
 
 **AS TRAVAS:** 279 testes. 16 sabotagens da D567 e as 10 da D557, todas mordendo, hash igual.
+
+## Decisão 43 — uma mensagem de leitura por vez, e o conselho certo para cada porta · 26/09/2026
+
+**POR QUÊ (CTO-D570):** o CTO aceitou a tela da D567 com dois retoques antes do Pedro. Na foto 05,
+duas mensagens verdes iguais ("8 itens importados via IA.") ficavam empilhadas depois da troca pelo
+certeiro, e a 375 e 768 cobriam o "Salvar Rascunho" e o "Emitir". E o 422 da resposta cortada, no
+servidor de verdade, termina em "Divida a lista em partes menores." — conselho do texto colado,
+errado para uma foto.
+
+**O QUE MUDOU (no ramo `d557-lista-em-texto`, `2f499c1`; NÃO publicado):**
+- `showToast` ganhou uma **chave**, opcional: mensagem com chave tira a velha da mesma chave. As
+  mensagens de leitura usam a mesma chave; as outras mensagens do sistema não mudam.
+- A troca diz o que aconteceu: **"O certeiro trocou os N itens."** (`avisoDaTroca`, puro).
+- Na **imagem**, `erroDaImagem` (puro) tira a frase da frase do servidor que fala da "lista" e põe
+  "Se foram várias páginas, mande menos de cada vez." — o teto é da leitura inteira, e menos páginas
+  ajudam. Frase sem "lista" passa como veio. **Na caixa de texto, a frase inteira fica.**
+- Quem chama a função passa a montar o próprio erro: a frase ajustada da imagem continua sendo a do
+  servidor para a tela (sem o prefixo "Erro na importação:").
+
+**O QUE FICOU:** a 375, a mensagem única ainda cobre metade do botão laranja por 3,4 s — como toda
+mensagem do sistema. Não mexi no lugar das mensagens: é do sistema inteiro, e não foi pedido.
+
+**AS FOTOS:** refeitas a 04 (saiu idêntica, byte a byte), a 05 e a 07, e nova a 10 (o 422 na caixa
+de texto, com a frase inteira), nas quatro larguras: 40 fotos. Rolagem de lado 0, nada fora.
+
+**AS TRAVAS:** 285 testes. 7 sabotagens novas (17–23), todas mordendo, hash igual.

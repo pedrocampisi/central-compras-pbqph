@@ -237,22 +237,25 @@ segurou).
 D567** (a corrida da IA da OC, largada pelo Pedro às 22h4x), que construiu por cima dela a escolha
 do leitor: **rápido ou certeiro**, antes de ler, a mesma para a imagem e para o texto.
 
-**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`df82ceb`**, empurrado. **Fora do
-`main`** (decisão 41). As fotos da D567 estão em `docs/Capturas/2026-09-26_D567/` (36: 9 estados ×
-1280, 1024, 768 e 375).
+**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`2f499c1`** (os retoques da
+D570), empurrado. **Fora do `main`** (decisão 41). As fotos estão em
+`docs/Capturas/2026-09-26_D567/` (40: 10 estados × 1280, 1024, 768 e 375).
+
+**A tela está aceita pelo CTO** (D570), com os dois retoques feitos (decisão 43): uma mensagem de
+leitura por vez, e o 422 da imagem sem o conselho da lista.
 
 **Pronto no ramo:** tudo o da D557, e mais: a escolha com a dica e o "?"; a espera do certeiro que
 diz "até 1 minuto"; o resultado com o total lido em destaque e quem leu; o "Ler de novo com o
 certeiro", que troca só os itens daquela leitura e pergunta antes se algum foi mexido; o erro do
-rápido que oferece o certeiro; a trava do `_meta.leitor`. 279 testes; 16 sabotagens da D567 e as 10
-da D557 mordendo (decisão 42).
+rápido que oferece o certeiro; a trava do `_meta.leitor`. 285 testes; 16 sabotagens da D567, 7 da
+D570 e as 10 da D557 mordendo (decisões 42 e 43).
 
 **Falta, na ordem:**
-1. o `CTO` olhar as fotos (aprova ou pede retoque) e levar ao Pedro;
-2. a `extrair-itens` v5 (do `Banco_de_Dados`) na produção, e a medida do texto;
+1. o `CTO` olhar as fotos refeitas e levar ao Pedro;
+2. o "sim" do Pedro (a `extrair-itens` v5 já está na produção desde 23:02, conferida pelo CTO);
 3. o aviso de publicar, **por carta do `CTO`**. Então: trazer o ramo para o `main` do dia, rodar
    tudo, publicar pelo PowerShell, medir por fora e escrever a carta com as linhas de exemplo para o
-   Pedro, dizendo nela o limite de **2.000 caracteres** do texto (o da v4; conferir o da v5).
+   Pedro, dizendo nela o limite de **2.000 caracteres** do texto (o da v5, dito pelo CTO na D570).
 ---
 
 ## ✅ Fechadas (registro)
