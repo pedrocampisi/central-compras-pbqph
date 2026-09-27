@@ -2325,3 +2325,20 @@ qualquer import). 13 sabotagens novas mordendo; as 97 de antes também, rodadas 
 
 **A LINHA DO §9.5:** 981 linhas novas fora de `docs\` contra `7edb715`; 2.304 contra o `main`, somada a tela de editar,
 que já espera o perito. A perícia é decisão do CTO.
+
+## Decisão 58 — a máscara aprovada, com o retoque em Configurações · 27/09/2026
+
+**POR QUÊ (CTO-D601):** o aviso "Somente leitura — as configurações ainda não é gravado" ficava logo abaixo do "Armar".
+Quem lê entende que a opção recém-armada não grava, e é o contrário.
+
+**O QUE MUDOU (no ramo `d599-uma-obra`, `feefada`; NÃO publicado):** a opção "Mostrar só uma obra" fechada por uma
+linha, separada do resto; o aviso depois dela, dizendo "o resto desta tela"; o subtítulo "Mostrar só uma obra, textos
+legais e integração com IA." O componente do aviso não mudou. Fotos 01a, 01b e 01c refeitas.
+
+**AS TRAVAS:** 398 testes (uma trava nova: o aviso fora da opção e depois dela); 3 sabotagens novas mordendo.
+
+**DECIDIDO PELO CTO NA MESMA CARTA:** as datas da auditoria ficam no código só como sugestão de preenchimento; o
+lockfile e os restos antigos esperam a triagem da perícia de código.
+
+**A LINHA DO §9.5:** 1.003 linhas novas fora de `docs\` contra `7edb715` (eram 981; o retoque somou 22). Passa do portão
+por 3; dito na carta, e a decisão é do CTO.
