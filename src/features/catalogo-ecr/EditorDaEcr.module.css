@@ -72,6 +72,13 @@
   line-height: 1.45;
 }
 .rotulo { font-weight: 600; }
+/* O exemplo dentro do campo vazio não pode parecer um rótulo escrito (D596, foto 05). */
+.rotulo::placeholder,
+.texto::placeholder,
+.descricao::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
 .texto,
 .descricao {
   resize: vertical;

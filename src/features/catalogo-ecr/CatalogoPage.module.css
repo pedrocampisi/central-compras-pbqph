@@ -141,6 +141,14 @@
 @media (max-width: 700px) {
   .body { padding: 14px 12px; }
   .revisao { margin-left: 0; flex-basis: 100%; }
+  /* Com mais de um botão (o Pedro vê "Editar" e "PDF"), os botões descem para a
+     linha de baixo: ao lado, o título virava uma coluna de uma palavra (D596, foto 01). */
+  .cabeca:has(> :nth-child(3)) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    padding-bottom: 10px;
+  }
+  .cabeca:has(> :nth-child(3)) > .head { flex-basis: 100%; }
 
   /* A 375, cada revisão vira um bloco: o nome da coluna ao lado do valor. */
   .tabela thead { display: none; }
