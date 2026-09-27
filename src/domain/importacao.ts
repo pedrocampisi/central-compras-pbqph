@@ -115,3 +115,29 @@ export function avisoDaLeitura(itens: number, ignoradas: number): string {
   const entraram = `${plural(itens, 'item importado', 'itens importados')} via IA`;
   return ignoradas > 0 ? `${entraram} · ${plural(ignoradas, 'linha ignorada', 'linhas ignoradas')}.` : `${entraram}.`;
 }
+
+/**
+ * O aviso do fim da TROCA pelo certeiro (CTO-D570): diz o que aconteceu, e não
+ * "importados" de novo — os itens não somaram, foram trocados.
+ */
+export function avisoDaTroca(itens: number, ignoradas: number): string {
+  const trocou = `O certeiro trocou ${itens === 1 ? 'o item' : `os ${itens} itens`}`;
+  return ignoradas > 0 ? `${trocou} · ${plural(ignoradas, 'linha ignorada', 'linhas ignoradas')}.` : `${trocou}.`;
+}
+
+/** O conselho da imagem quando a resposta sai cortada: o teto é da leitura inteira. */
+export const CONSELHO_DA_IMAGEM = 'Se foram várias páginas, mande menos de cada vez.';
+
+/**
+ * A frase do servidor, na IMAGEM (CTO-D570). O servidor é um só para a imagem
+ * e para o texto, e o 422 da resposta cortada termina em "Divida a lista em
+ * partes menores." — conselho do texto colado, errado para uma foto. Sai toda
+ * frase que fala da lista, e entra o conselho da imagem. Sem frase da lista, a
+ * do servidor fica como veio. Na caixa de texto, a frase inteira fica.
+ */
+export function erroDaImagem(doServidor: string): string {
+  const frases = doServidor.split(/(?<=[.!?])\s+/).filter((f) => f.trim() !== '');
+  const daImagem = frases.filter((f) => !/\blista\b/i.test(f));
+  if (daImagem.length === frases.length) return doServidor;
+  return [...daImagem, CONSELHO_DA_IMAGEM].join(' ');
+}

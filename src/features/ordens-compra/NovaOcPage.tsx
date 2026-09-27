@@ -21,7 +21,10 @@ import { UN_PADRAO } from '../../domain/constants';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
 import { ErroDaImportacao, lerLista, lerPedido, statusDoErro } from '../../services/ai/lerPedido';
-import { avisoDaLeitura } from '../../domain/importacao';
+import { avisoDaLeitura, avisoDaTroca } from '../../domain/importacao';
+
+/** A chave das mensagens de leitura: uma por vez na tela (D570). */
+const CHAVE_DA_LEITURA = 'leitura-da-ia';
 import {
   LEITOR_PADRAO,
   itensMexidos,
@@ -640,7 +643,14 @@ export function NovaOcPage() {
       }
       setResultado({ leitor: quemLeu(r.leitor), itens: r.itens });
       if (f.tipo === 'texto') setImportTexto('');
-      showToast(avisoDaLeitura(r.itens.length, r.ignoradas.length), 'success');
+      // Uma mensagem de leitura por vez: a da troca tira a da leitura anterior (D570).
+      showToast(
+        trocar
+          ? avisoDaTroca(r.itens.length, r.ignoradas.length)
+          : avisoDaLeitura(r.itens.length, r.ignoradas.length),
+        'success',
+        CHAVE_DA_LEITURA,
+      );
     } catch (err) {
       setImportErro(mensagemDaFalha(err));
       setOferecerCerteiro(com === 'rapido' && outroLeitorPodeAjudar(statusDoErro(err)));

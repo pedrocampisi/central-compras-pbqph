@@ -15,7 +15,7 @@ import type { Item } from '../../domain/types';
 import { normalizeItem } from '../../domain/normalize';
 import { UN_PADRAO } from '../../domain/constants';
 import { supabase } from '../supabase/client';
-import { MAX_PAGINAS, mensagemDePaginas } from '../../domain/importacao';
+import { MAX_PAGINAS, erroDaImagem, mensagemDePaginas } from '../../domain/importacao';
 import { ErroDaImportacao } from './lerPedido';
 import { LEITOR_PADRAO, leitorDaResposta, type Leitor } from '../../domain/leitor';
 
@@ -132,7 +132,9 @@ async function erroDoServidor(resp: Response): Promise<string> {
 
 async function chamarExtrairItens(
   corpo: ({ imagens: string[] } | { texto: string }) & { leitor: Leitor },
-  mensagem: (status: number, doServidor: string) => string,
+  // A frase do próprio servidor vai como ErroDaImportacao: a tela a mostra sem
+  // prefixo (D557). Quem chama decide, porque a imagem a ajusta (D570).
+  falha: (status: number, doServidor: string) => Error,
 ): Promise<ResultadoDaLeitura> {
   const url = import.meta.env['VITE_SUPABASE_URL'] as string;
 
@@ -154,11 +156,8 @@ async function chamarExtrairItens(
 
   if (!resp.ok) {
     const doServidor = await erroDoServidor(resp);
-    const texto = mensagem(resp.status, doServidor);
-    // A frase do próprio servidor vai para a tela como veio, sem prefixo (D557).
-    const erro = texto === doServidor ? new ErroDaImportacao(texto) : new Error(texto);
     // O status vai junto: é por ele que a tela sabe se o outro leitor pode ajudar (D567).
-    throw Object.assign(erro, { status: resp.status });
+    throw Object.assign(falha(resp.status, doServidor), { status: resp.status });
   }
 
   return paraResultado(await resp.json());
@@ -181,9 +180,12 @@ export async function extractItemsFromImages(
   // As mensagens da imagem ficam as de sempre; o 400 (D557: grande demais) e o
   // 422 trazem a do servidor. O 422 porque, desde a v4, ele também é a
   // resposta CORTADA — e "tente uma imagem mais nítida" é conselho errado para
-  // um PDF limpo e comprido (D567).
+  // um PDF limpo e comprido (D567). Sem o conselho de dividir a LISTA, que é
+  // do texto colado (D570).
   return chamarExtrairItens({ imagens: imagesDataUrls, leitor }, (status, doServidor) =>
-    (status === 400 || status === 422) && doServidor ? doServidor : mensagemErro(status),
+    (status === 400 || status === 422) && doServidor
+      ? new ErroDaImportacao(erroDaImagem(doServidor))
+      : new Error(mensagemErro(status)),
   );
 }
 
@@ -195,6 +197,8 @@ export async function extractItemsFromImages(
 export async function organizarTexto(texto: string, leitor: Leitor = LEITOR_PADRAO): Promise<ResultadoDaLeitura> {
   if (texto.trim() === '') throw new Error('Cole a lista de materiais na caixa de texto.');
   return chamarExtrairItens({ texto, leitor }, (status, doServidor) =>
-    doServidor || (status === 422 ? 'A IA não encontrou itens neste texto.' : mensagemErro(status)),
+    doServidor
+      ? new ErroDaImportacao(doServidor)
+      : new Error(status === 422 ? 'A IA não encontrou itens neste texto.' : mensagemErro(status)),
   );
 }

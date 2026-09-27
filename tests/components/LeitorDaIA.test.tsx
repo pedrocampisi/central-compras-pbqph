@@ -25,6 +25,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useConfirmStore } from '../../src/stores/useConfirmStore';
+import { useUiStore } from '../../src/stores/useUiStore';
 import { normalizeItem } from '../../src/domain/normalize';
 import type { Data, Item } from '../../src/domain/types';
 
@@ -217,6 +218,28 @@ describe('D567 — "Ler de novo com o certeiro": troca os itens, e pergunta se j
     expect(descricoes()).toEqual(['Cimento CP-II 50kg', 'Areia média', 'Brita 1', 'Posto à mão']);
     expect(resultadoNaTela()).toHaveTextContent('Lido pelo certeiro · 3 itens');
     expect(screen.getByRole('radio', { name: /Certeiro/ })).toBeChecked();
+  });
+
+  it('D570: depois da troca, UMA mensagem na tela — a do certeiro, que tira a do rápido', async () => {
+    useUiStore.setState({ toasts: [] });
+    await lerComORapido();
+    expect(useUiStore.getState().toasts.map((t) => t.message)).toEqual(['2 itens importados via IA.']);
+    lerPedido.mockResolvedValueOnce(leituraDoCerteiro());
+    await userEvent.click(screen.getByRole('button', { name: /Ler de novo com o certeiro/ }));
+    await screen.findByDisplayValue('Brita 1');
+    expect(useUiStore.getState().toasts.map((t) => t.message)).toEqual(['O certeiro trocou os 3 itens.']);
+  });
+
+  it('D570: a chave só junta as mensagens dela — outra mensagem da tela não some', () => {
+    useUiStore.setState({ toasts: [] });
+    const { showToast } = useUiStore.getState();
+    showToast('Selecione um fornecedor.', 'warning');
+    showToast('2 itens importados via IA.', 'success', 'leitura');
+    showToast('O certeiro trocou os 3 itens.', 'success', 'leitura');
+    expect(useUiStore.getState().toasts.map((t) => t.message)).toEqual([
+      'Selecione um fornecedor.',
+      'O certeiro trocou os 3 itens.',
+    ]);
   });
 
   it('com item mexido: pergunta antes; "Manter os meus" não lê nada e não troca nada', async () => {

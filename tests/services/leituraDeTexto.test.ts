@@ -13,8 +13,11 @@ import { linhasDosItens } from '../../src/services/supabase/linhas';
 import { corpoDaTabelaDeItens } from '../../src/services/pdf/tabelaDeItens';
 import { ItemSchema } from '../../src/domain/schemas/data.schema';
 import {
+  CONSELHO_DA_IMAGEM,
   avisoDaLeitura,
+  avisoDaTroca,
   destinoDaColagem,
+  erroDaImagem,
   juntarTexto,
 } from '../../src/domain/importacao';
 
@@ -140,6 +143,39 @@ describe('D557 — o contrato com o servidor', () => {
     await expect(extractItemsFromImages(['a'])).rejects.toBeInstanceOf(ErroDaImportacao);
     vi.stubGlobal('fetch', respostaFalsa(200, { itens: [{ descricao: 'x' }], ignoradas: [] }));
     await expect(extractItemsFromImages(['a'])).resolves.toMatchObject({ ignoradas: [] });
+  });
+});
+
+describe('D570 — o 422 da resposta cortada, com a frase REAL do servidor', () => {
+  // Copiada do código da `extrair-itens` (a dos dois leitores), palavra por palavra.
+  const CORTADA =
+    'A resposta da IA foi cortada antes do fim, e nenhum item foi devolvido ' +
+    'para não faltar item sem aviso. Divida a lista em partes menores.';
+
+  it('na imagem: a primeira frase fica, o conselho da LISTA sai, e entra o da imagem', async () => {
+    vi.stubGlobal('fetch', respostaFalsa(422, { erro: CORTADA }));
+    const e = await extractItemsFromImages(['a']).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(ErroDaImportacao);
+    const m = (e as Error).message;
+    expect(m).toContain('A resposta da IA foi cortada antes do fim, e nenhum item foi devolvido');
+    expect(m).not.toMatch(/lista|Divida/i);
+    expect(m).toBe(`A resposta da IA foi cortada antes do fim, e nenhum item foi devolvido para não faltar item sem aviso. ${CONSELHO_DA_IMAGEM}`);
+  });
+
+  it('na caixa de texto: a frase inteira do servidor fica', async () => {
+    vi.stubGlobal('fetch', respostaFalsa(422, { erro: CORTADA }));
+    await expect(organizarTexto('10 sc cimento')).rejects.toThrow(CORTADA);
+  });
+
+  it('frase do servidor que não fala da lista passa como veio, na imagem', () => {
+    expect(erroDaImagem('Máximo de 10 páginas por vez. Recebidas 12.')).toBe('Máximo de 10 páginas por vez. Recebidas 12.');
+    expect(erroDaImagem('Resposta da IA sem JSON válido.')).toBe('Resposta da IA sem JSON válido.');
+  });
+
+  it('o aviso da troca diz que o certeiro TROCOU, não que importou de novo', () => {
+    expect(avisoDaTroca(8, 0)).toBe('O certeiro trocou os 8 itens.');
+    expect(avisoDaTroca(1, 0)).toBe('O certeiro trocou o item.');
+    expect(avisoDaTroca(3, 2)).toBe('O certeiro trocou os 3 itens · 2 linhas ignoradas.');
   });
 });
 

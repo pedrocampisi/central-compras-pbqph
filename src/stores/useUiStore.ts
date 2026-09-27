@@ -24,6 +24,8 @@ export interface Toast {
   id: string;
   message: string;
   tone: ToastTone;
+  /** Mensagens da mesma chave são uma só: a nova tira a velha (CTO-D570). */
+  chave?: string;
 }
 
 export interface HistFilter {
@@ -75,7 +77,7 @@ interface UiState {
   setObraFilter: (partial: Partial<ObraFilter>) => void;
   setPrestadorFilter: (partial: Partial<PrestadorFilter>) => void;
   setCatalogoFilter: (partial: Partial<CatalogoFilter>) => void;
-  showToast: (message: string, tone?: ToastTone) => void;
+  showToast: (message: string, tone?: ToastTone, chave?: string) => void;
   dismissToast: (id: string) => void;
 }
 
@@ -114,9 +116,13 @@ export const useUiStore = create<UiState>((set) => ({
     set((s) => ({ catalogoFilter: { ...s.catalogoFilter, ...partial } }));
   },
 
-  showToast(message, tone = 'info') {
+  showToast(message, tone = 'info', chave) {
     const id = `toast-${++toastSeq}`;
-    set((s) => ({ toasts: [...s.toasts, { id, message, tone }] }));
+    // Com chave, a mensagem nova tira a velha da mesma chave: duas iguais
+    // empilhadas cobriam o rodapé da Nova OC a 375px (D570, foto 05).
+    set((s) => ({
+      toasts: [...s.toasts.filter((t) => chave === undefined || t.chave !== chave), { id, message, tone, chave }],
+    }));
     // Auto-dismiss após 3.4s
     setTimeout(() => {
       set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }));
