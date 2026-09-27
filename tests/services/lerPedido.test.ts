@@ -13,7 +13,7 @@ import { extractItemsFromImages } from '../../src/services/ai/extractItems';
 import type { Item } from '../../src/domain/types';
 import type { ResultadoDaLeitura } from '../../src/services/ai/extractItems';
 
-const VAZIO: ResultadoDaLeitura = { itens: [], confira: {}, ignoradas: [] };
+const VAZIO: ResultadoDaLeitura = { itens: [], confira: {}, ignoradas: [], leitor: null };
 
 const pdf = (nome: string) => new File(['%PDF'], nome, { type: 'application/pdf' });
 const png = (nome = 'image.png') => new File(['png'], nome, { type: 'image/png' });
@@ -111,8 +111,8 @@ describe('D554 — vários arquivos de uma vez viram UMA leitura, como páginas'
 
   it('exatamente 5 páginas passa; o que o servidor devolve é o que volta', async () => {
     const item = { descricao: 'Cimento' } as Item;
-    d.enviar.mockResolvedValueOnce({ itens: [item], confira: {}, ignoradas: [] });
-    await expect(lerPedido([pdf('pedido.pdf'), png(), png()], d.deps)).resolves.toEqual({ itens: [item], confira: {}, ignoradas: [] });
+    d.enviar.mockResolvedValueOnce({ itens: [item], confira: {}, ignoradas: [], leitor: null });
+    await expect(lerPedido([pdf('pedido.pdf'), png(), png()], d.deps)).resolves.toEqual({ itens: [item], confira: {}, ignoradas: [], leitor: null });
   });
 
   it('arquivo que não abre: a mensagem diz qual, e nada é enviado', async () => {

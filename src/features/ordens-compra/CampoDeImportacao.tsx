@@ -11,12 +11,18 @@
  *   a caixa de texto .... a lista de materiais do jeito que veio, e o
  *                         "Organizar com IA"
  *
+ * E a escolha do leitor (CTO-D567): rápido ou certeiro, ANTES de ler, a mesma
+ * para a imagem e para o texto. Depois da leitura, o campo fica aberto com o
+ * resultado: o total lido em destaque, quem leu, e — se foi o rápido — o "Ler
+ * de novo com o certeiro".
+ *
  * O campo não lê nada sozinho: fecha pelo X ou pelo Esc, e quem lê é a página
  * (`onArquivos`, `onOrganizar`). Enquanto lê, as portas ficam fechadas. O texto
  * da caixa é da página, e por isso não se perde quando a leitura falha.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
 import { Loader } from '../../components/Loader/Loader';
@@ -27,7 +33,15 @@ import {
   foraDeCampoDeTexto,
   juntarTexto,
 } from '../../domain/importacao';
+import { CERTEIRO_INDISPONIVEL, DICA_DO_LEITOR, LEITORES, type Leitor } from '../../domain/leitor';
+import { formatBrl } from '../../domain/format';
 import styles from './CampoDeImportacao.module.css';
+
+export interface ResultadoNaTela {
+  leitor: Leitor;
+  itens: number;
+  total: number;
+}
 
 interface Props {
   lendo: boolean;
@@ -41,6 +55,24 @@ interface Props {
   onOrganizar?: () => void;
   /** As linhas da última leitura que não viraram item — ficam até fechar. */
   ignoradas?: string[];
+  /** A escolha do leitor (D567). Sem `onLeitor`, o campo não mostra a escolha. */
+  leitor?: Leitor;
+  onLeitor?: (l: Leitor) => void;
+  /** Quem está lendo agora, para a espera dizer quanto pode levar. */
+  lendoCom?: Leitor;
+  resultado?: ResultadoNaTela | null;
+  onLerDeNovoComCerteiro?: () => void;
+  /** A leitura do rápido falhou de um jeito que o certeiro pode resolver. */
+  oferecerCerteiro?: boolean;
+  onLerComCerteiro?: () => void;
+  /** Escolheu o certeiro e a resposta não era dele: nada entrou. */
+  certeiroIndisponivel?: boolean;
+}
+
+const LEITORES_NA_ORDEM: Leitor[] = ['rapido', 'certeiro'];
+
+function contarItens(n: number): string {
+  return n === 1 ? '1 item' : `${n} itens`;
 }
 
 export function CampoDeImportacao({
@@ -53,11 +85,20 @@ export function CampoDeImportacao({
   onTexto,
   onOrganizar,
   ignoradas = [],
+  leitor = 'rapido',
+  onLeitor,
+  lendoCom = 'rapido',
+  resultado = null,
+  onLerDeNovoComCerteiro,
+  oferecerCerteiro = false,
+  onLerComCerteiro,
+  certeiroIndisponivel = false,
 }: Props) {
   const [arrastando, setArrastando] = useState(false);
   const zonaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const caixaRef = useRef<HTMLTextAreaElement>(null);
+  const idDoLeitor = useId();
 
   // As portas leem a versão mais nova das props sem religar os ouvintes.
   const atual = useRef({ lendo, onArquivos, onFechar, texto, onTexto });
@@ -124,6 +165,8 @@ export function CampoDeImportacao({
   };
 
   const comTexto = !!onTexto;
+  const comEscolha = !!onLeitor;
+  const certeiroLendo = comEscolha && lendoCom === 'certeiro';
 
   return (
     <div
@@ -162,14 +205,138 @@ export function CampoDeImportacao({
 
       {lendo ? (
         <div className={styles.lendo}>
-          <strong className={styles.titulo}>{oQueLe === 'texto' ? 'Organizando a lista…' : 'Lendo o pedido…'}</strong>
-          <span className={styles.nota}>Os itens entram na OC assim que a leitura terminar.</span>
+          <strong className={styles.titulo}>
+            {oQueLe === 'texto' ? 'Organizando a lista' : 'Lendo o pedido'}
+            {comEscolha ? ` com o ${LEITORES[lendoCom].nome.toLowerCase()}` : ''}…
+          </strong>
+          {certeiroLendo ? (
+            <span className={styles.nota} data-espera-certeiro="">
+              O certeiro pode levar <strong>até 1 minuto</strong>. A tela não travou: os itens entram
+              na OC assim que a leitura terminar.
+            </span>
+          ) : (
+            <span className={styles.nota}>Os itens entram na OC assim que a leitura terminar.</span>
+          )}
           <div className={styles.espera}>
             <Loader />
           </div>
         </div>
       ) : (
         <>
+          {resultado && (
+            <section className={styles.resultado} aria-label="Resultado da leitura" data-resultado="">
+              <div className={styles.linhaComAjuda}>
+                <span className={styles.rotuloTotal}>Total lido</span>
+                <Ajuda sobre="Por que conferir o total lido">
+                  O rápido pode trocar um preço em foto ou papel escaneado. Nos testes, quando isso
+                  aconteceu, o total lido quase sempre deixou de bater com o do papel. Conferir o total é
+                  o jeito mais rápido de pegar o erro. Se não bater, leia de novo com o certeiro.
+                </Ajuda>
+              </div>
+              <strong className={styles.totalLido} data-total-lido="">
+                {formatBrl(resultado.total)}
+              </strong>
+              <span className={styles.subtitulo}>
+                Lido pelo <strong>{LEITORES[resultado.leitor].nome.toLowerCase()}</strong> ·{' '}
+                {contarItens(resultado.itens)}
+              </span>
+              <span className={styles.contexto}>
+                Confira com a soma dos itens no papel, sem o frete. Se não bater, algum preço ou
+                quantidade saiu errado.
+              </span>
+              {resultado.leitor === 'rapido' && onLerDeNovoComCerteiro && (
+                <div className={styles.acaoDoResultado}>
+                  <Button variant="outline" size="sm" onClick={onLerDeNovoComCerteiro}>
+                    <Icon name="reload" size={13} /> Ler de novo com o certeiro
+                  </Button>
+                  <span className={styles.contexto}>
+                    Troca os {contarItens(resultado.itens)} desta leitura pelos do certeiro. Leva até 1
+                    minuto.
+                  </span>
+                </div>
+              )}
+            </section>
+          )}
+
+          {certeiroIndisponivel && (
+            <div className={styles.avisoLeitor} role="alert" data-certeiro-indisponivel="">
+              <strong>{CERTEIRO_INDISPONIVEL.titulo}</strong>
+              <span>{CERTEIRO_INDISPONIVEL.texto}</span>
+            </div>
+          )}
+
+          {erro && (
+            <div className={styles.erroComAcao}>
+              <p className={styles.erro} role="alert">
+                {erro}
+              </p>
+              {oferecerCerteiro && onLerComCerteiro && (
+                <div className={styles.acaoDoResultado}>
+                  <Button variant="outline" size="sm" onClick={onLerComCerteiro}>
+                    <Icon name="reload" size={13} /> Ler com o certeiro
+                  </Button>
+                  <span className={styles.contexto}>O mesmo pedido, pelo outro leitor. Leva até 1 minuto.</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {ignoradas.length > 0 && (
+            <div className={styles.ignoradas} role="status" aria-label="Linhas ignoradas">
+              <strong>
+                {ignoradas.length === 1 ? '1 linha ficou de fora' : `${ignoradas.length} linhas ficaram de fora`}{' '}
+                — não viraram item:
+              </strong>
+              <ul>
+                {ignoradas.map((l, i) => (
+                  <li key={i}>{l}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {comEscolha && (
+            <div className={styles.leitor} role="radiogroup" aria-labelledby={idDoLeitor}>
+              <div className={styles.linhaComAjuda}>
+                <span id={idDoLeitor} className={styles.tituloDoLeitor}>
+                  Qual leitor da IA lê o pedido?
+                </span>
+                <Ajuda sobre="Os dois leitores">
+                  Os dois leem o mesmo pedido, e você escolhe. No PDF que o fornecedor gera no
+                  computador, os dois acertaram tudo nos testes. Em foto, papel escaneado, página de
+                  lado ou letra miúda, o rápido errou preço em 7 de 16 leituras, e o certeiro em
+                  nenhuma — mas ele demora mais. Na dúvida, leia com o rápido e confira o total: se não
+                  bater, leia de novo com o certeiro.
+                </Ajuda>
+              </div>
+              <span className={styles.subtituloDoLeitor}>A escolha vale para o arquivo e para a lista em texto.</span>
+              <div className={styles.opcoes}>
+                {LEITORES_NA_ORDEM.map((l) => (
+                  <label
+                    key={l}
+                    className={[styles.opcao, leitor === l ? styles.opcaoMarcada : ''].filter(Boolean).join(' ')}
+                  >
+                    <input
+                      type="radio"
+                      name="oc-leitor"
+                      value={l}
+                      checked={leitor === l}
+                      onChange={() => onLeitor?.(l)}
+                    />
+                    <span className={styles.opcaoTexto}>
+                      <span className={styles.opcaoNome}>{LEITORES[l].nome}</span>
+                      <span className={styles.opcaoParaQue}>{LEITORES[l].paraQue}</span>
+                      <span className={styles.opcaoEspera}>{LEITORES[l].espera}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className={styles.dica} data-dica-do-leitor="">
+                <Icon name="alerta" size={13} /> {DICA_DO_LEITOR}
+              </p>
+            </div>
+          )}
+
           <span className={styles.icone}>
             <Icon name="upload" size={26} />
           </span>
@@ -218,30 +385,11 @@ export function CampoDeImportacao({
                 title={texto.trim() === '' ? 'Cole a lista na caixa acima' : undefined}
               >
                 <Icon name="sparkles" size={13} /> Organizar com IA
+                {comEscolha ? ` (${LEITORES[leitor].nome.toLowerCase()})` : ''}
               </Button>
             </div>
           )}
         </>
-      )}
-
-      {erro && !lendo && (
-        <p className={styles.erro} role="alert">
-          {erro}
-        </p>
-      )}
-
-      {ignoradas.length > 0 && !lendo && (
-        <div className={styles.ignoradas} role="status" aria-label="Linhas ignoradas">
-          <strong>
-            {ignoradas.length === 1 ? '1 linha ficou de fora' : `${ignoradas.length} linhas ficaram de fora`}{' '}
-            — não viraram item:
-          </strong>
-          <ul>
-            {ignoradas.map((l, i) => (
-              <li key={i}>{l}</li>
-            ))}
-          </ul>
-        </div>
       )}
     </div>
   );

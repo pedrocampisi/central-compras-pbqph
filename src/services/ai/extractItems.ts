@@ -17,6 +17,7 @@ import { UN_PADRAO } from '../../domain/constants';
 import { supabase } from '../supabase/client';
 import { MAX_PAGINAS, mensagemDePaginas } from '../../domain/importacao';
 import { ErroDaImportacao } from './lerPedido';
+import { LEITOR_PADRAO, leitorDaResposta, type Leitor } from '../../domain/leitor';
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -69,11 +70,13 @@ export interface ResultadoDaLeitura {
   confira: Record<string, string>;
   /** As linhas que a IA não transformou em item, como vieram. */
   ignoradas: string[];
+  /** Quem o servidor diz que leu (`_meta.leitor`, D567); a v4 não diz: `null`. */
+  leitor: Leitor | null;
 }
 
 /** A resposta do servidor → o resultado da tela. Pura, para o teste. */
 export function paraResultado(payload: unknown): ResultadoDaLeitura {
-  const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown };
+  const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown; _meta?: unknown };
   const rawItems = (Array.isArray(p.itens) ? p.itens : []) as RawExtractedItem[];
   const confira: Record<string, string> = {};
   const itens = rawItems.map((it) => {
@@ -93,7 +96,7 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
   });
   const ignoradas = (Array.isArray(p.ignoradas) ? p.ignoradas : [])
     .filter((l): l is string => typeof l === 'string' && l.trim() !== '');
-  return { itens, confira, ignoradas };
+  return { itens, confira, ignoradas, leitor: leitorDaResposta(p._meta) };
 }
 
 // ── Erros da função do servidor, em português ─────────────────────────────────
@@ -128,7 +131,7 @@ async function erroDoServidor(resp: Response): Promise<string> {
 }
 
 async function chamarExtrairItens(
-  corpo: { imagens: string[] } | { texto: string },
+  corpo: ({ imagens: string[] } | { texto: string }) & { leitor: Leitor },
   mensagem: (status: number, doServidor: string) => string,
 ): Promise<ResultadoDaLeitura> {
   const url = import.meta.env['VITE_SUPABASE_URL'] as string;
@@ -153,7 +156,9 @@ async function chamarExtrairItens(
     const doServidor = await erroDoServidor(resp);
     const texto = mensagem(resp.status, doServidor);
     // A frase do próprio servidor vai para a tela como veio, sem prefixo (D557).
-    throw texto === doServidor ? new ErroDaImportacao(texto) : new Error(texto);
+    const erro = texto === doServidor ? new ErroDaImportacao(texto) : new Error(texto);
+    // O status vai junto: é por ele que a tela sabe se o outro leitor pode ajudar (D567).
+    throw Object.assign(erro, { status: resp.status });
   }
 
   return paraResultado(await resp.json());
@@ -165,15 +170,20 @@ async function chamarExtrairItens(
  * Envia as imagens (data URLs JPEG) para a função do servidor e devolve os
  * itens já normalizados, prontos para entrar na OC.
  */
-export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<ResultadoDaLeitura> {
+export async function extractItemsFromImages(
+  imagesDataUrls: string[],
+  leitor: Leitor = LEITOR_PADRAO,
+): Promise<ResultadoDaLeitura> {
   if (!imagesDataUrls.length) throw new Error('Nenhuma imagem fornecida.');
   // Nunca cortar em silêncio (CTO-D554): `lerPedido` já barrou antes, e esta
   // é a última porta — página demais não sai do navegador.
   if (imagesDataUrls.length > MAX_PAGINAS) throw new Error(mensagemDePaginas(imagesDataUrls.length));
-  // As mensagens da imagem ficam as de sempre; só o 400 (novo, D557: grande
-  // demais) traz a do servidor.
-  return chamarExtrairItens({ imagens: imagesDataUrls }, (status, doServidor) =>
-    status === 400 && doServidor ? doServidor : mensagemErro(status),
+  // As mensagens da imagem ficam as de sempre; o 400 (D557: grande demais) e o
+  // 422 trazem a do servidor. O 422 porque, desde a v4, ele também é a
+  // resposta CORTADA — e "tente uma imagem mais nítida" é conselho errado para
+  // um PDF limpo e comprido (D567).
+  return chamarExtrairItens({ imagens: imagesDataUrls, leitor }, (status, doServidor) =>
+    (status === 400 || status === 422) && doServidor ? doServidor : mensagemErro(status),
   );
 }
 
@@ -182,9 +192,9 @@ export async function extractItemsFromImages(imagesDataUrls: string[]): Promise<
  * limites e os erros são do servidor, e a mensagem dele vai para a tela como
  * veio; sem ela, a do status.
  */
-export async function organizarTexto(texto: string): Promise<ResultadoDaLeitura> {
+export async function organizarTexto(texto: string, leitor: Leitor = LEITOR_PADRAO): Promise<ResultadoDaLeitura> {
   if (texto.trim() === '') throw new Error('Cole a lista de materiais na caixa de texto.');
-  return chamarExtrairItens({ texto }, (status, doServidor) =>
+  return chamarExtrairItens({ texto, leitor }, (status, doServidor) =>
     doServidor || (status === 422 ? 'A IA não encontrou itens neste texto.' : mensagemErro(status)),
   );
 }

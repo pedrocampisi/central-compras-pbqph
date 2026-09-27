@@ -30,8 +30,11 @@
   line-height: 1.55;
   white-space: pre-line;
 }
+/* Quebra linha: a 375px, botão de rótulo comprido empurrava a caixa para fora
+   da tela (medido na D567, a mesma regra da D555). */
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
 }

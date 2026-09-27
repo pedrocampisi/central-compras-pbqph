@@ -159,7 +159,9 @@ describe('COLUNAS_DA_FORNECEDORES — a OC pede só o que usa da crua', () => {
   });
 
   it('tudo o que o mapeador lê da linha crua está na lista (senão, some da tela calado)', () => {
-    const dados = readFileSync('src/services/supabase/dados.ts', 'utf-8');
+    // CRLF vira LF: com o autocrlf do Windows, o '\n}\n' não achava o fim da
+    // função e o corpo ia até o fim do arquivo (D559).
+    const dados = readFileSync('src/services/supabase/dados.ts', 'utf-8').replace(/\r\n/g, '\n');
     const ini = dados.indexOf('function paraFornecedor(');
     const corpo = dados.slice(ini, dados.indexOf('\n}\n', ini));
     const lidas = [...corpo.matchAll(/\bl\['(\w+)'\]/g)].map((m) => m[1]!);

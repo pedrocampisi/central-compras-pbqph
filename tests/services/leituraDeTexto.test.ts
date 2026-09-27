@@ -63,7 +63,7 @@ describe('D557 — a resposta do servidor vira o resultado da tela', () => {
 
   it('resposta da imagem sem "ignoradas" (ou do servidor antigo) continua servindo', () => {
     expect(paraResultado({ itens: [{ descricao: 'x' }] })).toMatchObject({ confira: {}, ignoradas: [] });
-    expect(paraResultado(null)).toEqual({ itens: [], confira: {}, ignoradas: [] });
+    expect(paraResultado(null)).toEqual({ itens: [], confira: {}, ignoradas: [], leitor: null });
   });
 });
 
@@ -101,7 +101,8 @@ describe('D557 — o contrato com o servidor', () => {
     const r = await organizarTexto('10 sacos de cimento\nbom dia');
     const [url, init] = f.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toMatch(/\/functions\/v1\/extrair-itens$/);
-    expect(JSON.parse(String(init.body))).toEqual({ texto: '10 sacos de cimento\nbom dia' });
+    // D567: o leitor vai junto; sem escolha, o rápido.
+    expect(JSON.parse(String(init.body))).toEqual({ texto: '10 sacos de cimento\nbom dia', leitor: 'rapido' });
     expect(r.itens).toHaveLength(3);
   });
 
@@ -126,9 +127,15 @@ describe('D557 — o contrato com o servidor', () => {
     expect(f).not.toHaveBeenCalled();
   });
 
-  it('a imagem continua como era: as mesmas mensagens; só o 400 novo traz a do servidor', async () => {
-    vi.stubGlobal('fetch', respostaFalsa(422, { erro: 'mensagem nova' }));
+  it('a imagem: as mesmas mensagens; o 400 e o 422 (D567: a resposta cortada) trazem a do servidor', async () => {
+    vi.stubGlobal('fetch', respostaFalsa(422, {}));
     await expect(extractItemsFromImages(['a'])).rejects.toThrow('A IA não conseguiu ler itens neste arquivo.');
+    vi.stubGlobal('fetch', respostaFalsa(422, { erro: 'A resposta da IA foi cortada antes do fim.' }));
+    const cortada = await extractItemsFromImages(['a']).catch((x: unknown) => x);
+    expect(cortada).toBeInstanceOf(ErroDaImportacao);
+    expect((cortada as Error).message).toBe('A resposta da IA foi cortada antes do fim.');
+    vi.stubGlobal('fetch', respostaFalsa(503, { erro: 'Serviço de extração não configurado.' }));
+    await expect(extractItemsFromImages(['a'])).rejects.toThrow('A importação por IA ainda não foi configurada');
     vi.stubGlobal('fetch', respostaFalsa(400, { erro: 'A imagem é grande demais.' }));
     await expect(extractItemsFromImages(['a'])).rejects.toBeInstanceOf(ErroDaImportacao);
     vi.stubGlobal('fetch', respostaFalsa(200, { itens: [{ descricao: 'x' }], ignoradas: [] }));

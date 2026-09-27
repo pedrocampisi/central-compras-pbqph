@@ -20,9 +20,18 @@ import { uid } from '../../domain/id';
 import { UN_PADRAO } from '../../domain/constants';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
-import { ErroDaImportacao, lerLista, lerPedido } from '../../services/ai/lerPedido';
-import type { ResultadoDaLeitura } from '../../services/ai/extractItems';
+import { ErroDaImportacao, lerLista, lerPedido, statusDoErro } from '../../services/ai/lerPedido';
 import { avisoDaLeitura } from '../../domain/importacao';
+import {
+  LEITOR_PADRAO,
+  itensMexidos,
+  leituraServe,
+  outroLeitorPodeAjudar,
+  quemLeu,
+  totalLido,
+  trocarItensDaLeitura,
+  type Leitor,
+} from '../../domain/leitor';
 import { CampoDeImportacao } from './CampoDeImportacao';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
@@ -303,6 +312,9 @@ function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
   );
 }
 
+/** O que foi lido por último — o mesmo pedido pode ser lido de novo pelo outro leitor. */
+type FonteDaLeitura = { tipo: 'arquivos'; arquivos: File[] } | { tipo: 'texto'; texto: string };
+
 /** A mensagem de uma leitura que falhou: a da importação vai como está. */
 function mensagemDaFalha(err: unknown): string {
   return err instanceof ErroDaImportacao
@@ -324,6 +336,7 @@ export function NovaOcPage() {
   const updateItem = useOcEditingStore((s) => s.updateItem);
   const removeItem = useOcEditingStore((s) => s.removeItem);
   const appendItems = useOcEditingStore((s) => s.appendItems);
+  const replaceItems = useOcEditingStore((s) => s.replaceItems);
 
   const showToast = useUiStore((s) => s.showToast);
   const setTab = useUiStore((s) => s.setActiveTab);
@@ -336,6 +349,17 @@ export function NovaOcPage() {
   const [importTexto, setImportTexto] = useState('');
   const [importOQue, setImportOQue] = useState<'arquivo' | 'texto'>('arquivo');
   const [importIgnoradas, setImportIgnoradas] = useState<string[]>([]);
+  // Os dois leitores (CTO-D567). A tela começa no rápido; a escolha vale para
+  // o arquivo e para o texto. `fonte` guarda o que foi lido por último, para
+  // o "Ler de novo com o certeiro" e o "Ler com o certeiro" do erro.
+  const [leitor, setLeitor] = useState<Leitor>(LEITOR_PADRAO);
+  const [lendoCom, setLendoCom] = useState<Leitor>(LEITOR_PADRAO);
+  const [fonte, setFonte] = useState<FonteDaLeitura | null>(null);
+  // Os itens como ENTRARAM: é contra esta fotografia que se sabe se a pessoa
+  // já mexeu neles antes de trocar pelos do certeiro.
+  const [resultado, setResultado] = useState<{ leitor: Leitor; itens: Item[] } | null>(null);
+  const [oferecerCerteiro, setOferecerCerteiro] = useState(false);
+  const [certeiroIndisponivel, setCerteiroIndisponivel] = useState(false);
   // O "confira" da IA, por id do item. Fica AQUI, fora do item: o item vai ao
   // banco e ao PDF, a dúvida não. Some ao editar a linha e ao salvar.
   const [confira, setConfira] = useState<Record<string, string>>({});
@@ -562,59 +586,112 @@ export function NovaOcPage() {
     setImportAberto(false);
     setImportErro('');
     setImportIgnoradas([]);
+    setResultado(null);
+    setFonte(null);
+    setOferecerCerteiro(false);
+    setCerteiroIndisponivel(false);
   }, []);
 
-  // O fim de qualquer leitura: os itens entram SOMADOS, o aviso diz quantos
-  // entraram e quantas linhas ficaram de fora, e as ignoradas ficam à vista
-  // no campo até a pessoa fechar. Sem item nenhum, é falha: nada entra.
-  const aplicarLeitura = useCallback((r: ResultadoDaLeitura, origem: 'arquivo' | 'texto'): boolean => {
-    setImportIgnoradas(r.ignoradas);
-    if (!r.itens.length) {
-      setImportErro(origem === 'texto'
-        ? 'A IA não encontrou itens no texto.'
-        : 'A IA não encontrou itens no arquivo. Tente uma imagem mais nítida.');
-      return false;
+  // UMA leitura, de arquivo ou de texto, por um dos dois leitores (D567).
+  //   somar ... os itens entram SOMADOS ao que a OC já tem (D554/D557)
+  //   trocar .. os itens da leitura anterior saem e os novos entram no lugar
+  // O fim é sempre o mesmo: o aviso diz quantos entraram e quantas linhas
+  // ficaram de fora; o campo fica aberto com o resultado. Sem item, é falha.
+  const ler = useCallback(async (f: FonteDaLeitura, com: Leitor, trocar: string[] | null) => {
+    if (!data || importing) return;
+    setImporting(true);
+    setLendoCom(com);
+    setImportOQue(f.tipo === 'texto' ? 'texto' : 'arquivo');
+    setImportErro('');
+    setImportIgnoradas([]);
+    setOferecerCerteiro(false);
+    setCerteiroIndisponivel(false);
+    setFonte(f);
+    // Leitura nova apaga o resultado da anterior; a troca o mantém até dar certo.
+    if (!trocar) setResultado(null);
+    try {
+      const r = f.tipo === 'texto'
+        ? await lerLista(f.texto, undefined, com)
+        : await lerPedido(f.arquivos, undefined, com);
+      // A trava: escolheu o certeiro, só entra leitura que o servidor diz ser dele.
+      if (!leituraServe(com, r.leitor)) {
+        setCerteiroIndisponivel(true);
+        return;
+      }
+      setImportIgnoradas(r.ignoradas);
+      if (!r.itens.length) {
+        setImportErro(f.tipo === 'texto'
+          ? 'A IA não encontrou itens no texto.'
+          : 'A IA não encontrou itens no arquivo. Tente uma imagem mais nítida.');
+        setOferecerCerteiro(com === 'rapido');
+        return;
+      }
+      if (trocar) {
+        const agora = useOcEditingStore.getState().ocEditing?.itens ?? [];
+        replaceItems(trocarItensDaLeitura(agora, trocar, r.itens));
+        setConfira((antes) => {
+          const resto = { ...antes };
+          for (const id of trocar) delete resto[id];
+          return { ...resto, ...r.confira };
+        });
+      } else {
+        appendItems(r.itens);
+        setConfira((antes) => ({ ...antes, ...r.confira }));
+      }
+      setResultado({ leitor: quemLeu(r.leitor), itens: r.itens });
+      if (f.tipo === 'texto') setImportTexto('');
+      showToast(avisoDaLeitura(r.itens.length, r.ignoradas.length), 'success');
+    } catch (err) {
+      setImportErro(mensagemDaFalha(err));
+      setOferecerCerteiro(com === 'rapido' && outroLeitorPodeAjudar(statusDoErro(err)));
+    } finally {
+      setImporting(false);
     }
-    appendItems(r.itens);
-    setConfira((antes) => ({ ...antes, ...r.confira }));
-    showToast(avisoDaLeitura(r.itens.length, r.ignoradas.length), 'success');
-    if (r.ignoradas.length === 0) setImportAberto(false);
-    return true;
-  }, [appendItems, showToast]);
+  }, [data, importing, appendItems, replaceItems, showToast]);
 
   // Os arquivos que entraram de uma vez viram UMA leitura (lerPedido): tipo
   // errado e página demais param antes do servidor, e o aviso fica no campo.
-  const handleImportFiles = useCallback(async (arquivos: File[]) => {
-    if (!data || importing) return;
-    setImporting(true);
-    setImportOQue('arquivo');
-    setImportErro('');
-    setImportIgnoradas([]);
-    try {
-      aplicarLeitura(await lerPedido(arquivos), 'arquivo');
-    } catch (err) {
-      setImportErro(mensagemDaFalha(err));
-    } finally {
-      setImporting(false);
-    }
-  }, [data, importing, aplicarLeitura]);
+  const handleImportFiles = useCallback((arquivos: File[]) => {
+    void ler({ tipo: 'arquivos', arquivos }, leitor, null);
+  }, [ler, leitor]);
 
   // A lista colada em texto (D557): deu certo, a caixa esvazia; falhou, o
   // texto fica lá para tentar de novo.
-  const handleOrganizarTexto = useCallback(async () => {
-    if (!data || importing || importTexto.trim() === '') return;
-    setImporting(true);
-    setImportOQue('texto');
-    setImportErro('');
-    setImportIgnoradas([]);
-    try {
-      if (aplicarLeitura(await lerLista(importTexto), 'texto')) setImportTexto('');
-    } catch (err) {
-      setImportErro(mensagemDaFalha(err));
-    } finally {
-      setImporting(false);
+  const handleOrganizarTexto = useCallback(() => {
+    if (importTexto.trim() === '') return;
+    void ler({ tipo: 'texto', texto: importTexto }, leitor, null);
+  }, [ler, leitor, importTexto]);
+
+  // "Ler de novo com o certeiro": troca os itens que o rápido leu. Se a pessoa
+  // já mexeu em algum, pergunta antes — nada some calado.
+  const lerDeNovoComCerteiro = useCallback(async () => {
+    if (!resultado || !fonte || importing) return;
+    const agora = useOcEditingStore.getState().ocEditing?.itens ?? [];
+    const mexidos = itensMexidos(resultado.itens, agora);
+    if (mexidos > 0) {
+      const n = resultado.itens.length;
+      const ok = await confirmAsync({
+        title: 'Trocar os itens desta leitura?',
+        message:
+          `Você já mexeu em ${mexidos === 1 ? '1 item' : `${mexidos} itens`} desta leitura. ` +
+          `O certeiro troca ${n === 1 ? 'o item' : `os ${n} itens`} que o rápido leu, e essas mudanças se perdem. ` +
+          'Os itens que você pôs à mão ficam.',
+        confirmLabel: 'Trocar pelos do certeiro',
+        cancelLabel: 'Manter os meus',
+        tone: 'danger',
+      });
+      if (!ok) return;
     }
-  }, [data, importing, importTexto, aplicarLeitura]);
+    setLeitor('certeiro');
+    await ler(fonte, 'certeiro', resultado.itens.map((i) => i.id));
+  }, [resultado, fonte, importing, ler]);
+
+  // O erro do rápido oferece o certeiro: o mesmo pedido, pelo outro leitor.
+  const lerComCerteiro = useCallback(() => {
+    if (!fonte) return;
+    setLeitor('certeiro');
+    void ler(fonte, 'certeiro', null);
+  }, [fonte, ler]);
 
   // Editar a linha é conferir: o aviso some. Remover também.
   const tirarConfira = useCallback((id: string) => {
@@ -805,12 +882,24 @@ export function NovaOcPage() {
                 lendo={importing}
                 oQueLe={importOQue}
                 erro={importErro}
-                onArquivos={(arquivos) => void handleImportFiles(arquivos)}
+                onArquivos={handleImportFiles}
                 onFechar={fecharImportacao}
                 texto={importTexto}
                 onTexto={setImportTexto}
-                onOrganizar={() => void handleOrganizarTexto()}
+                onOrganizar={handleOrganizarTexto}
                 ignoradas={importIgnoradas}
+                leitor={leitor}
+                onLeitor={setLeitor}
+                lendoCom={lendoCom}
+                resultado={resultado && {
+                  leitor: resultado.leitor,
+                  itens: resultado.itens.length,
+                  total: totalLido(resultado.itens),
+                }}
+                onLerDeNovoComCerteiro={() => void lerDeNovoComCerteiro()}
+                oferecerCerteiro={oferecerCerteiro}
+                onLerComCerteiro={lerComCerteiro}
+                certeiroIndisponivel={certeiroIndisponivel}
               />
             </div>
           )}
@@ -819,7 +908,7 @@ export function NovaOcPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setImportAberto(true); setImportErro(''); setImportIgnoradas([]); }}
+              onClick={() => { fecharImportacao(); setImportAberto(true); }}
               disabled={importAberto}
               title="Importar os itens de um pedido (PDF, foto ou print) pela IA"
             >

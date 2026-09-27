@@ -168,7 +168,8 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
     expect(lerPedido).not.toHaveBeenCalled();
   });
 
-  it('com o campo aberto: colar lê; os itens entram, o campo fecha, e Esc não reabre nada', async () => {
+  // D567: o campo não fecha mais sozinho — fica aberto com o resultado (o total lido). O Esc fecha.
+  it('com o campo aberto: colar lê; os itens entram, o resultado fica no campo, e o Esc fecha', async () => {
     lerPedido.mockResolvedValueOnce({ confira: {}, ignoradas: [], itens: [
       { id: 'i1', descricao: 'Cimento CP-II', observacao: '', quantidade: 10, unidade: 'sc', preco_unit: 30, ipi_pct: 0, desc_pct: 0, ecr_id: null },
     ] });
@@ -178,6 +179,8 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
     colar(document.body, [print]);
     expect(lerPedido).toHaveBeenCalledWith([print]);
     expect(await screen.findByDisplayValue('Cimento CP-II')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Resultado da leitura' })).toHaveTextContent('R$ 300,00');
+    await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('group', { name: 'Importar pedido pela IA' })).toBeNull();
   });
 
