@@ -3,10 +3,16 @@
  * nunca no do computador. Este arquivo roda com o computador em UTC: se a
  * conta usasse o fuso do computador, a máscara ligaria três horas antes, às
  * 21h de 15/11 — e os testes dos limites acusam.
+ *
+ * O fuso muda ANTES de qualquer import (`vi.hoisted`): o formatador de horas
+ * nasce quando o módulo carrega, e nasceria com o fuso desta máquina — que já é
+ * o de Brasília, e esconderia o erro.
  */
-process.env.TZ = 'UTC';
+import { describe, expect, it, vi } from 'vitest';
 
-import { describe, expect, it } from 'vitest';
+vi.hoisted(() => {
+  process.env.TZ = 'UTC';
+});
 import {
   JANELA_SUGERIDA,
   emBrasilia,
