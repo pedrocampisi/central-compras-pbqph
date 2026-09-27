@@ -179,6 +179,8 @@ describe('D557 — na Nova OC', () => {
 
     expect(lerLista).toHaveBeenCalledWith(LISTA);
     expect(await screen.findByDisplayValue('Cimento CP-II 50kg')).toBeInTheDocument();
+    // Depois da leitura o campo fica só com o resultado (D575); a caixa volta vazia.
+    await userEvent.click(screen.getByRole('button', { name: /Ler outro pedido/ }));
     expect(caixaAgora().value).toBe('');
     const marca = document.querySelector('[data-confira]') as HTMLElement;
     expect(marca).toHaveAttribute('title', DUVIDA);

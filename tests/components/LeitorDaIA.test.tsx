@@ -187,6 +187,94 @@ describe('D567 — o resultado: o total lido em destaque, e quem leu', () => {
   });
 });
 
+describe('D575 — depois da leitura, o campo encolhe para o resultado', () => {
+  // O jsdom não mede janela: o que se trava aqui é o que faz caber (o campo
+  // encolhido e a rolagem até o fim dele). A medida da janela, a 1920 × 1080,
+  // é a do fotógrafo, no navegador de verdade.
+  const rolar = vi.fn();
+  beforeEach(() => {
+    lerPedido.mockReset();
+    lerLista.mockReset();
+    useOcEditingStore.getState().stopEditing();
+    useDataStore.setState({ data: DADOS });
+    useAuthStore.setState({ perfil: { papel: 'admin' } as never });
+    useConfirmStore.setState({ open: false, resolve: null });
+    rolar.mockReset();
+    Element.prototype.scrollIntoView = rolar;
+  });
+
+  async function lerComORapido() {
+    lerPedido.mockResolvedValueOnce(leituraDoRapido());
+    await abrir();
+    colar(document.body, [png()]);
+    await screen.findByDisplayValue('Areia média');
+  }
+
+  it('fica o resultado e o "Ler de novo com o certeiro"; a escolha e as portas saem', async () => {
+    await lerComORapido();
+    expect(resultadoNaTela().querySelector('[data-total-lido]')).toHaveTextContent('R$ 350,00');
+    expect(within(resultadoNaTela()).getByRole('button', { name: /Ler de novo com o certeiro/ })).toBeInTheDocument();
+    expect(screen.queryByRole('radiogroup')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Escolher arquivo' })).toBeNull();
+    expect(screen.queryByLabelText(/cole aqui a lista de materiais/)).toBeNull();
+    expect(within(campo()).getByRole('button', { name: /Ler outro pedido/ })).toBeInTheDocument();
+  });
+
+  it('a leitura que deu certo leva o fim do campo ao pé da janela, sem animação', async () => {
+    await lerComORapido();
+    expect(rolar).toHaveBeenCalledWith({ block: 'end' });
+    expect(rolar.mock.contexts.at(-1)).toBe(campo());
+  });
+
+  it('"Ler outro pedido" traz de volta a escolha e as portas, e o resultado fica', async () => {
+    await lerComORapido();
+    await userEvent.click(screen.getByRole('button', { name: /Ler outro pedido/ }));
+    expect(screen.getByRole('radiogroup', { name: 'Qual leitor da IA lê o pedido?' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Escolher arquivo' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/cole aqui a lista de materiais/)).toBeInTheDocument();
+    expect(resultadoNaTela()).toHaveTextContent('Lido pelo rápido · 2 itens');
+    expect(screen.queryByRole('button', { name: /Ler outro pedido/ })).toBeNull();
+  });
+
+  it('a leitura seguinte encolhe de novo', async () => {
+    await lerComORapido();
+    await userEvent.click(screen.getByRole('button', { name: /Ler outro pedido/ }));
+    lerPedido.mockResolvedValueOnce(leituraDoCerteiro());
+    colar(document.body, [png()]);
+    await screen.findByDisplayValue('Brita 1');
+    expect(screen.queryByRole('radiogroup')).toBeNull();
+    expect(rolar).toHaveBeenCalledTimes(2);
+  });
+
+  it('recolhido, colar TEXTO traz a caixa de volta com o texto dentro', async () => {
+    await lerComORapido();
+    const e = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(e, 'clipboardData', { value: { files: [], getData: () => '10 sc cimento' } });
+    act(() => {
+      document.body.dispatchEvent(e);
+    });
+    expect(await screen.findByLabelText(/cole aqui a lista de materiais/)).toHaveValue('10 sc cimento');
+  });
+
+  it('recolhido, colar outro pedido (imagem) ainda lê', async () => {
+    await lerComORapido();
+    lerPedido.mockResolvedValueOnce(leituraDoCerteiro());
+    colar(document.body, [png()]);
+    await screen.findByDisplayValue('Brita 1');
+    expect(lerPedido).toHaveBeenCalledTimes(2);
+  });
+
+  it('a falha, sem leitura anterior, deixa o campo inteiro (a escolha e as portas à vista)', async () => {
+    lerPedido.mockRejectedValueOnce(Object.assign(new Error('Resposta cortada.'), { status: 422 }));
+    await abrir();
+    colar(document.body, [png()]);
+    await screen.findByRole('button', { name: /Ler com o certeiro/ });
+    expect(screen.getByRole('radiogroup')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Ler outro pedido/ })).toBeNull();
+    expect(rolar).not.toHaveBeenCalled();
+  });
+});
+
 describe('D567 — "Ler de novo com o certeiro": troca os itens, e pergunta se já foram mexidos', () => {
   beforeEach(() => {
     lerPedido.mockReset();
@@ -217,6 +305,7 @@ describe('D567 — "Ler de novo com o certeiro": troca os itens, e pergunta se j
     expect(lerPedido).toHaveBeenLastCalledWith([foto], undefined, 'certeiro');
     expect(descricoes()).toEqual(['Cimento CP-II 50kg', 'Areia média', 'Brita 1', 'Posto à mão']);
     expect(resultadoNaTela()).toHaveTextContent('Lido pelo certeiro · 3 itens');
+    await userEvent.click(screen.getByRole('button', { name: /Ler outro pedido/ }));
     expect(screen.getByRole('radio', { name: /Certeiro/ })).toBeChecked();
   });
 

@@ -16,6 +16,11 @@
  * resultado: o total lido em destaque, quem leu, e — se foi o rápido — o "Ler
  * de novo com o certeiro".
  *
+ * Depois da leitura, o campo ENCOLHE para o resultado (CTO-D575): a escolha e
+ * as portas somem até o "Ler outro pedido", e o campo rola até o fim dele. Os
+ * itens lidos ficam logo acima, e a pessoa confere o total sem perder nenhum
+ * dos dois de vista. Colar ou soltar um pedido continua valendo recolhido.
+ *
  * O campo não lê nada sozinho: fecha pelo X ou pelo Esc, e quem lê é a página
  * (`onArquivos`, `onOrganizar`). Enquanto lê, as portas ficam fechadas. O texto
  * da caixa é da página, e por isso não se perde quando a leitura falha.
@@ -67,6 +72,11 @@ interface Props {
   onLerComCerteiro?: () => void;
   /** Escolheu o certeiro e a resposta não era dele: nada entrou. */
   certeiroIndisponivel?: boolean;
+  /** Só o resultado: a escolha e as portas voltam pelo "Ler outro pedido" (D575). */
+  recolhido?: boolean;
+  onLerOutro?: () => void;
+  /** Conta as leituras que deram certo: a cada uma, o campo rola até o fim. */
+  leiturasFeitas?: number;
 }
 
 const LEITORES_NA_ORDEM: Leitor[] = ['rapido', 'certeiro'];
@@ -93,6 +103,9 @@ export function CampoDeImportacao({
   oferecerCerteiro = false,
   onLerComCerteiro,
   certeiroIndisponivel = false,
+  recolhido = false,
+  onLerOutro,
+  leiturasFeitas = 0,
 }: Props) {
   const [arrastando, setArrastando] = useState(false);
   const zonaRef = useRef<HTMLDivElement>(null);
@@ -101,15 +114,22 @@ export function CampoDeImportacao({
   const idDoLeitor = useId();
 
   // As portas leem a versão mais nova das props sem religar os ouvintes.
-  const atual = useRef({ lendo, onArquivos, onFechar, texto, onTexto });
+  const atual = useRef({ lendo, onArquivos, onFechar, texto, onTexto, recolhido, onLerOutro });
   useEffect(() => {
-    atual.current = { lendo, onArquivos, onFechar, texto, onTexto };
+    atual.current = { lendo, onArquivos, onFechar, texto, onTexto, recolhido, onLerOutro };
   });
 
   // Ao abrir, o foco vem para o campo: o Ctrl+V já vale sem clicar em nada.
   useEffect(() => {
     zonaRef.current?.focus();
   }, []);
+
+  // A leitura deu certo: o fim do campo vai para o pé da janela, e os itens
+  // lidos, que entraram logo acima, ficam à vista junto do total (D575). Sem
+  // animação: movimento só na espera e no login.
+  useEffect(() => {
+    if (leiturasFeitas > 0) zonaRef.current?.scrollIntoView?.({ block: 'end' });
+  }, [leiturasFeitas]);
 
   useEffect(() => {
     const colar = (e: ClipboardEvent) => {
@@ -132,9 +152,15 @@ export function CampoDeImportacao({
       // Texto: dentro da caixa, o navegador cola onde está o cursor.
       if (naCaixa) return;
       e.preventDefault();
-      const { lendo: l, onTexto: definir, texto: t } = atual.current;
+      const { lendo: l, onTexto: definir, texto: t, recolhido: r, onLerOutro: reabrir } = atual.current;
       if (l || !definir) return;
       definir(juntarTexto(t, colado));
+      // Recolhido, a caixa não está na tela: o texto colado a traz de volta.
+      if (r && reabrir) {
+        reabrir();
+        setTimeout(() => caixaRef.current?.focus(), 0);
+        return;
+      }
       caixaRef.current?.focus();
     };
     const tecla = (e: KeyboardEvent) => {
@@ -295,99 +321,112 @@ export function CampoDeImportacao({
             </div>
           )}
 
-          {comEscolha && (
-            <div className={styles.leitor} role="radiogroup" aria-labelledby={idDoLeitor}>
-              <div className={styles.linhaComAjuda}>
-                <span id={idDoLeitor} className={styles.tituloDoLeitor}>
-                  Qual leitor da IA lê o pedido?
-                </span>
-                <Ajuda sobre="Os dois leitores">
-                  Os dois leem o mesmo pedido, e você escolhe. No PDF que o fornecedor gera no
-                  computador, os dois acertaram tudo nos testes. Em foto, papel escaneado, página de
-                  lado ou letra miúda, o rápido errou preço em 7 de 16 leituras, e o certeiro em
-                  nenhuma — mas ele demora mais. Na dúvida, leia com o rápido e confira o total: se não
-                  bater, leia de novo com o certeiro.
-                </Ajuda>
-              </div>
-              <span className={styles.subtituloDoLeitor}>A escolha vale para o arquivo e para a lista em texto.</span>
-              <div className={styles.opcoes}>
-                {LEITORES_NA_ORDEM.map((l) => (
-                  <label
-                    key={l}
-                    className={[styles.opcao, leitor === l ? styles.opcaoMarcada : ''].filter(Boolean).join(' ')}
-                  >
-                    <input
-                      type="radio"
-                      name="oc-leitor"
-                      value={l}
-                      checked={leitor === l}
-                      onChange={() => onLeitor?.(l)}
-                    />
-                    <span className={styles.opcaoTexto}>
-                      <span className={styles.opcaoNome}>{LEITORES[l].nome}</span>
-                      <span className={styles.opcaoParaQue}>{LEITORES[l].paraQue}</span>
-                      <span className={styles.opcaoEspera}>{LEITORES[l].espera}</span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <p className={styles.dica} data-dica-do-leitor="">
-                <Icon name="alerta" size={13} /> {DICA_DO_LEITOR}
-              </p>
+          {recolhido && onLerOutro && (
+            <div className={styles.acaoDoResultado} data-ler-outro="">
+              <Button variant="outline" size="sm" onClick={onLerOutro}>
+                <Icon name="upload" size={13} /> Ler outro pedido
+              </Button>
+              <span className={styles.contexto}>A escolha do leitor, o arquivo e a lista em texto voltam aqui.</span>
             </div>
           )}
 
-          <span className={styles.icone}>
-            <Icon name="upload" size={26} />
-          </span>
-          <strong className={styles.titulo}>
-            <span className={styles.soComputador}>Arraste o pedido para cá ou cole com Ctrl+V</span>
-            <span className={styles.soCelular}>Escolha o PDF ou as fotos do pedido</span>
-          </strong>
-          <span className={styles.nota}>
-            PDF, JPG ou PNG, ou um print. Até {MAX_PAGINAS} páginas por leitura, somando tudo o que
-            entrar junto.
-          </span>
-          <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-            Escolher arquivo
-          </Button>
-          <input
-            ref={inputRef}
-            type="file"
-            multiple
-            accept={ACCEPT_DA_IMPORTACAO}
-            hidden
-            onChange={(e) => {
-              entregar(e.target.files);
-              e.target.value = ''; // o mesmo arquivo pode ser escolhido de novo
-            }}
-          />
+          {!recolhido && (
+            <>
+              {comEscolha && (
+                <div className={styles.leitor} role="radiogroup" aria-labelledby={idDoLeitor}>
+                  <div className={styles.linhaComAjuda}>
+                    <span id={idDoLeitor} className={styles.tituloDoLeitor}>
+                      Qual leitor da IA lê o pedido?
+                    </span>
+                    <Ajuda sobre="Os dois leitores">
+                      Os dois leem o mesmo pedido, e você escolhe. No PDF que o fornecedor gera no
+                      computador, os dois acertaram tudo nos testes. Em foto, papel escaneado, página de
+                      lado ou letra miúda, o rápido errou preço em 7 de 16 leituras, e o certeiro em
+                      nenhuma — mas ele demora mais. Na dúvida, leia com o rápido e confira o total: se não
+                      bater, leia de novo com o certeiro.
+                    </Ajuda>
+                  </div>
+                  <span className={styles.subtituloDoLeitor}>A escolha vale para o arquivo e para a lista em texto.</span>
+                  <div className={styles.opcoes}>
+                    {LEITORES_NA_ORDEM.map((l) => (
+                      <label
+                        key={l}
+                        className={[styles.opcao, leitor === l ? styles.opcaoMarcada : ''].filter(Boolean).join(' ')}
+                      >
+                        <input
+                          type="radio"
+                          name="oc-leitor"
+                          value={l}
+                          checked={leitor === l}
+                          onChange={() => onLeitor?.(l)}
+                        />
+                        <span className={styles.opcaoTexto}>
+                          <span className={styles.opcaoNome}>{LEITORES[l].nome}</span>
+                          <span className={styles.opcaoParaQue}>{LEITORES[l].paraQue}</span>
+                          <span className={styles.opcaoEspera}>{LEITORES[l].espera}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className={styles.dica} data-dica-do-leitor="">
+                    <Icon name="alerta" size={13} /> {DICA_DO_LEITOR}
+                  </p>
+                </div>
+              )}
 
-          {comTexto && (
-            <div className={styles.lista}>
-              <label className={styles.rotuloDaLista} htmlFor="oc-lista-texto">
-                ou cole aqui a lista de materiais, do jeito que veio
-              </label>
-              <textarea
-                ref={caixaRef}
-                id="oc-lista-texto"
-                className={styles.caixa}
-                rows={5}
-                value={texto}
-                placeholder={'Ex.:\n10 sacos de cimento\nareia média 3 m³\nvergalhão 10mm'}
-                onChange={(e) => onTexto?.(e.target.value)}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOrganizar}
-                disabled={texto.trim() === ''}
-                title={texto.trim() === '' ? 'Cole a lista na caixa acima' : undefined}
-              >
-                <Icon name="sparkles" size={13} /> Organizar com IA
-                {comEscolha ? ` (${LEITORES[leitor].nome.toLowerCase()})` : ''}
+              <span className={styles.icone}>
+                <Icon name="upload" size={26} />
+              </span>
+              <strong className={styles.titulo}>
+                <span className={styles.soComputador}>Arraste o pedido para cá ou cole com Ctrl+V</span>
+                <span className={styles.soCelular}>Escolha o PDF ou as fotos do pedido</span>
+              </strong>
+              <span className={styles.nota}>
+                PDF, JPG ou PNG, ou um print. Até {MAX_PAGINAS} páginas por leitura, somando tudo o que
+                entrar junto.
+              </span>
+              <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
+                Escolher arquivo
               </Button>
-            </div>
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                accept={ACCEPT_DA_IMPORTACAO}
+                hidden
+                onChange={(e) => {
+                  entregar(e.target.files);
+                  e.target.value = ''; // o mesmo arquivo pode ser escolhido de novo
+                }}
+              />
+
+              {comTexto && (
+                <div className={styles.lista}>
+                  <label className={styles.rotuloDaLista} htmlFor="oc-lista-texto">
+                    ou cole aqui a lista de materiais, do jeito que veio
+                  </label>
+                  <textarea
+                    ref={caixaRef}
+                    id="oc-lista-texto"
+                    className={styles.caixa}
+                    rows={5}
+                    value={texto}
+                    placeholder={'Ex.:\n10 sacos de cimento\nareia média 3 m³\nvergalhão 10mm'}
+                    onChange={(e) => onTexto?.(e.target.value)}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onOrganizar}
+                    disabled={texto.trim() === ''}
+                    title={texto.trim() === '' ? 'Cole a lista na caixa acima' : undefined}
+                  >
+                    <Icon name="sparkles" size={13} /> Organizar com IA
+                    {comEscolha ? ` (${LEITORES[leitor].nome.toLowerCase()})` : ''}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}

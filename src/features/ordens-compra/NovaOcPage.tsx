@@ -363,6 +363,11 @@ export function NovaOcPage() {
   const [resultado, setResultado] = useState<{ leitor: Leitor; itens: Item[] } | null>(null);
   const [oferecerCerteiro, setOferecerCerteiro] = useState(false);
   const [certeiroIndisponivel, setCerteiroIndisponivel] = useState(false);
+  // Depois da leitura, o campo encolhe para o resultado: os itens lidos e o
+  // total cabem na mesma janela (CTO-D575). "Ler outro pedido" reabre as
+  // portas; cada leitura que dá certo conta uma, e o campo rola até ela.
+  const [portasAbertas, setPortasAbertas] = useState(false);
+  const [leiturasFeitas, setLeiturasFeitas] = useState(0);
   // O "confira" da IA, por id do item. Fica AQUI, fora do item: o item vai ao
   // banco e ao PDF, a dúvida não. Some ao editar a linha e ao salvar.
   const [confira, setConfira] = useState<Record<string, string>>({});
@@ -593,6 +598,7 @@ export function NovaOcPage() {
     setFonte(null);
     setOferecerCerteiro(false);
     setCerteiroIndisponivel(false);
+    setPortasAbertas(false);
   }, []);
 
   // UMA leitura, de arquivo ou de texto, por um dos dois leitores (D567).
@@ -642,6 +648,8 @@ export function NovaOcPage() {
         setConfira((antes) => ({ ...antes, ...r.confira }));
       }
       setResultado({ leitor: quemLeu(r.leitor), itens: r.itens });
+      setPortasAbertas(false);
+      setLeiturasFeitas((n) => n + 1);
       if (f.tipo === 'texto') setImportTexto('');
       // Uma mensagem de leitura por vez: a da troca tira a da leitura anterior (D570).
       showToast(
@@ -910,6 +918,9 @@ export function NovaOcPage() {
                 oferecerCerteiro={oferecerCerteiro}
                 onLerComCerteiro={lerComCerteiro}
                 certeiroIndisponivel={certeiroIndisponivel}
+                recolhido={!!resultado && !portasAbertas}
+                onLerOutro={() => setPortasAbertas(true)}
+                leiturasFeitas={leiturasFeitas}
               />
             </div>
           )}
