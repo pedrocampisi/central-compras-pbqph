@@ -2205,3 +2205,68 @@ contra o ramo). 300 testes; tipos e lint limpos; as 4 sabotagens da D585 mordend
 ~20 s em que o endereço ainda servia a anterior): o `versao.txt` diz `…-707631c`; o pacote servido
 (`index-DR3jH4dr.js`) tem "Prestadores de Serviço", `prestadores_servico` e `avaliacoes_prestadores` 0 vezes, e
 "Catálogo ECR" continua.
+
+## Decisão 53 — a tela de ler as ECRs e o PDF de cada uma · 27/09/2026
+
+**POR QUÊ (CTO-D586, emendada pela D588; D589 §4, o primeiro passo):** palavra do Pedro — as ECRs do sistema viram as
+do documento, e depois "o verdadeiro será o dos ECR's": os `.docx` se aposentam, a ECR do sistema é a que vale, e a
+obra e o auditor a leem por um "botão de PDF em cada ECR". Só o Pedro revisa (a tela de editar é o segundo passo).
+
+**O QUE MUDOU (no ramo `d586-ecrs-do-sgq`, `eca44c1`; NÃO publicado):**
+- **A tela:** cada ECR aberta mostra as cinco seções como o documento ("01." a "05.", o quadradinho, o rótulo em
+  negrito, a nota fora da lista em destaque), "Materiais" e o histórico de revisões no fim (tabela; a 375, um bloco
+  por revisão). Saem Objetivo, Escopo, Normas, Documentos, Critérios, Ensaios e Observações (os campos ficam no banco).
+  O subtítulo proposto: "O texto em vigor de cada ECR, com o histórico de revisões no fim." A seta vira desenho,
+  sem animação.
+- **O histórico:** lido de `compras.ecr_revisoes` junto com as ECRs, pelo contrato do Banco (os nomes das colunas
+  `_nome`; a ordem da data e da chave; sem o texto das revisões velhas).
+- **O PDF:** jsPDF, como o da OC: o cabeçalho e a tabela de revisões em toda página, "Página N de M". O Word imprime
+  "01." e o quadradinho, e não "1.1" (a premissa da carta corrigida, pelo PDF exportado do próprio Word). O "mᶟ" sai
+  "m³" no PDF; a tela mostra o banco como está. A marca comprimida: 88 KB, e não 4 MB.
+- **O `auth.ts`:** o comentário velho do `pode_editar_cadastro` corrigido (D589 §4.4).
+
+**AS TRAVAS:** 342 testes (eram 300): `tests/domain/ecr.test.ts`, `tests/services/ecrPdf.test.ts` (lê o texto de
+dentro do PDF, página por página, e o peso com a marca de verdade) e `tests/components/CatalogoEcr.test.tsx`. 18
+sabotagens novas e as 55 de antes mordendo, hash igual.
+
+**AS FOTOS:** `docs/Capturas/2026-09-27_D586/` — a lista fechada, a ECR 03 e a ECR 08 abertas (inteiras), antes e
+depois, a 1920 e a 375; o histórico aberto; os dois PDFs e as páginas deles em imagem. Dados: o texto das 20 como
+está na produção (368 linhas); nomes do histórico inventados.
+
+**ACHADOS, SEM MEXER:** o PDF da OC no ar pesa 4,1 MB por OC, pela mesma marca sem compressão (a D586 §5 diz que
+ele não muda; fica para carta do CTO). A ECR 02 tem uma linha com rótulo "Dimensão" e texto vazio — a `revisar_ecr`
+recusaria toda revisão da ECR 02 que a mantivesse (vai para a tela de editar).
+
+## Decisão 54 — o PDF da OC com a marca comprimida · 27/09/2026
+
+**POR QUÊ (CTO-D593 §3, emenda a D586 §5):** o achado da decisão 53 — o PDF da OC no ar pesava 4,1 MB por OC, porque
+o jsPDF grava a marca crua. É o arquivo que vai anexado ao e-mail do fornecedor. A D593 também aprovou a tela de ler
+e o PDF das ECRs (o subtítulo e as três correções de premissa aceitos) e manda publicar **só depois da D592 do
+Banco**: a migration dele mexe em `secoes`, que a tela nova passa a ler.
+
+**O QUE MUDOU (no ramo `d586-ecrs-do-sgq`, `ba53d2f`; NÃO publicado):** só `'FAST'` no `addImage` da marca. A mesma
+OC de teste: 4.227.036 → 75.513 bytes; a página 1 a 110 dpi e a marca a 300 dpi com 0 pixels diferentes (as imagens
+de antes e depois são o mesmo arquivo, byte a byte).
+
+**AS TRAVAS:** `tests/services/ocPdfPeso.test.ts` (a marca de verdade, abaixo de 300 KB, e a marca presente); 2
+sabotagens mordendo (sem compressão; sem a marca). 343 testes. Fotos em `docs/Capturas/2026-09-27_D593/`.
+
+## Decisão 55 — no ar: a tela de ler as ECRs, o PDF de cada uma e o PDF da OC comprimido · 27/09/2026
+
+**POR QUÊ (CTO-D594):** a D592 do Banco está na produção desde 11:46 (a ECR 04 na revisão 01; a linha "Dimensão" da
+ECR 02 com texto), e o CTO mandou publicar o ramo aprovado pela D593.
+
+**O QUE MUDOU:** o ramo `d586-ecrs-do-sgq` (`ba53d2f`) entrou no `main` em `34ee3ff` (o diff fora de `docs/` é vazio).
+343 testes, tipos e lint limpos, e as 20 sabotagens das decisões 53 e 54 mordendo no `main`. **Publicado:**
+`080168b8-0465-4dac-b2eb-bbd04e3ff1a3`, versão `20260927145752-34ee3ff`. **O desfazer é `b2c4cf79`.**
+
+**A MEDIDA POR FORA:**
+- **O `versao.txt`** traz a versão nova já na primeira leitura.
+- **No pacote servido:** o subtítulo novo, "Histórico de revisões", `ecr_revisoes` e o cabeçalho do PDF aparecem 1
+  vez cada. "Objetivo", "Critérios de Recebimento", "Normas Aplicáveis", "Ensaios" e o subtítulo recusado aparecem 0
+  vezes.
+- **Logado:** não medido, porque a casa não entra com senha. Lido no banco, só leitura: a ECR 04 em `01` / `2026-04-21`,
+  com 2 linhas no histórico, e a ECR 02 com a linha "Dimensão:" com texto. O olho na tela logada fica para o Pedro.
+
+**DAQUI EM DIANTE:** cai o leitor aceito da D591. `secoes` só muda pela `revisar_ecr`. A tela de editar (D589 §4.2)
+segue no ramo `d589-editar-ecr`, sem publicar sem carta.
