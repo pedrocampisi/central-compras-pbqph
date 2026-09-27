@@ -88,24 +88,27 @@ function textoOuVazio(v: unknown): string {
 }
 
 /**
- * O histórico como veio do banco, da revisão mais antiga à vigente, ou `null`
- * se não veio. PROVISÓRIO na forma: a tabela é da D588 §3.1, e o Banco ainda
- * não mandou o contrato dela. Ajusta-se aqui, e só aqui.
+ * O histórico como veio de `compras.ecr_revisoes` (contrato do Banco,
+ * D588/D589 §1), ou `null` se não veio. A ordem é a do contrato: a data da
+ * revisão (`emitida_em`) e, no empate, a chave (`id`). Os nomes vêm das
+ * colunas `_nome` — nas revisões do sistema, a função do banco grava ali o
+ * nome do perfil na hora.
  */
 export function revisoesDoBanco(v: unknown): EcrRevisao[] | null {
   if (!Array.isArray(v)) return null;
-  return v
-    .map((r): EcrRevisao => {
-      const o = (r ?? {}) as Record<string, unknown>;
-      return {
+  const linhas = v.map((r) => (r ?? {}) as Record<string, unknown>);
+  const data = (o: Record<string, unknown>) => (o['emitida_em'] == null ? '' : String(o['emitida_em']));
+  return [...linhas]
+    .sort((a, b) => data(a).localeCompare(data(b)) || Number(a['id'] ?? 0) - Number(b['id'] ?? 0))
+    .map(
+      (o): EcrRevisao => ({
         revisao: textoOuVazio(o['revisao']),
-        data: o['data'] == null ? null : String(o['data']),
+        data: o['emitida_em'] == null ? null : String(o['emitida_em']),
         descricao: textoOuVazio(o['descricao']),
-        revisado_por: textoOuVazio(o['revisado_por']),
-        aprovado_por: textoOuVazio(o['aprovado_por']),
-      };
-    })
-    .sort((a, b) => a.revisao.localeCompare(b.revisao, 'pt-BR', { numeric: true }));
+        revisado_por: textoOuVazio(o['revisado_por_nome']),
+        aprovado_por: textoOuVazio(o['aprovado_por_nome']),
+      }),
+    );
 }
 
 /** "Rev. 00 · emitida em 15/04/2026" — ou o pedaço que houver, ou `null`. */

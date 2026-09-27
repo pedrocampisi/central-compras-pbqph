@@ -89,14 +89,28 @@ describe('D588 — a revisão e o histórico', () => {
     expect(revisoesDoBanco([])).toEqual([]);
   });
 
-  it('da revisão mais antiga à vigente, com 10 depois de 09', () => {
+  it('a linha do banco vira a do rodapé: a data de emitida_em e os nomes das colunas _nome', () => {
+    expect(
+      revisoesDoBanco([
+        {
+          id: 7, ecr_id: 3, revisao: '00', emitida_em: '2026-04-15', descricao: 'Emissão Inicial',
+          revisado_por_nome: 'Revisor de teste', aprovado_por_nome: 'Aprovador de teste',
+          revisado_por: null, aprovado_por: null,
+        },
+      ]),
+    ).toEqual([
+      { revisao: '00', data: '2026-04-15', descricao: 'Emissão Inicial', revisado_por: 'Revisor de teste', aprovado_por: 'Aprovador de teste' },
+    ]);
+  });
+
+  it('na ordem do contrato: a data da revisão e, no empate, a chave', () => {
     const r = revisoesDoBanco([
-      { revisao: '10', data: '2027-01-02', descricao: 'd', revisado_por: 'a', aprovado_por: 'b' },
-      { revisao: '00', data: '2026-04-15', descricao: 'Emissão Inicial', revisado_por: 'a', aprovado_por: 'b' },
-      { revisao: '09', data: null, descricao: 'c' },
+      { id: 30, revisao: '02', emitida_em: '2027-03-01' },
+      { id: 12, revisao: '01b', emitida_em: '2026-10-01' },
+      { id: 1, revisao: '00', emitida_em: '2026-04-15' },
+      { id: 11, revisao: '01', emitida_em: '2026-10-01' },
     ])!;
-    expect(r.map((x) => x.revisao)).toEqual(['00', '09', '10']);
-    expect(r[1]).toEqual({ revisao: '09', data: null, descricao: 'c', revisado_por: '', aprovado_por: '' });
+    expect(r.map((x) => x.revisao)).toEqual(['00', '01', '01b', '02']);
   });
 
   it('a linha da tabela: a data em dd/mm/aaaa, e "—" sem data', () => {
