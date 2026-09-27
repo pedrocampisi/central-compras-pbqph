@@ -195,7 +195,9 @@ export function desenhaPdfDaEcr(ecr: Ecr, logo: string | null): jsPDF {
 
     if (logo) {
       try {
-        doc.addImage(logo, 'PNG', MARGEM, 9, 16, 16);
+        // Comprimida ('FAST'): sem isso, o jsPDF grava a marca crua, e o PDF
+        // de uma página passa de 4 MB. 1080 × 974 pontos: 16 × 14,4 mm.
+        doc.addImage(logo, 'PNG', MARGEM, 10, 16, 14.4, 'marca', 'FAST');
       } catch {
         /* a marca é enfeite; sem ela, o PDF sai do mesmo jeito */
       }

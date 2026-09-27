@@ -125,7 +125,7 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
             ecr.secoes.map((s, i) => (
               <section key={i} className={styles.secao}>
                 <h4>
-                  <span className={styles.numero}>{numeroDaSecao(i)}</span> {s.titulo}
+                  {numeroDaSecao(i)} {s.titulo}
                 </h4>
                 {blocosDaSecao(s.itens).map((b, j) =>
                   b.tipo === 'lista' ? (

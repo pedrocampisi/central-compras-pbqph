@@ -37,7 +37,8 @@
   color: var(--text-muted);
 }
 .setaAberta { transform: rotate(180deg); }
-.titleRow { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-width: 0; }
+/* O título encolhe ao lado da seta: a 375 a seta não ganha uma linha só para ela. */
+.titleRow { flex: 1 1 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-width: 0; }
 .code {
   font-weight: 600;
   color: var(--marca);
@@ -69,7 +70,6 @@
   letter-spacing: 0.02em;
   color: var(--texto);
 }
-.numero { font-family: var(--fonte-mono); }
 .lista {
   margin: 0;
   padding-left: 20px;
