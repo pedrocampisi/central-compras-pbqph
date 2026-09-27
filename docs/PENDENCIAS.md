@@ -231,26 +231,28 @@ segurou).
 
 ---
 
-### 14. ⏸️ D557 — colar a lista de materiais em texto e a IA organiza · **em espera (D559)**
+### 14. D557 + D567 — a lista em texto e a escolha do leitor · **no ramo, esperando o Pedro olhar as fotos**
 
-*Aberta em 26/09/2026.* Palavra do Pedro, pelo `CTO` (D559): *"essas melhorias aí da IA, da
-pesquisa, anote em pendências para ser feito depois"*. **Volta só por carta do `CTO`.**
+*Aberta em 26/09/2026.* A D557 (colar a lista em texto) ficou em espera pela D559; **voltou na
+D567** (a corrida da IA da OC, largada pelo Pedro às 22h4x), que construiu por cima dela a escolha
+do leitor: **rápido ou certeiro**, antes de ler, a mesma para a imagem e para o texto.
 
-**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit `320dd21`, empurrado. **Fora do
-`main`** (desfeita nele por um commit de reversão, sem reescrever história — decisão 41). A carta
-da D557 fica em `Devolucoes/`, porque não foi cumprida.
+**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`df82ceb`**, empurrado. **Fora do
+`main`** (decisão 41). As fotos da D567 estão em `docs/Capturas/2026-09-26_D567/` (36: 9 estados ×
+1280, 1024, 768 e 375).
 
-**Pronto no ramo:** a caixa de texto e o "Organizar com IA" no campo da D554; o Ctrl+V que decide
-pelo que veio; itens somados; aviso com itens e linhas ignoradas; as ignoradas na tela até fechar;
-o "confira" fora do Item (nunca vai ao `salvar_oc` nem ao PDF); a falha não apaga o texto; a frase
-do servidor como veio. 247 testes; 10 sabotagens mordendo; conferido na tela a 375/768/1024/1440
-com servidor falso. O servidor já está na produção (`extrair-itens` v4, do `Banco_de_Dados`), e o
-contrato dele bate com o do ramo.
+**Pronto no ramo:** tudo o da D557, e mais: a escolha com a dica e o "?"; a espera do certeiro que
+diz "até 1 minuto"; o resultado com o total lido em destaque e quem leu; o "Ler de novo com o
+certeiro", que troca só os itens daquela leitura e pergunta antes se algum foi mexido; o erro do
+rápido que oferece o certeiro; a trava do `_meta.leitor`. 279 testes; 16 sabotagens da D567 e as 10
+da D557 mordendo (decisão 42).
 
-**Falta, quando voltar:** trazer o ramo para o `main` do dia (conflito provável em `NovaOcPage`),
-rodar tudo de novo, publicar pelo PowerShell, medir por fora e escrever a carta com as linhas de
-exemplo para o Pedro. Anotar nela o limite de **2.000 caracteres** do servidor.
-
+**Falta, na ordem:**
+1. o `CTO` olhar as fotos (aprova ou pede retoque) e levar ao Pedro;
+2. a `extrair-itens` v5 (do `Banco_de_Dados`) na produção, e a medida do texto;
+3. o aviso de publicar, **por carta do `CTO`**. Então: trazer o ramo para o `main` do dia, rodar
+   tudo, publicar pelo PowerShell, medir por fora e escrever a carta com as linhas de exemplo para o
+   Pedro, dizendo nela o limite de **2.000 caracteres** do texto (o da v4; conferir o da v5).
 ---
 
 ## ✅ Fechadas (registro)

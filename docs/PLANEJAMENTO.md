@@ -1948,3 +1948,33 @@ um teste da D551 (`tests/services/linhas.test.ts`) ficou vermelho em código id�
 fim de `paraFornecedor` por `'\n}\n'`; com CRLF não achava, e lia até o fim do arquivo. Qualquer
 clone novo nesta máquina já quebrava. Agora o teste troca CRLF por LF antes de procurar. Sabotado
 (uma coluna lida tirada da lista): 2 vermelhos, hash igual. 213 verdes, os mesmos da D555.
+
+## Decisão 42 — os dois leitores da IA: a pessoa escolhe, e a tela nunca finge · 26/09/2026
+
+**POR QUÊ (CTO-D567, palavra do Pedro às 21h25):** a leitura do pedido passa a ter dois leitores, e
+**a pessoa escolhe**. O parecer do Pesquisador (D556–D565) mediu o rápido errando preço em 7 de 16
+leituras de foto e papel escaneado, e o certeiro em nenhuma; em 6 dos 7 erros o total lido não batia
+com o do papel.
+
+**O QUE MUDOU (no ramo `d557-lista-em-texto`, `df82ceb`; NÃO publicado):**
+- `domain/leitor.ts`, lógica pura: os dois leitores e o que a tela diz deles; `leituraServe` (a trava
+  do `_meta.leitor`); `totalLido`; `itensMexidos` (contra a fotografia de quando entraram);
+  `trocarItensDaLeitura` (no lugar dos antigos); `outroLeitorPodeAjudar` (422 e 5xx, menos 503).
+- O campo mostra a escolha antes das portas, e o resultado depois da leitura: o campo **não fecha
+  mais sozinho** ao dar certo — fica aberto com o total lido.
+- O "?" da régua D475 virou componente (`components/Ajuda`): abre na página, fecha com Esc (na
+  captura, para não fechar o campo junto), com o "Fechar", com clique fora.
+- O erro leva o status; o 422 da imagem passa a mostrar a frase do servidor, porque desde a v4 ele
+  também é a resposta cortada, e "tente uma imagem mais nítida" era conselho errado.
+- A caixa de confirmação quebra a fila de botões: a foto de 375 achou o "Trocar pelos do certeiro"
+  empurrando a caixa para fora da tela (a regra da D555, estendida).
+
+**O TEMPO:** o aplicativo não põe limite na chamada; o da função é o do Supabase, 150 s sem resposta
+(depois, 504). O certeiro mais lento medido levou 50 s.
+
+**AS FOTOS:** saíram por protocolo do Chrome (CDP), com a largura por emulação: a janela do Chrome
+tem largura mínima, e a primeira leva de 375 saiu cortada à direita por causa do fotógrafo, não da
+tela. Servidor falso dentro da página, com respostas escritas à mão no formato da v5 — a v5 não
+estava no ensaio, e chamada de verdade pede sessão, que eu não tenho (pendência 13).
+
+**AS TRAVAS:** 279 testes. 16 sabotagens da D567 e as 10 da D557, todas mordendo, hash igual.
