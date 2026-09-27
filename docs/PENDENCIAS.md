@@ -231,35 +231,6 @@ segurou).
 
 ---
 
-### 14. D557 + D567 — a lista em texto e a escolha do leitor · **no ramo, esperando o Pedro olhar as fotos**
-
-*Aberta em 26/09/2026.* A D557 (colar a lista em texto) ficou em espera pela D559; **voltou na
-D567** (a corrida da IA da OC, largada pelo Pedro às 22h4x), que construiu por cima dela a escolha
-do leitor: **rápido ou certeiro**, antes de ler, a mesma para a imagem e para o texto.
-
-**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`3795db0`** (a D575: depois da
-leitura, os itens e o total na mesma janela), empurrado. **Fora do `main`** (decisão 41). As fotos estão em
-`docs/Capturas/2026-09-26_D567/` (40: 10 estados × 1280, 1024, 768 e 375; e mais 10 a
-1920 × 1080, o monitor do Pedro, com o menu de verdade — CTO-D574).
-
-**A tela está aprovada pelo CTO** (D571), com os dois retoques da D570 feitos (decisão 43): uma mensagem de
-leitura por vez, e o 422 da imagem sem o conselho da lista. E, pela D575 (decisão 45), o campo
-encolhe depois da leitura: a 1920 × 1080, os 8 itens e o Total lido cabem na mesma janela.
-
-**Pronto no ramo:** tudo o da D557, e mais: a escolha com a dica e o "?"; a espera do certeiro que
-diz "até 1 minuto"; o resultado com o total lido em destaque e quem leu; o "Ler de novo com o
-certeiro", que troca só os itens daquela leitura e pergunta antes se algum foi mexido; o erro do
-rápido que oferece o certeiro; a trava do `_meta.leitor`. 285 testes; 16 sabotagens da D567, 7 da
-D570 e as 10 da D557 mordendo (decisões 42 e 43).
-
-**Falta, na ordem:**
-1. o `CTO` levar a tela ao Pedro pelas fotos (aprovada por ele na D571);
-2. o "sim" do Pedro (a `extrair-itens` v5 já está na produção desde 23:02, conferida pelo CTO);
-3. o aviso de publicar, **por carta do `CTO`**. Então: trazer o ramo para o `main` do dia, rodar
-   tudo, publicar pelo PowerShell, medir por fora e escrever a carta com as linhas de exemplo para o
-   Pedro, dizendo nela o limite de **2.000 caracteres** do texto (o da v5, dito pelo CTO na D570).
----
-
 ## Onde estão as fechadas
 
 Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.

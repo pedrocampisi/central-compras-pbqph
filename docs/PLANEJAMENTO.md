@@ -2054,3 +2054,30 @@ sai cortado na borda esquerda. É a moldura do sistema, igual à do `main`; as f
 mostravam. Levado ao CTO, sem conserto.
 
 **AS TRAVAS:** 292 testes. 8 sabotagens novas (24 a 31), todas mordendo, hash igual.
+
+## Decisão 46 — no ar: a caixa de texto e a escolha do leitor · 27/09/2026
+
+**POR QUÊ (CTO-D577):** o Pedro olhou as 10 fotos de 1920 × 1080 e disse "Pode aplicar" (27/09, 00h1x,
+na janela do CTO). Publicar a OC é ato da casa depois da avaliação do CTO (lei 3, emenda 3 ao 7.2); a
+avaliação é a D576.
+
+**A JUNÇÃO (`782a8cf`):** o ramo `d557-lista-em-texto` (`3795db0`) entrou no `main` por junção de verdade,
+sem reescrever história. O `main` tinha a reversão da D557 (decisão 41): numa junção comum, ela
+continuaria valendo nos arquivos que o ramo não tocou depois (a `tabelaDeItens.ts`, por exemplo), e a
+D557 subiria pela metade. Por isso, fora de `docs/`, o `main` ficou **igual ao ramo** (conferido: diff
+vazio), e `docs/` ficou o do `main` (diff vazio contra `cf52779`).
+
+**A BATERIA NO MAIN JUNTADO:** 292 testes; tipos e lint limpos; **41 sabotagens** mordendo, hash igual (10
+da D557, 16 da D567, 7 da D570, 8 da D575). Três delas (D557 n.7, D567 n.11 e n.15) tinham o alvo em
+linha que a D570 reescreveu, e foram refeitas no código de hoje.
+
+**PUBLICADO:** saiu `69e5921a-275e-489e-8f02-f1673d7b2f30` (a D555, **O DESFAZER**); entrou
+`a9b3b112-108f-45fe-9c1b-1288cd74c267`, versão `20260927033219-782a8cf`, 100% do tráfego. Medido por
+fora em `compras.campisi.com.br`: o `versao.txt` diz `…-782a8cf`, e o pacote servido traz "Qual leitor
+da IA lê o pedido?", a dica do certeiro, "Ler outro pedido", "Ler de novo com o certeiro", "O certeiro
+trocou", a caixa de colar a lista e o conselho da imagem. A chamada de verdade pede sessão: não tentei
+entrar, e a primeira leitura real é de uma pessoa (o CTO a vê no log da `extrair-itens`).
+
+**UM COMENTÁRIO VELHO:** o `wrangler.jsonc` ainda diz que o deploy "só roda com a palavra do Pedro, dita
+na janela dele — nunca por carta". É de antes da emenda 3 (15/09), e a lei vale mais. Não o mudei
+nesta carta; está dito ao CTO.
