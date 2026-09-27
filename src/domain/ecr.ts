@@ -158,3 +158,137 @@ export function nomeDoPdfDaEcr(ecr: Pick<Ecr, 'codigo' | 'nome' | 'revisao'>): s
   const nome = `${ecr.codigo} - ${ecr.nome}`.replace(/[\\/:*?"<>|]/g, '-').trim();
   return ecr.revisao ? `${nome} - Rev ${ecr.revisao}.pdf` : `${nome}.pdf`;
 }
+
+// ── A revisão (CTO-D589 §4.2): só o Pedro edita, e salvar é aprovar ─────────
+//
+// A tela confere as mesmas regras da `compras.revisar_ecr` ANTES de mandar
+// (D593 §1): as mesmas seções, com os mesmos títulos e na mesma ordem; cada
+// seção com pelo menos uma linha; o texto com letra; o rótulo em branco ou com
+// letra; e o texto diferente do vigente. O banco confere de novo — a tela só
+// poupa a pessoa de uma recusa.
+
+const LETRA = /\p{L}/u;
+
+/** Uma linha nova, em branco, na lista. */
+export function linhaNova(): EcrItem {
+  return { rotulo: null, texto: '', numerado: true };
+}
+
+/**
+ * O texto como vai ao banco: sem espaço nas pontas do texto e do rótulo, e o
+ * rótulo em branco vira `null` (o banco recusa rótulo sem letra). Espaço de
+ * dentro fica como está.
+ */
+export function limparParaGravar(secoes: readonly EcrSecao[]): EcrSecao[] {
+  return secoes.map((s) => ({
+    titulo: s.titulo,
+    itens: s.itens.map((i) => {
+      const rotulo = i.rotulo?.trim() ?? '';
+      return { rotulo: rotulo === '' ? null : rotulo, texto: i.texto.trim(), numerado: i.numerado };
+    }),
+  }));
+}
+
+/** O mesmo texto, depois de limpo (é o que o banco compara). */
+export function mesmoTexto(a: readonly EcrSecao[], b: readonly EcrSecao[]): boolean {
+  return JSON.stringify(limparParaGravar(a)) === JSON.stringify(limparParaGravar(b));
+}
+
+export interface ProblemaDaRevisao {
+  /** O índice da seção, ou `null` quando o problema é do texto inteiro. */
+  secao: number | null;
+  /** O índice da linha, ou `null` quando o problema é da seção. */
+  linha: number | null;
+  frase: string;
+}
+
+/** O que impede a revisão de ir ao banco. Lista vazia: pode ir. */
+export function problemasDaRevisao(
+  vigente: readonly EcrSecao[],
+  nova: readonly EcrSecao[],
+  revisaoVigente: string | null,
+): ProblemaDaRevisao[] {
+  const limpa = limparParaGravar(nova);
+  const problemas: ProblemaDaRevisao[] = [];
+  if (limpa.length !== vigente.length || limpa.some((s, i) => s.titulo !== vigente[i]!.titulo)) {
+    return [{ secao: null, linha: null, frase: 'As seções têm de ser as mesmas da ECR, com os mesmos títulos e na mesma ordem.' }];
+  }
+  limpa.forEach((s, i) => {
+    const n = numeroDaSecao(i);
+    if (s.itens.length === 0) {
+      problemas.push({ secao: i, linha: null, frase: `A seção ${n} precisa de pelo menos uma linha.` });
+    }
+    s.itens.forEach((it, j) => {
+      if (!LETRA.test(it.texto)) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, linha ${j + 1}: escreva o texto (ele precisa ter pelo menos uma letra).` });
+      }
+      if (it.rotulo !== null && !LETRA.test(it.rotulo)) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, linha ${j + 1}: o rótulo precisa ter uma letra, ou ficar em branco.` });
+      }
+    });
+  });
+  if (problemas.length === 0 && mesmoTexto(vigente, limpa)) {
+    problemas.push({
+      secao: null,
+      linha: null,
+      frase: `O texto está igual ao da revisão ${revisaoVigente ?? 'vigente'}: não há o que revisar.`,
+    });
+  }
+  return problemas;
+}
+
+/** A revisão que o salvar cria: "00" → "01", "09" → "10". */
+export function proximaRevisao(revisao: string | null): string {
+  const n = Number.parseInt(revisao ?? '', 10);
+  return String((Number.isNaN(n) ? -1 : n) + 1).padStart(2, '0');
+}
+
+/** O que a tela mostra antes de gravar: "Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você." */
+export function resumoDaRevisao(revisao: string | null, hojeIso: string): string {
+  return `Rev. ${revisao ?? '—'} → ${proximaRevisao(revisao)}, emitida hoje (${formatDate(hojeIso)}), aprovada por você.`;
+}
+
+/** A frase para a pessoa quando o banco recusa a revisão, pelo código da recusa. */
+export function fraseDaRecusaDaRevisao(codigo: string | undefined, mensagem: string): string {
+  switch (codigo) {
+    case '42501':
+      return 'Só o Pedro revisa uma ECR. A revisão não foi gravada.';
+    case 'P0002':
+      return 'Esta ECR não existe mais no banco. Recarregue a página. A revisão não foi gravada.';
+    case '55000':
+      return 'A revisão vigente desta ECR não tem o texto guardado no histórico, e revisar agora perderia esse texto. A revisão não foi gravada.';
+    case '22023':
+      return `O banco recusou a revisão: ${mensagem}`;
+    default:
+      return `Falha ao gravar a revisão: ${mensagem}`;
+  }
+}
+
+// As mudanças no rascunho — sempre uma cópia nova, nunca o original.
+
+type Secoes = readonly EcrSecao[];
+
+function naSecao(secoes: Secoes, s: number, f: (itens: EcrItem[]) => EcrItem[]): EcrSecao[] {
+  return secoes.map((sec, i) => (i === s ? { ...sec, itens: f([...sec.itens]) } : sec));
+}
+
+export function mudaLinha(secoes: Secoes, s: number, l: number, parte: Partial<EcrItem>): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => itens.map((it, j) => (j === l ? { ...it, ...parte } : it)));
+}
+
+export function poeLinha(secoes: Secoes, s: number): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => [...itens, linhaNova()]);
+}
+
+export function tiraLinha(secoes: Secoes, s: number, l: number): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => itens.filter((_, j) => j !== l));
+}
+
+export function moveLinha(secoes: Secoes, s: number, l: number, para: -1 | 1): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => {
+    const k = l + para;
+    if (k < 0 || k >= itens.length) return itens;
+    [itens[l], itens[k]] = [itens[k]!, itens[l]!];
+    return itens;
+  });
+}
