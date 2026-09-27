@@ -2236,3 +2236,17 @@ está na produção (368 linhas); nomes do histórico inventados.
 **ACHADOS, SEM MEXER:** o PDF da OC no ar pesa 4,1 MB por OC, pela mesma marca sem compressão (a D586 §5 diz que
 ele não muda; fica para carta do CTO). A ECR 02 tem uma linha com rótulo "Dimensão" e texto vazio — a `revisar_ecr`
 recusaria toda revisão da ECR 02 que a mantivesse (vai para a tela de editar).
+
+## Decisão 54 — o PDF da OC com a marca comprimida · 27/09/2026
+
+**POR QUÊ (CTO-D593 §3, emenda a D586 §5):** o achado da decisão 53 — o PDF da OC no ar pesava 4,1 MB por OC, porque
+o jsPDF grava a marca crua. É o arquivo que vai anexado ao e-mail do fornecedor. A D593 também aprovou a tela de ler
+e o PDF das ECRs (o subtítulo e as três correções de premissa aceitos) e manda publicar **só depois da D592 do
+Banco**: a migration dele mexe em `secoes`, que a tela nova passa a ler.
+
+**O QUE MUDOU (no ramo `d586-ecrs-do-sgq`, `ba53d2f`; NÃO publicado):** só `'FAST'` no `addImage` da marca. A mesma
+OC de teste: 4.227.036 → 75.513 bytes; a página 1 a 110 dpi e a marca a 300 dpi com 0 pixels diferentes (as imagens
+de antes e depois são o mesmo arquivo, byte a byte).
+
+**AS TRAVAS:** `tests/services/ocPdfPeso.test.ts` (a marca de verdade, abaixo de 300 KB, e a marca presente); 2
+sabotagens mordendo (sem compressão; sem a marca). 343 testes. Fotos em `docs/Capturas/2026-09-27_D593/`.
