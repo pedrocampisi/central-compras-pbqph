@@ -1,0 +1,278 @@
+[
+ {
+  "codigo": "ECR 03",
+  "nome": "CONCRETO USINADO",
+  "revisao": "00",
+  "emitida_em": "2026-04-15",
+  "secoes": [
+   {
+    "titulo": "REFERÊNCIA",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "NBR 7212 - Execução de Concreto Dosado em Central - Especificação;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "NBR 8953 - Concreto para fins estruturais;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "NBR 12655 - Preparo, Controle e Recebimento do Concreto - Procedimento;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "NBR 15575 - Edificações habitacionais – Desempenho",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "Volume (mᶟ);",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Slump ou flow;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Fator a/c;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Resistencia (FCK);",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "REGISTRO DO FORNECEDOR",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "Carta traço por resistência e especificações, conforme projeto.",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "INSPEÇÃO DO RECEBIMENTO",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "Realizar a cada caminhão.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Especificações",
+      "texto": "Com a chegada de cada caminhão na obra, antes da descarga verificar se todos os itens da NF do concreto estão conforme o pedido de compra, a hora da saída e hora da chegada na obra.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Quantidade",
+      "texto": "Conferir se a quantidade entregue está de acordo com pedido de compra.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Validade",
+      "texto": "O tempo entre dosagem do concreto (usina) e final de aplicação não deve ultrapassar 2h 30min.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Trabalhabilidade",
+      "texto": "Antes da descarga de cada caminhão, é preciso realizar o ensaio de slump test.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Atenção",
+      "texto": "Qualquer divergência entre material entregue, pedido de compra e nota fiscal comunicar ao setor de compras.  Rejeitar a mercadoria somente com autorização do setor de compras e planejamento da obra. O concreto deverá ser recebido pelo mestre de obras e/ou responsável pelo setor de planejamento da obra.",
+      "numerado": false
+     }
+    ]
+   },
+   {
+    "titulo": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "O transporte pode ocorrer em carrinho de mão ou mecânico, de modo que o concreto não sofra vibrações excessivas;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Embora não haja armazenamento de concreto na obra, reservar um local de pouco importância estrutural para aproveitamento do concreto;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Para os ensaios de resistência exigidos em projeto, identificar os corpos de prova conforme Controle Tecnológico;",
+      "numerado": true
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "codigo": "ECR 08",
+  "nome": "REVESTIMENTO DE PAREDE E PISO",
+  "revisao": "00",
+  "emitida_em": "2026-04-15",
+  "secoes": [
+   {
+    "titulo": "REFERÊNCIA",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "NBR 13753 - Revestimento de piso interno ou externo com placas cerâmicas e com utilização de argamassa colante;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "NBR 15463 - Placas cerâmicas para revestimento - Porcelanato;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "NBR 15575 - Edificações Habitacionais - Desempenho.",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "Quantidade;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Dimensões das peças.",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Especificação do produto;",
+      "numerado": true
+     },
+     {
+      "rotulo": "Resistência a abrasão",
+      "texto": "(PEI), quando aplicável",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "REGISTRO DO FORNECEDOR",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "Certificado de estabilidade e a segurança estrutural para cargas permanentes e acidentais;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de deslocamentos-limites permanentes e cargas acidentais em geral;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de resistência do produto;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de ensaio á cargas verticais concentradas nos pisos;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de avaliação da reação do fogo da face inferior do sistema de piso;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de ensaio de acordo com a ABNT NBR 13818 na condição projetada de uso (molhada ou seca);",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de resistência a umidade do sistema de pisos de áreas molhadas e molháveis;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de resistência ao ataque químico dos sistemas de pisos;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "Certificado de desgaste por abrasão da camada de piso de acordo com a NBR 7686, 8810, 13818 e 14833-1",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "INSPEÇÃO DO RECEBIMENTO",
+    "itens": [
+     {
+      "rotulo": "Lote",
+      "texto": "definido pelo fornecedor.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Aspecto geral",
+      "texto": "Verificar se não estão com as caixas rasgadas, e se não existe peças quebradas.  Peças com defeitos tais como: saliências, bolhas cantos e lados lascados, rachaduras, manchas, riscos, falta de vidrado, devem ser recusadas.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Especificações",
+      "texto": "Verificar o tipo e a tonalidade das peças. Caso tenha peças de tonalidades diferentes deverão ser armazenadas separadamente para uso em unidades diferentes, conforme pedido de compra.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Quantidade",
+      "texto": "Conferir se a quantidade entregue conforme pedido de compra.",
+      "numerado": true
+     },
+     {
+      "rotulo": "Dimensão",
+      "texto": "Verificar as dimensões das peças.  Tirar amostra de aproximadamente 4 caixas e abrir para conferencia de dimensão dos lados, espessura, esquadro, empeno e tonalidade.",
+      "numerado": true
+     }
+    ]
+   },
+   {
+    "titulo": "MANUSEIO, ARMAZENAMENTO E IDENTIFICAÇÃO",
+    "itens": [
+     {
+      "rotulo": null,
+      "texto": "O manuseio pode ser manual ou com carrinho, realizado com cuidado para evitar danos ao material;",
+      "numerado": true
+     },
+     {
+      "rotulo": null,
+      "texto": "O local de armazenamento deve ser protegido da umidade, o material deve ser colocado sobre estrados de madeira, caixas empilhadas com altura máxima de 1,0 m, empilhar conforme orientações do fabricante, quando aplicável;",
+      "numerado": true
+     },
+     {
+      "rotulo": "Identificar",
+      "texto": "por tipo e lote.",
+      "numerado": true
+     }
+    ]
+   }
+  ]
+ }
+]

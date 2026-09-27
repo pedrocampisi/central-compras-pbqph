@@ -5,16 +5,39 @@
   background: var(--surface);
   overflow: hidden;
 }
-.head {
+
+/* A cabeça: o botão que abre a ECR e, ao lado, o do PDF. */
+.cabeca {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
-  cursor: pointer;
+  gap: 8px;
+  padding-right: 12px;
   background: var(--bg);
 }
-.head:hover { background: var(--marca-fraca); }
-.titleRow { display: flex; gap: 10px; align-items: center; }
+.cabeca:hover { background: var(--marca-fraca); }
+.head {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.head:focus-visible { outline: 2px solid var(--marca); outline-offset: -2px; }
+.seta {
+  flex: none;
+  color: var(--text-muted);
+}
+.setaAberta { transform: rotate(180deg); }
+.titleRow { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-width: 0; }
 .code {
   font-weight: 600;
   color: var(--marca);
@@ -23,37 +46,58 @@
 }
 .name { font-weight: 600; font-size: 13px; }
 .meta { font-size: 11px; color: var(--text-muted); }
-.body { padding: 14px; border-top: 1px solid var(--border); }
-.section { margin-bottom: 12px; }
-.section h4 {
-  margin: 0 0 6px;
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.revisao {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+.pdf { flex: none; }
+
+.body { padding: 16px 18px; border-top: 1px solid var(--border); }
+
+/* As seções como o documento: "01. REFERÊNCIA", com o traço embaixo. */
+.secao { margin-bottom: 16px; }
+.secao h4,
+.materiais h4,
+.historico h4 {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--texto);
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--texto);
 }
-.section p { margin: 0; font-size: 13px; color: var(--text-mid); }
-.specs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+.numero { font-family: var(--fonte-mono); }
+.lista {
+  margin: 0;
+  padding-left: 20px;
+  list-style: square;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-mid);
 }
-.specs > div {
-  background: var(--bg);
-  padding: 10px;
+.lista li { margin-bottom: 3px; }
+.lista strong { color: var(--texto); }
+
+/* A nota fora da lista, em destaque, como no documento. */
+.nota {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--erro);
   border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--texto);
 }
-.specs h4 {
-  margin: 0 0 6px;
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 700;
-}
-.specs ul { margin: 0; padding-left: 18px; font-size: 12px; }
-.specs li { margin-bottom: 4px; color: var(--text-mid); }
+.semTexto { margin: 0; font-size: 13px; color: var(--text-muted); }
+
+.materiais { margin-bottom: 16px; }
+.materiais ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-mid); }
+.materiais li { margin-bottom: 3px; }
 .tag {
   display: inline-block;
   margin-left: 6px;
@@ -64,13 +108,53 @@
   color: var(--navy-mid);
   font-weight: 600;
 }
-.sub {
-  display: block;
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
+
+/* O histórico: a tabela do rodapé do documento. */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
 }
+.tabela th,
+.tabela td {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.tabela th {
+  background: var(--bg);
+  font-weight: 700;
+  color: var(--texto);
+}
+.tabela td { color: var(--text-mid); }
 
 @media (max-width: 700px) {
-  .specs { grid-template-columns: 1fr; }
+  .body { padding: 14px 12px; }
+  .revisao { margin-left: 0; flex-basis: 100%; }
+
+  /* A 375, cada revisão vira um bloco: o nome da coluna ao lado do valor. */
+  .tabela thead { display: none; }
+  .tabela,
+  .tabela tbody,
+  .tabela tr,
+  .tabela td { display: block; width: 100%; }
+  .tabela tr {
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--raio-pequeno);
+  }
+  .tabela td {
+    display: flex;
+    gap: 8px;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tabela td:last-child { border-bottom: 0; }
+  .tabela td::before {
+    content: attr(data-coluna);
+    flex: 0 0 96px;
+    font-weight: 700;
+    color: var(--texto);
+  }
 }

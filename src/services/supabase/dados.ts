@@ -22,6 +22,7 @@ import type {
   Data, Ecr, Fornecedor, Item, Obra, OrdemCompra,
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
+import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
@@ -198,6 +199,16 @@ function paraEcr(l: Record<string, unknown>): Ecr {
       descricao: vazio(m['descricao']),
       unidade_padrao: vazio(m['unidade_padrao']),
     })),
+    // O texto da ECR (CTO-D586) e o histórico de revisões (CTO-D588).
+    revisao: l['revisao'] == null ? null : String(l['revisao']),
+    emitida_em: l['emitida_em'] == null ? null : String(l['emitida_em']),
+    secoes: secoesDoBanco(l['secoes']),
+    // PROVISÓRIO: a tabela do histórico ainda não existe no banco (D588
+    // §3.1). Até a carta do Banco com a forma dela, a leitura das ECRs não
+    // a pede, `revisoes` chega vazio e a tela diz "ainda não foi carregado".
+    // Quando a tabela chegar, ela entra no select das ECRs, e o tradutor é
+    // `revisoesDoBanco` — ajustado à forma do Banco.
+    revisoes: revisoesDoBanco(l['revisoes']),
   };
 }
 

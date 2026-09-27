@@ -56,7 +56,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-async function loadCampisiLogo(): Promise<string | null> {
+export async function loadCampisiLogo(): Promise<string | null> {
   if (typeof fetch !== 'function' || typeof FileReader === 'undefined') return null;
 
   logoDataUrlPromise ??= fetch(LOGO_PATH)
