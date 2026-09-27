@@ -73,8 +73,10 @@ export function MostrarUmaObra({ obras }: { obras: Obra[] }) {
   const ligada = !!armada && obraAtiva === armada.obraId;
   const ordenadas = [...obras].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
+  // Separada do resto da página (CTO-D601): o aviso "somente leitura" fala do
+  // resto, e esta opção grava.
   return (
-    <FieldGroup title="Mostrar só uma obra">
+    <FieldGroup title="Mostrar só uma obra" className={styles.opcaoSeparada}>
       <p className={styles.hint}>
         Neste navegador, durante a janela, todas as telas mostram só a obra escolhida. Os outros computadores continuam
         vendo tudo. As horas são as de Brasília.

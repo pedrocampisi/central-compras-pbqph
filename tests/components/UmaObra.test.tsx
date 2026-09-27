@@ -225,6 +225,17 @@ describe('D599 §2 — a opção em Configurações', () => {
     expect(screen.queryByText('Mostrar só uma obra')).toBeNull();
   });
 
+  it('o aviso "somente leitura" fala do resto da tela, fora da opção, que grava (CTO-D601)', async () => {
+    await abrir();
+    await aba('config');
+    const opcao = (await screen.findByText('Mostrar só uma obra')).parentElement!;
+    const aviso = screen.getByText(/Somente leitura nesta versão/);
+    expect(aviso.textContent).toContain('o resto desta tela ainda não é gravado');
+    expect(opcao.contains(aviso)).toBe(false);
+    expect(opcao.compareDocumentPosition(aviso) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText('Mostrar só uma obra, textos legais e integração com IA.')).toBeInTheDocument();
+  });
+
   it('armar: a obra, a janela já preenchida com a da auditoria; depois diz quando liga e desliga, e desarma', async () => {
     await abrir();
     await aba('config');

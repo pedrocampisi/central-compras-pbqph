@@ -31,14 +31,15 @@ export function ConfigPage() {
       <div className="section-header">
         <div>
           <h2>Configurações</h2>
-          <p className="section-sub">Textos legais e integração com IA.</p>
+          <p className="section-sub">Mostrar só uma obra, textos legais e integração com IA.</p>
         </div>
       </div>
 
       {/* Só para quem revisa as ECRs (CTO-D599); é a única coisa desta tela que se muda. */}
       <MostrarUmaObra obras={data.obras} />
 
-      <AvisoSomenteLeitura oQue="as configurações" />
+      {/* O aviso fala do resto, e não da opção de cima, que grava (CTO-D601). */}
+      <AvisoSomenteLeitura oQue="o resto desta tela" />
 
       {/* ── Destinatário da nota ───────────────────────────────────────────── */}
       <FieldGroup title="Destinatário da nota">
