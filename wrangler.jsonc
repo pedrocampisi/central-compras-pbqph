@@ -23,8 +23,10 @@
 // EMBUTIDO do proprio pnpm (empacotar workspace), que nao tem nada a ver com
 // isto e nao publica nada. Medido em 03/09/2026, no primeiro ensaio.
 //
-// ⚠️ `wrangler deploy` e ato que sai desta maquina. So roda com a palavra do
-// Pedro, dita na janela dele -- nunca por carta, nunca por decisao de agente.
+// ⚠️ `wrangler deploy` e ato que sai desta maquina. Quem decide quando ele roda
+// e a lei 3 (3_AGENTES_E_CORREIO.md, 7.2, emenda 3 de 15/09/2026): publicar a
+// Ordem de Compra e ato desta casa, por carta, depois da avaliacao do CTO no
+// ensaio. Voltar atras e publicar a versao anterior. Fora de carta, nao roda.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
 
