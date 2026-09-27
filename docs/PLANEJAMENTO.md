@@ -2005,3 +2005,20 @@ mensagem do sistema. Não mexi no lugar das mensagens: é do sistema inteiro, e 
 de texto, com a frase inteira), nas quatro larguras: 40 fotos. Rolagem de lado 0, nada fora.
 
 **AS TRAVAS:** 285 testes. 7 sabotagens novas (17–23), todas mordendo, hash igual.
+
+## Decisão 44 — a gaveta do fim da corrida: fechado sai da fila viva · 26/09/2026
+
+**POR QUÊ (CTO-D571; lei 2, e lei 3 §7.6):** a corrida fecha com teto zero nas gavetas — carta
+"fechada lá" ainda aberta aqui, e item ✅ no `PENDENCIAS` vivo. A tela da escolha foi aprovada pelo
+CTO na mesma carta; a publicação sai por carta dele, depois do "sim" do Pedro.
+
+**O QUE MUDOU:**
+- A `D429` que eu mandei em 21/09 foi para `Arquivo_Morto/Enviados/`, pelo nome: ela mesma diz
+  "Espero de volta: nada" (a régua da D258).
+- Os 16 itens da seção "Fechadas (registro)" saíram do `PENDENCIAS.md` para o arquivo novo
+  `Arquivo_Morto/PENDENCIAS_FECHADAS.md`, inteiros, como estavam. O `PENDENCIAS` caiu de 720 para
+  263 linhas e aponta para lá.
+- **Ficaram de propósito:** os ✅ dentro dos itens 1 e 5, que são passos de itens ainda abertos (o 1
+  espera alguém com conta emitir; o 5 ainda tem o passo 6). E a carta `D557` na `Devolucoes/`: a
+  ordem dela termina na publicação, que ainda pende (pendência 14). Nada sai da caixa com item
+  pendurado.
