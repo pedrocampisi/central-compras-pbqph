@@ -2166,3 +2166,28 @@ vazio contra o ramo). 297 testes; tipos e lint limpos; as 4 sabotagens da D582 m
 `10205e67-c34f-4da9-ae57-ee129d07b087`, versão `20260927123631-1dca293`, 100% do tráfego. Medido por fora: o
 `versao.txt` diz `…-1dca293`; o pacote servido (`index-867c1nWr.js`) traz os três textos novos uma vez
 cada, e nenhum dos antigos.
+
+## Decisão 51 — a aba Prestadores sai da OC · 27/09/2026
+
+**POR QUÊ (CTO-D585):** palavra do Pedro, na janela do CTO: "TIRE a aba de prestadores de serviço, não faz
+sentido ter aqui." Medido pelo CTO: `compras.prestadores_servico` é visão do cadastro único (os nomes moram nos
+fornecedores), `compras.avaliacoes_prestadores` tem 0 linhas, e fora da OC ninguém lê essa aba.
+
+**O QUE MUDOU (no ramo `d585-sem-prestadores`, `2672433`; NÃO publicado):**
+- Saíram o item do menu, o título, a página (`src/features/prestadores-servico/`, 4 arquivos), o filtro e a aba
+  da loja da interface, as 4 ações da loja de dados, as duas consultas e os dois tradutores de `dados.ts`, os dois
+  campos do formato de dados (tipos, esquema, `normalize`) e as constantes que só a aba usava.
+- Ficaram: o degrau v3 → v4 da escada de formatos dos arquivos antigos (tirar quebra a escada; o `normalize`
+  descarta o que ele acrescenta), o desenho `wrench` do conjunto de ícones e o comentário de `linhas.ts`, que fala
+  do cadastro único.
+- **A aba guardada:** a OC não guarda a aba aberta (a chave `central-compras-ui-v1` tem leitura e gravação, e
+  nenhum código as chama). Mesmo assim, `abaQueExiste` confere a aba no `App` e na loja: aba que não existe vira
+  a tela inicial.
+- O banco não muda.
+
+**AS TRAVAS:** `tests/components/SemPrestadores.test.tsx` monta o `App` de verdade, com sessão e banco falsos
+(o menu sem Prestadores; a aba velha abre no Dashboard). 300 testes; 4 sabotagens novas e as 51 de sempre
+mordendo, hash igual (a D557 n.5 refeita no código de hoje).
+
+**AS FOTOS:** `docs/Capturas/2026-09-27_D585/`, o menu antes e depois a 1920 e a 375, e Fornecedores depois. Só o
+menu muda. O fotógrafo passou a esperar as fontes: a primeira foto de 1920 saíra com a fonte de reserva.
