@@ -331,12 +331,40 @@
   .sfIdentidade {
     justify-content: center;
   }
+  /* D579: o menu estreito tem 44px por dentro. O rodape usa a largura toda, e o
+     avatar e o botao do tema ficam um em cima do outro -- lado a lado, a fila
+     passava da largura e o avatar saia cortado pela esquerda. */
+  .sidebarFooter {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .sfIdentidade {
+    flex-direction: column;
+    gap: 8px;
+  }
   .temaBtn {
     margin: 0 auto;
+  }
+  /* D579: o topo cresce com o que tem dentro e o selo desce para a linha de
+     baixo quando nao cabe -- com altura presa, o titulo quebrado passava por
+     cima da pagina e o selo saia cortado na borda direita. */
+  .topbar {
+    height: auto;
+    min-height: 68px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   .topbar,
   .mainContent {
     padding-left: 20px;
     padding-right: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .topbarTitle {
+    font-size: 20px;
   }
 }
