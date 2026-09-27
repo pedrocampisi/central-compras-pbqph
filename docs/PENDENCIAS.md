@@ -218,6 +218,14 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
+### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **no ramo, esperando a carta do CTO para publicar**
+
+*Aberta em 27/09/2026 (decisão 56).* **Onde mora:** o ramo **`d589-editar-ecr`**, commit **`7edb715`**, empurrado,
+**fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D596/`. **Fecha quando:** a carta do CTO mandar
+publicar. O desfazer será a `080168b8`. **Depois dela:** a primeira revisão de verdade é do Pedro.
+
+---
+
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do

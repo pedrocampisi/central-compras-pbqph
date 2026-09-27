@@ -2270,3 +2270,33 @@ ECR 02 com texto), e o CTO mandou publicar o ramo aprovado pela D593.
 
 **DAQUI EM DIANTE:** cai o leitor aceito da D591. `secoes` só muda pela `revisar_ecr`. A tela de editar (D589 §4.2)
 segue no ramo `d589-editar-ecr`, sem publicar sem carta.
+
+## Decisão 56 — a tela de editar a ECR e os dez campos fora do código · 27/09/2026
+
+**POR QUÊ (CTO-D596 §3; D589 §4.2):** a `revisar_ecr` está na produção, as 20 ECRs se revisam (D592) e a tela de ler
+está no ar: não havia o que esperar. Só o Pedro revisa, e salvar é aprovar. Os dez campos velhos de `ecrs` são uma
+segunda verdade que ninguém lê; o Banco os tirou da produção às 12:06 (a D596 dele).
+
+**O QUE MUDOU (no ramo `d589-editar-ecr`, `7edb715`; NÃO publicado):**
+- **A tela de editar:** "Editar" só para quem a `core.pode_revisar_ecr()` diz sim (na falha, não aparece); uma ECR por
+  vez, "Em edição"; o rascunho numa loja (trocar de aba não perde). Cada linha: rótulo, texto, "Nota (fora da lista)",
+  subir, descer, tirar (não tira a última da seção); "Pôr linha" no fim da seção.
+- **Confere antes de mandar** (a proposta do §6 da carta da D586): as regras da `revisar_ecr`; a linha com defeito
+  marcada, a frase embaixo dela — pelo rótulo quando tem ("a linha "Dimensão" está sem texto…") —, o cursor nela, e nada
+  vai ao banco.
+- **A confirmação:** "Rev. 00 → 01, emitida hoje (dd/mm/aaaa), aprovada por você." — hoje é o de São Paulo; "O que
+  mudou" obrigatório (é a descrição do histórico). Gravou: recarrega, fecha e avisa. Recusa: a frase de cada código
+  (42501, P0002, 55000, 22023) dentro da confirmação, e o rascunho fica.
+- **Sair sem salvar:** "Cancelar" pergunta quando há mudança; fechar o navegador também.
+- **Os dez campos fora do código:** tipos, esquema, os quatro tradutores do `normalize.ts` e o `paraEcr`. O
+  `normalizeEcr` os descarta se vierem; o degrau v2 → v3 fica, com a nota.
+- **As fotos pegaram duas coisas, corrigidas:** a 375 com dois botões o nome virava uma coluna (os botões descem só
+  quando são dois); o exemplo "Rótulo (opcional)" parecia um rótulo escrito.
+
+**AS TRAVAS:** 368 testes (eram 343): `tests/components/EditarEcr.test.tsx` (21, com as duas funções do banco falsas
+pelo contrato) e 11 das regras em `tests/domain/ecr.test.ts`; os testes da tela de ler não falam mais com banco nenhum.
+21 sabotagens novas mordendo; as 20 da D586/D593 (duas com alvo novo) e as 56 de antes também. Nenhuma revisão de
+verdade: a primeira é do Pedro.
+
+**AS FOTOS:** `docs/Capturas/2026-09-27_D596/` — 7 estados, a 1920 e a 375; dados de antes da D592 (a ECR 02 com a
+linha "Dimensão" vazia), funções do banco falsas.
