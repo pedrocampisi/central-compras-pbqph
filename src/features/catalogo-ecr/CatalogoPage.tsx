@@ -2,10 +2,11 @@
  * Aba Catálogo ECR — as 20 ECRs em vigor (CTO-D586, com a D588: a ECR do
  * sistema é a que vale). Cada ECR aberta mostra a revisão, as cinco seções na
  * ordem do documento, os materiais e, no fim, o histórico de revisões. Cada
- * ECR tem o botão do PDF (D589 §4.1), para quem vê o catálogo.
+ * ECR tem o botão do PDF (D589 §4.1), para quem vê o catálogo, e o de editar
+ * (D589 §4.2), só para o Pedro.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import type { Ecr, EcrItem } from '../../domain/types';
@@ -23,6 +24,9 @@ import {
   revisaoDaEcr,
 } from '../../domain/ecr';
 import { baixarPdfDaEcr } from '../../services/pdf/generateEcrPdf';
+import { podeRevisarEcr } from '../../services/supabase/ecrs';
+import { useRevisaoEcrStore } from '../../stores/useRevisaoEcrStore';
+import { EditorDaEcr } from './EditorDaEcr';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
 import styles from './CatalogoPage.module.css';
@@ -75,11 +79,16 @@ function Historico({ ecr }: { ecr: Ecr }) {
   );
 }
 
-function EcrCard({ ecr }: { ecr: Ecr }) {
+function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
   const [open, setOpen] = useState(false);
   const [gerando, setGerando] = useState(false);
   const showToast = useUiStore((s) => s.showToast);
+  const emEdicao = useRevisaoEcrStore((s) => s.ecrId);
+  const abrirRevisao = useRevisaoEcrStore((s) => s.abrir);
   const revisao = revisaoDaEcr(ecr);
+  // A ECR em edição fica aberta: o rascunho não se esconde.
+  const editando = emEdicao === ecr.id;
+  const aberta = open || editando;
 
   async function pdf() {
     setGerando(true);
@@ -95,8 +104,8 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
   return (
     <div className={styles.card}>
       <div className={styles.cabeca}>
-        <button type="button" className={styles.head} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-          <Icon name="chevron" size={16} className={open ? `${styles.seta} ${styles.setaAberta}` : styles.seta} />
+        <button type="button" className={styles.head} aria-expanded={aberta} onClick={() => setOpen((o) => !o)}>
+          <Icon name="chevron" size={16} className={aberta ? `${styles.seta} ${styles.setaAberta}` : styles.seta} />
           <span className={styles.titleRow}>
             <span className={styles.code}>{ecr.codigo}</span>
             <span className={styles.name}>{ecr.nome}</span>
@@ -104,6 +113,23 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
           </span>
           {revisao && <span className={styles.revisao}>{revisao}</span>}
         </button>
+        {editando && <span className={styles.emEdicao}>Em edição</span>}
+        {/* Uma ECR em edição por vez: enquanto uma está aberta, as outras não oferecem "Editar". */}
+        {podeRevisar && ecr.secoes && emEdicao === null && (
+          <Button
+            variant="outline"
+            size="sm"
+            className={styles.pdf}
+            onClick={() => {
+              abrirRevisao(ecr);
+              setOpen(true);
+            }}
+            aria-label={`Editar a ${ecr.codigo}`}
+          >
+            <Icon name="lapis" size={14} />
+            Editar
+          </Button>
+        )}
         {ecr.secoes && (
           <Button
             variant="outline"
@@ -119,9 +145,11 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
         )}
       </div>
 
-      {open && (
+      {aberta && (
         <div className={styles.body} data-ecr-aberta="">
-          {ecr.secoes ? (
+          {editando ? (
+            <EditorDaEcr ecr={ecr} />
+          ) : ecr.secoes ? (
             ecr.secoes.map((s, i) => (
               <section key={i} className={styles.secao}>
                 <h4>
@@ -150,7 +178,7 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
             </p>
           )}
 
-          {ecr.materiais.length > 0 && (
+          {!editando && ecr.materiais.length > 0 && (
             <section className={styles.materiais} data-materiais="">
               <h4>{MATERIAIS}</h4>
               <ul>
@@ -163,7 +191,7 @@ function EcrCard({ ecr }: { ecr: Ecr }) {
             </section>
           )}
 
-          <Historico ecr={ecr} />
+          {!editando && <Historico ecr={ecr} />}
         </div>
       )}
     </div>
@@ -175,6 +203,18 @@ export function CatalogoPage() {
   // Filtro no uiStore: persiste ao trocar de aba.
   const search = useUiStore((s) => s.catalogoFilter.search);
   const setCatalogoFilter = useUiStore((s) => s.setCatalogoFilter);
+  // Só o Pedro revisa (D589 §4.3). O banco responde; na dúvida, o botão não aparece.
+  const [podeRevisar, setPodeRevisar] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    podeRevisarEcr().then(
+      (ok) => vivo && setPodeRevisar(ok),
+      () => vivo && setPodeRevisar(false),
+    );
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   if (!data) return null;
 
@@ -205,7 +245,7 @@ export function CatalogoPage() {
         style={{ width: '100%', marginBottom: 14, padding: '9px 11px', border: '1.5px solid var(--border)', borderRadius: 7, fontSize: 13 }}
       />
       {ecrs.map((ecr) => (
-        <EcrCard key={ecr.id} ecr={ecr} />
+        <EcrCard key={ecr.id} ecr={ecr} podeRevisar={podeRevisar} />
       ))}
     </div>
   );

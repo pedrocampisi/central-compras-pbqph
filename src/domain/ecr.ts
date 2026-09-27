@@ -124,6 +124,11 @@ export function numeroDaSecao(indice: number): string {
   return `${String(indice + 1).padStart(2, '0')}.`;
 }
 
+/** O número da seção dentro de uma frase, sem o ponto do documento: "Seção 02, …". */
+export function numeroNaFrase(indice: number): string {
+  return String(indice + 1).padStart(2, '0');
+}
+
 /** A linha do histórico como a tabela a mostra: a data em dd/mm/aaaa, "—" sem data. */
 export function linhaDoHistorico(r: EcrRevisao): string[] {
   return [r.revisao, r.data ? formatDate(r.data) : '—', r.descricao, r.revisado_por, r.aprovado_por];
@@ -214,16 +219,18 @@ export function problemasDaRevisao(
     return [{ secao: null, linha: null, frase: 'As seções têm de ser as mesmas da ECR, com os mesmos títulos e na mesma ordem.' }];
   }
   limpa.forEach((s, i) => {
-    const n = numeroDaSecao(i);
+    const n = numeroNaFrase(i);
     if (s.itens.length === 0) {
       problemas.push({ secao: i, linha: null, frase: `A seção ${n} precisa de pelo menos uma linha.` });
     }
     s.itens.forEach((it, j) => {
+      // A linha pelo rótulo, quando tem: é assim que o Pedro a reconhece.
+      const qual = it.rotulo && LETRA.test(it.rotulo) ? `a linha "${it.rotulo}"` : `a linha ${j + 1}`;
       if (!LETRA.test(it.texto)) {
-        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, linha ${j + 1}: escreva o texto (ele precisa ter pelo menos uma letra).` });
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual} está sem texto: escreva o texto ou tire a linha.` });
       }
       if (it.rotulo !== null && !LETRA.test(it.rotulo)) {
-        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, linha ${j + 1}: o rótulo precisa ter uma letra, ou ficar em branco.` });
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual}: o rótulo precisa ter uma letra, ou ficar em branco.` });
       }
     });
   });
@@ -241,6 +248,11 @@ export function problemasDaRevisao(
 export function proximaRevisao(revisao: string | null): string {
   const n = Number.parseInt(revisao ?? '', 10);
   return String((Number.isNaN(n) ? -1 : n) + 1).padStart(2, '0');
+}
+
+/** Hoje em São Paulo (AAAA-MM-DD): é a data que o banco põe na revisão. */
+export function hojeEmSaoPaulo(agora: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(agora);
 }
 
 /** O que a tela mostra antes de gravar: "Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você." */

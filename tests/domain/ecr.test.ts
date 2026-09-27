@@ -8,13 +8,24 @@ import {
   O_QUE_E_O_CATALOGO,
   TITULOS_DA_ECR,
   blocosDaSecao,
+  fraseDaRecusaDaRevisao,
+  hojeEmSaoPaulo,
+  limparParaGravar,
   linhaDoDocumento,
   linhaDoHistorico,
+  mesmoTexto,
+  moveLinha,
+  mudaLinha,
   nomeDoPdfDaEcr,
   numeroDaSecao,
+  poeLinha,
+  problemasDaRevisao,
+  proximaRevisao,
+  resumoDaRevisao,
   revisaoDaEcr,
   revisoesDoBanco,
   secoesDoBanco,
+  tiraLinha,
 } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
 import ecrs from '../fixtures/ecrs-03-e-08.json';
@@ -142,5 +153,92 @@ describe('D588/D589 — o que a tela e o PDF dizem', () => {
       'ECR 03 - Concreto Usinado - Rev 00.pdf',
     );
     expect(nomeDoPdfDaEcr({ codigo: 'ECR 20', nome: 'Gás/GLP', revisao: null })).toBe('ECR 20 - Gás-GLP.pdf');
+  });
+});
+
+// ── A revisão (CTO-D589 §4.2, D596 §3): as regras da revisar_ecr, na tela ──
+
+describe('D589 — as regras da revisão, antes de mandar', () => {
+  const vigente = secoesDoBanco(ecr03.secoes)!;
+
+  it('texto igual (mesmo com espaço nas pontas) não é revisão', () => {
+    const nova = mudaLinha(vigente, 0, 0, { texto: `  ${vigente[0]!.itens[0]!.texto}  ` });
+    expect(mesmoTexto(vigente, nova)).toBe(true);
+    expect(problemasDaRevisao(vigente, nova, '00').map((p) => p.frase)).toEqual([
+      'O texto está igual ao da revisão 00: não há o que revisar.',
+    ]);
+  });
+
+  it('uma mudança de verdade passa sem problema', () => {
+    expect(problemasDaRevisao(vigente, mudaLinha(vigente, 0, 0, { texto: 'NBR 7212;' }), '00')).toEqual([]);
+  });
+
+  it('aponta a linha: pelo rótulo quando tem, pelo número quando não', () => {
+    let nova = mudaLinha(vigente, 1, 0, { rotulo: 'Dimensão', texto: '  ' });
+    nova = mudaLinha(nova, 1, 1, { texto: '12,5 ;' });
+    nova = mudaLinha(nova, 1, 2, { rotulo: '1)' });
+    expect(problemasDaRevisao(vigente, nova, '00')).toEqual([
+      { secao: 1, linha: 0, frase: 'Seção 02, a linha "Dimensão" está sem texto: escreva o texto ou tire a linha.' },
+      { secao: 1, linha: 1, frase: 'Seção 02, a linha 2 está sem texto: escreva o texto ou tire a linha.' },
+      { secao: 1, linha: 2, frase: 'Seção 02, a linha 3: o rótulo precisa ter uma letra, ou ficar em branco.' },
+    ]);
+  });
+
+  it('seção sem linha nenhuma não passa', () => {
+    const nova = tiraLinha(vigente, 2, 0);
+    expect(problemasDaRevisao(vigente, nova, '00')).toEqual([
+      { secao: 2, linha: null, frase: 'A seção 03 precisa de pelo menos uma linha.' },
+    ]);
+  });
+
+  it('as seções têm de ser as mesmas, com os mesmos títulos e na mesma ordem', () => {
+    const trocada = [vigente[1]!, vigente[0]!, ...vigente.slice(2)];
+    expect(problemasDaRevisao(vigente, trocada, '00')[0]!.frase).toBe(
+      'As seções têm de ser as mesmas da ECR, com os mesmos títulos e na mesma ordem.',
+    );
+    expect(problemasDaRevisao(vigente, vigente.slice(1), '00')).toHaveLength(1);
+  });
+
+  it('o que vai ao banco: pontas limpas, rótulo em branco vira null, as chaves exatas', () => {
+    const nova = mudaLinha(vigente, 0, 0, { rotulo: '  ', texto: '  NBR 7212;  ' });
+    const limpo = limparParaGravar(nova);
+    expect(limpo[0]!.itens[0]).toEqual({ rotulo: null, texto: 'NBR 7212;', numerado: true });
+    expect(Object.keys(limpo[0]!)).toEqual(['titulo', 'itens']);
+    expect(Object.keys(limpo[0]!.itens[0]!)).toEqual(['rotulo', 'texto', 'numerado']);
+  });
+
+  it('as mudanças no rascunho nunca mexem no original', () => {
+    const copia = JSON.stringify(vigente);
+    const a = moveLinha(vigente, 0, 0, 1);
+    expect(a[0]!.itens.map((i) => i.texto)[0]).toBe(vigente[0]!.itens[1]!.texto);
+    expect(moveLinha(vigente, 0, 0, -1)[0]!.itens).toEqual(vigente[0]!.itens);
+    expect(poeLinha(vigente, 0)[0]!.itens.at(-1)).toEqual({ rotulo: null, texto: '', numerado: true });
+    expect(tiraLinha(vigente, 0, 0)[0]!.itens).toHaveLength(3);
+    expect(JSON.stringify(vigente)).toBe(copia);
+  });
+});
+
+describe('D589 — a confirmação e a recusa', () => {
+  it('a próxima revisão: 00 → 01, 09 → 10', () => {
+    expect(proximaRevisao('00')).toBe('01');
+    expect(proximaRevisao('09')).toBe('10');
+    expect(proximaRevisao(null)).toBe('00');
+  });
+
+  it('hoje é o de São Paulo (é a data que o banco põe), e não o do relógio UTC', () => {
+    expect(hojeEmSaoPaulo(new Date('2026-09-28T02:00:00Z'))).toBe('2026-09-27');
+    expect(hojeEmSaoPaulo(new Date('2026-09-28T03:00:00Z'))).toBe('2026-09-28');
+  });
+
+  it('o resumo: "Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você."', () => {
+    expect(resumoDaRevisao('00', '2026-09-27')).toBe('Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você.');
+  });
+
+  it('cada recusa do banco com a sua frase; a desconhecida diz a mensagem', () => {
+    expect(fraseDaRecusaDaRevisao('42501', 'x')).toBe('Só o Pedro revisa uma ECR. A revisão não foi gravada.');
+    expect(fraseDaRecusaDaRevisao('P0002', 'x')).toMatch(/^Esta ECR não existe mais no banco\./);
+    expect(fraseDaRecusaDaRevisao('55000', 'x')).toMatch(/não tem o texto guardado no histórico/);
+    expect(fraseDaRecusaDaRevisao('22023', 'texto igual')).toBe('O banco recusou a revisão: texto igual');
+    expect(fraseDaRecusaDaRevisao(undefined, 'sem rede')).toBe('Falha ao gravar a revisão: sem rede');
   });
 });
