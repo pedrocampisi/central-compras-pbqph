@@ -6,6 +6,15 @@
 
 ---
 
+### 16. D582 — o rápido primeiro: o texto da escolha do leitor · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `10205e67`, com a dica curta (CTO-D583, decisão 50)**
+
+*Aberta em 27/09/2026 (decisão 49).* Os três textos da escolha trocados pela palavra do Pedro. **Onde mora:** o
+ramo **`d582-rapido-primeiro`**, commit **`2482612`**, empurrado, **fora do `main`**. As fotos estão em
+`docs/Capturas/2026-09-27_D582/`. **Fecha quando:** a carta do CTO mandar publicar. Aí o ramo entra no `main` e
+sobe pelo PowerShell; o desfazer é `72257144`.
+
+---
+
 ### 15. D579 — a moldura na tela estreita · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `72257144` (CTO-D580, decisão 48)**
 
 *Aberta em 27/09/2026 (decisão 47).* O topo e o rodapé do menu consertados a 375 e a 768, e o comentário

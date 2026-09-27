@@ -2147,3 +2147,22 @@ escolha (03 a 06) saíram idênticos byte a byte. A dica quebra em uma linha a m
 
 **AS TRAVAS:** 297 testes; as que conferem os textos mudaram junto, e a espera do rápido passou a ser
 conferida. 4 sabotagens, todas mordendo, hash igual.
+
+## Decisão 50 — no ar: o rápido primeiro, com a dica curta · 27/09/2026
+
+**POR QUÊ (CTO-D583):** o CTO aprovou os dois "para quê" da D582 (decisão 49). A dica longa quebrava em duas
+linhas a 1920 (com "conta." sozinho) e repetia o cartão do Certeiro logo acima; ele a trocou por **"Comece
+sempre pelo rápido."** e mandou publicar na mesma volta, com uma condição: se a dica não coubesse numa linha a
+1920 e a 375, parar.
+
+**O QUE MUDOU:** `DICA_DO_LEITOR`, e a trava dela (`984017f`, no ramo). Medido: a dica cabe numa linha a
+1920 × 1080 e a 375; os "para quê" em 2 linhas cada, como antes; rolagem de lado 0 e nada fora da tela.
+Fotos em `docs/Capturas/2026-09-27_D583/`.
+
+**A JUNÇÃO E A BATERIA:** o ramo `d582-rapido-primeiro` entrou no `main` em `1dca293` (fora de `docs/`, diff
+vazio contra o ramo). 297 testes; tipos e lint limpos; as 4 sabotagens da D582 mordendo, hash igual.
+
+**PUBLICADO:** saiu `72257144-4a26-4e16-b177-5ebc7678f142` (**O DESFAZER**); entrou
+`10205e67-c34f-4da9-ae57-ee129d07b087`, versão `20260927123631-1dca293`, 100% do tráfego. Medido por fora: o
+`versao.txt` diz `…-1dca293`; o pacote servido (`index-867c1nWr.js`) traz os três textos novos uma vez
+cada, e nenhum dos antigos.
