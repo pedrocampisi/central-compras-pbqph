@@ -2022,3 +2022,35 @@ CTO na mesma carta; a publicação sai por carta dele, depois do "sim" do Pedro.
   espera alguém com conta emitir; o 5 ainda tem o passo 6). E a carta `D557` na `Devolucoes/`: a
   ordem dela termina na publicação, que ainda pende (pendência 14). Nada sai da caixa com item
   pendurado.
+
+## Decisão 45 — depois da leitura, o campo encolhe para o resultado · 27/09/2026
+
+**POR QUÊ (CTO-D575):** nas fotos a 1920 × 1080 (D574), o "Total lido" pedia para conferir com o
+papel, mas os itens lidos ficavam fora da janela, acima do campo aberto (uns 860 px de altura). Para
+conferir, era preciso rolar e perder o total de vista.
+
+**O QUE MUDOU (no ramo `d557-lista-em-texto`, `3795db0`; NÃO publicado):** o caminho 1 da carta.
+- Depois da leitura que deu certo, o campo fica **só com o resultado**: o total, quem leu, o
+  "Ler de novo com o certeiro", as linhas ignoradas e os avisos. A escolha do leitor, o "Escolher
+  arquivo" e a caixa de texto somem até o **"Ler outro pedido"**, que os traz de volta. Textos, cores
+  e a ordem das coisas não mudaram: o que some, some inteiro, no lugar em que estava.
+- Colar ou soltar outro pedido continua valendo com o campo encolhido. Colar **texto** traz a caixa de
+  volta, com o texto dentro.
+- A leitura que deu certo leva **o fim do campo ao pé da janela** (`scrollIntoView`, `block: 'end'`,
+  sem animação). Os itens, que entraram logo acima, ficam à vista junto do total.
+- A falha, sem leitura anterior, deixa o campo inteiro, como antes.
+
+**A MEDIDA:** o jsdom não mede janela. A bateria trava o que faz caber: o campo encolhido, a rolagem
+até o fim dele (e não até o alto), o "Ler outro pedido". A janela se mede no navegador de verdade: o
+fotógrafo confere se as linhas da tabela e o cartão do total estão inteiros dentro da área que rola.
+Deu 8 de 8 e o total à vista nos estados 04, 05 e 06, a 1920 e nas quatro larguras.
+
+**AS FOTOS:** as 10 de 1920 foram refeitas; as sete sem resultado saíram idênticas, byte a byte. As
+04, 05 e 06 foram refeitas também a 1280, 1024, 768 e 375, agora com o `App` inteiro.
+
+**O ACHADO, que não é desta carta:** com o `App` inteiro a 375, o título do topo ("Nova Ordem de
+Compra") quebra em quatro linhas e passa por cima do título da página, e o avatar do rodapé do menu
+sai cortado na borda esquerda. É a moldura do sistema, igual à do `main`; as fotos de antes não a
+mostravam. Levado ao CTO, sem conserto.
+
+**AS TRAVAS:** 292 testes. 8 sabotagens novas (24 a 31), todas mordendo, hash igual.

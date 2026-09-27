@@ -237,13 +237,14 @@ segurou).
 D567** (a corrida da IA da OC, largada pelo Pedro às 22h4x), que construiu por cima dela a escolha
 do leitor: **rápido ou certeiro**, antes de ler, a mesma para a imagem e para o texto.
 
-**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`2f499c1`** (os retoques da
-D570), empurrado. **Fora do `main`** (decisão 41). As fotos estão em
+**Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`3795db0`** (a D575: depois da
+leitura, os itens e o total na mesma janela), empurrado. **Fora do `main`** (decisão 41). As fotos estão em
 `docs/Capturas/2026-09-26_D567/` (40: 10 estados × 1280, 1024, 768 e 375; e mais 10 a
 1920 × 1080, o monitor do Pedro, com o menu de verdade — CTO-D574).
 
 **A tela está aprovada pelo CTO** (D571), com os dois retoques da D570 feitos (decisão 43): uma mensagem de
-leitura por vez, e o 422 da imagem sem o conselho da lista.
+leitura por vez, e o 422 da imagem sem o conselho da lista. E, pela D575 (decisão 45), o campo
+encolhe depois da leitura: a 1920 × 1080, os 8 itens e o Total lido cabem na mesma janela.
 
 **Pronto no ramo:** tudo o da D557, e mais: a escolha com a dica e o "?"; a espera do certeiro que
 diz "até 1 minuto"; o resultado com o total lido em destaque e quem leu; o "Ler de novo com o
