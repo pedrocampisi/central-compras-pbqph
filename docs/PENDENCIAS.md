@@ -226,6 +226,16 @@ publicar. O desfazer será a `080168b8`. **Depois dela:** a primeira revisão de
 
 ---
 
+### 20. D599 — mostrar só uma obra, para a auditoria de 16 e 17/11 · **no ramo, esperando a carta do CTO para publicar**
+
+*Aberta em 27/09/2026 (decisão 57).* **Onde mora:** o ramo **`d599-uma-obra`**, empurrado, **fora do `main`**, feito
+na cópia `C:\Users\Pedro Paulo\Softwares\Copias_de_trabalho\OC_uma-obra` (sai só por `git worktree remove`). As
+fotos estão em `docs/Capturas/2026-09-27_D599/`. **Fecha quando:** a carta do CTO mandar publicar, depois da tela de
+editar (pendência 19), **até 06/11**, para o ensaio do Pedro até 09/11. **Se a perícia consertar o `d589-editar-ecr`,**
+o conserto vem para este ramo.
+
+---
+
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
