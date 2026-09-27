@@ -16,6 +16,7 @@ import { useDataStore } from './stores/useDataStore';
 import { useOcEditingStore } from './stores/useOcEditingStore';
 import { abaQueExiste, useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
+import { esquecerRascunhoGuardado, useUmaObraStore } from './stores/useUmaObraStore';
 
 // Services
 import { sessaoAtual, perfilAtual, sair, type Papel } from './services/supabase/auth';
@@ -113,6 +114,23 @@ export default function App() {
 
   const { escuro, alternar } = useTema();
 
+  // ── "Mostrar só uma obra" (CTO-D599): o relógio da máscara ─────────────────
+  // Ela liga e desliga sozinha: a tela confere de tempos em tempos, e quando a
+  // pessoa volta à janela. Na virada, os dados recarregam (abaixo).
+  const obraAtiva = useUmaObraStore((s) => s.obraAtiva);
+  useEffect(() => {
+    const conferir = () => useUmaObraStore.getState().conferir();
+    conferir();
+    const relogio = setInterval(conferir, 15_000);
+    document.addEventListener('visibilitychange', conferir);
+    window.addEventListener('focus', conferir);
+    return () => {
+      clearInterval(relogio);
+      document.removeEventListener('visibilitychange', conferir);
+      window.removeEventListener('focus', conferir);
+    };
+  }, []);
+
   // ── Sessão: estado inicial + mudanças (login, logout, expiração) ───────────
   // Assinatura direta no supabase (e não via aoMudarSessao) porque aqui o NOME
   // do evento importa: PASSWORD_RECOVERY significa que a pessoa chegou pelo
@@ -133,7 +151,8 @@ export default function App() {
 
   // ── Dados: perfil + carga inicial + realtime, amarrados ao usuário logado ──
   // Chaveado no user.id (não no objeto sessão) para não recarregar tudo a cada
-  // renovação de token, que troca o objeto mas não o usuário.
+  // renovação de token, que troca o objeto mas não o usuário. E na obra da
+  // máscara: quando ela liga ou desliga, a busca e o aviso mudam (CTO-D599).
 
   const userId = sessao?.user.id ?? '';
 
@@ -144,6 +163,7 @@ export default function App() {
       // O rascunho de OC aberto também é dado de quem estava logado: sem isto,
       // quem entra depois no mesmo computador encontra a OC do colega no editor.
       useOcEditingStore.getState().stopEditing();
+      esquecerRascunhoGuardado();
       setTab('dashboard');
       return;
     }
@@ -185,7 +205,7 @@ export default function App() {
       cancelarRealtime();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, obraAtiva]);
 
   // ── Ações ──────────────────────────────────────────────────────────────────
 

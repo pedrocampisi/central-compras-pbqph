@@ -25,6 +25,7 @@ import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
+import { obraDaMascara } from '../storage/umaObra';
 import {
   COLUNAS_DA_FORNECEDORES, bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
   ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, linhasDosItens, paraEndereco, raizDoDocumento,
@@ -49,7 +50,22 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 const COLUNAS_DAS_ECRS =
   '*, materiais(*), revisoes:ecr_revisoes(id, revisao, emitida_em, descricao, revisado_por_nome, aprovado_por_nome)';
 
+/**
+ * A máscara "mostrar só uma obra" (CTO-D599) filtra aqui, na busca, e em
+ * nenhum outro lugar: com ela ligada, o banco manda só aquela obra e as OCs
+ * dela, e as outras nem chegam ao navegador. Toda tela lê daqui, então
+ * nenhuma escapa. Fornecedores, ECRs e a numeração não são por obra.
+ */
 export async function carregarDados(): Promise<Data> {
+  const obra = obraDaMascara();
+  const todasAsObras = core()
+    .from('intervencoes')
+    .select(
+      'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
+      'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
+      'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
+    );
+  const todasAsOcs = compras().from('ordens_compra').select('*, itens:oc_itens(*)');
   const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
     // Só as colunas que a OC usa, nunca o `*` (CTO-D551): a classificação e o
     // costume vêm da resolvida, logo abaixo.
@@ -62,16 +78,9 @@ export async function carregarDados(): Promise<Data> {
     // imóvel vem junto porque é dele que saem endereço e responsável; o
     // destinatário da nota (empresa OU cliente, trava do banco) vem junto
     // porque é dele que a OC fatura — a OC não escolhe, lê (CTO-D390).
-    core()
-      .from('intervencoes')
-      .select(
-        'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
-        'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
-        'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
-      )
-      .order('descricao_curta'),
+    (obra ? todasAsObras.eq('id', obra) : todasAsObras).order('descricao_curta'),
     compras().from('ecrs').select(COLUNAS_DAS_ECRS).order('id'),
-    compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
+    (obra ? todasAsOcs.eq('intervencao_id', obra) : todasAsOcs).order('ano').order('sequencial'),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
     // Quais ECRs cada fornecedor atende. Tabela própria desde 17/08 — até
     // então a tela deixava marcar e a marcação sumia no reload.
@@ -478,9 +487,15 @@ export async function totaisDaOc(ocId: string) {
 }
 
 export function assinarMudancas(aoMudar: () => void): () => void {
+  // O aviso traz a linha da OC junto: com a máscara ligada, só os da obra dela.
+  const obra = obraDaMascara();
   const canal = supabase
     .channel('compras-mudancas')
-    .on('postgres_changes', { event: '*', schema: 'compras', table: 'ordens_compra' }, aoMudar)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'compras', table: 'ordens_compra', ...(obra ? { filter: `intervencao_id=eq.${obra}` } : {}) },
+      aoMudar,
+    )
     .on('postgres_changes', { event: '*', schema: 'core', table: 'fornecedores' }, aoMudar)
     .subscribe();
   return () => void supabase.removeChannel(canal);

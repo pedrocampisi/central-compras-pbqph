@@ -16,6 +16,7 @@ import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Field } from '../../components/Field/Field';
 import { Button } from '../../components/Button/Button';
 import { AvisoSomenteLeitura } from '../../components/AvisoSomenteLeitura/AvisoSomenteLeitura';
+import { MostrarUmaObra } from './MostrarUmaObra';
 import styles from './ConfigPage.module.css';
 
 export function ConfigPage() {
@@ -33,6 +34,9 @@ export function ConfigPage() {
           <p className="section-sub">Textos legais e integração com IA.</p>
         </div>
       </div>
+
+      {/* Só para quem revisa as ECRs (CTO-D599); é a única coisa desta tela que se muda. */}
+      <MostrarUmaObra obras={data.obras} />
 
       <AvisoSomenteLeitura oQue="as configurações" />
 
