@@ -2107,3 +2107,21 @@ do rodapé. 297 testes; 6 sabotagens, todas mordendo, hash igual.
 
 **O `wrangler.jsonc`:** o comentário do deploy agora cita a lei 3 (7.2, emenda 3): publicar é ato da casa
 por carta, depois da avaliação do CTO no ensaio; voltar é publicar a anterior. O arquivo faz o mesmo.
+
+## Decisão 48 — no ar: a moldura consertada na tela estreita · 27/09/2026
+
+**POR QUÊ (CTO-D580):** o CTO olhou as fotos da D579 (decisão 47) e aprovou. Publicar a OC é ato da casa
+depois da avaliação do CTO (lei 3, emenda 3 ao 7.2). É conserto de defeito, e a cara não muda, então não
+precisou do Pedro.
+
+**A JUNÇÃO (`1df7116`):** o ramo `d579-moldura-375` (`4cb6569`) entrou no `main` por junção de verdade. Fora
+de `docs/`, o diff contra o ramo é vazio. 297 testes; tipos e lint limpos; as 6 sabotagens da D579
+mordendo, hash igual.
+
+**PUBLICADO:** saiu `a9b3b112-108f-45fe-9c1b-1288cd74c267` (**O DESFAZER**); entrou
+`72257144-4a26-4e16-b177-5ebc7678f142`, versão `20260927034807-1df7116`, 100% do tráfego. Medido por fora:
+o `versao.txt` diz `…-1df7116`, e o estilo servido (`index-B3kauaLa.css`) traz as regras novas do topo e
+do rodapé do menu, e a regra de 700 px com o título a 20 px.
+
+**O TEXTO DE EXEMPLO DA BUSCA** no Histórico a 375 fica como está (CTO-D580 §3): reticências dentro do campo,
+como as buscas fazem no celular.

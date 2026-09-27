@@ -6,6 +6,15 @@
 
 ---
 
+### 15. D579 — a moldura na tela estreita · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `72257144` (CTO-D580, decisão 48)**
+
+*Aberta em 27/09/2026 (decisão 47).* O topo e o rodapé do menu consertados a 375 e a 768, e o comentário
+do `wrangler.jsonc` alinhado com a lei. **Onde mora:** o ramo **`d579-moldura-375`**, commit **`4cb6569`**,
+empurrado, **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D579/`. **Fecha quando:** a carta do
+CTO mandar publicar. Aí o ramo entra no `main` e sobe pelo PowerShell; o desfazer é `a9b3b112`.
+
+---
+
 ### 14. D557 + D567 — a lista em texto e a escolha do leitor · **no ramo, esperando o Pedro olhar as fotos** — **FECHADA EM 27/09/2026: NO AR em `a9b3b112` (CTO-D577, decisão 46)**
 
 *Aberta em 26/09/2026.* A D557 (colar a lista em texto) ficou em espera pela D559; **voltou na
