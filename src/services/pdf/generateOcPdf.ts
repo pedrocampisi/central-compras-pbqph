@@ -10,11 +10,12 @@ import jsPDF from 'jspdf';
 // com erro "(0, Et.default) is not a function".
 import autoTable from 'jspdf-autotable/es';
 import type { Data, Destinatario, OrdemCompra } from '../../domain/types';
-import { computeItemTotal, computeOcTotals } from '../../domain/compute';
+import { computeOcTotals } from '../../domain/compute';
 import { destinatarioParaImpressao, documentoRotulado, formatarDocumento } from '../../domain/destinatario';
 import { formatBrl, formatDate } from '../../domain/format';
 import { drawBox, addrLine } from './helpers';
 import { downloadBlob } from '../storage/download';
+import { corpoDaTabelaDeItens } from './tabelaDeItens';
 
 // ── Types internos ────────────────────────────────────────────────────────────
 
@@ -218,21 +219,7 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
 
   // ── Tabela de itens ────────────────────────────────────────────────────────
   const head = [['Item', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit', 'IPI%', 'Desc%', 'Total', 'Prazo']];
-  const body = (oc.itens ?? []).map((it, i) => {
-    const tot = computeItemTotal(it);
-    return [
-      String(i + 1),
-      it.descricao ?? '',
-      it.observacao ?? '',
-      (Number(it.quantidade) || 0).toLocaleString('pt-BR'),
-      it.unidade ?? '',
-      formatBrl(it.preco_unit),
-      `${Number(it.ipi_pct) || 0}%`,
-      `${Number(it.desc_pct) || 0}%`,
-      formatBrl(tot.total),
-      it.prazo_entrega ? formatDate(it.prazo_entrega) : '—',
-    ];
-  });
+  const body = corpoDaTabelaDeItens(oc.itens ?? []);
 
   autoTable(doc, {
     head,

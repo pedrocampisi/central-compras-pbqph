@@ -1,0 +1,71 @@
+/* O "?" (CTO-D475). Cores só dos tokens. */
+
+.ajuda {
+  display: contents;
+}
+
+.botao {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pill);
+  background: var(--painel);
+  color: var(--texto-suave);
+  font-family: var(--fonte-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--transicao),
+    color var(--transicao);
+}
+.botao:hover,
+.botaoAberto {
+  border-color: var(--marca);
+  color: var(--marca);
+}
+.botao:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--marca-fraca);
+}
+
+.resposta {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--marca);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.texto {
+  display: block;
+}
+
+.fechar {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--marca);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

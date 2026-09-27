@@ -34,7 +34,8 @@ export type IconName =
   | 'sun'
   | 'moon'
   | 'upload'
-  | 'x';
+  | 'x'
+  | 'alerta';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -160,6 +161,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
     </>
   ),
   x: <path d="M6 6l12 12M18 6 6 18" />,
+  alerta: (
+    <>
+      <path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z" />
+      <path d="M12 9.5v4M12 17h.01" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 16, className }: IconProps) {

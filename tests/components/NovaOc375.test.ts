@@ -65,3 +65,15 @@ describe('D555 — fila alinhada à direita quebra linha (transbordo à esquerda
     for (const r of alinhadasADireita) expect(valor(r.corpo, 'flex-wrap'), r.seletor).toBe('wrap');
   });
 });
+
+// D567: a foto de 375 achou o mesmo defeito na caixa de confirmação — o "Trocar
+// pelos do certeiro" empurrava a caixa para fora da tela. A regra vale lá também.
+describe('D567 — a caixa de confirmação: a fila de botões quebra linha', () => {
+  const dialogo = readFileSync('src/components/ConfirmDialog/ConfirmDialog.module.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const acoes = dialogo.match(/\.actions\s*\{([^}]*)\}/)?.[1] ?? '';
+
+  it('.actions é fila alinhada à direita, e quebra linha', () => {
+    expect(valor(acoes, 'justify-content')).toBe('flex-end');
+    expect(valor(acoes, 'flex-wrap')).toBe('wrap');
+  });
+});

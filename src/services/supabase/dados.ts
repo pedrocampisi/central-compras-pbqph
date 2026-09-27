@@ -27,7 +27,7 @@ import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import {
   COLUNAS_DA_FORNECEDORES, bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
-  ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, paraEndereco, raizDoDocumento,
+  ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, linhasDosItens, paraEndereco, raizDoDocumento,
 } from './linhas';
 
 // ---------------------------------------------------------------------------
@@ -448,19 +448,7 @@ export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Pro
     // Mandamos a lista SEMPRE: a tela edita os itens como um todo. Omitir a
     // chave significaria "não mexa nos itens", e lista vazia significa
     // "apague todos" — são pedidos diferentes no contrato do banco.
-    itens: (oc.itens ?? []).map((i, idx) => ({
-      posicao: idx + 1,
-      ecr_id: i.ecr_id ?? null,
-      material_id: i.material_id || null,
-      descricao: i.descricao || 'Item sem descrição',
-      observacao: i.observacao || null,
-      quantidade: i.quantidade ?? 0,
-      unidade: i.unidade || null,
-      preco_unit: i.preco_unit ?? 0,
-      ipi_pct: i.ipi_pct ?? 0,
-      desc_pct: i.desc_pct ?? 0,
-      prazo_entrega: i.prazo_entrega || null,
-    })),
+    itens: linhasDosItens(oc.itens ?? []),
   };
 
   if (!ehNova) {

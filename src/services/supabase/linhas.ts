@@ -7,7 +7,7 @@
  * silêncio é a bandeira `fornece_material`, que decide se o fornecedor
  * aparece ou não na lista da OC.
  */
-import type { Destinatario, Endereco, Fornecedor, OrdemCompra } from '../../domain/types';
+import type { Destinatario, Endereco, Fornecedor, Item, OrdemCompra } from '../../domain/types';
 
 const vazio = (v: unknown): string => (v == null ? '' : String(v));
 
@@ -105,6 +105,27 @@ export function cabecalhoDaOc(oc: OrdemCompra): Record<string, unknown> {
     desconto_material: oc.desconto_material ?? 0,
     observacoes: oc.observacoes || null,
   };
+}
+
+/**
+ * Os itens como `compras.salvar_oc` recebe: campo por campo, NUNCA o item
+ * espalhado. É o que garante que nada além do contrato vai ao banco — em
+ * especial o "confira" da leitura de texto (CTO-D557), que é da tela.
+ */
+export function linhasDosItens(itens: readonly Item[]): Record<string, unknown>[] {
+  return itens.map((i, idx) => ({
+    posicao: idx + 1,
+    ecr_id: i.ecr_id ?? null,
+    material_id: i.material_id || null,
+    descricao: i.descricao || 'Item sem descrição',
+    observacao: i.observacao || null,
+    quantidade: i.quantidade ?? 0,
+    unidade: i.unidade || null,
+    preco_unit: i.preco_unit ?? 0,
+    ipi_pct: i.ipi_pct ?? 0,
+    desc_pct: i.desc_pct ?? 0,
+    prazo_entrega: i.prazo_entrega || null,
+  }));
 }
 
 export function deEndereco(e: Partial<Endereco> | undefined) {

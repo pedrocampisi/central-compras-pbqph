@@ -9,7 +9,7 @@
  * que `enviar` nunca é chamado nos dois casos.
  */
 
-import type { Item } from '../../domain/types';
+import type { ResultadoDaLeitura } from './extractItems';
 import {
   MAX_PAGINAS,
   mensagemDePaginas,
@@ -18,10 +18,11 @@ import {
   type TipoDoArquivo,
 } from '../../domain/importacao';
 import type { ArquivoAberto } from './pdfToImages';
+import { LEITOR_PADRAO, type Leitor } from '../../domain/leitor';
 
 export interface DepsDaLeitura {
   abrir: (arquivo: File, tipo: TipoDoArquivo) => Promise<ArquivoAberto>;
-  enviar: (imagens: string[]) => Promise<Item[]>;
+  enviar: (imagens: string[], leitor: Leitor) => Promise<ResultadoDaLeitura>;
 }
 
 /** Erro que a própria importação explica — a mensagem vai inteira para a tela. */
@@ -35,7 +36,11 @@ async function depsReais(): Promise<DepsDaLeitura> {
   return { abrir: abrirArquivo, enviar: extractItemsFromImages };
 }
 
-export async function lerPedido(arquivos: File[], deps?: DepsDaLeitura): Promise<Item[]> {
+export async function lerPedido(
+  arquivos: File[],
+  deps?: DepsDaLeitura,
+  leitor: Leitor = LEITOR_PADRAO,
+): Promise<ResultadoDaLeitura> {
   if (arquivos.length === 0) throw new ErroDaImportacao('Nenhum arquivo chegou.');
 
   // 1. Tipo — todos, antes de abrir qualquer um.
@@ -62,5 +67,26 @@ export async function lerPedido(arquivos: File[], deps?: DepsDaLeitura): Promise
   for (const x of abertos) imagens.push(...(await x.imagens()));
   if (imagens.length > MAX_PAGINAS) throw new ErroDaImportacao(mensagemDePaginas(imagens.length));
 
-  return d.enviar(imagens);
+  return d.enviar(imagens, leitor);
+}
+
+/**
+ * A lista de materiais colada em texto (CTO-D557): vai inteira, como veio —
+ * quem organiza é a IA, e os limites são do servidor. Caixa vazia não sai do
+ * navegador.
+ */
+export async function lerLista(
+  texto: string,
+  enviar?: (texto: string, leitor: Leitor) => Promise<ResultadoDaLeitura>,
+  leitor: Leitor = LEITOR_PADRAO,
+): Promise<ResultadoDaLeitura> {
+  if (texto.trim() === '') throw new ErroDaImportacao('Cole a lista de materiais na caixa de texto.');
+  const e = enviar ?? (await import('./extractItems')).organizarTexto;
+  return e(texto, leitor);
+}
+
+/** O status HTTP de uma leitura que o servidor recusou (D567); falha sem servidor: `null`. */
+export function statusDoErro(err: unknown): number | null {
+  const s = (err as { status?: unknown } | null)?.status;
+  return typeof s === 'number' ? s : null;
 }

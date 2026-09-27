@@ -74,3 +74,70 @@ export function foraDeCampoDeTexto(
   if (tag === 'INPUT') return INPUTS_QUE_NAO_SAO_TEXTO.has((alvo.type ?? 'text').toLowerCase());
   return true;
 }
+
+// ── A lista em texto (CTO-D557) ──────────────────────────────────────────────
+
+export type DestinoDaColagem = 'arquivos' | 'texto' | 'nada';
+
+/**
+ * O Ctrl+V com o campo aberto decide pelo que VEIO, e não pelo lugar do cursor:
+ * imagem ou arquivo importam (mesmo com o cursor na caixa de texto do campo);
+ * texto vai para a caixa.
+ *
+ * Uma exceção, de propósito: quando vêm os dois — texto de verdade E imagem —,
+ * vale o texto. É o Ctrl+C de uma planilha ou de um documento: o Excel põe na
+ * área de transferência o texto das células e também uma FOTO delas, e o
+ * navegador entrega as duas. Quem copiou uma lista quer a lista. O print
+ * (Win+Shift+S) não traz texto, e o arquivo copiado no Explorer, quando traz,
+ * traz só o caminho — esses continuam indo para a importação.
+ */
+export function destinoDaColagem(arquivos: { name: string }[], texto: string): DestinoDaColagem {
+  const t = texto.trim();
+  if (arquivos.length === 0) return t ? 'texto' : 'nada';
+  if (!t) return 'arquivos';
+  const umaLinha = !/[\r\n]/.test(t);
+  // C:\…, \\servidor\…, /…, file:… — ou termina no nome do próprio arquivo.
+  const ehCaminho =
+    umaLinha && (/^([a-z]:\\|\\\\|\/|file:)/i.test(t) || arquivos.some((a) => a.name !== '' && t.endsWith(a.name)));
+  return ehCaminho ? 'arquivos' : 'texto';
+}
+
+/** O texto colado entra no fim do que já está na caixa, numa linha nova. */
+export function juntarTexto(atual: string, colado: string): string {
+  if (atual.trim() === '') return colado;
+  return atual.replace(/\s*$/, '') + '\n' + colado;
+}
+
+const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
+
+/** O aviso do fim da leitura: quantos itens entraram, e quantas linhas ficaram de fora. */
+export function avisoDaLeitura(itens: number, ignoradas: number): string {
+  const entraram = `${plural(itens, 'item importado', 'itens importados')} via IA`;
+  return ignoradas > 0 ? `${entraram} · ${plural(ignoradas, 'linha ignorada', 'linhas ignoradas')}.` : `${entraram}.`;
+}
+
+/**
+ * O aviso do fim da TROCA pelo certeiro (CTO-D570): diz o que aconteceu, e não
+ * "importados" de novo — os itens não somaram, foram trocados.
+ */
+export function avisoDaTroca(itens: number, ignoradas: number): string {
+  const trocou = `O certeiro trocou ${itens === 1 ? 'o item' : `os ${itens} itens`}`;
+  return ignoradas > 0 ? `${trocou} · ${plural(ignoradas, 'linha ignorada', 'linhas ignoradas')}.` : `${trocou}.`;
+}
+
+/** O conselho da imagem quando a resposta sai cortada: o teto é da leitura inteira. */
+export const CONSELHO_DA_IMAGEM = 'Se foram várias páginas, mande menos de cada vez.';
+
+/**
+ * A frase do servidor, na IMAGEM (CTO-D570). O servidor é um só para a imagem
+ * e para o texto, e o 422 da resposta cortada termina em "Divida a lista em
+ * partes menores." — conselho do texto colado, errado para uma foto. Sai toda
+ * frase que fala da lista, e entra o conselho da imagem. Sem frase da lista, a
+ * do servidor fica como veio. Na caixa de texto, a frase inteira fica.
+ */
+export function erroDaImagem(doServidor: string): string {
+  const frases = doServidor.split(/(?<=[.!?])\s+/).filter((f) => f.trim() !== '');
+  const daImagem = frases.filter((f) => !/\blista\b/i.test(f));
+  if (daImagem.length === frases.length) return doServidor;
+  return [...daImagem, CONSELHO_DA_IMAGEM].join(' ');
+}
