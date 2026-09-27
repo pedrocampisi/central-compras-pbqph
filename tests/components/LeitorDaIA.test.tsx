@@ -104,7 +104,7 @@ describe('D567 — a escolha do leitor, antes de ler', () => {
     expect(certeiro.closest('label')).toHaveTextContent('Só para papel escaneado, ou quando o rápido não der conta.');
     expect(rapido.closest('label')).toHaveTextContent('Leva uns segundos.');
     expect(certeiro.closest('label')).toHaveTextContent('Leva até 1 minuto.');
-    expect(campo()).toHaveTextContent('Comece pelo rápido. O certeiro é só para papel escaneado ou quando o rápido não der conta.');
+    expect(campo()).toHaveTextContent('Comece sempre pelo rápido.');
   });
 
   it('o "?" abre a resposta na página; o Esc fecha a resposta e NÃO fecha o campo', async () => {

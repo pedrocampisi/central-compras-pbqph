@@ -39,8 +39,7 @@ export const LEITORES: Record<Leitor, { nome: string; paraQue: string; espera: s
   },
 };
 
-export const DICA_DO_LEITOR =
-  'Comece pelo rápido. O certeiro é só para papel escaneado ou quando o rápido não der conta.';
+export const DICA_DO_LEITOR = 'Comece sempre pelo rápido.';
 
 /**
  * Quem leu, pelo `_meta.leitor` da resposta. A função de hoje (v4) não diz —
