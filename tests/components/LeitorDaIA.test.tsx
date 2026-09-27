@@ -100,10 +100,11 @@ describe('D567 — a escolha do leitor, antes de ler', () => {
     const certeiro = within(grupo).getByRole('radio', { name: /Certeiro/ });
     expect(rapido).toBeChecked();
     expect(certeiro).not.toBeChecked();
-    expect(rapido.closest('label')).toHaveTextContent('Para o PDF do fornecedor e papel limpo.');
-    expect(certeiro.closest('label')).toHaveTextContent('Para foto, papel escaneado e tabela cheia.');
+    expect(rapido.closest('label')).toHaveTextContent('Use primeiro. Serve para quase todo pedido.');
+    expect(certeiro.closest('label')).toHaveTextContent('Só para papel escaneado, ou quando o rápido não der conta.');
+    expect(rapido.closest('label')).toHaveTextContent('Leva uns segundos.');
     expect(certeiro.closest('label')).toHaveTextContent('Leva até 1 minuto.');
-    expect(campo()).toHaveTextContent('Foto ou papel escaneado? Use o certeiro.');
+    expect(campo()).toHaveTextContent('Comece sempre pelo rápido.');
   });
 
   it('o "?" abre a resposta na página; o Esc fecha a resposta e NÃO fecha o campo', async () => {
