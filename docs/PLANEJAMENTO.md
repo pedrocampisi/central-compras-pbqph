@@ -2125,3 +2125,25 @@ do rodapé do menu, e a regra de 700 px com o título a 20 px.
 
 **O TEXTO DE EXEMPLO DA BUSCA** no Histórico a 375 fica como está (CTO-D580 §3): reticências dentro do campo,
 como as buscas fazem no celular.
+
+## Decisão 49 — o rápido primeiro: o texto da escolha do leitor · 27/09/2026
+
+**POR QUÊ (CTO-D582):** o Pedro viu a escolha no ar e disse: "mude esse texto. Deixe que para utilizar o
+Certeiro é so caso o papel scaneado ou caso o rapido não de conta, a prioridade é o rapido". A tela punha
+os dois leitores como iguais, e a dica mandava ir ao certeiro.
+
+**O QUE MUDOU (no ramo `d582-rapido-primeiro`, `2482612`; NÃO publicado):** só os três textos de
+`src/domain/leitor.ts`, palavra por palavra da carta:
+- o rápido diz "Use primeiro. Serve para quase todo pedido.";
+- o certeiro diz "Só para papel escaneado, ou quando o rápido não der conta.";
+- a dica diz "Comece pelo rápido. O certeiro é só para papel escaneado ou quando o rápido não der conta.".
+
+As esperas, o título, a ordem, o Rápido marcado ao abrir, as cores e o ícone ficaram iguais. Os dois "?"
+ficaram (a carta manda). Não achei outro texto que mande ao certeiro antes do rápido.
+
+**AS FOTOS:** 10 estados a 1920 × 1080 e a 01 a 375, em `docs/Capturas/2026-09-27_D582/`. Os 4 estados sem a
+escolha (03 a 06) saíram idênticos byte a byte. A dica quebra em uma linha a mais (2 a 1920, só com
+"conta." na segunda; 3 a 375); o resto desce 20 px, sem sobrepor. Dito ao CTO, sem mexer.
+
+**AS TRAVAS:** 297 testes; as que conferem os textos mudaram junto, e a espera do rápido passou a ser
+conferida. 4 sabotagens, todas mordendo, hash igual.

@@ -218,6 +218,15 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
+### 16. D582 — o rápido primeiro: o texto da escolha do leitor · **no ramo, esperando a carta do CTO para publicar**
+
+*Aberta em 27/09/2026 (decisão 49).* Os três textos da escolha trocados pela palavra do Pedro. **Onde mora:** o
+ramo **`d582-rapido-primeiro`**, commit **`2482612`**, empurrado, **fora do `main`**. As fotos estão em
+`docs/Capturas/2026-09-27_D582/`. **Fecha quando:** a carta do CTO mandar publicar. Aí o ramo entra no `main` e
+sobe pelo PowerShell; o desfazer é `72257144`.
+
+---
+
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
