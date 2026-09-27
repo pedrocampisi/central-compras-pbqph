@@ -136,7 +136,9 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   // ── Header ─────────────────────────────────────────────────────────────────
   if (logoDataUrl) {
     try {
-      doc.addImage(logoDataUrl, 'PNG', margin, 6, 14, 14);
+      // Comprimida ('FAST', CTO-D593 §3): sem isso, o jsPDF grava a marca crua
+      // (1080 × 974 pontos, com transparência) e cada OC passava de 4 MB.
+      doc.addImage(logoDataUrl, 'PNG', margin, 6, 14, 14, undefined, 'FAST');
     } catch {
       /* logo é decorativa; se falhar, o PDF continua sendo gerado */
     }
