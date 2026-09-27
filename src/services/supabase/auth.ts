@@ -67,9 +67,9 @@ export async function perfilAtual(): Promise<PerfilUsuario | null> {
  *   - OCs (compras.pode_emitir_oc) e fornecedores (fornecedores_escrita):
  *     admin | engenharia | financeiro — o financeiro foi incluído pela
  *     migration 20260810120000_financeiro_emite_oc, por decisão do Pedro.
- *   - Catálogo técnico (ECRs/materiais), prestadores e avaliações
- *     (core.pode_editar_cadastro): admin | engenharia apenas. As telas
- *     correspondentes estão somente-leitura nesta versão, então não há
+ *   - Catálogo técnico (ECRs/materiais)
+ *     (core.pode_editar_cadastro): admin | engenharia apenas. A tela
+ *     correspondente está somente-leitura nesta versão, então não há
  *     botão para o financeiro clicar e tomar erro.
  */
 export function podeEditar(papel: Papel | null | undefined): boolean {

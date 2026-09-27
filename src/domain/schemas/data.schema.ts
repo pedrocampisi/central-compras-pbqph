@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import {
-  STATUS_OC, TIPOS_EMITENTE, TIPOS_PRESTADOR, STATUS_CRITERIO, CURRENT_SCHEMA_VERSION,
+  STATUS_OC, TIPOS_EMITENTE, CURRENT_SCHEMA_VERSION,
 } from '../constants';
 
 // ── Endereço ────────────────────────────────────────────────────────────────
@@ -173,47 +173,6 @@ export const OrdemCompraSchema = z.object({
   versao: z.number().default(0),
 });
 
-// ── Prestador de Serviço ──────────────────────────────────────────────────
-export const PrestadorServicoSchema = z.object({
-  id: z.string(),
-  razao_social: z.string().default(''),
-  nome_fantasia: z.string().default(''),
-  tipo: z.enum(TIPOS_PRESTADOR).default('PJ'),
-  cnpj_cpf: z.string().default(''),
-  categoria_servico: z.string().default(''),
-  endereco: EnderecoSchema.default({
-    logradouro: '',
-    numero: '',
-    complemento: '',
-    bairro: '',
-    cidade: '',
-    uf: '',
-    cep: '',
-  }),
-  telefones: z.tuple([z.string().default(''), z.string().default('')]).default(['', '']),
-  email: z.string().default(''),
-  contato_responsavel: z.string().default(''),
-  observacoes: z.string().default(''),
-  ativo: z.boolean().default(true),
-  criado_em: z.string().default(''),
-  atualizado_em: z.string().default(''),
-});
-
-// ── Avaliação de Prestador ────────────────────────────────────────────────
-export const AvaliacaoPrestadorSchema = z.object({
-  id: z.string(),
-  prestador_id: z.string().default(''),
-  obra_id: z.string().default(''),
-  data_avaliacao: z.string().default(''),
-  responsavel: z.string().default(''),
-  atendeu_prazo: z.enum(STATUS_CRITERIO).nullable().default(null),
-  usou_epi: z.enum(STATUS_CRITERIO).nullable().default(null),
-  conforme_pes: z.enum(STATUS_CRITERIO).nullable().default(null),
-  observacoes: z.string().default(''),
-  criado_em: z.string().default(''),
-  atualizado_em: z.string().default(''),
-});
-
 // ── Config ─────────────────────────────────────────────────────────────────
 export const ConfigSchema = z.object({
   emitente: z.record(z.string(), z.unknown()).optional(),
@@ -249,8 +208,6 @@ export const DataSchema = z.object({
   obras: z.array(ObraSchema).default([]),
   ecrs: z.array(EcrSchema).default([]),
   ordens_compra: z.array(OrdemCompraSchema).default([]),
-  prestadores_servico: z.array(PrestadorServicoSchema).default([]),
-  avaliacoes_prestadores: z.array(AvaliacaoPrestadorSchema).default([]),
 });
 
 export type DataParsed = z.infer<typeof DataSchema>;

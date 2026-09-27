@@ -1,6 +1,6 @@
 /**
  * Bloco de campos de endereço compartilhado pelos drawers de
- * Fornecedor, Obra, Prestador e Emitente. Renderiza os 7 campos
+ * Fornecedor, Obra e Emitente. Renderiza os 7 campos
  * dentro do grid do FieldGroup pai (não inclui o FieldGroup).
  */
 

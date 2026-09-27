@@ -3,7 +3,7 @@
  * Inferidos diretamente dos schemas Zod em src/domain/schemas/.
  */
 
-import type { StatusOc, TipoEmitente, TipoPrestador, StatusCriterio } from './constants';
+import type { StatusOc, TipoEmitente } from './constants';
 
 export interface Endereco {
   logradouro: string;
@@ -198,37 +198,6 @@ export interface OrdemCompra {
   versao: number;
 }
 
-export interface PrestadorServico {
-  id: string;
-  razao_social: string;
-  nome_fantasia: string;
-  tipo: TipoPrestador;
-  cnpj_cpf: string;
-  categoria_servico: string;
-  endereco: Endereco;
-  telefones: [string, string];
-  email: string;
-  contato_responsavel: string;
-  observacoes: string;
-  ativo: boolean;
-  criado_em: string;
-  atualizado_em: string;
-}
-
-export interface AvaliacaoPrestador {
-  id: string;
-  prestador_id: string;
-  obra_id: string;
-  data_avaliacao: string;
-  responsavel: string;
-  atendeu_prazo: StatusCriterio;
-  usou_epi: StatusCriterio;
-  conforme_pes: StatusCriterio;
-  observacoes: string;
-  criado_em: string;
-  atualizado_em: string;
-}
-
 export interface Config {
   /** Legacy — mantido para retrocompat; novos códigos usam emitentes[]. */
   emitente?: Partial<Emitente>;
@@ -255,6 +224,4 @@ export interface Data {
   obras: Obra[];
   ecrs: Ecr[];
   ordens_compra: OrdemCompra[];
-  prestadores_servico: PrestadorServico[];
-  avaliacoes_prestadores: AvaliacaoPrestador[];
 }

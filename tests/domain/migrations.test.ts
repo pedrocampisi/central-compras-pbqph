@@ -183,9 +183,10 @@ describe('Round-trip com fixture de produção', () => {
     // Não deve lançar ZodError
     const parsed = DataSchema.parse(normalized);
     expect(parsed.schema_version).toBe(5);
-    // Novos arrays presentes após migração
-    expect(Array.isArray(parsed.prestadores_servico)).toBe(true);
-    expect(Array.isArray(parsed.avaliacoes_prestadores)).toBe(true);
+    // A aba Prestadores saiu (CTO-D585): o degrau v3 → v4 ainda acrescenta os
+    // dois arrays, e o formato de dados os descarta.
+    expect('prestadores_servico' in parsed).toBe(false);
+    expect('avaliacoes_prestadores' in parsed).toBe(false);
   });
 
   it('todos os 20 ECRs têm estrutura válida após migração', () => {

@@ -136,7 +136,7 @@ const DADOS = {
     condicoes_pagamento: ['À vista'], texto_condicoes_contratacao: '', texto_envio_nf: '',
     texto_qualidade: '', pasta_backups: '',
   },
-  fornecedores: [], obras: [], ecrs: [], ordens_compra: [], prestadores_servico: [], avaliacoes_prestadores: [],
+  fornecedores: [], obras: [], ecrs: [], ordens_compra: [],
 } as unknown as Data;
 
 describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta', () => {

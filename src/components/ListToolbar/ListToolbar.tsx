@@ -1,7 +1,7 @@
 /**
  * Barra de filtros padrão das páginas de lista (busca + selects + toggle).
  * Substitui os blocos .filterBar/.searchInput/.toggleGroup/.filterSelect
- * que estavam duplicados em Histórico, Fornecedores, Obras e Prestadores.
+ * que estavam duplicados em Histórico, Fornecedores e Obras.
  */
 
 import type { ReactNode, SelectHTMLAttributes } from 'react';
