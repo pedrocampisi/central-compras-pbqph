@@ -239,7 +239,8 @@ do leitor: **rápido ou certeiro**, antes de ler, a mesma para a imagem e para o
 
 **Onde mora:** o ramo **`d557-lista-em-texto`**, último commit **`2f499c1`** (os retoques da
 D570), empurrado. **Fora do `main`** (decisão 41). As fotos estão em
-`docs/Capturas/2026-09-26_D567/` (40: 10 estados × 1280, 1024, 768 e 375).
+`docs/Capturas/2026-09-26_D567/` (40: 10 estados × 1280, 1024, 768 e 375; e mais 10 a
+1920 × 1080, o monitor do Pedro, com o menu de verdade — CTO-D574).
 
 **A tela está aprovada pelo CTO** (D571), com os dois retoques da D570 feitos (decisão 43): uma mensagem de
 leitura por vez, e o 422 da imagem sem o conselho da lista.
