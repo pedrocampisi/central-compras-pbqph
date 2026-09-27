@@ -2191,3 +2191,17 @@ mordendo, hash igual (a D557 n.5 refeita no código de hoje).
 
 **AS FOTOS:** `docs/Capturas/2026-09-27_D585/`, o menu antes e depois a 1920 e a 375, e Fornecedores depois. Só o
 menu muda. O fotógrafo passou a esperar as fontes: a primeira foto de 1920 saíra com a fonte de reserva.
+
+## Decisão 52 — no ar: a OC sem a aba Prestadores · 27/09/2026
+
+**POR QUÊ (CTO-D587):** o CTO olhou as fotos da D585 (decisão 51) e mandou publicar; aceitou a correção da premissa
+(a OC não guardava a aba aberta) e o degrau v3 → v4 que fica.
+
+**A JUNÇÃO E A BATERIA:** o ramo `d585-sem-prestadores` entrou no `main` em `707631c` (fora de `docs/`, diff vazio
+contra o ramo). 300 testes; tipos e lint limpos; as 4 sabotagens da D585 mordendo, hash igual.
+
+**PUBLICADO:** saiu `10205e67-c34f-4da9-ae57-ee129d07b087` (**O DESFAZER**); entrou
+`b2c4cf79-c850-4e72-814b-9370373ea2af`, versão `20260927132520-707631c`, 100% do tráfego. Medido por fora (depois de
+~20 s em que o endereço ainda servia a anterior): o `versao.txt` diz `…-707631c`; o pacote servido
+(`index-DR3jH4dr.js`) tem "Prestadores de Serviço", `prestadores_servico` e `avaliacoes_prestadores` 0 vezes, e
+"Catálogo ECR" continua.

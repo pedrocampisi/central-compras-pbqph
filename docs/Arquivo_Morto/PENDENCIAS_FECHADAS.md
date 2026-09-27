@@ -6,6 +6,14 @@
 
 ---
 
+### 17. D585 — a aba Prestadores sai da OC · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `b2c4cf79` (CTO-D587, decisão 52)**
+
+*Aberta em 27/09/2026 (decisão 51).* **Onde mora:** o ramo **`d585-sem-prestadores`**, commit **`2672433`**,
+empurrado, **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D585/`. **Fecha quando:** a carta do CTO
+mandar publicar; o desfazer é `10205e67`.
+
+---
+
 ### 16. D582 — o rápido primeiro: o texto da escolha do leitor · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `10205e67`, com a dica curta (CTO-D583, decisão 50)**
 
 *Aberta em 27/09/2026 (decisão 49).* Os três textos da escolha trocados pela palavra do Pedro. **Onde mora:** o

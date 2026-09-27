@@ -218,14 +218,6 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 17. D585 — a aba Prestadores sai da OC · **no ramo, esperando a carta do CTO para publicar**
-
-*Aberta em 27/09/2026 (decisão 51).* **Onde mora:** o ramo **`d585-sem-prestadores`**, commit **`2672433`**,
-empurrado, **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D585/`. **Fecha quando:** a carta do CTO
-mandar publicar; o desfazer é `10205e67`.
-
----
-
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
