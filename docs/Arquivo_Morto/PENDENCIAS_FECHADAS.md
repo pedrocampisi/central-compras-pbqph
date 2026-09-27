@@ -6,6 +6,16 @@
 
 ---
 
+### 18. D586 + D588 + D589 + D593 — a tela de ler as ECRs, o PDF delas e o PDF da OC comprimido · **aprovado pela D593; esperando a ordem de publicar** — **FECHADA EM 27/09/2026: NO AR em `080168b8` (CTO-D594, decisão 55); o desfazer é `b2c4cf79`. A tela de editar segue aberta no ramo `d589-editar-ecr`**
+
+*Aberta em 27/09/2026 (decisão 53; decisão 54).* **Onde mora:** o ramo **`d586-ecrs-do-sgq`**, commit **`ba53d2f`**,
+empurrado, **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D586/` e `docs/Capturas/2026-09-27_D593/`.
+**Fecha quando:** o CTO mandar, numa linha, por campainha, **depois de conferir a D592 do Banco na produção** (a
+migration mexe em `secoes` e vai antes da tela). O desfazer é `b2c4cf79`. **Depois dela:** a tela de editar (D589 §4.2), num ramo à parte,
+com a linha "Dimensão" sem texto da ECR 02 e a ECR 04 (recusada pelo banco até a decisão do CTO) em aberto.
+
+---
+
 ### 17. D585 — a aba Prestadores sai da OC · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 27/09/2026: NO AR em `b2c4cf79` (CTO-D587, decisão 52)**
 
 *Aberta em 27/09/2026 (decisão 51).* **Onde mora:** o ramo **`d585-sem-prestadores`**, commit **`2672433`**,

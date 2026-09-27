@@ -2250,3 +2250,23 @@ de antes e depois são o mesmo arquivo, byte a byte).
 
 **AS TRAVAS:** `tests/services/ocPdfPeso.test.ts` (a marca de verdade, abaixo de 300 KB, e a marca presente); 2
 sabotagens mordendo (sem compressão; sem a marca). 343 testes. Fotos em `docs/Capturas/2026-09-27_D593/`.
+
+## Decisão 55 — no ar: a tela de ler as ECRs, o PDF de cada uma e o PDF da OC comprimido · 27/09/2026
+
+**POR QUÊ (CTO-D594):** a D592 do Banco está na produção desde 11:46 (a ECR 04 na revisão 01; a linha "Dimensão" da
+ECR 02 com texto), e o CTO mandou publicar o ramo aprovado pela D593.
+
+**O QUE MUDOU:** o ramo `d586-ecrs-do-sgq` (`ba53d2f`) entrou no `main` em `34ee3ff` (o diff fora de `docs/` é vazio).
+343 testes, tipos e lint limpos, e as 20 sabotagens das decisões 53 e 54 mordendo no `main`. **Publicado:**
+`080168b8-0465-4dac-b2eb-bbd04e3ff1a3`, versão `20260927145752-34ee3ff`. **O desfazer é `b2c4cf79`.**
+
+**A MEDIDA POR FORA:**
+- **O `versao.txt`** traz a versão nova já na primeira leitura.
+- **No pacote servido:** o subtítulo novo, "Histórico de revisões", `ecr_revisoes` e o cabeçalho do PDF aparecem 1
+  vez cada. "Objetivo", "Critérios de Recebimento", "Normas Aplicáveis", "Ensaios" e o subtítulo recusado aparecem 0
+  vezes.
+- **Logado:** não medido, porque a casa não entra com senha. Lido no banco, só leitura: a ECR 04 em `01` / `2026-04-21`,
+  com 2 linhas no histórico, e a ECR 02 com a linha "Dimensão:" com texto. O olho na tela logada fica para o Pedro.
+
+**DAQUI EM DIANTE:** cai o leitor aceito da D591. `secoes` só muda pela `revisar_ecr`. A tela de editar (D589 §4.2)
+segue no ramo `d589-editar-ecr`, sem publicar sem carta.

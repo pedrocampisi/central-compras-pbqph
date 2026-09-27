@@ -218,16 +218,6 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 18. D586 + D588 + D589 + D593 — a tela de ler as ECRs, o PDF delas e o PDF da OC comprimido · **aprovado pela D593; esperando a ordem de publicar**
-
-*Aberta em 27/09/2026 (decisão 53; decisão 54).* **Onde mora:** o ramo **`d586-ecrs-do-sgq`**, commit **`ba53d2f`**,
-empurrado, **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D586/` e `docs/Capturas/2026-09-27_D593/`.
-**Fecha quando:** o CTO mandar, numa linha, por campainha, **depois de conferir a D592 do Banco na produção** (a
-migration mexe em `secoes` e vai antes da tela). O desfazer é `b2c4cf79`. **Depois dela:** a tela de editar (D589 §4.2), num ramo à parte,
-com a linha "Dimensão" sem texto da ECR 02 e a ECR 04 (recusada pelo banco até a decisão do CTO) em aberto.
-
----
-
 ### 13. A sessão `campisi-oc` venceu: prova de tela no ensaio parada
 
 *Aberta em 25/09/2026, na decisão 34.* O estado guardado em 15/09 (2.900 bytes, com a sessão do
