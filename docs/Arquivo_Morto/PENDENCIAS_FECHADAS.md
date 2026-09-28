@@ -1,7 +1,7 @@
 # Pendências fechadas — Ordem de Compra
 
 > **Data:** 26/09/2026
-> **Estado:** REGISTRO — não é fila de trabalho
+> **Estado:** CONCLUÍDO — é registro, não é fila de trabalho
 > **Escopo:** os itens do `PENDENCIAS.md` que já fecharam, **inteiros, como estavam**, cada um com a data do fecho no título. Saíram da fila viva em 26/09/2026, na gaveta do fim da corrida (CTO-D571; lei 2, e lei 3 §7.6). Item que fechar daqui em diante vem para cá no dia em que fecha.
 
 ---
@@ -148,7 +148,7 @@ clicar por código lendo a tela na mesma linha disse que **o botão não respond
 aparece depois que a tela se redesenha. **A lição 31 pelas duas pontas:** o instrumento errado não
 só esconde defeito, ele **inventa** defeito.
 
-Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Arquivo_Morto/Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
+Carta: [`Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md`](Enviados/2026-09-07_de_Ordem_de_Compra_para_CTO_a-conferencia-da-ui-para-na-porta-o-que-medi-e-a-porta.md)
 
 ---
 
@@ -240,7 +240,7 @@ em 14/09, e só para ela.
 achou, não a sorte.*
 
 O valor está escrito em **um** documento arquivado,
-[`Arquivo_Morto/RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md`](Arquivo_Morto/RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md),
+[`Arquivo_Morto/RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md`](RELATORIO-MIGRACAO-SUPABASE-2026-08-08.md),
 que entrou no registro `ce72335`, de 08/08/2026 — antes desta caixa existir. **Já está público**,
 no ramo `migracao-supabase`, e não é novidade que a virada cria: é dívida que a virada só carrega
 para a `main`.
@@ -296,7 +296,7 @@ que emenda a 6.
 repositório público quebra o clone de quem tiver um, e a CTO-D49 proíbe. O documento de 08/08
 fica como está.
 
-Carta: [`Arquivo_Morto/Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md`](Arquivo_Morto/Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md)
+Carta: [`Arquivo_Morto/Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md`](Devolucoes/2026-09-04_de_CTO_para_Ordem_de_Compra_voce-bateu-a-minha-condicao-de-parada-e-trouxe-o-motivo-medi-e-voce-esta-certa.md)
 
 
 ---
@@ -482,7 +482,7 @@ entra na pendência da conferência automática.
 |---|---|
 | **Estado em todo documento** | **17 documentos, 17 cabeçalhos** `Data / Estado / Escopo`. As **22 cartas** ficam de fora **de propósito**: o estado de uma carta é a gaveta em que ela está (**decisão 13**) |
 | **Os motivos saem do `Agente.md`** | Viraram as **decisões 14 a 18**. O `Agente.md` ficou só com a regra e o número da decisão ao lado |
-| **`Readme.md` → `README.md`** | Não era o que parecia: o `README.md` da raiz **já existia e já era a porta certa** desde 20/08. O `docs/Readme.md` era **outro documento** — um guia de 280 linhas para dev. Virou [`docs/roteiros/guia-do-desenvolvedor.md`](roteiros/guia-do-desenvolvedor.md), e com isso sumiu o segundo arquivo com cara de "leia-me" |
+| **`Readme.md` → `README.md`** | Não era o que parecia: o `README.md` da raiz **já existia e já era a porta certa** desde 20/08. O `docs/Readme.md` era **outro documento** — um guia de 280 linhas para dev. Virou [`docs/roteiros/guia-do-desenvolvedor.md`](../roteiros/guia-do-desenvolvedor.md), e com isso sumiu o segundo arquivo com cara de "leia-me" |
 | **`pecas/` e `roteiros/`** | `roteiros/` **nasceu** com o guia acima. `pecas/` continua não existindo, **e isso é a lei sendo cumprida**: pasta vazia não se cria |
 
 **Duas coisas apareceram no caminho e foram consertadas:** a pasta `melhorias futuras/` estava
