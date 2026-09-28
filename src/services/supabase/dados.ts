@@ -524,6 +524,13 @@ export function assinarMudancas(aoMudar: () => void): () => void {
       aoMudar,
     )
     .on('postgres_changes', { event: '*', schema: 'core', table: 'fornecedores' }, aoMudar)
+    // A qualificação e a avaliação de entrega gravadas por outra pessoa
+    // (D604; a publicação liga no dia de publicar, carta do Banco de 28/09 §4).
+    // Sem filtro de obra, de propósito: a qualificação é da empresa, e um
+    // filtro por coluna que a tabela não tenha derrubaria o canal inteiro. O
+    // recarregar que o aviso dispara já aplica a máscara.
+    .on('postgres_changes', { event: '*', schema: 'compras', table: 'qualificacoes' }, aoMudar)
+    .on('postgres_changes', { event: '*', schema: 'compras', table: 'avaliacoes_entrega' }, aoMudar)
     .subscribe();
   return () => void supabase.removeChannel(canal);
 }

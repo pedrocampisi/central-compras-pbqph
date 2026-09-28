@@ -167,6 +167,10 @@ describe('D599 §4.1 — com a máscara ligada, cada busca pede só a obra, e ca
     }
     const avisoDasOcs = banco.estado.avisos.find((a) => a['table'] === 'ordens_compra')!;
     expect(avisoDasOcs['filter']).toBe('intervencao_id=eq.obra-a');
+    // A qualificação e a avaliação de entrega também avisam (D604, carta do Banco de 28/09 §4).
+    expect(banco.estado.avisos.map((a) => `${String(a['schema'])}.${String(a['table'])}`)).toEqual([
+      'compras.ordens_compra', 'core.fornecedores', 'compras.qualificacoes', 'compras.avaliacoes_entrega',
+    ]);
 
     // Dashboard
     expect(pagina().textContent).toContain('2026/001');
