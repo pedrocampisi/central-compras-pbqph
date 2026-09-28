@@ -14,6 +14,10 @@ import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolb
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
 import { seloDaFilial } from '../../domain/qualificacao';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
+import { secoesDosQualificados } from '../../domain/folhasDoAuditor';
+import { hojeEmSaoPaulo } from '../../domain/ecr';
+import { baixarPdfDosQualificados } from '../../services/pdf/generateFolhasDoAuditor';
+import { Icon } from '../../components/Icon/Icon';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
 
@@ -24,6 +28,7 @@ export function FornecedoresPage() {
   const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
 
+  const showToast = useUiStore((s) => s.showToast);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Fornecedor | null>(null);
 
@@ -45,6 +50,22 @@ export function FornecedoresPage() {
     }
     return true;
   });
+
+  /** A folha do auditor (CTO-D604 §3.5): a FO 8.4.1.1 tirada do sistema, inteira. */
+  async function pdfDosQualificados() {
+    if (!qualificacoes || !data) {
+      showToast('As qualificações não carregaram. Recarregue a página para gerar o PDF.', 'warning');
+      return;
+    }
+    try {
+      await baixarPdfDosQualificados(
+        secoesDosQualificados(qualificacoes.linhas, qualificacoes.categorias, data.fornecedores),
+        hojeEmSaoPaulo(),
+      );
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
+  }
 
   function openNew() {
     setEditing(null);
@@ -133,9 +154,14 @@ export function FornecedoresPage() {
             {filtered.length} de {data.fornecedores.length} cadastrado(s)
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={openNew}>
-          + Novo Fornecedor
-        </Button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <Button variant="outline" size="sm" onClick={() => void pdfDosQualificados()}>
+            <Icon name="file-text" size={13} /> PDF dos qualificados
+          </Button>
+          <Button variant="primary" size="sm" onClick={openNew}>
+            + Novo Fornecedor
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}

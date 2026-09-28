@@ -26,6 +26,11 @@ import type { StatusOc } from '../../domain/constants';
 import { marcarPdfGerado } from '../../services/supabase/dados';
 import { mudarStatusDaOc } from './mudarStatusDaOc';
 import { RegistrarEntregaDialogo } from './RegistrarEntregaDialogo';
+import { lerAvaliacoesDeEntrega } from '../../services/supabase/qualificacao';
+import { linhasDasAvaliacoes } from '../../domain/folhasDoAuditor';
+import { hojeEmSaoPaulo } from '../../domain/ecr';
+import { baixarPdfDasAvaliacoes } from '../../services/pdf/generateFolhasDoAuditor';
+import { obraDaMascara } from '../../services/storage/umaObra';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
@@ -158,6 +163,24 @@ export function HistoricoPage() {
     await mudarStatusDaOc(oc, status, data!.fornecedores, showToast);
   }
 
+  /**
+   * A folha do auditor das entregas (CTO-D604 §3.5): todas as avaliações, ou
+   * só as da obra da máscara da D599 — a leitura já filtra.
+   */
+  async function handlePdfDasAvaliacoes() {
+    try {
+      const avaliacoes = await lerAvaliacoesDeEntrega();
+      const mascara = obraDaMascara();
+      await baixarPdfDasAvaliacoes(
+        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras),
+        mascara ? (obraNome.get(mascara) ?? 'Obra da auditoria') : null,
+        hojeEmSaoPaulo(),
+      );
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
+  }
+
   /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */
   function handleExportCsv() {
     const header = ['Número', 'Data', 'Fornecedor', 'Obra', 'Status', 'Qtd. Itens', 'Total (R$)'];
@@ -236,6 +259,9 @@ export function HistoricoPage() {
         <div style={{ display: 'flex', gap: 8 }}>
           <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => void handlePdfDasAvaliacoes()}>
+            <Icon name="file-text" size={13} /> PDF das avaliações
           </Button>
           <Button
             variant="primary"

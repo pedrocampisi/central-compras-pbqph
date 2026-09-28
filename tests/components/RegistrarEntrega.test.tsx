@@ -12,10 +12,24 @@ vi.mock('../../src/services/supabase/client', () => ({
   core: () => ({}),
   compras: () => ({}),
 }));
-const banco = vi.hoisted(() => ({}) as { registrar: Mock; status: Mock; recarregar: Mock });
+const banco = vi.hoisted(
+  () => ({ mascara: null as string | null, pdfs: [] as unknown[][] }) as {
+    registrar: Mock; status: Mock; recarregar: Mock; avaliacoes: Mock; mascara: string | null; pdfs: unknown[][];
+  },
+);
 vi.mock('../../src/services/supabase/qualificacao', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/qualificacao')>()),
   registrarEntrega: (...a: unknown[]) => banco.registrar(...a),
+  lerAvaliacoesDeEntrega: () => banco.avaliacoes(),
+}));
+vi.mock('../../src/services/storage/umaObra', async (original) => ({
+  ...(await original<typeof import('../../src/services/storage/umaObra')>()),
+  obraDaMascara: () => banco.mascara,
+}));
+vi.mock('../../src/services/pdf/generateFolhasDoAuditor', () => ({
+  baixarPdfDasAvaliacoes: async (...a: unknown[]) => {
+    banco.pdfs.push(a);
+  },
 }));
 vi.mock('../../src/services/supabase/dados', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/dados')>()),
@@ -66,6 +80,9 @@ beforeEach(() => {
     throw new Error('parada aqui pelo teste');
   });
   banco.recarregar = vi.fn(async () => {});
+  banco.avaliacoes = vi.fn(async () => []);
+  banco.mascara = null;
+  banco.pdfs = [];
   useDataStore.setState({ data: dados() });
   useAuthStore.setState({ perfil: { papel: 'admin' } as never });
   useUiStore.setState({ toasts: [] });
@@ -197,5 +214,43 @@ describe('D604 §3.2 — o comando de status não leva a OC a entregue', () => {
     await mudarStatusDaOc(oc('001', 'emitida'), 'entregue', [FORNECEDOR], avisar);
     expect(banco.status).not.toHaveBeenCalled();
     expect(avisar).toHaveBeenCalledWith(ENTREGUE_SO_COM_AVALIACAO, 'warning');
+  });
+});
+
+describe('D604 §3.5 — o PDF das avaliações, pelo Histórico', () => {
+  const AVALIACAO = {
+    id: 1, ocId: '001', intervencaoId: OBRA.id, notaFiscal: '1234', recebidoEm: '2026-09-20',
+    prazoConforme: true, integridadeConforme: true, ocEcrConforme: true, naoConformes: 0, observacao: '', tratativa: '',
+    avaliadoPorNome: 'Pessoa de teste', cienciaPorNome: '', cienciaEm: '', cienciaNota: '',
+  };
+  async function gerar() {
+    render(<HistoricoPage />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /PDF das avaliações/ }));
+    });
+  }
+
+  it('sem a máscara: as avaliações lidas, "todas as obras"', async () => {
+    banco.avaliacoes = vi.fn(async () => [AVALIACAO]);
+    await gerar();
+    expect(banco.pdfs).toHaveLength(1);
+    const [linhas, obra] = banco.pdfs[0]! as [string[][], string | null];
+    expect(obra).toBeNull();
+    expect(linhas[0]!.slice(0, 4)).toEqual(['2026/001', 'Filial A (teste)', 'Obra de teste', '1234']);
+  });
+
+  it('com a máscara da D599: o nome da obra dela vai no PDF', async () => {
+    banco.mascara = OBRA.id;
+    await gerar();
+    expect((banco.pdfs[0]! as [string[][], string | null])[1]).toBe('Obra de teste');
+  });
+
+  it('a leitura falhou: aviso de erro, nenhum PDF', async () => {
+    banco.avaliacoes = vi.fn(async () => {
+      throw new Error('Falha ao ler as avaliações de entrega: rede');
+    });
+    await gerar();
+    expect(banco.pdfs).toHaveLength(0);
+    expect(avisos()).toContain('Erro ao gerar o PDF: Falha ao ler as avaliações de entrega: rede');
   });
 });

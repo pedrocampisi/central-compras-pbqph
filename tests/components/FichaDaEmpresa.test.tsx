@@ -18,6 +18,10 @@ vi.mock('../../src/services/supabase/qualificacao', async (original) => ({
   qualificarEmpresa: (...a: unknown[]) => banco.qualificar(...a),
 }));
 vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: () => banco.recarregar() }));
+const baixados = vi.hoisted(() => [] as { nome: string; tamanho: number }[]);
+vi.mock('../../src/services/storage/download', () => ({
+  downloadBlob: (b: Blob, nome: string) => baixados.push({ nome, tamanho: b.size }),
+}));
 
 import { FornecedoresPage } from '../../src/features/fornecedores/FornecedoresPage';
 import { NovaOcPage } from '../../src/features/ordens-compra/NovaOcPage';
@@ -117,6 +121,7 @@ beforeEach(() => {
   useUiStore.setState({ toasts: [], fornFilter: { search: '', status: 'todos' } } as never);
   useQualificacaoStore.getState().definir(qualificacoes(HISTORICO));
   useOcEditingStore.getState().stopEditing();
+  baixados.length = 0;
 });
 
 function abrirFicha(nome = 'Filial A (teste)') {
@@ -271,5 +276,27 @@ describe('D604 §3.1/§3.3 — qualificar e requalificar pela ficha', () => {
       fireEvent.click(within(caixa('[data-dialogo-qualificar]')!).getByRole('button', { name: 'Gravar qualificação' }));
     });
     expect(banco.qualificar.mock.calls[0]![0]).toMatchObject({ sujeito: { fornecedor_id: 'prestador-b' }, categoria: 'servico' });
+  });
+});
+
+describe('D604 §3.5 — o botão do PDF dos qualificados', () => {
+  it('com as qualificações carregadas, baixa a folha', async () => {
+    render(<FornecedoresPage />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /PDF dos qualificados/ }));
+    });
+    expect(baixados).toHaveLength(1);
+    expect(baixados[0]!.nome).toMatch(/^qualificacao-de-fornecedores \d{4}-\d{2}-\d{2}\.pdf$/);
+    expect(baixados[0]!.tamanho).toBeGreaterThan(1000);
+  });
+
+  it('sem as qualificações, não baixa uma folha vazia: avisa', async () => {
+    useQualificacaoStore.getState().falhou('rede');
+    render(<FornecedoresPage />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /PDF dos qualificados/ }));
+    });
+    expect(baixados).toHaveLength(0);
+    expect(avisos()).toContain('As qualificações não carregaram. Recarregue a página para gerar o PDF.');
   });
 });
