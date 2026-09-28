@@ -9,7 +9,7 @@ import type jsPDF from 'jspdf';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { desenhaPdfDaEcr, paraAFonteDoPdf } from '../../src/services/pdf/generateEcrPdf';
-import { secoesDoBanco } from '../../src/domain/ecr';
+import { problemasDaRevisao, secoesDoBanco } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
 import type { Ecr, EcrRevisao } from '../../src/domain/types';
 import ecrs from '../fixtures/ecrs-03-e-08.json';
@@ -147,5 +147,99 @@ describe('D589 — o PDF diz o que falta, e não quebra', () => {
 
   it('um caractere que a fonte não tem vira "?", e nunca some calado', () => {
     expect(paraAFonteDoPdf('a→b ᶟ – “x”')).toBe('a?b ³ – “x”');
+  });
+});
+
+// Perícia do Codex, 27/09/2026, achado 3 — MEDIDA, não conserto (CTO-D603).
+// O "como conferir" do perito: uma ECR sintética com "≥" e "≤" em linhas
+// diferentes e uma quebra de linha dentro do texto; passa pelas regras do
+// editor e vira PDF em memória. O certo: ou as regras recusam, ou o PDF mostra
+// o sinal (sem aplicar `paraAFonteDoPdf` no esperado).
+describe('Perícia 27/09, achado 3 — os sinais que o editor aceita e o PDF troca', () => {
+  // `it.fails`: esta medida REPRODUZ o achado no código de hoje. Quando o conserto
+  // entrar, ela passa a falhar — aí o `.fails` sai e a medida vira trava.
+  it.fails('"≥" e "≤" e a quebra de linha: o editor recusa, ou o PDF os mantém', () => {
+    const vigente = ecr(0);
+    const nova = vigente.secoes!.map((s, i) =>
+      i === 0
+        ? {
+            ...s,
+            itens: [
+              { rotulo: null, texto: 'Resistência ≥ 30 MPa', numerado: true },
+              { rotulo: null, texto: 'Abatimento ≤ 10 cm', numerado: true },
+              { rotulo: null, texto: 'Linha um\nLinha dois', numerado: true },
+            ],
+          }
+        : s,
+    );
+    const problemas = problemasDaRevisao(vigente.secoes!, nova, vigente.revisao);
+    const recusou = problemas.length > 0;
+
+    const doc = desenhaPdfDaEcr({ ...vigente, secoes: nova }, null);
+    const tudo = Array.from({ length: doc.getNumberOfPages() }, (_, i) => textoDaPagina(doc, i + 1)).join(' ');
+    const manteve =
+      !tudo.includes('Resistência ? 30 MPa') && !tudo.includes('Abatimento ? 10 cm') && !tudo.includes('um?Linha');
+    const trechos = tudo.match(/Resistência . 30 MPa|Abatimento . 10 cm|um.Linha/g);
+    expect(recusou || manteve, JSON.stringify({ recusou, problemas: problemas.length, trechos })).toBe(true);
+  });
+});
+
+// Perícia do Codex, 27/09/2026, achado 7 — MEDIDA, não conserto (CTO-D603).
+// O "como conferir" do perito: uma ECR sintética com 50 linhas curtas de
+// histórico, e outra com uma descrição longa; olhar ONDE os textos caem na
+// página. O certo: a tabela de revisões fica abaixo do texto do corpo, sem
+// cobrir o cabeçalho nem o conteúdo (o corpo começa a 36 mm do topo).
+describe('Perícia 27/09, achado 7 — o histórico que cresce no rodapé', () => {
+  const MM = 72 / 25.4;
+  /** Cada texto de uma página e a altura dele, em mm a partir do topo. */
+  function textosComAltura(doc: jsPDF, pagina: number): { texto: string; mm: number }[] {
+    const ph = doc.internal.pageSize.getHeight() * MM;
+    const conteudo = (doc.internal as unknown as { pages: string[][] }).pages[pagina]!.join('\n');
+    return [...conteudo.matchAll(/[\d.]+ ([\d.]+) Td\n\(((?:\\.|[^\\)])*)\) Tj/g)].map((m) => ({
+      texto: m[2]!.replace(/\\(.)/g, '$1'),
+      mm: Math.round(((ph - Number(m[1])) / MM) * 10) / 10,
+    }));
+  }
+  const DA_TABELA = /^(Revisão|Data|Descrição|Revisado por|Aprovado por|Revisor de teste|Aprovador de teste|Emissão Inicial|15\/04\/2026|\d\d)$|^Revisão sintética|^Descrição longa|^palavra/;
+  const DO_CABECALHO = 26; // o cabeçalho vai até ~21 mm; o corpo começa a 36
+  /** Por página: onde começa a tabela, e quantos textos do corpo caem nela ou abaixo dela. */
+  function medida(revisoes: EcrRevisao[]) {
+    const doc = desenhaPdfDaEcr(ecr(0, { revisoes }), null);
+    const paginas = Array.from({ length: doc.getNumberOfPages() }, (_, i) => {
+      const t = textosComAltura(doc, i + 1);
+      const topo = Math.min(...t.filter((x) => DA_TABELA.test(x.texto)).map((x) => x.mm));
+      const corpo = t.filter((x) => x.mm >= DO_CABECALHO && !DA_TABELA.test(x.texto) && !/^Página /.test(x.texto));
+      return { topo, corpoNaTabela: corpo.filter((x) => x.mm >= topo - 1).length, corpo: corpo.length };
+    });
+    const ruins = paginas.filter((p) => p.topo < 36 || p.corpoNaTabela > 0);
+    return { paginas: paginas.length, topoDaTabelaNaPagina1: paginas[0]!.topo, paginasComSobreposicao: ruins.length, pagina1: paginas[0] };
+  }
+  const umaRevisao = (i: number, descricao = `Revisão sintética ${i}`): EcrRevisao => ({
+    revisao: String(i).padStart(2, '0'), data: '2026-04-15', descricao, revisado_por: 'Revisor de teste', aprovado_por: 'Aprovador de teste',
+  });
+
+  it('a régua da medida: com a revisão de hoje, nada se sobrepõe', () => {
+    const m = medida(HISTORICO);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+  });
+
+  // `it.fails`: esta medida REPRODUZ o achado no código de hoje. Quando o conserto
+  // entrar, ela passa a falhar — aí o `.fails` sai e a medida vira trava.
+  it.fails('com 50 revisões curtas, a tabela não cobre o cabeçalho nem o corpo', () => {
+    const m = medida(Array.from({ length: 50 }, (_, i) => umaRevisao(i)));
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+  });
+
+  // O tamanho da descrição: nem a tela nem o contrato do banco o limitam.
+  const comDescricaoDe = (letras: number) => medida([umaRevisao(0, `Descrição longa ${'palavra '.repeat(letras / 8)}`.trim())]);
+  it('com uma descrição de 2.000 letras, ainda cabe', () => {
+    const m = comDescricaoDe(2000);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+  });
+  // `it.fails`: esta medida REPRODUZ o achado no código de hoje. Quando o conserto
+  // entrar, ela passa a falhar — aí o `.fails` sai e a medida vira trava.
+  it.fails('com uma descrição de 6.000 letras, a tabela não cobre o cabeçalho nem o corpo', () => {
+    const m = comDescricaoDe(6000);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
   });
 });

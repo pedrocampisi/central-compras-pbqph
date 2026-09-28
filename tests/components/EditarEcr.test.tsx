@@ -356,3 +356,37 @@ describe('D589 §4.2 — sair sem salvar', () => {
     expect(sair()).toBe(false);
   });
 });
+
+// Perícia do Codex, 27/09/2026, achado 2 — MEDIDA, não conserto (CTO-D603).
+// O "como conferir" do perito: abre a Rev. 00 e muda a linha A; os dados
+// recarregam com uma Rev. 01 em que a linha B mudou (outra aba aprovou); salva
+// o rascunho aberto. O certo: a linha B vai com o texto da 01, ou a tela recusa
+// a base velha.
+describe('Perícia 27/09, achado 2 — o rascunho aberto sobre uma revisão que já mudou', () => {
+  // `it.fails`: esta medida REPRODUZ o achado no código de hoje. Quando o conserto
+  // entrar, ela passa a falhar — aí o `.fails` sai e a medida vira trava.
+  it.fails('a mudança da Rev. 01 na linha B não é desfeita pelo rascunho aberto na 00', async () => {
+    await montar([ecr03()]);
+    await editar('ECR 03');
+    fireEvent.change(texto('01', 1), { target: { value: 'NBR 7212 - Concreto dosado em central;' } });
+
+    // Outra aba aprovou a Rev. 01, com a linha B (seção 01, linha 2) mudada; a tela recarrega.
+    const rev01 = ecr03();
+    rev01.revisao = '01';
+    rev01.secoes = rev01.secoes!.map((s, i) =>
+      i === 0 ? { ...s, itens: s.itens.map((it, j) => (j === 1 ? { ...it, texto: 'Texto da linha B na Rev. 01.' } : it)) } : s,
+    );
+    act(() => useDataStore.setState({ data: { ecrs: [rev01] } as unknown as Data }));
+
+    clicar('Salvar revisão');
+    if (dialogo()) {
+      fireEvent.change(screen.getByLabelText(/O que mudou/), { target: { value: 'A linha A.' } });
+      await act(async () => clicar('Gravar revisão'));
+    }
+
+    const recusou = banco.chamadas.length === 0;
+    const linhaB = recusou ? null : (banco.chamadas[0]!['p_secoes'] as EcrSecao[])[0]!.itens[1]!.texto;
+    const confirmacao = dialogo()?.textContent ?? null;
+    expect(recusou || linhaB === 'Texto da linha B na Rev. 01.', JSON.stringify({ recusou, linhaB, confirmacao })).toBe(true);
+  });
+});
