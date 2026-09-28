@@ -218,7 +218,7 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **no ramo, com os sete consertos; esperando o CTO conferir e mandar publicar**
+### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **consertos conferidos; esperando a perícia única sobre `fe119e6`**
 
 *Aberta em 27/09/2026 (decisão 56).* **Onde mora:** o ramo **`d589-editar-ecr`**, commit **`7edb715`**, empurrado,
 **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D596/`. **Fecha quando:** a carta do CTO mandar
@@ -228,10 +228,13 @@ os sete reproduzem (o 5 no banco falso, o 6 por mutação). **Nada consertado:**
 *Em 28/09 (D607, decisão 59):* os sete aceitos e consertados no ramo, commit **`97226b3`**, empurrado; levados à cópia
 `OC_uma-obra` por merge (`fe119e6`). 412 testes, zero `it.fails`. **1.185 linhas novas** contra `5f287cd`, acima do portão
 de mil (lei 3 §9.5): o CTO decide se vai perícia antes. **Fecha quando:** a carta do CTO mandar publicar e o editor estiver no ar.
+*Em 28/09 (D611):* conferidos. Por passar de mil, vai **uma perícia só** sobre a cópia `OC_uma-obra` em `fe119e6`
+(escopo `7edb715..fe119e6`: consertos, medidas, máscara e merge); o Pedro dispara. A cópia fica parada em `fe119e6` e o ramo
+em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem consertar. Editor, consertos e máscara vão ao ar juntos.
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **esperando a vez (D607 §2.4)**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **começada em 28/09 (D611 §3.4), na cópia `OC_fornecedores`, ramo `d604-fornecedores`**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
