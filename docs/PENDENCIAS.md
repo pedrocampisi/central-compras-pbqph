@@ -234,7 +234,7 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **retocadas no ramo `d604-fornecedores` (`ebbebb0`); a prova do Banco passou; esperando a conferência e a perícia**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **conferidas no ramo `d604-fornecedores` (`ebbebb0`, D616); esperando o relatório da perícia**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -259,6 +259,9 @@ o selo, a trava com o "Qualificar agora", a avaliação na entrega, as tratativa
 - a perícia `fe119e6..ebbebb0`; a cópia fica parada até o relatório;
 - a publicação;
 - no mesmo dia, avisar o Banco, que liga as travas e o tempo real na produção e manda a hora.
+*Em 28/09 (D616):* os retoques conferidos e as 40 fotos aprovadas; a linha do tempo real fica. A perícia
+`fe119e6..ebbebb0` está com o Pedro; o relatório chega em `docs/Pericias/`. A cópia fica parada em `ebbebb0`. Quando
+chegar: medir cada achado (reproduziu, não reproduziu, não dá para medir), sem consertar antes da triagem do CTO.
 
 ---
 
