@@ -2382,3 +2382,20 @@ entram as quatro tabelas.
 
 **O QUE FALTA:** a conferência do CTO; a perícia `fe119e6..ebbebb0` (4.471 linhas em `src` e testes); a publicação,
 depois do editor, dos consertos e da máscara; no mesmo dia, o aviso ao Banco, que liga as travas e o tempo real.
+
+## Decisão 62 — as duas perícias medidas, sem conserto · 28/09/2026
+
+**POR QUÊ (CTO-D611 e D616):** as duas perícias chegaram: a dos consertos e da máscara (`fe119e6`, 4 achados) e a da
+qualificação dos fornecedores (`fe119e6..ebbebb0`, 7 achados). A ordem do CTO: medir cada achado e não consertar nada
+antes da triagem dele.
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `d504c0f`; NÃO publicado):** só testes. São 17 `it.fails`, um por medida, e
+6 controles. Nenhuma linha de `src/`. Os 11 achados reproduziram; o 3 da primeira perícia, por mutação, e o 5 da
+segunda, no banco falso (o teto real da API não foi conferido). As medidas da primeira perícia foram feitas no ramo, que
+nessa parte é igual a `fe119e6`; a cópia `OC_uma-obra` continua congelada. O comentário do tempo real de `07385e9` estava
+errado para `avaliacoes_entrega`: a tabela tem a obra.
+
+**AS TRAVAS:** 572 testes, 43 arquivos; tipos e lint limpos; CI verde (36500646426). Cada medida rodou uma vez como teste
+comum e falhou na linha da medida. As duas mutações voltaram com o mesmo sha256.
+
+**O QUE FALTA:** a triagem do CTO; os consertos que ela mandar; a publicação, na ordem combinada.
