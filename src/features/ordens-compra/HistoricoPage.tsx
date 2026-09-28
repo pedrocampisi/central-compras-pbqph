@@ -23,12 +23,13 @@ import { downloadBlob } from '../../services/storage/download';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
-import { definirStatusOc, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
+import { marcarPdfGerado } from '../../services/supabase/dados';
+import { mudarStatusDaOc } from './mudarStatusDaOc';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
 import {
-  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra, travaDaFilial,
+  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
 } from '../../domain/fornecedores';
 import { normalizarBusca } from '../../domain/pesquisa';
 
@@ -151,31 +152,7 @@ export function HistoricoPage() {
   }
 
   async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
-    // A filial bloqueada não emite, por nenhuma porta (D545).
-    if (status === 'emitida') {
-      const trava = travaDaFilial(data!.fornecedores.find((f) => f.id === oc.fornecedor_id), 'emitir');
-      if (trava) { showToast(trava, 'warning'); return; }
-    }
-    try {
-      // Comando estreito: muda o status e nada mais. Vai com a versão que esta
-      // tela leu — se outra pessoa mexeu na OC nesse meio-tempo, o banco recusa
-      // em vez de sobrescrever o trabalho dela.
-      // Emitir daqui também é o que reserva o número, se ainda não houver.
-      const gravada = await definirStatusOc(oc.id, status, oc.versao);
-      await recarregarDados();
-      showToast(
-        status === 'emitida' && gravada.numero
-          ? `OC emitida com o número ${gravada.numero}.`
-          : `Status alterado para "${status}".`,
-        'success',
-      );
-    } catch (err) {
-      if (err instanceof ConflitoDeVersao) {
-        showToast(err.message, 'warning');
-        return;
-      }
-      showToast(`Erro ao alterar status: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
-    }
+    await mudarStatusDaOc(oc, status, data!.fornecedores, showToast);
   }
 
   /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */

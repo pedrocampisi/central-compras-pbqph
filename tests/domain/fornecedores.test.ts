@@ -10,6 +10,7 @@ import {
   ordemDoCnpj,
   filialPrincipal,
   travaDaFilial,
+  EMITIR_SEM_CONFIRMACAO,
   EMITIR_BLOQUEADA,
 } from '../../src/domain/fornecedores';
 import { readFileSync } from 'node:fs';
@@ -239,7 +240,8 @@ describe('a OC escolhe só a empresa, e grava a filial principal (CTO-D549)', ()
 
 describe('a filial bloqueada salva, mas não emite (CTO-D545)', () => {
   const bloqueada = forn({ id: 'b', fornece_material: true, bloqueado_para_compra_nova: true });
-  const livre = forn({ id: 'l', fornece_material: true });
+  const livre = forn({ id: 'l', fornece_material: true, bloqueado_para_compra_nova: false });
+  const semBloqueioLido = forn({ id: 'd', fornece_material: true });
 
   it('emitir com a bloqueada é recusado, e a mensagem diz o motivo e o que fazer', () => {
     expect(travaDaFilial(bloqueada, 'emitir')).toBe(EMITIR_BLOQUEADA);
@@ -253,20 +255,32 @@ describe('a filial bloqueada salva, mas não emite (CTO-D545)', () => {
     expect(travaDaFilial(bloqueada, 'salvar')).toBe('');
   });
 
-  it('a filial livre emite e salva; sem fornecedor, a trava não é quem fala', () => {
+  it('a filial livre (o banco disse "não bloqueada") emite e salva', () => {
     expect(travaDaFilial(livre, 'emitir')).toBe('');
     expect(travaDaFilial(livre, 'salvar')).toBe('');
-    expect(travaDaFilial(undefined, 'emitir')).toBe('');
+  });
+
+  it('falha fechada (perícia 27/09, achado 5): bloqueio desconhecido ou filial fora da lista não emite, mas salva', () => {
+    expect(travaDaFilial(semBloqueioLido, 'emitir')).toBe(EMITIR_SEM_CONFIRMACAO);
+    expect(travaDaFilial(undefined, 'emitir')).toBe(EMITIR_SEM_CONFIRMACAO);
+    expect(travaDaFilial(semBloqueioLido, 'salvar')).toBe('');
+    expect(travaDaFilial(undefined, 'salvar')).toBe('');
+    expect(EMITIR_SEM_CONFIRMACAO).toBe(
+      'Não deu para confirmar se esta filial pode receber compra nova: o cadastro dela não chegou inteiro. ' +
+        'Recarregue a página e tente de novo.',
+    );
   });
 
   it('as portas passam pela trava: Salvar, Emitir (Nova OC) e emitir pelo Histórico', () => {
     const nova = readFileSync('src/features/ordens-compra/NovaOcPage.tsx', 'utf-8');
-    const hist = readFileSync('src/features/ordens-compra/HistoricoPage.tsx', 'utf-8');
+    // A porta do Histórico mora em `mudarStatusDaOc` desde a D607; o teste de
+    // comportamento das duas portas está em tests/components/PortasDaEmissao.
+    const hist = readFileSync('src/features/ordens-compra/mudarStatusDaOc.ts', 'utf-8');
     const salvar = nova.slice(nova.indexOf('const handleSaveDraft'), nova.indexOf('const handleEmitir'));
     const emitir = nova.slice(nova.indexOf('const handleEmitir'));
     expect(salvar).toMatch(/travaDaFilial\([^;]*'salvar'\)/);
     expect(emitir.slice(0, emitir.indexOf('salvarOrdemCompra'))).toMatch(/travaDaFilial\([^;]*'emitir'\)/);
-    const status = hist.slice(hist.indexOf('async function handleStatusChange'));
+    const status = hist.slice(hist.indexOf('export async function mudarStatusDaOc'));
     expect(status.slice(0, status.indexOf('definirStatusOc'))).toMatch(/travaDaFilial\([^;]*'emitir'\)/);
   });
 });

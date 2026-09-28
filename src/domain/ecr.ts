@@ -16,6 +16,7 @@
 
 import type { Ecr, EcrItem, EcrRevisao, EcrSecao } from './types';
 import { formatDate } from './format';
+import { letrasQueOPdfNaoImprime } from './letrasDoPdf';
 
 /** Os cinco títulos, na ordem do documento. */
 export const TITULOS_DA_ECR = [
@@ -58,6 +59,17 @@ export const NENHUMA_REVISAO = 'Nenhuma revisão registrada.';
 
 /** O cabeçalho do PDF, como o do documento. */
 export const CABECALHO_DO_PDF = 'ECR – ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO';
+
+/** O título das páginas do fim do PDF, quando o histórico não cabe no rodapé (achado 7). */
+export const TITULO_DO_HISTORICO = 'HISTÓRICO DE REVISÕES';
+
+/** A linha do rodapé que diz onde estão as revisões que não couberam nele. */
+export function notaDoRodape(revisoes: readonly EcrRevisao[], escondidas: number): string {
+  const [primeira, ultima] = [revisoes[0]?.revisao ?? '', revisoes[escondidas - 1]?.revisao ?? ''];
+  return escondidas === 1
+    ? `A Rev. ${primeira} está no histórico completo, no fim deste documento.`
+    : `As revisões ${primeira} a ${ultima} estão no histórico completo, no fim deste documento.`;
+}
 
 /**
  * As seções como vieram do banco, ou `null` se não vieram (ECR ainda não
@@ -207,6 +219,14 @@ export interface ProblemaDaRevisao {
   frase: string;
 }
 
+/** "o caractere "☃"", "os caracteres "☃" e "✓"", "um caractere invisível". */
+export function nomeDasLetras(letras: readonly string[]): string {
+  const nomes = letras.map((c) => (/\p{C}/u.test(c) ? 'um caractere invisível' : `"${c}"`));
+  const unicos = [...new Set(nomes)];
+  if (unicos.length === 1) return unicos[0]!.startsWith('"') ? `o caractere ${unicos[0]}` : unicos[0]!;
+  return `os caracteres ${unicos.slice(0, -1).join(', ')} e ${unicos[unicos.length - 1]}`;
+}
+
 /** O que impede a revisão de ir ao banco. Lista vazia: pode ir. */
 export function problemasDaRevisao(
   vigente: readonly EcrSecao[],
@@ -231,6 +251,19 @@ export function problemasDaRevisao(
       }
       if (it.rotulo !== null && !LETRA.test(it.rotulo)) {
         problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual}: o rótulo precisa ter uma letra, ou ficar em branco.` });
+      }
+      // O que o PDF não desenharia não entra (perícia de 27/09, achado 3).
+      const junto = `${it.rotulo ?? ''} ${it.texto}`;
+      if (/[\r\n]/.test(junto)) {
+        problemas.push({
+          secao: i,
+          linha: j,
+          frase: `Seção ${n}, ${qual} tem uma quebra de linha: cada linha da ECR é uma linha só. Para outra, use "Pôr linha".`,
+        });
+      }
+      const fora = letrasQueOPdfNaoImprime(junto.replace(/[\r\n]/g, ''));
+      if (fora.length > 0) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual} tem ${nomeDasLetras(fora)}, que o PDF não imprime: troque ou apague.` });
       }
     });
   });
@@ -261,12 +294,41 @@ export function resumoDaRevisao(revisao: string | null, hojeIso: string): string
 }
 
 /** A frase para a pessoa quando o banco recusa a revisão, pelo código da recusa. */
+/**
+ * A descrição da revisão, a frase da coluna "Descrição" do histórico: no
+ * máximo 500 caracteres, contados sem os espaços das pontas (contrato do
+ * Banco da D607 §3; perícia de 27/09, achado 7 — sem limite, uma descrição
+ * enorme empurrava o rodapé do PDF para fora da folha).
+ */
+export const LIMITE_DA_DESCRICAO = 500;
+
+/** Uma linha só: quebra de linha e espaço repetido viram um espaço. */
+export function descricaoParaGravar(descricao: string): string {
+  return descricao.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * O rascunho que partiu de uma revisão que já não é a vigente (perícia de
+ * 27/09, achado 2): gravar desfaria, sem ninguém ver, o que a revisão nova
+ * mudou. A tela recusa antes, e o banco recusa de novo (40001).
+ */
+export const RASCUNHO_VELHO =
+  'Esta ECR foi revisada depois que você abriu o rascunho, e ele partiu de uma revisão que já não vale. ' +
+  'Gravar agora desfaria a revisão nova. Copie o que quiser guardar, clique em "Cancelar" e abra a ECR de novo.';
+
+/** A ECR vigente já não é a de onde o rascunho partiu. */
+export function rascunhoVelho(ecr: Pick<Ecr, 'revisao' | 'secoes'>, revisaoDeOrigem: string | null, vigente: readonly EcrSecao[]): boolean {
+  return (ecr.revisao ?? '') !== (revisaoDeOrigem ?? '') || !ecr.secoes || !mesmoTexto(ecr.secoes, vigente);
+}
+
 export function fraseDaRecusaDaRevisao(codigo: string | undefined, mensagem: string): string {
   switch (codigo) {
     case '42501':
       return 'Só o Pedro revisa uma ECR. A revisão não foi gravada.';
     case 'P0002':
       return 'Esta ECR não existe mais no banco. Recarregue a página. A revisão não foi gravada.';
+    case '40001':
+      return `${RASCUNHO_VELHO} A revisão não foi gravada.`;
     case '55000':
       return 'A revisão vigente desta ECR não tem o texto guardado no histórico, e revisar agora perderia esse texto. A revisão não foi gravada.';
     case '22023':

@@ -45,6 +45,7 @@ import { GlobalConfirmDialog } from '../../src/components/ConfirmDialog/GlobalCo
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import { useRevisaoEcrStore } from '../../src/stores/useRevisaoEcrStore';
+import { useAuthStore } from '../../src/stores/useAuthStore';
 import { secoesDoBanco } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
 import type { Data, Ecr, EcrSecao } from '../../src/domain/types';
@@ -96,6 +97,8 @@ beforeEach(() => {
   banco.chamadas = [];
   recarregar.mockClear();
   useRevisaoEcrStore.getState().fechar();
+  // A conta logada (falsa): o rascunho guarda de quem é.
+  useAuthStore.setState({ sessao: { user: { id: 'conta-que-revisa' } } as never });
   useUiStore.setState({ catalogoFilter: { search: '' }, toasts: [] });
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date('2026-09-27T15:00:00Z'));
@@ -123,6 +126,21 @@ describe('D589 §4.3 — só o Pedro vê "Editar"', () => {
     banco.podeRevisar = 'falha';
     await montar([ecr03()]);
     expect(screen.queryByRole('button', { name: /Editar/ })).toBeNull();
+  });
+
+  // Perícia 27/09, achado 4: o catálogo confere por conta própria, mesmo que um
+  // rascunho tenha ficado na loja (a saída o apaga; isto é a segunda trava).
+  it('o rascunho de outra conta, que ficou na loja, não abre o editor', async () => {
+    useRevisaoEcrStore.getState().abrir(ecr03(), 'outra-conta');
+    await montar([ecr03()]);
+    expect(document.querySelector('[data-editor]')).toBeNull();
+  });
+
+  it('o rascunho da própria conta, para quem não pode mais revisar, não abre o editor', async () => {
+    banco.podeRevisar = false;
+    useRevisaoEcrStore.getState().abrir(ecr03(), 'conta-que-revisa');
+    await montar([ecr03()]);
+    expect(document.querySelector('[data-editor]')).toBeNull();
   });
 });
 
@@ -245,8 +263,10 @@ describe('D589 §4.2 — salvar é aprovar: a confirmação e o que vai ao banco
 
     expect(banco.chamadas).toHaveLength(1);
     const args = banco.chamadas[0]!;
-    expect(Object.keys(args).sort()).toEqual(['p_descricao', 'p_ecr_id', 'p_secoes']);
+    // A assinatura nova (contrato do Banco da D607 §3): a revisão de onde o rascunho partiu vai junto.
+    expect(Object.keys(args).sort()).toEqual(['p_descricao', 'p_ecr_id', 'p_revisao_de', 'p_secoes']);
     expect(args['p_ecr_id']).toBe(3);
+    expect(args['p_revisao_de']).toBe('00');
     expect(args['p_descricao']).toBe('O nome da NBR 7212.');
     const secoes = args['p_secoes'] as EcrSecao[];
     expect(secoes.map((s) => s.titulo)).toEqual(ecr03().secoes!.map((s) => s.titulo));
@@ -295,6 +315,13 @@ describe('D596 §3 — a recusa do banco, com a frase que a tela mostra', () => 
       'A revisão vigente desta ECR não tem o texto guardado no histórico, e revisar agora perderia esse texto. A revisão não foi gravada.',
     ],
     ['22023', 'o texto novo e igual ao vigente', 'O banco recusou a revisão: o texto novo e igual ao vigente'],
+    [
+      '40001',
+      'a vigente e a 01, e o rascunho partiu da 00; recarregue',
+      'Esta ECR foi revisada depois que você abriu o rascunho, e ele partiu de uma revisão que já não vale. ' +
+        'Gravar agora desfaria a revisão nova. Copie o que quiser guardar, clique em "Cancelar" e abra a ECR de novo. ' +
+        'A revisão não foi gravada.',
+    ],
   ];
 
   it.each(casos)('%s: a frase aparece na confirmação, e o rascunho não se perde', async (code, message, frase) => {
@@ -354,5 +381,100 @@ describe('D589 §4.2 — sair sem salvar', () => {
     expect(sair()).toBe(true);
     act(() => useRevisaoEcrStore.getState().fechar());
     expect(sair()).toBe(false);
+  });
+});
+
+// Perícia do Codex, 27/09/2026, achado 2 — medida na D603, TRAVA desde a D607:
+// o rascunho guarda a revisão de onde partiu, e a tela recusa o rascunho velho.
+// O "como conferir" do perito: abre a Rev. 00 e muda a linha A; os dados
+// recarregam com uma Rev. 01 em que a linha B mudou (outra aba aprovou); salva
+// o rascunho aberto. O certo: a linha B vai com o texto da 01, ou a tela recusa
+// a base velha.
+describe('Perícia 27/09, achado 2 — o rascunho aberto sobre uma revisão que já mudou', () => {
+  function aRev01(): Ecr {
+    const rev01 = ecr03();
+    rev01.revisao = '01';
+    rev01.secoes = rev01.secoes!.map((s, i) =>
+      i === 0 ? { ...s, itens: s.itens.map((it, j) => (j === 1 ? { ...it, texto: 'Texto da linha B na Rev. 01.' } : it)) } : s,
+    );
+    return rev01;
+  }
+
+  it('a mudança da Rev. 01 na linha B não é desfeita pelo rascunho aberto na 00', async () => {
+    await montar([ecr03()]);
+    await editar('ECR 03');
+    fireEvent.change(texto('01', 1), { target: { value: 'NBR 7212 - Concreto dosado em central;' } });
+
+    // Outra aba aprovou a Rev. 01, com a linha B (seção 01, linha 2) mudada; a tela recarrega.
+    act(() => useDataStore.setState({ data: { ecrs: [aRev01()] } as unknown as Data }));
+
+    clicar('Salvar revisão');
+    if (dialogo()) {
+      fireEvent.change(screen.getByLabelText(/O que mudou/), { target: { value: 'A linha A.' } });
+      await act(async () => clicar('Gravar revisão'));
+    }
+
+    const recusou = banco.chamadas.length === 0;
+    const linhaB = recusou ? null : (banco.chamadas[0]!['p_secoes'] as EcrSecao[])[0]!.itens[1]!.texto;
+    const confirmacao = dialogo()?.textContent ?? null;
+    expect(recusou || linhaB === 'Texto da linha B na Rev. 01.', JSON.stringify({ recusou, linhaB, confirmacao })).toBe(true);
+    // O jeito: a tela recusa, avisa na hora e diz o que fazer; o rascunho fica.
+    expect(recusou).toBe(true);
+    expect(dialogo()).toBeNull();
+    expect(document.querySelector('[data-rascunho-velho]')!.textContent).toContain('clique em "Cancelar" e abra a ECR de novo');
+    expect(texto('01', 1).value).toBe('NBR 7212 - Concreto dosado em central;');
+  });
+
+  it('a ECR muda com a confirmação aberta: "Gravar" confere de novo e não manda', async () => {
+    await montar([ecr03()]);
+    await editar('ECR 03');
+    fireEvent.change(texto('01', 1), { target: { value: 'NBR 7212 - Concreto dosado em central;' } });
+    clicar('Salvar revisão');
+    fireEvent.change(screen.getByLabelText(/O que mudou/), { target: { value: 'A linha A.' } });
+    act(() => useDataStore.setState({ data: { ecrs: [aRev01()] } as unknown as Data }));
+    await act(async () => clicar('Gravar revisão'));
+    expect(banco.chamadas).toHaveLength(0);
+    expect(within(dialogo()!).getByRole('alert').textContent).toContain('partiu de uma revisão que já não vale');
+  });
+
+  it('o rascunho guarda a revisão de onde partiu, e é ela que vai ao banco', async () => {
+    const rev01 = aRev01();
+    await montar([rev01]);
+    await editar('ECR 03');
+    expect(useRevisaoEcrStore.getState().revisaoDeOrigem).toBe('01');
+    expect(document.querySelector('[data-rascunho-velho]')).toBeNull();
+  });
+});
+
+describe('Perícia 27/09, achado 7 — a descrição da revisão tem limite (500, contrato do Banco da D607 §3)', () => {
+  async function comDescricao(d: string) {
+    await montar([ecr03()]);
+    await editar('ECR 03');
+    fireEvent.change(texto('01', 1), { target: { value: 'NBR 7212 - Concreto dosado em central;' } });
+    clicar('Salvar revisão');
+    fireEvent.change(screen.getByLabelText(/O que mudou/), { target: { value: d } });
+    await act(async () => clicar('Gravar revisão'));
+  }
+
+  it('o campo não aceita mais de 500', async () => {
+    await montar([ecr03()]);
+    await editar('ECR 03');
+    fireEvent.change(texto('01', 1), { target: { value: 'NBR 7212 - Concreto dosado em central;' } });
+    clicar('Salvar revisão');
+    expect((screen.getByLabelText(/O que mudou/) as HTMLTextAreaElement).maxLength).toBe(500);
+  });
+
+  it('501 (colado, por exemplo): a tela recusa e diz o tamanho; nada vai ao banco', async () => {
+    await comDescricao('a'.repeat(501));
+    expect(banco.chamadas).toHaveLength(0);
+    expect(within(dialogo()!).getByRole('alert').textContent).toBe(
+      'A descrição tem 501 caracteres; o limite é 500. Resuma o que mudou.',
+    );
+  });
+
+  it('500 passa; a quebra de linha e o espaço repetido viram um espaço, e as pontas saem', async () => {
+    await comDescricao(`  ${'a'.repeat(498)}\n\n  b  `);
+    expect(banco.chamadas).toHaveLength(1);
+    expect(banco.chamadas[0]!['p_descricao']).toBe(`${'a'.repeat(498)} b`);
   });
 });

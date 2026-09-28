@@ -21,10 +21,16 @@ import {
   numeroNaFrase,
   poeLinha,
   problemasDaRevisao,
+  RASCUNHO_VELHO,
+  rascunhoVelho,
+  descricaoParaGravar,
+  LIMITE_DA_DESCRICAO,
+  nomeDasLetras,
   resumoDaRevisao,
   tiraLinha,
 } from '../../domain/ecr';
 import { formatDate } from '../../domain/format';
+import { letrasQueOPdfNaoImprime } from '../../domain/letrasDoPdf';
 import { temMudancaNaRevisao, useRevisaoEcrStore } from '../../stores/useRevisaoEcrStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
@@ -45,6 +51,7 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
   const rascunho = useRevisaoEcrStore((s) => s.rascunho);
   const mudar = useRevisaoEcrStore((s) => s.mudar);
   const fechar = useRevisaoEcrStore((s) => s.fechar);
+  const revisaoDeOrigem = useRevisaoEcrStore((s) => s.revisaoDeOrigem);
   // Os problemas só aparecem depois do primeiro "Salvar": antes disso, a
   // pessoa ainda está escrevendo. Depois, somem assim que ela conserta.
   const [tentou, setTentou] = useState(false);
@@ -52,6 +59,9 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
 
   if (!vigente || !rascunho) return null;
 
+  // A ECR foi revisada (em outra aba, por exemplo) depois que o rascunho abriu:
+  // o aviso aparece na hora, e Salvar não vai (perícia de 27/09, achado 2).
+  const velho = rascunhoVelho(ecr, revisaoDeOrigem, vigente);
   const problemas = tentou ? problemasDaRevisao(vigente, rascunho, ecr.revisao) : [];
   const daLinha = (s: number, l: number) => problemas.filter((p) => p.secao === s && p.linha === l);
 
@@ -70,6 +80,7 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
   }
 
   function salvar() {
+    if (velho) return;
     setTentou(true);
     const achados = problemasDaRevisao(vigente!, rascunho!, ecr.revisao);
     if (achados.length === 0) {
@@ -86,6 +97,12 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
         Você está revisando a {ecr.codigo}, hoje na Rev. {ecr.revisao ?? '—'}. Salvar é aprovar: a revisão nova passa a
         valer, e a de agora fica no histórico.
       </p>
+
+      {velho && (
+        <p className={styles.problemas} role="alert" data-rascunho-velho="">
+          <Icon name="alerta" size={14} /> {RASCUNHO_VELHO}
+        </p>
+      )}
 
       {rascunho.map((secao, s) => (
         <fieldset key={s} className={styles.secao}>
@@ -208,6 +225,8 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
 /** A confirmação: o que a revisão vai ser, e o que mudou (vai para o histórico). */
 function DialogoDaRevisao({ ecr, aoVoltar }: { ecr: Ecr; aoVoltar: () => void }) {
   const rascunho = useRevisaoEcrStore((s) => s.rascunho);
+  const vigente = useRevisaoEcrStore((s) => s.vigente);
+  const revisaoDeOrigem = useRevisaoEcrStore((s) => s.revisaoDeOrigem);
   const fechar = useRevisaoEcrStore((s) => s.fechar);
   const showToast = useUiStore((s) => s.showToast);
   const [descricao, setDescricao] = useState('');
@@ -215,15 +234,31 @@ function DialogoDaRevisao({ ecr, aoVoltar }: { ecr: Ecr; aoVoltar: () => void })
   const [gravando, setGravando] = useState(false);
 
   async function gravar() {
-    if (!rascunho) return;
-    if (!descricao.trim()) {
+    if (!rascunho || !vigente || revisaoDeOrigem === null) return;
+    // A ECR pode ter mudado com o diálogo aberto: confere de novo antes de mandar.
+    if (rascunhoVelho(ecr, revisaoDeOrigem, vigente)) {
+      setErro(RASCUNHO_VELHO);
+      return;
+    }
+    const oQue = descricaoParaGravar(descricao);
+    if (!oQue) {
       setErro('Escreva o que mudou: é a descrição desta revisão no histórico.');
+      return;
+    }
+    if (oQue.length > LIMITE_DA_DESCRICAO) {
+      setErro(`A descrição tem ${oQue.length} caracteres; o limite é ${LIMITE_DA_DESCRICAO}. Resuma o que mudou.`);
+      return;
+    }
+    // A descrição vai para o histórico do PDF: o que ele não desenha não entra (achado 3).
+    const fora = letrasQueOPdfNaoImprime(oQue);
+    if (fora.length > 0) {
+      setErro(`A descrição tem ${nomeDasLetras(fora)}, que o PDF não imprime: troque ou apague.`);
       return;
     }
     setErro(null);
     setGravando(true);
     try {
-      const r = await revisarEcr(ecr.id, limparParaGravar(rascunho), descricao.trim());
+      const r = await revisarEcr(ecr.id, revisaoDeOrigem, limparParaGravar(rascunho), oQue);
       try {
         await recarregarDados();
       } catch {
@@ -257,9 +292,13 @@ function DialogoDaRevisao({ ecr, aoVoltar }: { ecr: Ecr; aoVoltar: () => void })
           value={descricao}
           aria-invalid={erro && !descricao.trim() ? true : undefined}
           placeholder="Ex.: a tolerância da dimensão passou a ±3 mm."
+          maxLength={LIMITE_DA_DESCRICAO}
           onChange={(e) => setDescricao(e.target.value)}
         />
-        <span className={styles.dica}>Vai para a coluna "Descrição" do histórico de revisões.</span>
+        <span className={styles.dica}>
+          Vai para a coluna "Descrição" do histórico de revisões. Até {LIMITE_DA_DESCRICAO} caracteres (
+          {descricaoParaGravar(descricao).length} agora).
+        </span>
         {erro && (
           <p className={styles.erro} role="alert">
             {erro}

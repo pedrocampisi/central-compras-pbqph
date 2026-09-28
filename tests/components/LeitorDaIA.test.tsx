@@ -457,3 +457,81 @@ describe('D567 — a trava: a leitura do rápido nunca aparece como se fosse do 
     expect(descricoes()).toEqual(['Cimento CP-II 50kg', 'Areia média']);
   });
 });
+
+// Perícia do Codex, 27/09/2026, achado 1 — medida na D603, TRAVA desde a D607:
+// a resposta se compara com o que saiu, e a tela pergunta se mudou na espera.
+// O "como conferir" do perito: a releitura pelo certeiro começa com os itens
+// intactos; DURANTE a espera a pessoa corrige a quantidade; só então a IA
+// responde. O certo é a correção ficar, ou a tela perguntar antes de trocar.
+describe('Perícia 27/09, achado 1 — a correção feita durante a espera da releitura', () => {
+  beforeEach(() => {
+    lerPedido.mockReset();
+    lerLista.mockReset();
+    useOcEditingStore.getState().stopEditing();
+    useDataStore.setState({ data: DADOS });
+    useAuthStore.setState({ perfil: { papel: 'admin' } as never });
+    useConfirmStore.setState({ open: false, resolve: null });
+  });
+
+  async function corrigirNaEspera() {
+    lerPedido.mockResolvedValueOnce(leituraDoRapido());
+    await abrir();
+    colar(document.body, [png()]);
+    await screen.findByDisplayValue('Areia média');
+    let responder!: (r: Leitura) => void;
+    lerPedido.mockReturnValueOnce(new Promise((r) => { responder = r; }));
+    await userEvent.click(screen.getByRole('button', { name: /Ler de novo com o certeiro/ }));
+    fireEvent.change(screen.getByDisplayValue('10'), { target: { value: '12' } });
+    await act(async () => responder(leituraDoCerteiro()));
+    await waitFor(() => expect(useConfirmStore.getState().open).toBe(true));
+  }
+  const cimento = () => useOcEditingStore.getState().ocEditing!.itens.find((i: Item) => i.descricao.startsWith('Cimento'))!;
+
+  it('a quantidade corrigida de 10 para 12 durante a espera não volta a 10 calada', async () => {
+    lerPedido.mockResolvedValueOnce(leituraDoRapido());
+    await abrir();
+    colar(document.body, [png()]);
+    await screen.findByDisplayValue('Areia média');
+
+    let responder!: (r: Leitura) => void;
+    lerPedido.mockReturnValueOnce(new Promise((r) => { responder = r; }));
+    await userEvent.click(screen.getByRole('button', { name: /Ler de novo com o certeiro/ }));
+    // Os itens estavam intactos: a releitura começou sem perguntar.
+    expect(useConfirmStore.getState().open).toBe(false);
+
+    // Durante a espera, a pessoa corrige a quantidade do cimento.
+    fireEvent.change(screen.getByDisplayValue('10'), { target: { value: '12' } });
+    const cimento = () => useOcEditingStore.getState().ocEditing!.itens.find((i: Item) => i.descricao.startsWith('Cimento'))!;
+    expect(cimento().quantidade).toBe(12);
+
+    // A IA responde com a quantidade de antes.
+    await act(async () => responder(leituraDoCerteiro()));
+
+    const perguntou = useConfirmStore.getState().open;
+    const ficou = cimento().quantidade === 12;
+    expect(perguntou || ficou, JSON.stringify({ perguntou, quantidade: cimento().quantidade })).toBe(true);
+    // O jeito: pergunta, e diz que foi NA ESPERA.
+    expect(perguntou).toBe(true);
+    expect(useConfirmStore.getState().options.message).toContain('Enquanto o certeiro lia, você mexeu em 1 item desta leitura.');
+    // Até a resposta, nada foi trocado.
+    expect(cimento().quantidade).toBe(12);
+  });
+
+  it('"Manter os meus": a correção fica, e a leitura do certeiro não entra', async () => {
+    await corrigirNaEspera();
+    await act(async () => useConfirmStore.getState().settle(false));
+    expect(cimento().quantidade).toBe(12);
+    expect(descricoes()).toEqual(['Cimento CP-II 50kg', 'Areia média']);
+    expect(useUiStore.getState().toasts.map((t) => t.message)).toContain(
+      'Os seus itens ficaram como estão. A leitura do certeiro não entrou.',
+    );
+  });
+
+  it('"Trocar pelos do certeiro": troca, como a pessoa escolheu', async () => {
+    await corrigirNaEspera();
+    await act(async () => useConfirmStore.getState().settle(true));
+    await screen.findByDisplayValue('Brita 1');
+    expect(descricoes()).toEqual(['Cimento CP-II 50kg', 'Areia média', 'Brita 1']);
+    expect(cimento().quantidade).toBe(10);
+  });
+});

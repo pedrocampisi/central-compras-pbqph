@@ -26,6 +26,7 @@ import {
 import { baixarPdfDaEcr } from '../../services/pdf/generateEcrPdf';
 import { podeRevisarEcr } from '../../services/supabase/ecrs';
 import { useRevisaoEcrStore } from '../../stores/useRevisaoEcrStore';
+import { useAuthStore } from '../../stores/useAuthStore';
 import { EditorDaEcr } from './EditorDaEcr';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
@@ -84,10 +85,13 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
   const [gerando, setGerando] = useState(false);
   const showToast = useUiStore((s) => s.showToast);
   const emEdicao = useRevisaoEcrStore((s) => s.ecrId);
+  const dono = useRevisaoEcrStore((s) => s.dono);
   const abrirRevisao = useRevisaoEcrStore((s) => s.abrir);
+  const meuId = useAuthStore((s) => s.sessao?.user.id ?? '');
   const revisao = revisaoDaEcr(ecr);
-  // A ECR em edição fica aberta: o rascunho não se esconde.
-  const editando = emEdicao === ecr.id;
+  // A ECR em edição fica aberta: o rascunho não se esconde. Mas só para quem
+  // revisa E abriu o rascunho: outra conta não o enxerga (perícia 27/09, achado 4).
+  const editando = podeRevisar && emEdicao === ecr.id && !!meuId && dono === meuId;
   const aberta = open || editando;
 
   async function pdf() {
@@ -121,7 +125,7 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
             size="sm"
             className={styles.pdf}
             onClick={() => {
-              abrirRevisao(ecr);
+              abrirRevisao(ecr, meuId);
               setOpen(true);
             }}
             aria-label={`Editar a ${ecr.codigo}`}
@@ -204,17 +208,20 @@ export function CatalogoPage() {
   const search = useUiStore((s) => s.catalogoFilter.search);
   const setCatalogoFilter = useUiStore((s) => s.setCatalogoFilter);
   // Só o Pedro revisa (D589 §4.3). O banco responde; na dúvida, o botão não aparece.
-  const [podeRevisar, setPodeRevisar] = useState(false);
+  // A resposta vale só para a conta que perguntou: trocou a conta, pergunta de novo.
+  const meuId = useAuthStore((s) => s.sessao?.user.id ?? '');
+  const [resposta, setResposta] = useState<{ conta: string; pode: boolean } | null>(null);
+  const podeRevisar = !!resposta && resposta.conta === meuId && resposta.pode;
   useEffect(() => {
     let vivo = true;
     podeRevisarEcr().then(
-      (ok) => vivo && setPodeRevisar(ok),
-      () => vivo && setPodeRevisar(false),
+      (ok) => vivo && setResposta({ conta: meuId, pode: ok }),
+      () => vivo && setResposta({ conta: meuId, pode: false }),
     );
     return () => {
       vivo = false;
     };
-  }, []);
+  }, [meuId]);
 
   if (!data) return null;
 

@@ -27,15 +27,31 @@ const banco = vi.hoisted(() => {
   function consulta(tabela: string) {
     const reg = { tabela, filtros: [] as [string, string][] };
     estado.registro.push(reg);
+    // Como a API: conta quando pedem ({ count: 'exact' }) e devolve a página (range).
+    let contar = false;
+    let pagina: [number, number] | null = null;
     const q: Record<string, unknown> = {
-      select: () => q,
+      select: (_colunas: string, opcoes?: { count?: string }) => {
+        contar = opcoes?.count === 'exact';
+        return q;
+      },
       order: () => q,
+      range: (de: number, ate: number) => {
+        pagina = [de, ate];
+        return q;
+      },
       eq: (coluna: string, valor: string) => {
         reg.filtros.push([coluna, valor]);
         return q;
       },
-      then: (ok: (r: unknown) => void) =>
-        ok({ data: (TABELAS[tabela] ?? []).filter((l) => reg.filtros.every(([c, v]) => l[c] === v)), error: null }),
+      then: (ok: (r: unknown) => void) => {
+        const linhas = (TABELAS[tabela] ?? []).filter((l) => reg.filtros.every(([c, v]) => l[c] === v));
+        return ok({
+          data: pagina ? linhas.slice(pagina[0], pagina[1] + 1) : linhas,
+          error: null,
+          ...(contar ? { count: linhas.length } : {}),
+        });
+      },
     };
     return q;
   }
