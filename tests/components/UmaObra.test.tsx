@@ -456,6 +456,23 @@ describe('Perícia 28/09 (fe119e6), achado 2 — a virada da janela pelo relógi
     await act(async () => vi.advanceTimersByTime(15_000));
     expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
   });
+
+  it.fails('no término: dois segundos depois de 00:00 de 18/11, a máscara já está desligada', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-18T02:59:59Z');
+    await abrir();
+    expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
+    await act(async () => vi.advanceTimersByTime(2_000));
+    expect(useUmaObraStore.getState().obraAtiva).toBeNull();
+  });
+
+  it('o controle do término: até 15 segundos depois ela desliga sozinha', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-18T02:59:59Z');
+    await abrir();
+    await act(async () => vi.advanceTimersByTime(15_000));
+    expect(useUmaObraStore.getState().obraAtiva).toBeNull();
+  });
 });
 
 describe('Perícia 28/09 (fe119e6), achado 4 — um campo da janela apagado, e o Armar', () => {
