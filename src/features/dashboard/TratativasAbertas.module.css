@@ -1,0 +1,64 @@
+/* As tratativas abertas no Painel (CTO-D613 §3). A barra de aviso chama o olho; sem animação. */
+
+.bloco {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--aviso);
+  border-radius: var(--raio);
+  background: var(--fundo);
+}
+.bloco h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.vazio { margin: 0; font-size: 13px; color: var(--texto-suave); }
+
+.lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  font-size: 13px;
+  color: var(--texto);
+}
+.cabeca { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.cabeca strong { overflow-wrap: anywhere; }
+.meta { font-size: 11px; color: var(--text-muted); }
+.nc { margin: 0; font-weight: 600; color: var(--aviso); }
+.texto { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.texto span { font-weight: 600; }
+
+.ciencia { display: flex; flex-direction: column; gap: 6px; }
+.ciencia textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+  field-sizing: content;
+  min-height: 38px;
+}
+.ciencia textarea:focus-visible { outline: 2px solid var(--marca); outline-offset: 0; border-color: var(--marca); }
+.erro {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+.acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

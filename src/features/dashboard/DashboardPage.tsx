@@ -2,6 +2,7 @@
  * Aba Dashboard — resumo de OCs recentes e indicadores.
  * Cards: total de OCs, emitidas, rascunhos, volume, fornecedores ativos, obras ativas.
  * Listas: últimas 8 OCs, top 5 fornecedores por valor e OCs por obra.
+ * No topo, para quem revisa ECR, as tratativas abertas (CTO-D613 §3).
  *
  * Volume total e rankings EXCLUEM OCs canceladas — cancelada não é compra.
  */
@@ -15,6 +16,7 @@ import { formatBrl, formatDate } from '../../domain/format';
 import { Pill } from '../../components/Pill/Pill';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Button } from '../../components/Button/Button';
+import { TratativasAbertas } from './TratativasAbertas';
 
 interface RankEntry {
   nome: string;
@@ -84,6 +86,9 @@ export function DashboardPage() {
 
   return (
     <div>
+      {/* O que espera ação vem primeiro: só para quem revisa ECR (CTO-D613 §3). */}
+      <TratativasAbertas />
+
       {/* Summary strip */}
       <div className={styles.strip}>
         <div className={styles.tile}>
