@@ -2330,3 +2330,34 @@ que decide se o editor precisa de perícia antes da produção. Não enxuguei pa
 
 **AS FOTOS:** `docs/Capturas/2026-09-28_D607/` — o PDF antes e depois (a ECR 03 igual; os sinais; 50 revisões de 30 páginas
 para 3).
+
+## Decisão 60 — as telas da qualificação e da entrega prontas no ramo · 28/09/2026
+
+**POR QUÊ (CTO-D604, D605, D606 e D613):** a auditoria do PBQP-H de 16/11 pede a qualificação dos fornecedores (FO
+8.4.1.1) e a avaliação de cada entrega (PS.02, 8.4.1.2) dentro do sistema, e a planilha se aposenta. O Banco já pôs as
+tabelas, as funções e a carga na produção, com as duas travas desligadas até a tela publicar (D609).
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `928320a`, na cópia `OC_fornecedores`, que cresce em `fe119e6`; NÃO
+publicado):**
+- **A ficha da empresa:** abre da gaveta de qualquer filial e traz as cinco categorias, o histórico e o Qualificar /
+  Requalificar. Ao requalificar, mostra o desempenho de 12 meses. O selo aparece na lista (a categoria certa para quem só
+  presta serviço) e na Nova OC.
+- **A trava (D605):** roda nas duas portas de emissão. Na Nova OC, a recusa abre o "Qualificar agora". Abaixo do mínimo
+  não emite, e a OC não é gravada. A 23514 do banco com dica vira aviso.
+- **A entrega:** o "Entregue" do Histórico abre a avaliação e grava numa escrita só, pela `registrar_entrega`. Com duas
+  "Não Conforme", a tratativa é obrigatória.
+- **As tratativas:** num bloco do Painel, só para quem revisa ECR, com o "Dar ciência".
+- **As folhas do auditor:** o PDF dos qualificados no desenho da FO 8.4.1.1, e o PDF das avaliações (só as da obra, com a
+  máscara).
+
+**AS TRAVAS:** 540 testes (98 novos); 39 sabotagens, 38 vermelhas e uma verde sem efeito (a regra está guardada duas
+vezes; dito na carta). CI verde no ramo.
+
+**O PORTÃO:** 4.258 linhas novas fora de `docs\` contra `fe119e6` (2.458 em `src`). A perícia vai de `fe119e6` a
+`928320a` (D613 §1); o CTO leva ao Pedro.
+
+**AS FOTOS:** `docs/Capturas/2026-09-28_D604/`, no ramo: 9 estados em 4 larguras, medidas sem defeito. A foto 01 achou
+um (o laboratório sem selo), consertado antes da carta.
+
+**O QUE FALTA:** a prova do Banco no ensaio com as travas ligadas; a perícia; a publicação, depois do editor, dos
+consertos e da máscara (D611). As travas ligam na produção no dia em que a D604 publicar, logo depois.

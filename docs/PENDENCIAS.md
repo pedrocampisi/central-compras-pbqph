@@ -234,7 +234,7 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **em construção na cópia `OC_fornecedores`, ramo `d604-fornecedores`, que cresce em `fe119e6` (D613)**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **telas prontas no ramo `d604-fornecedores` (`928320a`); esperando a prova do Banco no ensaio e a perícia**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -245,6 +245,14 @@ editor e da perícia da máscara, numa cópia nova. **O Banco pediu aviso** quan
 ramo já estava empurrado); a qualificação na ficha da empresa, com as cinco categorias e o selo na lista; as tratativas num
 bloco do Painel, só para quem revisa ECR; a locação sem OC fica para depois. A perícia deste ramo vai de `fe119e6` à ponta.
 A prova no ensaio é primeiro pelo lado do Banco. Já no ramo: as regras puras (`0318d8b`, 18 testes).
+*Em 28/09, 14h3x (decisão 60):* as telas prontas no ramo, `928320a`, CI verde, NÃO publicadas: a ficha da empresa,
+o selo, a trava com o "Qualificar agora", a avaliação na entrega, as tratativas no Painel e os dois PDFs do auditor. Tem
+540 testes e 39 sabotagens; as fotos estão em `docs/Capturas/2026-09-28_D604/`, no ramo. A carta ao CTO e ao Banco está na
+`Enviados/`. **Falta:**
+- a prova do Banco no ensaio, com as travas ligadas;
+- a perícia `fe119e6..928320a` (4.258 linhas);
+- a publicação, depois do editor, dos consertos e da máscara;
+- as travas ligadas na produção, logo depois de publicar.
 
 ---
 
