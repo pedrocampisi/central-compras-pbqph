@@ -3,7 +3,7 @@
  * Portado de renderHistorico (CentralCompras-PBQPH.html).
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -25,6 +25,7 @@ import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
 import { marcarPdfGerado } from '../../services/supabase/dados';
 import { mudarStatusDaOc } from './mudarStatusDaOc';
+import { RegistrarEntregaDialogo } from './RegistrarEntregaDialogo';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
@@ -48,6 +49,8 @@ export function HistoricoPage() {
   const setHistFilter = useUiStore((s) => s.setHistFilter);
   const setTab = useUiStore((s) => s.setActiveTab);
   const showToast = useUiStore((s) => s.showToast);
+  /** A OC cuja entrega está sendo registrada (PS.02, CTO-D604 §3.2). */
+  const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
 
   // ── Lookups e filtros (memoizados — busca deixa de ser O(n×m) por tecla) ──
   const fornecedorNome = useMemo(
@@ -313,9 +316,12 @@ export function HistoricoPage() {
               {o.status !== 'rascunho' && (
                 <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
               )}
-              {o.status === 'emitida' && gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'entregue')}>
-                  ✓ Entregue
+              {/* A entrega se registra com a avaliação do recebimento: a OC
+                  não vai a entregue sem ela (CTO-D604 §3.2). A já entregue
+                  aceita outra entrega — a parcial. */}
+              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => setEntregando(o)}>
+                  {o.status === 'emitida' ? 'Entregue' : 'Outra entrega'}
                 </Button>
               )}
               {o.status !== 'cancelada' && gravaOk && (
@@ -325,6 +331,15 @@ export function HistoricoPage() {
               )}
             </div>
           )}
+        />
+      )}
+
+      {entregando && (
+        <RegistrarEntregaDialogo
+          oc={entregando}
+          fornecedor={fornecedorNome.get(entregando.fornecedor_id) ?? ''}
+          obra={obraNome.get(entregando.obra_id) ?? ''}
+          aoFechar={() => setEntregando(null)}
         />
       )}
     </div>

@@ -1,0 +1,100 @@
+/* A avaliação no recebimento (PS.02). O fundo escuro é o do ConfirmDialog; sem animação. */
+
+.caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-elevada);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.quem {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.linhaDeCampos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 13px; font-weight: 600; color: var(--texto); }
+.campo input,
+.campo textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+.campo textarea { resize: vertical; field-sizing: content; min-height: 38px; }
+.campo input:focus-visible,
+.campo textarea:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 0;
+  border-color: var(--marca);
+}
+.obrigatorio { margin-left: 2px; color: var(--erro); }
+
+.pergunta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0;
+  padding: 8px 10px;
+  min-width: 0;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+  font-size: 13px;
+  color: var(--texto);
+}
+.pergunta legend { padding: 0 4px; font-weight: 700; }
+.pergunta label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+.aviso {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--aviso);
+  border-radius: var(--raio-pequeno);
+  background: var(--aviso-bg);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto);
+}
+.erro {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .caixa { padding: 16px; }
+  .linhaDeCampos { grid-template-columns: 1fr; }
+  .acoes > * { flex: 1 1 auto; }
+}
