@@ -176,6 +176,30 @@ describe('D604 §3.4 — o selo', () => {
   });
 });
 
+describe('D614 §2.1 — a gaveta mostra as ECRs da qualificação, só para ler', () => {
+  function abrirGaveta(nome = 'Filial A (teste)') {
+    render(<FornecedoresPage />);
+    fireEvent.click(within(screen.getByText(nome).closest('tr')!).getByRole('button', { name: 'Editar' }));
+  }
+
+  it('a linha diz as ECRs da qualificação que vale e onde muda; não há caixa de ECR para marcar', () => {
+    abrirGaveta();
+    expect(caixa('[data-ecrs-da-qualificacao]')!.textContent).toBe(
+      'ECR 12, pela qualificação de material. Muda na ficha da empresa.',
+    );
+    expect(screen.queryByText('ECRs que Atende')).toBeNull();
+    expect(screen.queryByRole('checkbox', { name: /Cimento \(teste\)/ })).toBeNull();
+    expect(screen.queryByRole('checkbox', { name: /Aço \(teste\)/ })).toBeNull();
+  });
+
+  it('sem qualificação de material, a linha diz isso', () => {
+    abrirGaveta('Prestador B (teste)');
+    expect(caixa('[data-ecrs-da-qualificacao]')!.textContent).toBe(
+      'Sem qualificação de material: nenhuma ECR. Muda na ficha da empresa.',
+    );
+  });
+});
+
 describe('D613 §2 — a ficha da empresa, aberta da gaveta da filial', () => {
   it('as cinco categorias, cada uma com o selo; o botão diz Requalificar onde há histórico', () => {
     const ficha = abrirFicha();

@@ -204,9 +204,39 @@ export function nomeDasEcrs(ecrs: readonly number[]): string {
   return `ECRs ${n.slice(0, -1).join(', ')} e ${n[n.length - 1]}`;
 }
 
+/**
+ * A linha da gaveta da filial (CTO-D614 §2.1): que ECRs a empresa atende é a
+ * qualificação de material que vale, a mesma que a trava lê. Só leitura; muda
+ * na ficha da empresa. Listar ECR ao lado de "Desqualificada" enganaria.
+ */
+export function ecrsDaGaveta(selo: Selo | null): string {
+  const onde = 'Muda na ficha da empresa.';
+  if (!selo) return 'As ECRs vêm da qualificação de material, que não carregou.';
+  if (selo.situacao === 'sem_qualificacao') return `Sem qualificação de material: nenhuma ECR. ${onde}`;
+  if (selo.situacao === 'desqualificada') return `Desqualificada para material: nenhuma ECR vale. ${onde}`;
+  if (selo.ecrs.length === 0) return `Nenhuma ECR na qualificação de material. ${onde}`;
+  if (selo.situacao === 'vencida') {
+    return `${nomeDasEcrs(selo.ecrs)}, pela qualificação de material, que venceu: requalifique na ficha da empresa.`;
+  }
+  return `${nomeDasEcrs(selo.ecrs)}, pela qualificação de material. ${onde}`;
+}
+
 export const QUALIFICACAO_SEM_CONFIRMACAO =
   'Não deu para confirmar a qualificação desta empresa: as qualificações não chegaram do banco. ' +
   'Recarregue a página e tente de novo.';
+
+/**
+ * Onde a pessoa resolve, que é o fim da frase da trava (CTO-D614 §2.4):
+ * dentro do "Qualificar agora", qualifica ali mesmo; fora dele (o Histórico,
+ * ou a Nova OC quando o diálogo não abre), na ficha da empresa. Mandar usar o
+ * "Qualificar agora" a quem já está nele, ou a quem está numa tela sem ele,
+ * é mandar procurar um botão que não está na frente.
+ */
+export type OndeQualifica = 'aqui' | 'na_ficha';
+const COMO_RESOLVER: Record<OndeQualifica, string> = {
+  aqui: 'Qualifique aqui para emitir, ou volte e salve como rascunho.',
+  na_ficha: 'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
+};
 
 /**
  * A recusa da emissão por qualificação, ou '' quando pode emitir. OC sem item
@@ -214,24 +244,28 @@ export const QUALIFICACAO_SEM_CONFIRMACAO =
  * só com a empresa qualificada (ou vencendo em 30 dias) E com todas as ECRs
  * da OC cobertas pela qualificação vigente (D606 1).
  */
-export function travaDaQualificacao(selo: Selo | null, ecrs: readonly number[]): string {
+export function travaDaQualificacao(
+  selo: Selo | null,
+  ecrs: readonly number[],
+  onde: OndeQualifica = 'na_ficha',
+): string {
   if (ecrs.length === 0) return '';
   // Sem as qualificações carregadas, não se sabe: a trava falha fechada, como a da filial (perícia de 27/09, achado 5).
   if (!selo) return QUALIFICACAO_SEM_CONFIRMACAO;
   if (!EMITE_COM.includes(selo.situacao)) {
     const porque =
       selo.situacao === 'vencida'
-        ? `a qualificação dela venceu em ${dataBr(selo.venceEm)}`
+        ? `a qualificação de material da empresa venceu em ${dataBr(selo.venceEm)}`
         : selo.situacao === 'desqualificada'
-          ? 'ela está desqualificada para material controlado'
-          : 'ela não tem qualificação de material';
-    return `Esta OC tem material controlado (${nomeDasEcrs(ecrs)}), e ${porque}. Use "Qualificar agora" para emitir.`;
+          ? 'a empresa está desqualificada para material controlado'
+          : 'a empresa não tem qualificação de material';
+    return `Esta OC tem material controlado (${nomeDasEcrs(ecrs)}), e ${porque}. ${COMO_RESOLVER[onde]}`;
   }
   const faltando = ecrs.filter((e) => !selo.ecrs.includes(e));
   if (faltando.length > 0) {
     return (
       `A empresa está qualificada, mas não para ${faltando.length === 1 ? 'a' : 'as'} ${nomeDasEcrs(faltando)} desta OC. ` +
-      'Use "Qualificar agora" para incluir.'
+      COMO_RESOLVER[onde]
     );
   }
   return '';

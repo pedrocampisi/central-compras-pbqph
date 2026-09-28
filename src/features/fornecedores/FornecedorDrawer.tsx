@@ -9,7 +9,6 @@ import { Field } from '../../components/Field/Field';
 import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { EnderecoFields } from '../../components/EnderecoFields/EnderecoFields';
 import { Button } from '../../components/Button/Button';
-import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { salvarFornecedor } from '../../services/supabase/dados';
@@ -18,7 +17,7 @@ import { podeEditar } from '../../services/supabase/auth';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
-import { seloDaFilial } from '../../domain/qualificacao';
+import { ecrsDaGaveta, seloDaFilial } from '../../domain/qualificacao';
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { FichaDaEmpresa } from './FichaDaEmpresa';
@@ -53,7 +52,6 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   // então o estado inicial do form já reflete o fornecedor correto.
   const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
   const [salvando, setSalvando] = useState(false);
-  const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
   const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);
   const editaOk = podeEditar(perfil?.papel);
@@ -66,15 +64,6 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
 
   function setEndereco(key: keyof Fornecedor['endereco'], value: string) {
     setForm((f) => ({ ...f, endereco: { ...f.endereco, [key]: value } }));
-  }
-
-  function toggleEcr(ecr_id: number) {
-    setForm((f) => ({
-      ...f,
-      ecrs_atende: f.ecrs_atende.includes(ecr_id)
-        ? f.ecrs_atende.filter((id) => id !== ecr_id)
-        : [...f.ecrs_atende, ecr_id],
-    }));
   }
 
   async function handleSave() {
@@ -97,6 +86,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   }
 
   const isNew = !fornecedor;
+  const seloDeMaterial = fornecedor && qualificacoes ? seloDaFilial(fornecedor, qualificacoes.linhas) : null;
 
   return (
     <Drawer
@@ -145,18 +135,28 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
         />
       </FieldGroup>
 
-      {/* A qualificação é da empresa, e mora na ficha dela (CTO-D613 §2). */}
+      {/*
+        A qualificação é da empresa, e mora na ficha dela (CTO-D613 §2). As
+        ECRs que a empresa atende também: são as da qualificação de material
+        que vale, as mesmas que a trava da emissão lê. Até 28/09 a gaveta
+        editava a `compras.fornecedor_ecrs`, por filial, que ninguém mais lia;
+        eram duas respostas, e o comprador marcava a ECR que a trava recusava
+        (CTO-D614 §2.1). Aqui só se lê.
+      */}
       {!isNew && fornecedor && (
         <FieldGroup title="Qualificação">
           <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-            <SeloDaQualificacao
-              selo={qualificacoes ? seloDaFilial(fornecedor, qualificacoes.linhas) : null}
-              rotulo="Material"
-            />
+            <SeloDaQualificacao selo={seloDeMaterial} rotulo="Material" />
             <Button variant="outline" size="sm" onClick={() => setFichaAberta(true)}>
               Abrir a ficha da empresa
             </Button>
           </div>
+          <p
+            data-ecrs-da-qualificacao
+            style={{ gridColumn: '1 / -1', margin: 0, fontSize: 13, color: 'var(--texto-suave)' }}
+          >
+            {ecrsDaGaveta(seloDeMaterial)}
+          </p>
         </FieldGroup>
       )}
       {fichaAberta && fornecedor && <FichaDaEmpresa filial={fornecedor} aoFechar={() => setFichaAberta(false)} />}
@@ -189,49 +189,6 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
       <FieldGroup title="Endereço">
         <EnderecoFields endereco={form.endereco} onChange={setEndereco} />
       </FieldGroup>
-
-      {/*
-        Voltou a ser editável em 19/08/2026: a tabela `compras.fornecedor_ecrs`
-        passou a existir, e a camada grava a diferença. Entre 12 e 19/08 este
-        bloco ficou somente-leitura de propósito — a tela dizia "salvo" e a
-        marcação sumia no reload, e mentir para quem usa é pior que não deixar
-        editar.
-      */}
-      {ecrs.length > 0 && (
-        <FieldGroup title="ECRs que Atende">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, gridColumn: '1 / -1' }}>
-            {ecrs.map((ecr) => (
-              <label
-                key={ecr.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 12,
-                  cursor: editaOk ? 'pointer' : 'not-allowed',
-                  padding: '4px 8px',
-                  borderRadius: 'var(--raio-pill)',
-                  background: form.ecrs_atende.includes(ecr.id)
-                    ? 'var(--marca-fraca)'
-                    : 'var(--painel-2)',
-                  border: `1px solid ${form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--borda)'}`,
-                  color: form.ecrs_atende.includes(ecr.id) ? 'var(--marca)' : 'var(--texto-suave)',
-                  fontWeight: form.ecrs_atende.includes(ecr.id) ? 600 : 400,
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={form.ecrs_atende.includes(ecr.id)}
-                  onChange={() => toggleEcr(ecr.id)}
-                  disabled={!editaOk}
-                  style={{ margin: 0 }}
-                />
-                {ecr.codigo} — {ecr.nome}
-              </label>
-            ))}
-          </div>
-        </FieldGroup>
-      )}
 
       <FieldGroup title="Observações">
         <Field

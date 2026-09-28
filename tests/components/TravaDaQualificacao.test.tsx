@@ -149,7 +149,11 @@ describe('D605 — a porta "Emitir OC" da Nova OC', () => {
     useQualificacaoStore.getState().definir(qualificacoes([]));
     await emitir();
     expect(gravacoes.salvar).not.toHaveBeenCalled();
-    expect(caixa()!.querySelector('[data-porque]')!.textContent).toContain('não tem qualificação de material');
+    const porque = caixa()!.querySelector('[data-porque]')!.textContent!;
+    expect(porque).toContain('não tem qualificação de material');
+    // D614 §2.4: quem lê já está dentro do "Qualificar agora".
+    expect(porque).toContain('Qualifique aqui para emitir, ou volte e salve como rascunho.');
+    expect(porque).not.toContain('Qualificar agora');
     expect(within(caixa()!).getByRole('checkbox', { name: /ECR 12/ })).toBeChecked();
     expect(within(caixa()!).getByRole('checkbox', { name: /ECR 19/ })).not.toBeChecked();
   });
@@ -300,6 +304,9 @@ describe('D605 — a porta "emitida" do Histórico', () => {
     await mudarStatusDaOc(oc(), 'emitida', [FILIAL], avisar);
     expect(gravacoes.status).not.toHaveBeenCalled();
     expect(avisar.mock.calls[0]![0]).toContain('não tem qualificação de material');
+    // O Histórico não tem o "Qualificar agora": a frase manda à ficha da empresa.
+    expect(avisar.mock.calls[0]![0]).toContain('Qualifique a empresa na ficha dela, em Fornecedores');
+    expect(avisar.mock.calls[0]![0]).not.toContain('Qualificar agora');
   });
 
   it('a régua: qualificada para a ECR, a gravação É chamada', async () => {

@@ -336,9 +336,11 @@ export async function salvarFornecedor(f: Fornecedor): Promise<string> {
     );
   }
 
-  const id = String((data as Record<string, unknown>)['id']);
-  await salvarEcrsDoFornecedor(id, f.ecrs_atende ?? []);
-  return id;
+  // As ECRs NÃO vão junto: desde 28/09 a resposta a "que ECR esta empresa
+  // atende" é a qualificação de material, a mesma que a trava lê, e ela muda
+  // na ficha da empresa. A `compras.fornecedor_ecrs` fica no banco como está;
+  // a tela não escreve mais nela (CTO-D614 §2.1).
+  return String((data as Record<string, unknown>)['id']);
 }
 
 /**
@@ -379,42 +381,6 @@ async function ensinarAMae(f: Fornecedor): Promise<true | null> {
     if (error) throw new Error(`Falha ao gravar a classificação da empresa: ${error.message}`);
   }
   return decisao.materialDaFilial;
-}
-
-/**
- * Sincroniza quais ECRs o fornecedor atende.
- *
- * Grava a diferença — insere só o que foi marcado, apaga só o que foi
- * desmarcado — em vez de apagar tudo e reinserir. Apagar-e-reinserir abriria a
- * janela em que uma falha no meio deixa o fornecedor sem nenhum ECR, que é
- * exatamente o defeito que o banco acabou de fechar do lado das OCs.
- */
-async function salvarEcrsDoFornecedor(fornecedorId: string, desejados: number[]): Promise<void> {
-  const { data, error } = await compras()
-    .from('fornecedor_ecrs')
-    .select('ecr_id')
-    .eq('fornecedor_id', fornecedorId);
-  if (error) throw new Error(`Falha ao ler os ECRs do fornecedor: ${error.message}`);
-
-  const atuais = new Set(((data ?? []) as Record<string, unknown>[]).map((l) => Number(l['ecr_id'])));
-  const alvo = new Set(desejados);
-  const inserir = [...alvo].filter((id) => !atuais.has(id));
-  const remover = [...atuais].filter((id) => !alvo.has(id));
-
-  if (inserir.length) {
-    const { error: erroIns } = await compras()
-      .from('fornecedor_ecrs')
-      .insert(inserir.map((ecr_id) => ({ fornecedor_id: fornecedorId, ecr_id })));
-    if (erroIns) throw new Error(`Falha ao gravar os ECRs do fornecedor: ${erroIns.message}`);
-  }
-  if (remover.length) {
-    const { error: erroDel } = await compras()
-      .from('fornecedor_ecrs')
-      .delete()
-      .eq('fornecedor_id', fornecedorId)
-      .in('ecr_id', remover);
-    if (erroDel) throw new Error(`Falha ao remover os ECRs do fornecedor: ${erroDel.message}`);
-  }
 }
 
 /** Estado da OC como o banco devolveu depois de gravar. */

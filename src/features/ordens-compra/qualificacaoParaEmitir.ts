@@ -16,8 +16,10 @@ import { ecrsDaOc, seloDaFilial, travaDaQualificacao, type Selo } from '../../do
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
 
 export interface QualificacaoParaEmitir {
-  /** '' = pode emitir; senão, a frase para a pessoa. */
+  /** '' = pode emitir; senão, a frase para a pessoa, que termina mandando à ficha da empresa. */
   trava: string;
+  /** A mesma recusa, para dentro do "Qualificar agora": termina em "qualifique aqui" (CTO-D614 §2.4). */
+  porqueDoQualificarAgora: string;
   /** O selo de material da filial; `null` quando não se sabe (store sem carga, ou filial fora da lista). */
   selo: Selo | null;
   /** As ECRs da OC. */
@@ -32,5 +34,10 @@ export function qualificacaoParaEmitir(
   const dados = useQualificacaoStore.getState().dados;
   const filial = fornecedores.find((f) => f.id === oc.fornecedor_id);
   const selo = dados && filial ? seloDaFilial(filial, dados.linhas) : null;
-  return { trava: travaDaQualificacao(selo, ecrs), selo, ecrs };
+  return {
+    trava: travaDaQualificacao(selo, ecrs),
+    porqueDoQualificarAgora: travaDaQualificacao(selo, ecrs, 'aqui'),
+    selo,
+    ecrs,
+  };
 }

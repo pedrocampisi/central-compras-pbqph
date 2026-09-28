@@ -17,7 +17,8 @@ import type { Fornecedor, Obra, OrdemCompra } from './types';
 
 const SITUACAO: Record<Situacao, string> = {
   qualificada: 'Qualificada',
-  vence_em_30_dias: 'Vence em 30 dias',
+  // "até": o auditor lê ao pé da letra, e a data está na coluna ao lado (CTO-D614 §2.2).
+  vence_em_30_dias: 'Vence em até 30 dias',
   vencida: 'Vencida',
   desqualificada: 'Desqualificada',
   sem_qualificacao: 'Sem qualificação',

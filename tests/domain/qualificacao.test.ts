@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   QUALIFICACAO_SEM_CONFIRMACAO,
   SEM_QUALIFICACAO,
+  ecrsDaGaveta,
   ecrsDaOc,
   ecrsDoQualificarAgora,
   desempenhoDaFilial,
@@ -72,19 +73,37 @@ describe('D605 — a trava da emissão, a mesma conta da qualificacao_da_oc do b
 
   it('vencida, desqualificada ou sem qualificação: não emite, e a frase diz por quê e o que fazer', () => {
     expect(travaDaQualificacao(selo({ situacao: 'vencida', venceEm: '2026-08-04', ecrs: [12] }), [12])).toBe(
-      'Esta OC tem material controlado (ECR 12), e a qualificação dela venceu em 04/08/2026. Use "Qualificar agora" para emitir.',
+      'Esta OC tem material controlado (ECR 12), e a qualificação de material da empresa venceu em 04/08/2026. ' +
+        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
     );
     expect(travaDaQualificacao(selo({ situacao: 'desqualificada' }), [12])).toContain('está desqualificada');
     expect(travaDaQualificacao(SEM_QUALIFICACAO, [5, 12])).toBe(
-      'Esta OC tem material controlado (ECRs 05 e 12), e ela não tem qualificação de material. Use "Qualificar agora" para emitir.',
+      'Esta OC tem material controlado (ECRs 05 e 12), e a empresa não tem qualificação de material. ' +
+        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
     );
   });
 
   it('qualificada, mas não para uma ECR da OC (D606 1): não emite, e a frase nomeia só a que falta', () => {
     expect(travaDaQualificacao(selo({ situacao: 'qualificada', ecrs: [12] }), [12, 19])).toBe(
-      'A empresa está qualificada, mas não para a ECR 19 desta OC. Use "Qualificar agora" para incluir.',
+      'A empresa está qualificada, mas não para a ECR 19 desta OC. ' +
+        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
     );
     expect(travaDaQualificacao(selo({ situacao: 'qualificada', ecrs: [] }), [5, 19])).toContain('as ECRs 05 e 19');
+  });
+
+  it('D614 §2.4 — dentro do "Qualificar agora", a frase não manda usar o "Qualificar agora": qualifica ali', () => {
+    const aqui = travaDaQualificacao(SEM_QUALIFICACAO, [12, 19], 'aqui');
+    expect(aqui).toBe(
+      'Esta OC tem material controlado (ECRs 12 e 19), e a empresa não tem qualificação de material. ' +
+        'Qualifique aqui para emitir, ou volte e salve como rascunho.',
+    );
+    expect(travaDaQualificacao(selo({ situacao: 'qualificada', ecrs: [12] }), [12, 19], 'aqui')).toBe(
+      'A empresa está qualificada, mas não para a ECR 19 desta OC. Qualifique aqui para emitir, ou volte e salve como rascunho.',
+    );
+    for (const onde of ['aqui', 'na_ficha'] as const) {
+      expect(travaDaQualificacao(SEM_QUALIFICACAO, [12], onde)).not.toContain('Qualificar agora');
+    }
+    expect(travaDaQualificacao(null, [12], 'aqui')).toBe(QUALIFICACAO_SEM_CONFIRMACAO);
   });
 
   it('"Qualificar agora" traz as ECRs da OC somadas às da vigente: requalificar não tira nenhuma', () => {
@@ -292,5 +311,33 @@ describe('D604 §3.3 — a prova ao requalificar: o desempenho dos últimos 12 m
     expect(textoDoDesempenho({ entregas: 0, noPrazo: 0, inteiras: 0, conformes: 0 })).toBe(
       'Nenhuma entrega avaliada nos últimos 12 meses.',
     );
+  });
+});
+
+describe('D614 §2.1 — a linha das ECRs na gaveta da filial: só leitura, pela qualificação de material', () => {
+  it('qualificada: as ECRs da qualificação que vale, e onde muda', () => {
+    expect(ecrsDaGaveta(selo({ situacao: 'qualificada', ecrs: [12, 19] }))).toBe(
+      'ECRs 12 e 19, pela qualificação de material. Muda na ficha da empresa.',
+    );
+    expect(ecrsDaGaveta(selo({ situacao: 'vence_em_30_dias', ecrs: [5] }))).toBe(
+      'ECR 05, pela qualificação de material. Muda na ficha da empresa.',
+    );
+  });
+
+  it('sem qualificação, desqualificada ou sem ECR: diz que nenhuma vale, e não lista ECR', () => {
+    expect(ecrsDaGaveta(SEM_QUALIFICACAO)).toBe('Sem qualificação de material: nenhuma ECR. Muda na ficha da empresa.');
+    expect(ecrsDaGaveta(selo({ situacao: 'desqualificada', ecrs: [12] }))).toBe(
+      'Desqualificada para material: nenhuma ECR vale. Muda na ficha da empresa.',
+    );
+    expect(ecrsDaGaveta(selo({ situacao: 'qualificada', ecrs: [] }))).toBe(
+      'Nenhuma ECR na qualificação de material. Muda na ficha da empresa.',
+    );
+  });
+
+  it('vencida: as ECRs, dizendo que venceu; sem carga: diz que não carregou', () => {
+    expect(ecrsDaGaveta(selo({ situacao: 'vencida', ecrs: [12] }))).toBe(
+      'ECR 12, pela qualificação de material, que venceu: requalifique na ficha da empresa.',
+    );
+    expect(ecrsDaGaveta(null)).toBe('As ECRs vêm da qualificação de material, que não carregou.');
   });
 });

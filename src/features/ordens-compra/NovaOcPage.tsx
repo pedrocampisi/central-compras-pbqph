@@ -488,8 +488,9 @@ export function NovaOcPage() {
       const q = qualificacaoParaEmitir(ocEditing, data.fornecedores);
       if (q.trava) {
         const material = useQualificacaoStore.getState().dados?.categorias.find((c) => c.categoria === 'material');
-        if (q.selo && material) setQualificando({ porque: q.trava, ecrs: ecrsDoQualificarAgora(q.ecrs, q.selo.ecrs) });
-        else showToast(q.trava, 'warning');
+        if (q.selo && material) {
+          setQualificando({ porque: q.porqueDoQualificarAgora, ecrs: ecrsDoQualificarAgora(q.ecrs, q.selo.ecrs) });
+        } else showToast(q.trava, 'warning');
         return;
       }
     }

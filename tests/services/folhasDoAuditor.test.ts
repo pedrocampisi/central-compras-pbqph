@@ -64,7 +64,7 @@ describe('D604 §3.5 — a lista de qualificados, no desenho da FO 8.4.1.1', () 
 
   it('as colunas da planilha: tipo, as duas datas, os "x", a nota, a situação — e as ECRs em material', () => {
     expect(secoes[0]!.linhas[0]).toEqual(['Alfa Tubos Ltda (teste)', 'Tubos', '07/05/2026', '07/05/2027', 'x', '', 'x', '2', 'Qualificada', 'ECRs 12 e 19']);
-    expect(secoes[0]!.linhas[1]!.slice(-2)).toEqual(['Vence em 30 dias', '—']);
+    expect(secoes[0]!.linhas[1]!.slice(-2)).toEqual(['Vence em até 30 dias', '—']); // D614 §2.2
     expect(secoes[1]!.linhas[0]).toEqual(['Prestador PF (teste)', '—', '07/05/2026', '07/05/2027', 'x', '', 'x', '1', 'Desqualificada']);
   });
 
@@ -126,5 +126,15 @@ describe('D604 §3.5 — as avaliações de entrega', () => {
     expect(comMascara).toContain('Tratativa: devolvido');
     expect(textoTodo(pdfDasAvaliacoes(linhas, null, '2026-09-28', null))).toContain('Todas as obras');
     expect(textoTodo(pdfDasAvaliacoes([], null, '2026-09-28', null))).toContain('Nenhuma entrega avaliada.');
+  });
+
+  it('D614 §2.3 — a legenda C/NC em toda página, para quem lê a folha sem a tela', () => {
+    const muitas = Array.from({ length: 80 }, () => linhas[0]!);
+    const doc = pdfDasAvaliacoes(muitas, null, '2026-09-28', null);
+    expect(doc.getNumberOfPages()).toBeGreaterThan(1);
+    for (let p = 1; p <= doc.getNumberOfPages(); p++) {
+      expect(textoDaPagina(doc, p)).toContain('C = Conforme');
+      expect(textoDaPagina(doc, p)).toMatch(/NC = N.o Conforme/);
+    }
   });
 });

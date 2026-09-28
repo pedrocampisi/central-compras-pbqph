@@ -122,7 +122,8 @@ export function pdfDasAvaliacoes(
 ): JsPDFWithAutoTable {
   const doc = novoDocumento();
   const titulo = 'AVALIAÇÃO NO RECEBIMENTO — PS.02, 8.4.1.2';
-  const subtitulo = obra ? `Obra: ${obra}` : 'Todas as obras';
+  // A legenda vai em toda página: o auditor lê a folha sem a tela na frente (CTO-D614 §2.3).
+  const subtitulo = `${obra ? `Obra: ${obra}` : 'Todas as obras'}   ·   C = Conforme · NC = Não Conforme`;
   autoTable(doc, {
     head: H([[
       'OC', 'Fornecedor', 'Obra', 'NF', 'Recebida em', 'Prazo', 'Integridade', 'OC / ECR',
