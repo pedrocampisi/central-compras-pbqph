@@ -62,56 +62,6 @@ function normalizeEndereco(e: unknown): {
   };
 }
 
-// ── Converters para sub-itens de ECR ─────────────────────────────────────────
-
-function toNormaItem(n: unknown): { codigo: string; titulo: string } {
-  if (typeof n === 'string') return { codigo: '', titulo: n };
-  const o = (n as Record<string, unknown>) ?? {};
-  return { codigo: String(o['codigo'] ?? ''), titulo: String(o['titulo'] ?? '') };
-}
-
-function toDocItem(x: unknown): { nome: string; periodicidade: string; observacao: string } {
-  if (typeof x === 'string') return { nome: x, periodicidade: '', observacao: '' };
-  const o = (x as Record<string, unknown>) ?? {};
-  return {
-    nome: String(o['nome'] ?? ''),
-    periodicidade: String(o['periodicidade'] ?? ''),
-    observacao: String(o['observacao'] ?? ''),
-  };
-}
-
-function toCritItem(x: unknown): {
-  criterio: string;
-  tolerancia: string;
-  metodo: string;
-  registro: string;
-} {
-  if (typeof x === 'string') return { criterio: x, tolerancia: '', metodo: '', registro: '' };
-  const o = (x as Record<string, unknown>) ?? {};
-  return {
-    criterio: String(o['criterio'] ?? ''),
-    tolerancia: String(o['tolerancia'] ?? ''),
-    metodo: String(o['metodo'] ?? ''),
-    registro: String(o['registro'] ?? ''),
-  };
-}
-
-function toEnsaioItem(x: unknown): {
-  nome: string;
-  metodo: string;
-  periodicidade: string;
-  amostragem: string;
-} {
-  if (typeof x === 'string') return { nome: x, metodo: '', periodicidade: '', amostragem: '' };
-  const o = (x as Record<string, unknown>) ?? {};
-  return {
-    nome: String(o['nome'] ?? ''),
-    metodo: String(o['metodo'] ?? ''),
-    periodicidade: String(o['periodicidade'] ?? ''),
-    amostragem: String(o['amostragem'] ?? ''),
-  };
-}
-
 // ── Funções públicas de normalização ─────────────────────────────────────────
 
 export function normalizeItem(it: unknown): Item {
@@ -201,6 +151,12 @@ export function normalizeObra(obra: unknown): Obra {
   return ObraSchema.parse(raw);
 }
 
+/**
+ * A ECR. Os dez campos de antes (objetivo, escopo, normas, documentos,
+ * critérios, ensaios, amostragem, registros, responsabilidades e observações)
+ * saíram (CTO-D596): se o banco ou um arquivo antigo ainda os trouxer, eles
+ * ficam de fora, e a ECR carrega igual.
+ */
 export function normalizeEcr(ecr: unknown): Ecr {
   const o = (ecr as Record<string, unknown>) ?? {};
   const id = toNum(o['id']);
@@ -209,21 +165,9 @@ export function normalizeEcr(ecr: unknown): Ecr {
     codigo: String(o['codigo'] ?? `ECR ${String(id).padStart(2, '0')}`),
     nome: String(o['nome'] ?? ''),
     categoria: String(o['categoria'] ?? ''),
-    objetivo: String(o['objetivo'] ?? ''),
-    escopo: String(o['escopo'] ?? ''),
-    normas: asArr(o['normas']).map(toNormaItem),
     unidades_padrao: asArr<string>(o['unidades_padrao']).length
       ? asArr<string>(o['unidades_padrao'])
       : ['un'],
-    documentos_obrigatorios: asArr(o['documentos_obrigatorios']).map(toDocItem),
-    criterios_recebimento: asArr(o['criterios_recebimento']).map(toCritItem),
-    ensaios: asArr(o['ensaios']).map(toEnsaioItem),
-    amostragem: String(o['amostragem'] ?? ''),
-    registros: asArr<unknown>(o['registros']).map((r) =>
-      typeof r === 'string' ? r : String((r as Record<string, unknown>)['nome'] ?? ''),
-    ),
-    responsabilidades: String(o['responsabilidades'] ?? ''),
-    observacoes: String(o['observacoes'] ?? ''),
     materiais: asArr<Record<string, unknown>>(o['materiais']).map((m) => ({
       id: String(m['id'] ?? uid('mat')),
       descricao: String(m['descricao'] ?? ''),

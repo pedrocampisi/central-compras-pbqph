@@ -25,6 +25,7 @@ import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
+import { obraDaMascara } from '../storage/umaObra';
 import {
   COLUNAS_DA_FORNECEDORES, bandeirasResolvidas, empresaResolvida, cabecalhoDaOc, classificacaoDoCadastroNovo, destinatarioDaLinhaDaObra,
   ehFornecedorNovo, fotografiaDaLinhaDaOc, linhaDoFornecedor, linhasDosItens, paraEndereco, raizDoDocumento,
@@ -49,33 +50,90 @@ const vazio = (v: unknown): string => (v == null ? '' : String(v));
 const COLUNAS_DAS_ECRS =
   '*, materiais(*), revisoes:ecr_revisoes(id, revisao, emitida_em, descricao, revisado_por_nome, aprovado_por_nome)';
 
+/** Linhas por pedido: o limite padrão da API do Supabase. */
+const PAGINA = 1000;
+
+interface Resposta<T> {
+  data: T[] | null;
+  error: { message: string } | null;
+  count?: number | null;
+}
+
+/**
+ * Todas as linhas de uma lista, página por página (perícia de 27/09, achado 5;
+ * CTO-D607). A API devolve no máximo um tanto de linhas por pedido e corta o
+ * resto SEM erro. A contagem diz quantas existem: pede-se a página seguinte até
+ * chegar nela e, se não chegar, a carga ACUSA — nunca segue com a lista pela
+ * metade. A consulta precisa de ordem com desempate (o id), senão as páginas
+ * se sobrepõem.
+ */
+async function todasAsLinhas<T>(
+  nome: string,
+  pagina: (de: number, ate: number) => PromiseLike<Resposta<T>>,
+): Promise<Resposta<T>> {
+  const linhas: T[] = [];
+  for (;;) {
+    const r = await pagina(linhas.length, linhas.length + PAGINA - 1);
+    if (r.error) return r;
+    if (typeof r.count !== 'number') {
+      throw new Error(`Falha ao carregar dados: a lista de ${nome} veio sem a contagem, e não há como saber se veio inteira.`);
+    }
+    const veio = r.data ?? [];
+    linhas.push(...veio);
+    if (linhas.length >= r.count) return { data: linhas, error: null };
+    if (veio.length === 0) {
+      throw new Error(`Falha ao carregar dados: a lista de ${nome} veio incompleta (${linhas.length} de ${r.count}).`);
+    }
+  }
+}
+
+/**
+ * A máscara "mostrar só uma obra" (CTO-D599) filtra aqui, na busca, e em
+ * nenhum outro lugar: com ela ligada, o banco manda só aquela obra e as OCs
+ * dela, e as outras nem chegam ao navegador. Toda tela lê daqui, então
+ * nenhuma escapa. Fornecedores, ECRs e a numeração não são por obra.
+ */
 export async function carregarDados(): Promise<Data> {
+  const obra = obraDaMascara();
+  // Uma consulta nova a cada página: a consulta do Supabase só se manda uma vez.
+  const todasAsObras = () => core()
+    .from('intervencoes')
+    .select(
+      'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
+      'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
+      'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
+      { count: 'exact' },
+    );
+  const todasAsOcs = () => compras().from('ordens_compra').select('*, itens:oc_itens(*)', { count: 'exact' });
   const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
     // Só as colunas que a OC usa, nunca o `*` (CTO-D551): a classificação e o
     // costume vêm da resolvida, logo abaixo.
-    core().from('fornecedores').select(COLUNAS_DA_FORNECEDORES.join(', ')).order('razao_social'),
+    todasAsLinhas('fornecedores', (de, ate) =>
+      core().from('fornecedores').select(COLUNAS_DA_FORNECEDORES.join(', '), { count: 'exact' })
+        .order('razao_social').order('id').range(de, ate)),
     // Material e serviço RESOLVIDOS (a filial, ou a mãe quando a filial está em
     // branco): é por eles que a lista da OC filtra desde a CTO-D519. O resto
     // do cadastro (endereço, telefones) continua vindo da filial, acima.
-    core().from('fornecedor_resolvido').select('id, fornece_material, presta_servico, empresa_apelido, empresa_id, bloqueado_para_compra_nova'),
+    todasAsLinhas('fornecedores resolvidos', (de, ate) =>
+      core().from('fornecedor_resolvido')
+        .select('id, fornece_material, presta_servico, empresa_apelido, empresa_id, bloqueado_para_compra_nova', { count: 'exact' })
+        .order('id').range(de, ate)),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável; o
     // destinatário da nota (empresa OU cliente, trava do banco) vem junto
     // porque é dele que a OC fatura — a OC não escolhe, lê (CTO-D390).
-    core()
-      .from('intervencoes')
-      .select(
-        'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
-        'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
-        'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
-      )
-      .order('descricao_curta'),
-    compras().from('ecrs').select(COLUNAS_DAS_ECRS).order('id'),
-    compras().from('ordens_compra').select('*, itens:oc_itens(*)').order('ano').order('sequencial'),
+    todasAsLinhas('obras', (de, ate) =>
+      (obra ? todasAsObras().eq('id', obra) : todasAsObras()).order('descricao_curta').order('id').range(de, ate)),
+    todasAsLinhas('ECRs', (de, ate) => compras().from('ecrs').select(COLUNAS_DAS_ECRS, { count: 'exact' }).order('id').range(de, ate)),
+    todasAsLinhas('ordens de compra', (de, ate) =>
+      (obra ? todasAsOcs().eq('intervencao_id', obra) : todasAsOcs())
+        .order('ano').order('sequencial').order('id').range(de, ate)),
     compras().from('numeracao').select('ano, ultimo_sequencial'),
     // Quais ECRs cada fornecedor atende. Tabela própria desde 17/08 — até
     // então a tela deixava marcar e a marcação sumia no reload.
-    compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id'),
+    todasAsLinhas('ECRs de cada fornecedor', (de, ate) =>
+      compras().from('fornecedor_ecrs').select('fornecedor_id, ecr_id', { count: 'exact' })
+        .order('fornecedor_id').order('ecr_id').range(de, ate)),
   ]);
 
   for (const r of [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs]) {
@@ -192,17 +250,7 @@ function paraEcr(l: Record<string, unknown>): Ecr {
     codigo: vazio(l['codigo']),
     nome: vazio(l['nome']),
     categoria: vazio(l['categoria']),
-    objetivo: vazio(l['objetivo']),
-    escopo: vazio(l['escopo']),
-    normas: (l['normas'] as Ecr['normas']) ?? [],
     unidades_padrao: (l['unidades_padrao'] as string[]) ?? [],
-    documentos_obrigatorios: (l['documentos_obrigatorios'] as Ecr['documentos_obrigatorios']) ?? [],
-    criterios_recebimento: (l['criterios_recebimento'] as Ecr['criterios_recebimento']) ?? [],
-    ensaios: (l['ensaios'] as Ecr['ensaios']) ?? [],
-    amostragem: vazio(l['amostragem']),
-    registros: (l['registros'] as string[]) ?? [],
-    responsabilidades: vazio(l['responsabilidades']),
-    observacoes: vazio(l['observacoes']),
     materiais: ((l['materiais'] as Record<string, unknown>[]) ?? []).map((m) => ({
       id: String(m['id']),
       descricao: vazio(m['descricao']),
@@ -488,9 +536,15 @@ export async function totaisDaOc(ocId: string) {
 }
 
 export function assinarMudancas(aoMudar: () => void): () => void {
+  // O aviso traz a linha da OC junto: com a máscara ligada, só os da obra dela.
+  const obra = obraDaMascara();
   const canal = supabase
     .channel('compras-mudancas')
-    .on('postgres_changes', { event: '*', schema: 'compras', table: 'ordens_compra' }, aoMudar)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'compras', table: 'ordens_compra', ...(obra ? { filter: `intervencao_id=eq.${obra}` } : {}) },
+      aoMudar,
+    )
     .on('postgres_changes', { event: '*', schema: 'core', table: 'fornecedores' }, aoMudar)
     .subscribe();
   return () => void supabase.removeChannel(canal);

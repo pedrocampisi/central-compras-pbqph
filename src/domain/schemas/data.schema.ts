@@ -91,24 +91,6 @@ export const ObraSchema = z.object({
 });
 
 // ── ECR ────────────────────────────────────────────────────────────────────
-export const NormaSchema = z.object({ codigo: z.string().default(''), titulo: z.string().default('') });
-export const DocumentoSchema = z.object({
-  nome: z.string().default(''),
-  periodicidade: z.string().default(''),
-  observacao: z.string().default(''),
-});
-export const CriterioSchema = z.object({
-  criterio: z.string().default(''),
-  tolerancia: z.string().default(''),
-  metodo: z.string().default(''),
-  registro: z.string().default(''),
-});
-export const EnsaioSchema = z.object({
-  nome: z.string().default(''),
-  metodo: z.string().default(''),
-  periodicidade: z.string().default(''),
-  amostragem: z.string().default(''),
-});
 export const MaterialSchema = z.object({
   id: z.string(),
   descricao: z.string().default(''),
@@ -137,17 +119,7 @@ export const EcrSchema = z.object({
   codigo: z.string().default(''),
   nome: z.string().default(''),
   categoria: z.string().default(''),
-  objetivo: z.string().default(''),
-  escopo: z.string().default(''),
-  normas: z.array(NormaSchema).default([]),
   unidades_padrao: z.array(z.string()).default(['un']),
-  documentos_obrigatorios: z.array(DocumentoSchema).default([]),
-  criterios_recebimento: z.array(CriterioSchema).default([]),
-  ensaios: z.array(EnsaioSchema).default([]),
-  amostragem: z.string().default(''),
-  registros: z.array(z.string()).default([]),
-  responsabilidades: z.string().default(''),
-  observacoes: z.string().default(''),
   materiais: z.array(MaterialSchema).default([]),
   revisao: z.string().nullable().default(null),
   emitida_em: z.string().nullable().default(null),

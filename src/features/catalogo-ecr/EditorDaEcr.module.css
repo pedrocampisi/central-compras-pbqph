@@ -1,0 +1,215 @@
+/* A tela de editar a ECR (CTO-D589 §4.2). Sem animação: movimento só em espera e no login. */
+
+.editor { display: flex; flex-direction: column; gap: 14px; }
+
+.aviso {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--marca);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto);
+}
+
+.secao {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.secao legend {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0 0 4px;
+  border-bottom: 2px solid var(--texto);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--texto);
+}
+
+/* Uma linha: o número, o rótulo, o texto e os controles. */
+.linha {
+  display: grid;
+  grid-template-columns: 24px minmax(120px, 180px) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  margin-bottom: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--raio-pequeno);
+  background: var(--surface);
+}
+/* A nota fora da lista, marcada como na tela de ler. */
+.linha[data-nota] { border-left: 3px solid var(--erro); }
+.linha[data-com-problema] {
+  border-color: var(--erro);
+  background: var(--erro-bg);
+}
+
+.numero {
+  padding-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.rotulo,
+.texto,
+.descricao {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.rotulo { font-weight: 600; }
+/* O exemplo dentro do campo vazio não pode parecer um rótulo escrito (D596, foto 05). */
+.rotulo::placeholder,
+.texto::placeholder,
+.descricao::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.texto,
+.descricao {
+  resize: vertical;
+  field-sizing: content;
+  min-height: 38px;
+}
+.rotulo:focus-visible,
+.texto:focus-visible,
+.descricao:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 0;
+  border-color: var(--marca);
+}
+.texto[aria-invalid],
+.descricao[aria-invalid] { border-color: var(--erro); }
+
+.controles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nota {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 6px;
+  font-size: 12px;
+  color: var(--text-mid);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.icone {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--text-mid);
+  cursor: pointer;
+}
+.icone:hover:not(:disabled) { border-color: var(--marca); color: var(--marca); }
+.icone:focus-visible { outline: 2px solid var(--marca); outline-offset: 1px; }
+.icone:disabled { opacity: 0.4; cursor: default; }
+.paraCima { transform: rotate(180deg); }
+
+/* A frase do problema, embaixo da linha, de ponta a ponta. */
+.problema {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--erro);
+}
+
+.problemas {
+  padding: 10px 12px;
+  border: 1px solid var(--erro);
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--texto);
+}
+.problemas ul { margin: 6px 0 0; padding-left: 20px; }
+.problemas li { margin-bottom: 2px; }
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* A confirmação. O fundo escuro é o do ConfirmDialog (sem cor solta aqui). */
+.caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 460px;
+  padding: 22px;
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-elevada);
+}
+.tituloDoDialogo {
+  margin: 0 0 4px;
+  font-family: var(--fonte-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.resumo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--texto);
+}
+.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--texto); }
+.obrigatorio { margin-left: 2px; color: var(--erro); }
+.dica { font-size: 12px; color: var(--text-muted); }
+.erro {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+.acoesDoDialogo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* A 375: o rótulo e o texto de ponta a ponta, os controles embaixo. */
+@media (max-width: 700px) {
+  .linha {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .rotulo { grid-column: 2; }
+  .texto { grid-column: 1 / -1; }
+  .controles { grid-column: 1 / -1; justify-content: flex-end; }
+  .nota { margin-right: auto; }
+  .acoes > * { flex: 1 1 auto; }
+}

@@ -116,68 +116,45 @@ describe('normalizeObra', () => {
 
 // ── normalizeEcr ──────────────────────────────────────────────────────────────
 
+const OS_DEZ_CAMPOS_VELHOS = [
+  'normas',
+  'documentos_obrigatorios',
+  'criterios_recebimento',
+  'ensaios',
+  'amostragem',
+  'registros',
+  'responsabilidades',
+  'observacoes',
+  'objetivo',
+  'escopo',
+];
+
 describe('normalizeEcr', () => {
-  it('aceita normas como strings (formato legado)', () => {
-    const ecr = normalizeEcr({ id: 1, normas: ['NBR 12345 — Cimento Portland'] });
-    expect(ecr.normas[0]).toEqual({ codigo: '', titulo: 'NBR 12345 — Cimento Portland' });
-  });
-
-  it('aceita normas como objetos (formato rico)', () => {
-    const ecr = normalizeEcr({ id: 1, normas: [{ codigo: 'NBR 12345', titulo: 'Cimento' }] });
-    expect(ecr.normas[0]).toEqual({ codigo: 'NBR 12345', titulo: 'Cimento' });
-  });
-
-  it('aceita documentos_obrigatorios como strings (legado)', () => {
-    const ecr = normalizeEcr({ id: 1, documentos_obrigatorios: ['NF-e'] });
-    expect(ecr.documentos_obrigatorios[0]).toEqual({
-      nome: 'NF-e',
-      periodicidade: '',
-      observacao: '',
-    });
-  });
-
-  it('aceita documentos_obrigatorios como objetos', () => {
+  // Os dez campos de antes saíram (CTO-D596). O banco ainda os manda até a
+  // carta do Banco tirar as colunas, e os arquivos antigos também os têm: a
+  // ECR carrega igual, sem eles.
+  it('descarta os dez campos velhos, e a ECR carrega igual', () => {
     const ecr = normalizeEcr({
       id: 1,
-      documentos_obrigatorios: [{ nome: 'Laudo', periodicidade: 'Por lote', observacao: '' }],
+      codigo: 'ECR 01',
+      objetivo: 'Garantir qualidade',
+      escopo: 'Recebimento',
+      normas: ['NBR 12345'],
+      documentos_obrigatorios: ['NF-e'],
+      criterios_recebimento: [{ criterio: 'Verificar embalagem' }],
+      ensaios: ['Resistência'],
+      amostragem: 'Por lote',
+      registros: ['FVM'],
+      responsabilidades: 'Almoxarife',
+      observacoes: 'Nota velha',
     });
-    expect(ecr.documentos_obrigatorios[0]?.nome).toBe('Laudo');
-    expect(ecr.documentos_obrigatorios[0]?.periodicidade).toBe('Por lote');
-  });
-
-  it('aceita criterios_recebimento como strings (legado)', () => {
-    const ecr = normalizeEcr({ id: 1, criterios_recebimento: ['Verificar embalagem'] });
-    expect(ecr.criterios_recebimento[0]).toEqual({
-      criterio: 'Verificar embalagem',
-      tolerancia: '',
-      metodo: '',
-      registro: '',
-    });
-  });
-
-  it('aceita ensaios como strings (legado)', () => {
-    const ecr = normalizeEcr({ id: 1, ensaios: ['Resistência à compressão'] });
-    expect(ecr.ensaios[0]).toEqual({
-      nome: 'Resistência à compressão',
-      metodo: '',
-      periodicidade: '',
-      amostragem: '',
-    });
+    expect(ecr.codigo).toBe('ECR 01');
+    for (const campo of OS_DEZ_CAMPOS_VELHOS) expect(campo in ecr, campo).toBe(false);
   });
 
   it('gera código padrão se ausente', () => {
     expect(normalizeEcr({ id: 5 }).codigo).toBe('ECR 05');
     expect(normalizeEcr({ id: 12 }).codigo).toBe('ECR 12');
-  });
-
-  it('preenche campos ricos com defaults vazios', () => {
-    const ecr = normalizeEcr({ id: 1 });
-    expect(ecr.objetivo).toBe('');
-    expect(ecr.escopo).toBe('');
-    expect(ecr.ensaios).toEqual([]);
-    expect(ecr.registros).toEqual([]);
-    expect(ecr.responsabilidades).toBe('');
-    expect(ecr.observacoes).toBe('');
   });
 
   it('mantém unidades_padrao existentes', () => {
