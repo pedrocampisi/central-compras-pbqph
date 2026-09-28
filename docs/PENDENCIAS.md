@@ -223,6 +223,8 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 *Aberta em 27/09/2026 (decisão 56).* **Onde mora:** o ramo **`d589-editar-ecr`**, commit **`7edb715`**, empurrado,
 **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D596/`. **Fecha quando:** a carta do CTO mandar
 publicar. O desfazer será a `080168b8`. **Depois dela:** a primeira revisão de verdade é do Pedro.
+*Em 27/09, 22h (D603):* a perícia do Codex chegou (sete achados). Medidos no ramo, commit `5f287cd`, só testes:
+os sete reproduzem (o 5 no banco falso, o 6 por mutação). **Nada consertado:** espera a triagem do CTO.
 
 ---
 
