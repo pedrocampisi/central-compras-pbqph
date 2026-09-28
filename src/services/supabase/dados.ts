@@ -53,7 +53,7 @@ const COLUNAS_DAS_ECRS =
 /** Linhas por pedido: o limite padrão da API do Supabase. */
 const PAGINA = 1000;
 
-interface Resposta<T> {
+export interface Resposta<T> {
   data: T[] | null;
   error: { message: string } | null;
   count?: number | null;
@@ -67,7 +67,7 @@ interface Resposta<T> {
  * metade. A consulta precisa de ordem com desempate (o id), senão as páginas
  * se sobrepõem.
  */
-async function todasAsLinhas<T>(
+export async function todasAsLinhas<T>(
   nome: string,
   pagina: (de: number, ate: number) => PromiseLike<Resposta<T>>,
 ): Promise<Resposta<T>> {

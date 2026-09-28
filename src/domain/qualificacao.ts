@@ -44,6 +44,92 @@ function mesAno(iso: string | null): string {
   return m ? `${m[2]}/${m[1]}` : '';
 }
 
+/** Uma linha de `compras.qualificacoes_situacao` (contrato §3), já no formato da tela. */
+export interface LinhaDeQualificacao {
+  id: number;
+  /** Exatamente um dos dois (D606 3): a empresa, ou o fornecedor sem raiz. */
+  empresaRaizId: string | null;
+  fornecedorId: string | null;
+  categoria: Categoria;
+  tipo: string;
+  qualificadaEm: string;
+  venceEm: string;
+  criterios: CriterioMarcado[];
+  nota: number;
+  minimo: number;
+  qualificada: boolean;
+  qualificadoPorNome: string;
+  origem: string;
+  situacao: Situacao;
+  ecrs: number[];
+  /** A última do mesmo sujeito e categoria: é a que vale. */
+  vigente: boolean;
+}
+
+/** De quem é a qualificação que uma filial mostra: a da empresa dela, ou a dela mesma. */
+export interface SujeitoDaFilial {
+  id: string;
+  /** O `empresa_id` resolvido pelo banco, que é o `core.empresa_raiz.id`. */
+  empresa_id?: string;
+}
+
+/** A mais recente primeiro: pela data da qualificação, e no empate pela linha mais nova. */
+function maisRecente(a: LinhaDeQualificacao, b: LinhaDeQualificacao): number {
+  return b.qualificadaEm.localeCompare(a.qualificadaEm) || b.id - a.id;
+}
+
+/**
+ * As linhas vigentes que valem para a filial numa categoria: as da empresa
+ * dela, pela raiz, e as do próprio fornecedor. As duas entram porque quem
+ * ganhou raiz depois continua qualificado pela linha antiga até a empresa ter
+ * uma mais nova — é o que a `qualificacao_do_fornecedor` do banco faz
+ * (contrato §2, a resposta à D606 3).
+ */
+function vigentesDaFilial(f: SujeitoDaFilial, linhas: readonly LinhaDeQualificacao[], categoria: Categoria) {
+  return linhas
+    .filter(
+      (l) =>
+        l.vigente &&
+        l.categoria === categoria &&
+        ((!!f.empresa_id && l.empresaRaizId === f.empresa_id) || l.fornecedorId === f.id),
+    )
+    .sort(maisRecente);
+}
+
+/** O selo da filial numa categoria (material, por padrão: é o da Nova OC). */
+export function seloDaFilial(
+  f: SujeitoDaFilial,
+  linhas: readonly LinhaDeQualificacao[],
+  categoria: Categoria = 'material',
+): Selo {
+  const l = vigentesDaFilial(f, linhas, categoria)[0];
+  return l ? { situacao: l.situacao, qualificadaEm: l.qualificadaEm, venceEm: l.venceEm, ecrs: l.ecrs } : SEM_QUALIFICACAO;
+}
+
+/** O histórico que a ficha mostra: todas as linhas do sujeito na categoria, a mais nova primeiro. */
+export function historicoDaFilial(
+  f: SujeitoDaFilial,
+  linhas: readonly LinhaDeQualificacao[],
+  categoria: Categoria,
+): LinhaDeQualificacao[] {
+  return linhas
+    .filter(
+      (l) =>
+        l.categoria === categoria &&
+        ((!!f.empresa_id && l.empresaRaizId === f.empresa_id) || l.fornecedorId === f.id),
+    )
+    .sort(maisRecente);
+}
+
+/**
+ * Para quem a qualificação nova é gravada (contrato §2): a empresa, quando a
+ * filial tem raiz; o próprio fornecedor, só quando não tem (o banco recusa
+ * filial com raiz).
+ */
+export function sujeitoParaGravar(f: SujeitoDaFilial): { empresa_raiz_id: string } | { fornecedor_id: string } {
+  return f.empresa_id ? { empresa_raiz_id: f.empresa_id } : { fornecedor_id: f.id };
+}
+
 /** O texto do selo, ao lado da empresa na Nova OC e na lista (D604 §3.4). */
 export function textoDoSelo(s: Selo): string {
   switch (s.situacao) {
@@ -87,14 +173,20 @@ export function nomeDasEcrs(ecrs: readonly number[]): string {
   return `ECRs ${n.slice(0, -1).join(', ')} e ${n[n.length - 1]}`;
 }
 
+export const QUALIFICACAO_SEM_CONFIRMACAO =
+  'Não deu para confirmar a qualificação desta empresa: as qualificações não chegaram do banco. ' +
+  'Recarregue a página e tente de novo.';
+
 /**
  * A recusa da emissão por qualificação, ou '' quando pode emitir. OC sem item
  * de ECR não é material controlado e não pede qualificação; com ECR, emite
  * só com a empresa qualificada (ou vencendo em 30 dias) E com todas as ECRs
  * da OC cobertas pela qualificação vigente (D606 1).
  */
-export function travaDaQualificacao(selo: Selo, ecrs: readonly number[]): string {
+export function travaDaQualificacao(selo: Selo | null, ecrs: readonly number[]): string {
   if (ecrs.length === 0) return '';
+  // Sem as qualificações carregadas, não se sabe: a trava falha fechada, como a da filial (perícia de 27/09, achado 5).
+  if (!selo) return QUALIFICACAO_SEM_CONFIRMACAO;
   if (!EMITE_COM.includes(selo.situacao)) {
     const porque =
       selo.situacao === 'vencida'

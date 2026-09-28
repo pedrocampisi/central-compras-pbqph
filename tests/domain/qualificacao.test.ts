@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  QUALIFICACAO_SEM_CONFIRMACAO,
   SEM_QUALIFICACAO,
   ecrsDaOc,
   ecrsDoQualificarAgora,
@@ -7,6 +8,7 @@ import {
   fraseDaRecusaDaEntrega,
   fraseDaRecusaDaQualificacao,
   fraseDaTravaDoBanco,
+  historicoDaFilial,
   naoConformes,
   nomeDasEcrs,
   notaAoVivo,
@@ -14,10 +16,13 @@ import {
   pedeTratativa,
   problemaDaAvaliacao,
   problemaDaQualificacao,
+  seloDaFilial,
+  sujeitoParaGravar,
   textoDoSelo,
   travaDaQualificacao,
   vencimentoDe,
   type Avaliacao,
+  type LinhaDeQualificacao,
   type Selo,
 } from '../../src/domain/qualificacao';
 
@@ -185,5 +190,79 @@ describe('as recusas do banco (contrato de 28/09 §2 e §4), em frase de gente',
     );
     expect(fraseDaRecusaDaCiencia({ code: '55000', message: 'x' })).toContain('já foi dada');
     expect(fraseDaRecusaDaEntrega({ code: 'XX000', message: 'caiu' })).toBe('Falha ao gravar a avaliação: caiu');
+  });
+});
+
+describe('D606 3 — de quem é o selo da filial (a mesma resolução da qualificacao_do_fornecedor)', () => {
+  const l = (o: Partial<LinhaDeQualificacao>): LinhaDeQualificacao => ({
+    id: 1,
+    empresaRaizId: null,
+    fornecedorId: null,
+    categoria: 'material',
+    tipo: '',
+    qualificadaEm: '2026-01-01',
+    venceEm: '2027-01-01',
+    criterios: [],
+    nota: 3,
+    minimo: 2,
+    qualificada: true,
+    qualificadoPorNome: '',
+    origem: 'sistema',
+    situacao: 'qualificada',
+    ecrs: [12],
+    vigente: true,
+    ...o,
+  });
+  const filial = { id: 'filial-1', empresa_id: 'empresa-a' };
+
+  it('a filial com raiz mostra a qualificação da empresa dela', () => {
+    const linhas = [l({ id: 1, empresaRaizId: 'empresa-a', ecrs: [12, 19] }), l({ id: 2, empresaRaizId: 'empresa-b' })];
+    expect(seloDaFilial(filial, linhas)).toEqual({
+      situacao: 'qualificada',
+      qualificadaEm: '2026-01-01',
+      venceEm: '2027-01-01',
+      ecrs: [12, 19],
+    });
+  });
+
+  it('só a vigente e só a categoria pedida; sem nenhuma, "sem qualificação"', () => {
+    const linhas = [
+      l({ id: 1, empresaRaizId: 'empresa-a', vigente: false, situacao: 'desqualificada' }),
+      l({ id: 2, empresaRaizId: 'empresa-a', categoria: 'servico', situacao: 'vencida' }),
+    ];
+    expect(seloDaFilial(filial, linhas).situacao).toBe('sem_qualificacao');
+    expect(seloDaFilial(filial, linhas, 'servico').situacao).toBe('vencida');
+  });
+
+  it('quem ganhou raiz depois segue pela linha antiga do fornecedor, até a empresa ter uma mais nova', () => {
+    const antiga = l({ id: 1, fornecedorId: 'filial-1', qualificadaEm: '2026-03-01', ecrs: [5] });
+    expect(seloDaFilial(filial, [antiga]).ecrs).toEqual([5]);
+    const daEmpresa = l({ id: 2, empresaRaizId: 'empresa-a', qualificadaEm: '2026-06-01', situacao: 'desqualificada' });
+    expect(seloDaFilial(filial, [antiga, daEmpresa]).situacao).toBe('desqualificada');
+  });
+
+  it('no mesmo dia, vale a linha mais nova', () => {
+    const a = l({ id: 3, empresaRaizId: 'empresa-a', qualificadaEm: '2026-06-01', situacao: 'desqualificada' });
+    const b = l({ id: 4, empresaRaizId: 'empresa-a', qualificadaEm: '2026-06-01', situacao: 'qualificada' });
+    expect(seloDaFilial(filial, [b, a]).situacao).toBe('qualificada');
+  });
+
+  it('o fornecedor sem raiz se qualifica por ele mesmo; com raiz, pela empresa', () => {
+    expect(sujeitoParaGravar({ id: 'pf-1' })).toEqual({ fornecedor_id: 'pf-1' });
+    expect(sujeitoParaGravar(filial)).toEqual({ empresa_raiz_id: 'empresa-a' });
+  });
+
+  it('o histórico da ficha: todas as linhas do sujeito na categoria, a mais nova primeiro', () => {
+    const linhas = [
+      l({ id: 1, empresaRaizId: 'empresa-a', qualificadaEm: '2025-01-01', vigente: false }),
+      l({ id: 2, empresaRaizId: 'empresa-a', qualificadaEm: '2026-01-01' }),
+      l({ id: 3, empresaRaizId: 'empresa-b' }),
+    ];
+    expect(historicoDaFilial(filial, linhas, 'material').map((x) => x.id)).toEqual([2, 1]);
+  });
+
+  it('sem as qualificações carregadas, a OC com ECR não emite: a trava falha fechada', () => {
+    expect(travaDaQualificacao(null, [12])).toBe(QUALIFICACAO_SEM_CONFIRMACAO);
+    expect(travaDaQualificacao(null, [])).toBe('');
   });
 });
