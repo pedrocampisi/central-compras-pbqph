@@ -12,7 +12,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
-import { seloDaFilial } from '../../domain/qualificacao';
+import { CATEGORIAS, seloDaFilial } from '../../domain/qualificacao';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { secoesDosQualificados } from '../../domain/folhasDoAuditor';
 import { hojeEmSaoPaulo } from '../../domain/ecr';
@@ -113,18 +113,24 @@ export function FornecedoresPage() {
           : '—',
     },
     {
-      // O selo de material para quem fornece material; para quem só presta
-      // serviço, o de serviço (D613 §2). As cinco ficam na ficha da empresa.
+      // Quem fornece material mostra o selo de material, o que a OC confere.
+      // Quem só presta serviço mostra a primeira categoria em que tem
+      // qualificação (serviço, laboratório, projeto, locação), com o nome
+      // dela; sem nenhuma, "Serviços: Sem qualificação" (D613 §2). As cinco
+      // ficam na ficha da empresa.
       key: 'qualificacao',
       label: 'Qualificação',
       render: (f) => {
-        const categoria = f.fornece_material === false && f.presta_servico ? 'servico' : 'material';
-        return (
-          <SeloDaQualificacao
-            selo={qualificacoes ? seloDaFilial(f, qualificacoes.linhas, categoria) : null}
-            rotulo={categoria === 'servico' ? 'Serviço' : undefined}
-          />
+        if (!qualificacoes) return <SeloDaQualificacao selo={null} />;
+        if (f.fornece_material !== false || !f.presta_servico) {
+          return <SeloDaQualificacao selo={seloDaFilial(f, qualificacoes.linhas)} />;
+        }
+        const comQualificacao = CATEGORIAS.filter((c) => c !== 'material').find(
+          (c) => seloDaFilial(f, qualificacoes.linhas, c).situacao !== 'sem_qualificacao',
         );
+        const categoria = comQualificacao ?? 'servico';
+        const nome = qualificacoes.categorias.find((c) => c.categoria === categoria)?.nome ?? 'Serviço';
+        return <SeloDaQualificacao selo={seloDaFilial(f, qualificacoes.linhas, categoria)} rotulo={nome} />;
       },
     },
     {

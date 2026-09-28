@@ -137,7 +137,23 @@ describe('D604 §3.4 — o selo', () => {
   it('na lista: material para quem fornece material, serviço para quem só presta serviço', () => {
     render(<FornecedoresPage />);
     expect(screen.getByText('Filial A (teste)').closest('tr')!.textContent).toContain('Qualificada até 05/2027');
-    expect(screen.getByText('Prestador B (teste)').closest('tr')!.textContent).toContain('Serviço: Sem qualificação');
+    expect(screen.getByText('Prestador B (teste)').closest('tr')!.textContent).toContain('Serviços: Sem qualificação');
+  });
+
+  it('na lista, quem só presta serviço mostra a categoria em que tem qualificação (o laboratório, por exemplo)', () => {
+    useQualificacaoStore.getState().definir(
+      qualificacoes([
+        ...HISTORICO,
+        linha({
+          id: 9, empresaRaizId: null, fornecedorId: 'prestador-b', categoria: 'controle_tecnologico', minimo: 1,
+          situacao: 'vence_em_30_dias', venceEm: '2026-10-20', ecrs: [],
+        }),
+      ]),
+    );
+    render(<FornecedoresPage />);
+    expect(screen.getByText('Prestador B (teste)').closest('tr')!.textContent).toContain(
+      'Controle tecnológico: Vence em 20/10/2026',
+    );
   });
 
   it('na lista, com as qualificações fora do ar: diz que não carregou, não "sem qualificação"', () => {
