@@ -234,13 +234,17 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **começada em 28/09 (D611 §3.4), na cópia `OC_fornecedores`, ramo `d604-fornecedores`**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **em construção na cópia `OC_fornecedores`, ramo `d604-fornecedores`, que cresce em `fe119e6` (D613)**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
 a D609 (as tabelas na produção, **as duas travas desligadas até a tela publicar**: a tela primeiro, a trava depois) e a D610
 (o tipo `laboratorio`; 2 pessoas físicas sem documento, qualificadas pelo `fornecedor_id`). **Quando começa:** depois do
 editor e da perícia da máscara, numa cópia nova. **O Banco pediu aviso** quando as telas estiverem prontas para teste.
+*Em 28/09 (D613):* o plano aceito com as quatro recomendações. O ramo cresce em `fe119e6` (por merge, e não recriado: o
+ramo já estava empurrado); a qualificação na ficha da empresa, com as cinco categorias e o selo na lista; as tratativas num
+bloco do Painel, só para quem revisa ECR; a locação sem OC fica para depois. A perícia deste ramo vai de `fe119e6` à ponta.
+A prova no ensaio é primeiro pelo lado do Banco. Já no ramo: as regras puras (`0318d8b`, 18 testes).
 
 ---
 
