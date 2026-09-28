@@ -1,0 +1,265 @@
+/**
+ * A qualificação dos fornecedores e a avaliação na entrega (CTO-D604, D605,
+ * D606; o contrato do Banco de 28/09, `compras.qualificacoes` e
+ * `compras.avaliacoes_entrega`).
+ *
+ * Regra pura, sem tela e sem banco. Quem decide é o BANCO: a situação, o
+ * vencimento e a nota gravada vêm das vistas dele, e as duas travas moram lá.
+ * O que está aqui é o que a tela precisa saber ANTES de perguntar — a nota ao
+ * vivo enquanto a pessoa marca, a frase de cada recusa, e a trava da emissão
+ * para a OC que ainda não foi gravada (a `qualificacao_da_oc` do banco só
+ * conhece OC gravada). É a mesma conta do banco, e o banco confere de novo.
+ *
+ * O "hoje" é o de São Paulo, o mesmo do banco: `hojeEmSaoPaulo`, de `ecr.ts`.
+ */
+
+export type Categoria = 'material' | 'servico' | 'controle_tecnologico' | 'projeto' | 'locacao';
+
+export const CATEGORIAS: readonly Categoria[] = ['material', 'servico', 'controle_tecnologico', 'projeto', 'locacao'];
+
+export type Situacao = 'qualificada' | 'vence_em_30_dias' | 'vencida' | 'desqualificada' | 'sem_qualificacao';
+
+/** As duas situações com que a OC com ECR emite (contrato §2, `qualificacao_da_oc`). */
+const EMITE_COM: readonly Situacao[] = ['qualificada', 'vence_em_30_dias'];
+
+/** A qualificação que vale para uma empresa numa categoria (a `vigente` da vista). */
+export interface Selo {
+  situacao: Situacao;
+  qualificadaEm: string | null; // 'aaaa-mm-dd'
+  venceEm: string | null; // 'aaaa-mm-dd'
+  ecrs: number[];
+}
+
+export const SEM_QUALIFICACAO: Selo = { situacao: 'sem_qualificacao', qualificadaEm: null, venceEm: null, ecrs: [] };
+
+/** 'aaaa-mm-dd' → 'dd/mm/aaaa'. */
+export function dataBr(iso: string | null | undefined): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso ?? '');
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+}
+
+/** 'aaaa-mm-dd' → 'mm/aaaa', como a D604 §3.4 escreve o selo. */
+function mesAno(iso: string | null): string {
+  const m = /^(\d{4})-(\d{2})/.exec(iso ?? '');
+  return m ? `${m[2]}/${m[1]}` : '';
+}
+
+/** O texto do selo, ao lado da empresa na Nova OC e na lista (D604 §3.4). */
+export function textoDoSelo(s: Selo): string {
+  switch (s.situacao) {
+    case 'qualificada':
+      return `Qualificada até ${mesAno(s.venceEm)}`;
+    case 'vence_em_30_dias':
+      return `Vence em ${dataBr(s.venceEm)}`;
+    case 'vencida':
+      return `Vencida desde ${dataBr(s.venceEm)}`;
+    case 'desqualificada':
+      return 'Desqualificada';
+    case 'sem_qualificacao':
+      return 'Sem qualificação';
+  }
+}
+
+/** Uma das cinco, ou "sem qualificação" para o que o banco mandar e a tela não conhecer. */
+export function paraSituacao(v: unknown): Situacao {
+  const s = String(v ?? '');
+  return (['qualificada', 'vence_em_30_dias', 'vencida', 'desqualificada', 'sem_qualificacao'] as const).find(
+    (x) => x === s,
+  ) ?? 'sem_qualificacao';
+}
+
+// ---------------------------------------------------------------------------
+// A trava da emissão (D605): a mesma conta da `qualificacao_da_oc` do banco
+// ---------------------------------------------------------------------------
+
+/** As ECRs da OC: as dos itens, sem repetir, em ordem. Item sem ECR não conta (D605 3). */
+export function ecrsDaOc(itens: readonly { ecr_id: number | null }[]): number[] {
+  return [...new Set(itens.map((i) => i.ecr_id).filter((e): e is number => typeof e === 'number'))].sort((a, b) => a - b);
+}
+
+const NN = (n: number) => String(n).padStart(2, '0');
+
+/** "ECR 12", "ECRs 12 e 19", "ECRs 05, 12 e 19". */
+export function nomeDasEcrs(ecrs: readonly number[]): string {
+  const n = ecrs.map(NN);
+  if (n.length === 0) return '';
+  if (n.length === 1) return `ECR ${n[0]}`;
+  return `ECRs ${n.slice(0, -1).join(', ')} e ${n[n.length - 1]}`;
+}
+
+/**
+ * A recusa da emissão por qualificação, ou '' quando pode emitir. OC sem item
+ * de ECR não é material controlado e não pede qualificação; com ECR, emite
+ * só com a empresa qualificada (ou vencendo em 30 dias) E com todas as ECRs
+ * da OC cobertas pela qualificação vigente (D606 1).
+ */
+export function travaDaQualificacao(selo: Selo, ecrs: readonly number[]): string {
+  if (ecrs.length === 0) return '';
+  if (!EMITE_COM.includes(selo.situacao)) {
+    const porque =
+      selo.situacao === 'vencida'
+        ? `a qualificação dela venceu em ${dataBr(selo.venceEm)}`
+        : selo.situacao === 'desqualificada'
+          ? 'ela está desqualificada para material controlado'
+          : 'ela não tem qualificação de material';
+    return `Esta OC tem material controlado (${nomeDasEcrs(ecrs)}), e ${porque}. Use "Qualificar agora" para emitir.`;
+  }
+  const faltando = ecrs.filter((e) => !selo.ecrs.includes(e));
+  if (faltando.length > 0) {
+    return (
+      `A empresa está qualificada, mas não para ${faltando.length === 1 ? 'a' : 'as'} ${nomeDasEcrs(faltando)} desta OC. ` +
+      'Use "Qualificar agora" para incluir.'
+    );
+  }
+  return '';
+}
+
+/**
+ * As ECRs que o "Qualificar agora" traz marcadas: as da OC somadas às da
+ * qualificação vigente (contrato §2: requalificar para uma ECR nova não pode
+ * tirar as que a empresa já tinha).
+ */
+export function ecrsDoQualificarAgora(daOc: readonly number[], vigente: readonly number[]): number[] {
+  return [...new Set([...vigente, ...daOc])].sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// O formulário de qualificar
+// ---------------------------------------------------------------------------
+
+export interface CriterioMarcado {
+  atende: boolean;
+  motivo: string;
+}
+
+/** A nota enquanto a pessoa marca: quantos critérios atendem. */
+export function notaAoVivo(criterios: readonly CriterioMarcado[]): number {
+  return criterios.filter((c) => c.atende).length;
+}
+
+/**
+ * O vencimento que o banco vai calcular: +12 meses, e o próprio dia ainda
+ * vale. 29/02 vira 28/02, como o `interval '12 months'` do Postgres.
+ */
+export function vencimentoDe(qualificadaEm: string): string {
+  const [a, m, d] = qualificadaEm.split('-').map(Number);
+  const ultimoDia = new Date(Date.UTC(a! + 1, m!, 0)).getUTCDate();
+  return `${a! + 1}-${NN(m!)}-${NN(Math.min(d!, ultimoDia))}`;
+}
+
+/** O que falta para gravar uma qualificação, na ordem da tela ('' = pode). */
+export function problemaDaQualificacao(
+  categoria: Categoria,
+  criterios: readonly CriterioMarcado[],
+  ecrs: readonly number[],
+  qualificadaEm: string,
+  hoje: string,
+): string {
+  if (criterios.length !== 3) return 'São três critérios.';
+  const semMotivo = criterios.findIndex((c) => !c.motivo.trim());
+  if (semMotivo >= 0) return `Escreva o motivo do critério ${semMotivo + 1}: por que atende, ou por que não atende.`;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(qualificadaEm)) return 'Informe a data da qualificação.';
+  if (qualificadaEm > hoje) return 'A data da qualificação não pode ser depois de hoje.';
+  if (categoria === 'material' && ecrs.length === 0) return 'Marque para quais ECRs a empresa está sendo qualificada.';
+  return '';
+}
+
+// ---------------------------------------------------------------------------
+// A avaliação na entrega (PS.02, SiAC 8.4.1.2)
+// ---------------------------------------------------------------------------
+
+export interface Avaliacao {
+  notaFiscal: string;
+  recebidoEm: string;
+  prazoConforme: boolean | null;
+  integridadeConforme: boolean | null;
+  ocEcrConforme: boolean | null;
+  observacao: string;
+  tratativa: string;
+}
+
+/** Quantas "Não Conforme" (resposta em branco não conta como nenhuma das duas). */
+export function naoConformes(a: Pick<Avaliacao, 'prazoConforme' | 'integridadeConforme' | 'ocEcrConforme'>): number {
+  return [a.prazoConforme, a.integridadeConforme, a.ocEcrConforme].filter((r) => r === false).length;
+}
+
+/** Com duas ou mais "Não Conforme", a tratativa é obrigatória (PS.02, regra operacional). */
+export function pedeTratativa(a: Pick<Avaliacao, 'prazoConforme' | 'integridadeConforme' | 'ocEcrConforme'>): boolean {
+  return naoConformes(a) >= 2;
+}
+
+/** O que falta para gravar a avaliação, na ordem da tela ('' = pode). */
+export function problemaDaAvaliacao(a: Avaliacao, hoje: string): string {
+  if (!a.notaFiscal.trim()) return 'Informe o número da nota fiscal.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(a.recebidoEm)) return 'Informe o dia do recebimento.';
+  if (a.recebidoEm > hoje) return 'O dia do recebimento não pode ser depois de hoje.';
+  if (a.prazoConforme === null || a.integridadeConforme === null || a.ocEcrConforme === null) {
+    return 'Responda as três perguntas: Conforme ou Não Conforme.';
+  }
+  if (pedeTratativa(a) && !a.tratativa.trim()) {
+    return 'Com duas ou mais "Não Conforme", escreva a tratativa: o que foi feito com a entrega.';
+  }
+  return '';
+}
+
+// ---------------------------------------------------------------------------
+// As recusas do banco, em frase de gente (contrato §2)
+// ---------------------------------------------------------------------------
+
+export interface ErroDoBanco {
+  code?: string;
+  message: string;
+  details?: string | null;
+  hint?: string | null;
+}
+
+/** A trava da emissão no banco (23514): o motivo vem na própria mensagem. */
+export function fraseDaTravaDoBanco(e: ErroDoBanco): string {
+  const dica = e.hint?.trim() ? ` ${e.hint.trim()}` : '';
+  return `O banco não deixou emitir: ${e.message.replace(/\.$/, '')}.${dica}`;
+}
+
+export function fraseDaRecusaDaQualificacao(e: ErroDoBanco): string {
+  switch (e.code) {
+    case '42501':
+      return 'Só quem pode emitir OC qualifica uma empresa, e o seu perfil precisa ter nome. A qualificação não foi gravada.';
+    case 'P0002':
+      return 'Esta empresa não existe mais no banco. Recarregue a página. A qualificação não foi gravada.';
+    case '22023':
+      return `O banco recusou a qualificação: ${e.message}`;
+    default:
+      return `Falha ao gravar a qualificação: ${e.message}`;
+  }
+}
+
+export function fraseDaRecusaDaEntrega(e: ErroDoBanco): string {
+  switch (e.code) {
+    case '42501':
+      return 'Só quem pode emitir OC registra a entrega. A avaliação não foi gravada.';
+    case 'P0002':
+      return 'Esta OC não existe mais no banco. Recarregue a página. A avaliação não foi gravada.';
+    case '40001':
+      return 'Esta OC mudou desde que você abriu a tela. Recarregue a página e registre de novo. A avaliação não foi gravada.';
+    case '55000':
+      return 'Só OC emitida ou entregue recebe avaliação de entrega. A avaliação não foi gravada.';
+    case '22023':
+      return `O banco recusou a avaliação: ${e.message}`;
+    default:
+      return `Falha ao gravar a avaliação: ${e.message}`;
+  }
+}
+
+export function fraseDaRecusaDaCiencia(e: ErroDoBanco): string {
+  switch (e.code) {
+    case '42501':
+      return 'Só quem revisa as ECRs dá ciência de tratativa. A ciência não foi gravada.';
+    case 'P0002':
+      return 'Esta avaliação não existe mais no banco. Recarregue a página.';
+    case '55000':
+      return 'A ciência desta tratativa já foi dada, ou ela não tem tratativa. Recarregue a página.';
+    case '22023':
+      return 'Escreva a nota da ciência.';
+    default:
+      return `Falha ao gravar a ciência: ${e.message}`;
+  }
+}
