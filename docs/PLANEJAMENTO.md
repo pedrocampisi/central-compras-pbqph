@@ -2300,3 +2300,33 @@ verdade: a primeira é do Pedro.
 
 **AS FOTOS:** `docs/Capturas/2026-09-27_D596/` — 7 estados, a 1920 e a 375; dados de antes da D592 (a ECR 02 com a
 linha "Dimensão" vazia), funções do banco falsas.
+
+## Decisão 59 — os sete achados da perícia consertados · 28/09/2026
+
+**POR QUÊ (CTO-D607):** a perícia do Codex achou sete defeitos, a D603 mediu os sete, e o CTO aceitou todos (zero falsos).
+Cada `it.fails` da medida vira trava quando o conserto entra. (As decisões 57 e 58 moram no ramo `d599-uma-obra`, a máscara;
+entram aqui quando ele juntar no `main`.)
+
+**O QUE MUDOU (no ramo `d589-editar-ecr`, `97226b3`; levado à cópia `OC_uma-obra` por merge, `fe119e6`; NÃO publicado):**
+- **A releitura:** a resposta do certeiro se compara com a foto tirada ao mandar; mexeu na espera, pergunta ("Trocar pelos do
+  certeiro" / "Manter os meus"). Os campos não travam.
+- **O rascunho velho:** o rascunho guarda a revisão de origem; a tela recusa e diz o que fazer; o banco recebe `p_revisao_de`
+  (a recusa 40001 tem frase). O editor só publica com isto: a assinatura velha já saiu da produção.
+- **O PDF:** os sinais (≥ ≤ ≠ ≈ √ ∞, setas, gregas) na Symbol, fonte padrão do PDF, sem embutir; larguras pelas métricas da
+  Adobe (a biblioteca erra). O editor recusa a quebra de linha e o que nenhuma fonte desenha, dizendo qual caractere.
+- **A troca de conta:** a saída apaga o rascunho; o rascunho tem dono; o catálogo confere dono e "pode revisar" da conta de agora.
+- **A carga:** as seis listas vêm em páginas, com a contagem e o id de desempate; incompleta ou sem contagem, acusa. A trava de
+  emitir falha fechada (bloqueio desconhecido não emite).
+- **As portas:** teste de comportamento nas duas (zero gravação); a porta do Histórico mora em `mudarStatusDaOc`. Nenhum botão do
+  Histórico leva a "emitida" hoje; a trava da D605 ("Entregue") passará pela mesma função.
+- **O rodapé:** teto de 60 mm. Até ele, o PDF é o de antes byte a byte (até 10 revisões de uma linha); passou, a nota e as
+  últimas que cabem, e o histórico inteiro no fim. A descrição até 500 caracteres, numa linha só.
+
+**AS TRAVAS:** 412 testes no ramo, 442 na cópia; zero `it.fails`. Seis impressões digitais do PDF de `5f287cd`. 27 sabotagens
+novas mordendo; as da D586 (17), D593 (2) e D596 (21) também, quatro com alvo novo; 7 no merge.
+
+**O PORTÃO:** 1.185 linhas novas fora de `docs\` contra `5f287cd` (592 em `src`). A D607 contava com menos de mil; dito ao CTO,
+que decide se o editor precisa de perícia antes da produção. Não enxuguei para caber.
+
+**AS FOTOS:** `docs/Capturas/2026-09-28_D607/` — o PDF antes e depois (a ECR 03 igual; os sinais; 50 revisões de 30 páginas
+para 3).

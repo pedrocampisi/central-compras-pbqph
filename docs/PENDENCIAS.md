@@ -218,13 +218,26 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **no ramo, esperando a carta do CTO para publicar**
+### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **no ramo, com os sete consertos; esperando o CTO conferir e mandar publicar**
 
 *Aberta em 27/09/2026 (decisão 56).* **Onde mora:** o ramo **`d589-editar-ecr`**, commit **`7edb715`**, empurrado,
 **fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D596/`. **Fecha quando:** a carta do CTO mandar
 publicar. O desfazer será a `080168b8`. **Depois dela:** a primeira revisão de verdade é do Pedro.
 *Em 27/09, 22h (D603):* a perícia do Codex chegou (sete achados). Medidos no ramo, commit `5f287cd`, só testes:
 os sete reproduzem (o 5 no banco falso, o 6 por mutação). **Nada consertado:** espera a triagem do CTO.
+*Em 28/09 (D607, decisão 59):* os sete aceitos e consertados no ramo, commit **`97226b3`**, empurrado; levados à cópia
+`OC_uma-obra` por merge (`fe119e6`). 412 testes, zero `it.fails`. **1.185 linhas novas** contra `5f287cd`, acima do portão
+de mil (lei 3 §9.5): o CTO decide se vai perícia antes. **Fecha quando:** a carta do CTO mandar publicar e o editor estiver no ar.
+
+---
+
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **esperando a vez (D607 §2.4)**
+
+*Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
+**Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
+a D609 (as tabelas na produção, **as duas travas desligadas até a tela publicar**: a tela primeiro, a trava depois) e a D610
+(o tipo `laboratorio`; 2 pessoas físicas sem documento, qualificadas pelo `fornecedor_id`). **Quando começa:** depois do
+editor e da perícia da máscara, numa cópia nova. **O Banco pediu aviso** quando as telas estiverem prontas para teste.
 
 ---
 
