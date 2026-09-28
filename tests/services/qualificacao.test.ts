@@ -14,6 +14,8 @@ const banco = vi.hoisted(() => {
     filtros: [] as string[],
     rpc: [] as { nome: string; args: Record<string, unknown> }[],
     resposta: { data: {} as unknown, error: null as null | { code: string; message: string } },
+    /** O teto de linhas por resposta da API (a perícia de 28/09, achado 5): sem teto, por padrão. */
+    teto: Number.POSITIVE_INFINITY,
   };
   function consulta(tabela: string) {
     let de = 0;
@@ -38,7 +40,7 @@ const banco = vi.hoisted(() => {
       },
       then: (ok: (v: unknown) => void) => {
         const todas = (TABELAS[tabela] ?? []).filter((l) => filtros.every(([k, v]) => l[k] === v));
-        ok({ data: todas.slice(de, ate + 1), error: null, ...(contar ? { count: todas.length } : {}) });
+        ok({ data: todas.slice(de, Math.min(ate + 1, de + estado.teto)), error: null, ...(contar ? { count: todas.length } : {}) });
       },
     };
     return c;
@@ -66,6 +68,7 @@ import {
   qualificarEmpresa,
   registrarEntrega,
 } from '../../src/services/supabase/qualificacao';
+import { desempenhoDaFilial, textoDoDesempenho } from '../../src/domain/qualificacao';
 
 const linha = (o: Record<string, unknown>) => ({
   id: 1,
@@ -120,6 +123,7 @@ beforeEach(() => {
   banco.estado.filtros = [];
   banco.estado.rpc = [];
   banco.estado.resposta = { data: {}, error: null };
+  banco.estado.teto = Number.POSITIVE_INFINITY;
 });
 
 describe('D604 — a carga das qualificações', () => {
@@ -270,5 +274,29 @@ describe('D604 — as três escritas, com as chaves do contrato', () => {
     expect(banco.estado.rpc[0]).toEqual({ nome: 'dar_ciencia_tratativa', args: { p_avaliacao_id: 7, p_nota: 'visto' } });
     banco.estado.resposta = { data: null, error: { code: '42501', message: 'x' } };
     await expect(darCienciaTratativa(7, 'visto')).rejects.toThrow('Só quem revisa as ECRs dá ciência de tratativa');
+  });
+});
+
+/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): a medida, SEM conserto. */
+describe('Perícia 28/09 (fornecedores), achado 5 — o desempenho com mais linhas que o teto da API', () => {
+  it.fails('1.001 sujeitos com entregas e teto de 1.000: o 1.001º não vira "nenhuma entrega"', async () => {
+    banco.estado.teto = 1000;
+    banco.TABELAS['desempenho_12_meses'] = Array.from({ length: 1001 }, (_, i) => ({
+      empresa_raiz_id: `empresa-${i + 1}`, fornecedor_id: null, entregas: 2, no_prazo: 2, inteiras: 2, conformes: 2,
+    }));
+    const r = await carregarQualificacoes().catch((e: unknown) => (e instanceof Error ? e : new Error(String(e))));
+    if (r instanceof Error) return; // recusar a carga incompleta também é certo
+    const d = desempenhoDaFilial({ id: 'filial-x', empresa_id: 'empresa-1001' }, r.desempenho);
+    expect(textoDoDesempenho(d)).not.toBe('Nenhuma entrega avaliada nos últimos 12 meses.');
+  });
+
+  it('controle: com 1.000 (cabe no teto), o último sujeito tem as entregas dele', async () => {
+    banco.estado.teto = 1000;
+    banco.TABELAS['desempenho_12_meses'] = Array.from({ length: 1000 }, (_, i) => ({
+      empresa_raiz_id: `empresa-${i + 1}`, fornecedor_id: null, entregas: 2, no_prazo: 2, inteiras: 2, conformes: 2,
+    }));
+    const r = await carregarQualificacoes();
+    const d = desempenhoDaFilial({ id: 'filial-x', empresa_id: 'empresa-1000' }, r.desempenho);
+    expect(textoDoDesempenho(d)).toContain('2 entregas avaliadas');
   });
 });

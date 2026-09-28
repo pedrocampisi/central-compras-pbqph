@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type jsPDF from 'jspdf';
-import { linhasDasAvaliacoes, secoesDosQualificados } from '../../src/domain/folhasDoAuditor';
+import { linhasDasAvaliacoes, secoesDosQualificados, type AvaliacaoParaFolha } from '../../src/domain/folhasDoAuditor';
 import { pdfDasAvaliacoes, pdfDosQualificados } from '../../src/services/pdf/generateFolhasDoAuditor';
 import { normalizeFornecedor } from '../../src/domain/normalize';
 import type { LinhaDeQualificacao } from '../../src/domain/qualificacao';
@@ -136,5 +136,42 @@ describe('D604 §3.5 — as avaliações de entrega', () => {
       expect(textoDaPagina(doc, p)).toContain('C = Conforme');
       expect(textoDaPagina(doc, p)).toMatch(/NC = N.o Conforme/);
     }
+  });
+});
+
+/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): as medidas, SEM conserto. */
+describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avaliações escreve', () => {
+  const avaliacao = (o: Partial<AvaliacaoParaFolha>): AvaliacaoParaFolha => ({
+    ocId: 'oc-1', intervencaoId: 'obra-1', notaFiscal: '1', recebidoEm: '2026-09-20',
+    prazoConforme: true, integridadeConforme: true, ocEcrConforme: true, observacao: '',
+    tratativa: '', avaliadoPorNome: 'Pessoa A', cienciaPorNome: '', cienciaEm: '',
+    ...o,
+  });
+  const OCS = [{ id: 'oc-1', numero: '2026/001', fornecedor_id: 'f1' }];
+  const OBRAS = [{ id: 'obra-1', nome: 'Obra de teste' }];
+
+  it.fails('achado 4: "≥" e "≤" da observação não saem como "?" no gerador real', () => {
+    const linhas = linhasDasAvaliacoes(
+      [avaliacao({ observacao: 'medida ≥ 30 mm' }), avaliacao({ observacao: 'medida ≤ 10 mm' })],
+      OCS, FORNECEDORES, OBRAS,
+    );
+    const texto = textoTodo(pdfDasAvaliacoes(linhas, null, '2026-09-28', null));
+    expect(texto).toContain('2026/001'); // a folha saiu com as linhas
+    expect(texto).not.toContain('medida ? 30 mm');
+    expect(texto).not.toContain('medida ? 10 mm');
+  });
+
+  const ciencia = (cienciaEm: string) =>
+    linhasDasAvaliacoes(
+      [avaliacao({ prazoConforme: false, integridadeConforme: false, tratativa: 'trocado', cienciaPorNome: 'Revisor', cienciaEm })],
+      OCS, FORNECEDORES, OBRAS,
+    )[0]!.at(-1);
+
+  it.fails('achado 7: a ciência às 21:30 de 28/09 em Brasília, escrita em UTC, sai 28/09', () => {
+    expect(ciencia('2026-09-29T00:30:00Z')).toBe('Revisor, 28/09/2026');
+  });
+
+  it('achado 7, controle: o mesmo instante escrito com -03:00 sai 28/09', () => {
+    expect(ciencia('2026-09-28T21:30:00-03:00')).toBe('Revisor, 28/09/2026');
   });
 });

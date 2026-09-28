@@ -23,6 +23,10 @@ const banco = vi.hoisted(() => {
     pode: true,
     registro: [] as { tabela: string; filtros: [string, string][] }[],
     avisos: [] as Record<string, unknown>[],
+    // Medidas da perícia de 28/09: segurar a resposta de uma busca (o `then`
+    // guarda a entrega em `presos`, e o teste solta quando quiser).
+    segurar: null as null | ((r: { tabela: string; filtros: [string, string][] }) => boolean),
+    presos: [] as (() => void)[],
   };
   function consulta(tabela: string) {
     const reg = { tabela, filtros: [] as [string, string][] };
@@ -45,14 +49,21 @@ const banco = vi.hoisted(() => {
         return q;
       },
       then: (ok: (r: unknown) => void) => {
-        const linhas = (TABELAS[tabela] ?? []).filter((l) => reg.filtros.every(([c, v]) => l[c] === v));
-        return ok({
-          data: pagina ? linhas.slice(pagina[0], pagina[1] + 1) : linhas,
-          error: null,
-          ...(contar ? { count: linhas.length } : {}),
-        });
+        if (estado.segurar?.(reg)) {
+          estado.presos.push(() => entregar(ok));
+          return;
+        }
+        return entregar(ok);
       },
     };
+    function entregar(ok: (r: unknown) => void) {
+      const linhas = (TABELAS[tabela] ?? []).filter((l) => reg.filtros.every(([c, v]) => l[c] === v));
+      return ok({
+        data: pagina ? linhas.slice(pagina[0], pagina[1] + 1) : linhas,
+        error: null,
+        ...(contar ? { count: linhas.length } : {}),
+      });
+    }
     return q;
   }
   const canal: Record<string, unknown> = {
@@ -91,6 +102,7 @@ import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUmaObraStore } from '../../src/stores/useUmaObraStore';
 import { janelaEscolhida, type MascaraDeObra } from '../../src/domain/umaObra';
 import { normalizeOC } from '../../src/domain/normalize';
+import { recarregarDados } from '../../src/services/supabase/sync';
 
 const { inicio, fim } = janelaEscolhida('2026-11-16', '00:00', '2026-11-17', '23:59');
 const AUDITORIA: MascaraDeObra = {
@@ -135,6 +147,8 @@ beforeEach(() => {
   banco.estado.pode = true;
   banco.estado.registro = [];
   banco.estado.avisos = [];
+  banco.estado.segurar = null;
+  banco.estado.presos = [];
   useDataStore.setState({ data: null, dirty: false, dirtySince: null });
   useUiStore.setState({ activeTab: ABA_INICIAL });
   useOcEditingStore.getState().stopEditing();
@@ -344,5 +358,151 @@ describe('D599 §2.5 — o rascunho da Nova OC de outra obra não reabre com a m
       useUmaObraStore.getState().armar({ ...AUDITORIA, inicio: new Date().toISOString(), ensaio: true });
     });
     expect(useOcEditingStore.getState().ocEditing?.obra_id).toBe('obra-a');
+  });
+});
+
+/**
+ * Perícia de 28/09 sobre `fe119e6` (consertos e máscara): as medidas, SEM
+ * conserto. Cada uma é escrita pelo lado do certo e fica `it.fails` enquanto o
+ * defeito existir; no dia do conserto ela acusa, o `.fails` sai e ela vira trava.
+ */
+describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não pode entrar na tela', () => {
+  const soltarTudo = async () => {
+    await act(async () => {
+      while (banco.estado.presos.length) banco.estado.presos.shift()!();
+    });
+  };
+  afterEach(soltarTudo);
+
+  it.fails('ao ligar, enquanto a busca filtrada não volta, a outra obra já não está na tela', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-16T02:59:50Z');
+    useUmaObraStore.getState().conferir();
+    await abrir();
+    expect(pagina().textContent).toContain('2026/002'); // antes da janela: as duas
+
+    banco.estado.segurar = (r) => r.tabela === 'compras.ordens_compra' && r.filtros.length > 0;
+    relogio('2026-11-16T03:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a'); // ligada
+    expect(banco.estado.presos.length).toBeGreaterThan(0); // e a busca filtrada presa
+
+    expect(pagina().textContent).not.toContain('2026/002');
+  });
+
+  it.fails('ao ligar, uma carga SEM filtro que termina depois da filtrada não traz a outra obra de volta', async () => {
+    await abrir();
+    banco.estado.segurar = (r) => r.tabela === 'compras.ordens_compra' && r.filtros.length === 0;
+    const velha = recarregarDados(); // o Recarregar, ou um aviso do tempo real, antes da virada
+    await act(async () => {});
+    expect(banco.estado.presos.length).toBe(1);
+
+    await armadaParaAuditoria();
+    relogio('2026-11-16T15:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(pagina().textContent).not.toContain('2026/002'); // a filtrada chegou primeiro
+
+    await act(async () => {
+      banco.estado.presos.shift()!();
+      await velha;
+    });
+    expect(pagina().textContent).not.toContain('2026/002');
+  });
+
+  it.fails('ao desligar, uma carga FILTRADA que termina depois não esconde de novo as outras obras', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-17T15:00:00Z');
+    useUmaObraStore.getState().conferir();
+    await abrir();
+    banco.estado.segurar = (r) => r.tabela === 'compras.ordens_compra' && r.filtros.length > 0;
+    const velha = recarregarDados();
+    await act(async () => {});
+    expect(banco.estado.presos.length).toBe(1);
+
+    relogio('2026-11-18T03:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(pagina().textContent).toContain('2026/002'); // desligou: as duas
+
+    await act(async () => {
+      banco.estado.presos.shift()!();
+      await velha;
+    });
+    expect(pagina().textContent).toContain('2026/002');
+  });
+});
+
+describe('Perícia 28/09 (fe119e6), achado 2 — a virada da janela pelo relógio do aplicativo, sem chamar a conferência por fora', () => {
+  beforeEach(() => {
+    vi.useRealTimers(); // o de fora só finge a data; aqui o intervalo também
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+  });
+
+  it.fails('dois segundos depois de 00:00 de 16/11, a máscara já está ligada', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-16T02:59:59Z');
+    await abrir();
+    expect(pagina().textContent).toContain('2026/002');
+    await act(async () => vi.advanceTimersByTime(2_000));
+    expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
+  });
+
+  it('o controle: até 15 segundos depois ela liga sozinha (o atraso tem teto)', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-16T02:59:59Z');
+    await abrir();
+    await act(async () => vi.advanceTimersByTime(15_000));
+    expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
+  });
+});
+
+describe('Perícia 28/09 (fe119e6), achado 4 — um campo da janela apagado, e o Armar', () => {
+  async function armarCom(campo: string) {
+    await abrir();
+    await aba('config');
+    await screen.findByText('Mostrar só uma obra');
+    fireEvent.change(screen.getByLabelText('Obra'), { target: { value: 'obra-a' } });
+    fireEvent.change(screen.getByLabelText(campo), { target: { value: '' } });
+    const erros: unknown[] = [];
+    const pegar = (e: ErrorEvent) => {
+      erros.push(e.error ?? e.message);
+      e.preventDefault();
+    };
+    window.addEventListener('error', pegar);
+    try {
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Armar' })));
+    } catch (e) {
+      erros.push(e);
+    } finally {
+      window.removeEventListener('error', pegar);
+    }
+    return erros;
+  }
+
+  it.fails('sem o dia: nenhuma exceção, e a mensagem pede o dia', async () => {
+    const erros = await armarCom('Liga em (dia)');
+    expect(erros).toEqual([]);
+    expect(screen.getByRole('alert').textContent).toMatch(/dia|data/i);
+  });
+
+  it.fails('sem a hora: o mesmo', async () => {
+    const erros = await armarCom('Liga em (hora)');
+    expect(erros).toEqual([]);
+    expect(screen.getByRole('alert').textContent).toMatch(/hora/i);
+  });
+});
+
+/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): as medidas, SEM conserto. */
+describe('Perícia 28/09 (fornecedores), achado 1 — o aviso das avaliações de entrega com a máscara ligada', () => {
+  it.fails('dentro da janela, o aviso de avaliacoes_entrega pede só a obra, como o das OCs', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-16T15:00:00Z');
+    useUmaObraStore.getState().conferir();
+    await abrir();
+    const aviso = banco.estado.avisos.find((a) => a['table'] === 'avaliacoes_entrega')!;
+    expect(aviso).toBeTruthy();
+    expect(aviso['filter']).toBe('intervencao_id=eq.obra-a');
   });
 });

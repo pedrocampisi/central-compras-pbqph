@@ -40,6 +40,7 @@ vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: () => banc
 import { HistoricoPage } from '../../src/features/ordens-compra/HistoricoPage';
 import { ENTREGUE_SO_COM_AVALIACAO, mudarStatusDaOc } from '../../src/features/ordens-compra/mudarStatusDaOc';
 import { hojeEmSaoPaulo } from '../../src/domain/ecr';
+import { linhasDasAvaliacoes } from '../../src/domain/folhasDoAuditor';
 import { normalizeFornecedor, normalizeItem, normalizeOC, normalizeObra } from '../../src/domain/normalize';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
@@ -252,5 +253,74 @@ describe('D604 §3.5 — o PDF das avaliações, pelo Histórico', () => {
     await gerar();
     expect(banco.pdfs).toHaveLength(0);
     expect(avisos()).toContain('Erro ao gerar o PDF: Falha ao ler as avaliações de entrega: rede');
+  });
+});
+
+/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): as medidas, SEM conserto. */
+describe('Perícia 28/09 (fornecedores), achado 2 — o PDF das avaliações atravessando a virada da máscara', () => {
+  const avaliacao = (id: number, intervencaoId: string) => ({
+    id, ocId: '001', intervencaoId, notaFiscal: String(1000 + id), recebidoEm: '2026-09-20',
+    prazoConforme: true, integridadeConforme: true, ocEcrConforme: true, naoConformes: 0, observacao: '', tratativa: '',
+    avaliadoPorNome: 'Pessoa de teste', cienciaPorNome: '', cienciaEm: '', cienciaNota: '',
+  });
+  async function gerarComAVirada(mascaraAntes: string | null, mascaraDepois: string | null, lidas: unknown[]) {
+    let soltar: (v: unknown[]) => void = () => {};
+    banco.mascara = mascaraAntes;
+    banco.avaliacoes = vi.fn(() => new Promise<unknown[]>((r) => (soltar = r)));
+    render(<HistoricoPage />);
+    fireEvent.click(screen.getByRole('button', { name: /PDF das avaliações/ }));
+    banco.mascara = mascaraDepois; // a janela virou durante a espera
+    await act(async () => soltar(lidas));
+  }
+  /** O certo: nenhum PDF (descartado), ou título e linhas do mesmo contexto. */
+  const coerente = (tituloEsperadoSeHouver: string | null) => {
+    if (banco.pdfs.length === 0) return;
+    const [linhas, obra] = banco.pdfs[0]! as [string[][], string | null];
+    expect(obra).toBe(tituloEsperadoSeHouver);
+    if (obra) for (const l of linhas) expect(l[2]).toBe(obra);
+  };
+
+  it.fails('começou sem máscara, ligou na espera: o PDF não sai com o título da obra e linhas das duas', async () => {
+    await gerarComAVirada(null, OBRA.id, [avaliacao(1, OBRA.id), avaliacao(2, 'obra-outra')]);
+    expect(banco.pdfs).toHaveLength(1);
+    const [linhas, obra] = banco.pdfs[0]! as [string[][], string | null];
+    expect(linhas).toHaveLength(2);
+    if (obra) for (const l of linhas) expect(l[2]).toBe(obra);
+  });
+
+  it.fails('começou com a máscara, desligou na espera: o PDF não sai como "todas as obras" com a lista de uma só', async () => {
+    await gerarComAVirada(OBRA.id, null, [avaliacao(1, OBRA.id)]);
+    coerente(OBRA.nome);
+  });
+});
+
+describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depois de corrigir a resposta', () => {
+  async function registrarComUmaSoNc() {
+    banco.registrar = vi.fn(async () => ({
+      avaliacaoId: 11, status: 'entregue', versao: 5, entregueEm: '2026-09-28', naoConformes: 1, tratativaAberta: false,
+    }));
+    abrir();
+    fireEvent.change(campo(/Nota fiscal/), { target: { value: '66' } });
+    responder([false, true, false]);
+    fireEvent.change(campo(/Tratativa/), { target: { value: 'devolvido ao fornecedor' } });
+    responder([true, true, false]); // corrigiu: ficou uma "Não Conforme" só
+    expect(caixa()!.querySelector('[data-aviso-tratativa]')).toBeNull(); // o campo sumiu da tela
+    await registrar();
+    expect(banco.registrar).toHaveBeenCalledTimes(1);
+    return banco.registrar.mock.calls[0]![2] as Record<string, unknown>;
+  }
+
+  it.fails('com uma "Não Conforme" só, a linha do PDF não diz "Aberta" (o Painel e a ciência não a oferecem)', async () => {
+    const enviado = await registrarComUmaSoNc();
+    const [linha] = linhasDasAvaliacoes(
+      [{ ocId: '001', intervencaoId: OBRA.id, avaliadoPorNome: 'Pessoa de teste', cienciaPorNome: '', cienciaEm: '', ...(enviado as object) } as never],
+      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA],
+    );
+    expect(linha!.at(-1)).not.toBe('Aberta');
+  });
+
+  it('o que foi enviado: a tratativa escondida foi junto (o registro do achado, não a medida)', async () => {
+    const enviado = await registrarComUmaSoNc();
+    expect(enviado).toMatchObject({ prazoConforme: true, integridadeConforme: true, ocEcrConforme: false, tratativa: 'devolvido ao fornecedor' });
   });
 });
