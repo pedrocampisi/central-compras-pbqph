@@ -603,10 +603,15 @@ export function NovaOcPage() {
 
   // UMA leitura, de arquivo ou de texto, por um dos dois leitores (D567).
   //   somar ... os itens entram SOMADOS ao que a OC já tem (D554/D557)
-  //   trocar .. os itens da leitura anterior saem e os novos entram no lugar
+  //   trocar .. os itens da leitura anterior saem e os novos entram no lugar;
+  //             `comoEstavam` é como eles estavam quando a releitura saiu
   // O fim é sempre o mesmo: o aviso diz quantos entraram e quantas linhas
   // ficaram de fora; o campo fica aberto com o resultado. Sem item, é falha.
-  const ler = useCallback(async (f: FonteDaLeitura, com: Leitor, trocar: string[] | null) => {
+  const ler = useCallback(async (
+    f: FonteDaLeitura,
+    com: Leitor,
+    trocar: { ids: string[]; comoEstavam: Item[] } | null,
+  ) => {
     if (!data || importing) return;
     setImporting(true);
     setLendoCom(com);
@@ -636,11 +641,30 @@ export function NovaOcPage() {
         return;
       }
       if (trocar) {
+        // A pessoa pode ter corrigido um item ENQUANTO o certeiro lia (perícia
+        // de 27/09, achado 1): compara de novo com o que saiu e, se mudou,
+        // pergunta antes de trocar. Os campos não travam durante a espera.
+        const naEspera = itensMexidos(trocar.comoEstavam, useOcEditingStore.getState().ocEditing?.itens ?? []);
+        if (naEspera > 0) {
+          const ok = await confirmAsync({
+            title: 'Trocar os itens desta leitura?',
+            message:
+              `Enquanto o certeiro lia, você mexeu em ${naEspera === 1 ? '1 item' : `${naEspera} itens`} desta leitura. ` +
+              'Trocar pelos do certeiro perde essas mudanças. Os itens que você pôs à mão ficam.',
+            confirmLabel: 'Trocar pelos do certeiro',
+            cancelLabel: 'Manter os meus',
+            tone: 'danger',
+          });
+          if (!ok) {
+            showToast('Os seus itens ficaram como estão. A leitura do certeiro não entrou.', 'info', CHAVE_DA_LEITURA);
+            return;
+          }
+        }
         const agora = useOcEditingStore.getState().ocEditing?.itens ?? [];
-        replaceItems(trocarItensDaLeitura(agora, trocar, r.itens));
+        replaceItems(trocarItensDaLeitura(agora, trocar.ids, r.itens));
         setConfira((antes) => {
           const resto = { ...antes };
-          for (const id of trocar) delete resto[id];
+          for (const id of trocar.ids) delete resto[id];
           return { ...resto, ...r.confira };
         });
       } else {
@@ -701,7 +725,10 @@ export function NovaOcPage() {
       if (!ok) return;
     }
     setLeitor('certeiro');
-    await ler(fonte, 'certeiro', resultado.itens.map((i) => i.id));
+    // Como os itens estão AGORA, na saída: é com isto que a resposta se compara.
+    const ids = resultado.itens.map((i) => i.id);
+    const comoEstavam = (useOcEditingStore.getState().ocEditing?.itens ?? []).filter((i) => ids.includes(i.id));
+    await ler(fonte, 'certeiro', { ids, comoEstavam });
   }, [resultado, fonte, importing, ler]);
 
   // O erro do rápido oferece o certeiro: o mesmo pedido, pelo outro leitor.

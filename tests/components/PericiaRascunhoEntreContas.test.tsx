@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
- * Perícia do Codex, 27/09/2026, achado 4 — MEDIDA, não conserto (CTO-D603).
+ * Perícia do Codex, 27/09/2026, achado 4 — medida na D603, TRAVA desde a D607
+ * (a saída apaga o rascunho, e o rascunho guarda de quem é).
  *
  * O "como conferir" do perito: o App de verdade, a MESMA instância. A conta que
  * revisa abre a ECR e muda um texto; sai; entra outra conta, que não revisa
@@ -93,9 +94,7 @@ beforeEach(() => {
 });
 
 describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de conta', () => {
-  // `it.fails`: esta medida REPRODUZ o achado no código de hoje. Quando o conserto
-  // entrar, ela passa a falhar — aí o `.fails` sai e a medida vira trava.
-  it.fails('a outra conta, que não revisa, não encontra o rascunho da conta anterior', async () => {
+  it('a outra conta, que não revisa, não encontra o rascunho da conta anterior', async () => {
     render(<App />);
     await screen.findByRole('navigation');
     await act(async () => useUiStore.getState().setActiveTab('catalogo'));
@@ -105,6 +104,8 @@ describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de cont
 
     // Sai a conta que revisa; entra outra, na mesma página.
     await act(async () => auth.aoMudar!('SIGNED_OUT', null));
+    // A saída, sozinha, já apaga: ninguém entrou ainda.
+    expect(useRevisaoEcrStore.getState().rascunho).toBeNull();
     auth.conta = 'outra';
     await act(async () => auth.aoMudar!('SIGNED_IN', sessaoDe('outra')));
     await screen.findByRole('navigation');
@@ -118,5 +119,27 @@ describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de cont
     const editor = document.querySelector('[data-editor]');
     const rascunhoNaTela = screen.queryByDisplayValue(RASCUNHO);
     expect({ editor: !!editor, rascunhoNaTela: !!rascunhoNaTela }).toEqual({ editor: false, rascunhoNaTela: false });
+    // E a loja está vazia: a saída apagou o rascunho, não só o escondeu.
+    expect(useRevisaoEcrStore.getState().rascunho).toBeNull();
+  });
+
+  it('troca de conta sem passar pela saída: o rascunho da conta anterior também some', async () => {
+    render(<App />);
+    await screen.findByRole('navigation');
+    await act(async () => useUiStore.getState().setActiveTab('catalogo'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar a ECR 03' }));
+    fireEvent.change(screen.getByLabelText('Texto da linha 1 da seção 01'), { target: { value: RASCUNHO } });
+    expect(useRevisaoEcrStore.getState().dono).toBe('revisor');
+
+    auth.conta = 'outra';
+    await act(async () => auth.aoMudar!('SIGNED_IN', sessaoDe('outra')));
+    await screen.findByText('Pessoa outra');
+    await act(async () => useUiStore.getState().setActiveTab('catalogo'));
+    await screen.findByText('Concreto Usinado');
+    await act(async () => {});
+
+    expect(document.querySelector('[data-editor]')).toBeNull();
+    expect(screen.queryByDisplayValue(RASCUNHO)).toBeNull();
+    expect(useRevisaoEcrStore.getState().rascunho).toBeNull();
   });
 });

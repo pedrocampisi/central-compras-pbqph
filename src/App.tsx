@@ -16,6 +16,7 @@ import { useDataStore } from './stores/useDataStore';
 import { useOcEditingStore } from './stores/useOcEditingStore';
 import { abaQueExiste, useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
+import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
 
 // Services
 import { sessaoAtual, perfilAtual, sair, type Papel } from './services/supabase/auth';
@@ -144,9 +145,14 @@ export default function App() {
       // O rascunho de OC aberto também é dado de quem estava logado: sem isto,
       // quem entra depois no mesmo computador encontra a OC do colega no editor.
       useOcEditingStore.getState().stopEditing();
+      // Idem o rascunho da ECR (perícia 27/09, achado 4).
+      useRevisaoEcrStore.getState().fechar();
       setTab('dashboard');
       return;
     }
+    // Troca de conta sem passar pela saída: o rascunho da outra conta some.
+    const { dono } = useRevisaoEcrStore.getState();
+    if (dono && dono !== userId) useRevisaoEcrStore.getState().fechar();
 
     let ativo = true;
 

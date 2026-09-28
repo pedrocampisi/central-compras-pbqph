@@ -25,10 +25,22 @@ export interface RevisaoGravada {
   emitida_em: string;
 }
 
-/** Grava a revisão. A recusa do banco sobe como uma frase para a pessoa. */
-export async function revisarEcr(ecrId: number, secoes: EcrSecao[], descricao: string): Promise<RevisaoGravada> {
+/**
+ * Grava a revisão. A recusa do banco sobe como uma frase para a pessoa.
+ *
+ * `revisaoDe` é a revisão de onde o rascunho partiu (contrato do Banco da
+ * D607 §3): se a vigente já for outra, o banco recusa com 40001 em vez de
+ * gravar o rascunho velho por cima (perícia de 27/09, achado 2).
+ */
+export async function revisarEcr(
+  ecrId: number,
+  revisaoDe: string,
+  secoes: EcrSecao[],
+  descricao: string,
+): Promise<RevisaoGravada> {
   const { data, error } = await compras().rpc('revisar_ecr', {
     p_ecr_id: ecrId,
+    p_revisao_de: revisaoDe,
     p_secoes: secoes,
     p_descricao: descricao,
   });
