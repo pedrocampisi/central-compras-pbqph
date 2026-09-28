@@ -1,0 +1,97 @@
+/* A ficha da empresa (CTO-D604 §3.1). O fundo escuro é o do ConfirmDialog; sem animação. */
+
+.caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-elevada);
+}
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.titulo {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.quem {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+.pista,
+.desempenho {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+.desempenho {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 13px;
+  color: var(--texto);
+}
+.semCarga {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+
+.categoria {
+  padding: 10px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+}
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.cabecalho h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+}
+.cabecalho > button { margin-left: auto; }
+.vale {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.historico { margin-top: 6px; font-size: 12px; color: var(--texto); }
+.historico summary { cursor: pointer; font-weight: 600; color: var(--marca); }
+.historico ol { margin: 6px 0 0; padding-left: 18px; }
+.historico ol > li { margin-bottom: 8px; }
+.historico ol > li[data-vigente] strong { color: var(--marca); }
+.historico ul { margin: 2px 0; padding-left: 16px; color: var(--texto-suave); }
+.origem { font-size: 11px; color: var(--text-muted); }
+
+@media (max-width: 700px) {
+  .caixa { padding: 16px; }
+  .cabecalho > button { margin-left: 0; }
+}

@@ -4,6 +4,7 @@ import {
   SEM_QUALIFICACAO,
   ecrsDaOc,
   ecrsDoQualificarAgora,
+  desempenhoDaFilial,
   fraseDaRecusaDaCiencia,
   fraseDaRecusaDaEntrega,
   fraseDaRecusaDaQualificacao,
@@ -18,6 +19,7 @@ import {
   problemaDaQualificacao,
   seloDaFilial,
   sujeitoParaGravar,
+  textoDoDesempenho,
   textoDoSelo,
   travaDaQualificacao,
   vencimentoDe,
@@ -264,5 +266,31 @@ describe('D606 3 — de quem é o selo da filial (a mesma resolução da qualifi
   it('sem as qualificações carregadas, a OC com ECR não emite: a trava falha fechada', () => {
     expect(travaDaQualificacao(null, [12])).toBe(QUALIFICACAO_SEM_CONFIRMACAO);
     expect(travaDaQualificacao(null, [])).toBe('');
+  });
+});
+
+describe('D604 §3.3 — a prova ao requalificar: o desempenho dos últimos 12 meses', () => {
+  const lista = [
+    { empresaRaizId: 'empresa-a', fornecedorId: null, entregas: 4, noPrazo: 3, inteiras: 4, conformes: 1 },
+    { empresaRaizId: null, fornecedorId: 'forn-pf', entregas: 1, noPrazo: 1, inteiras: 1, conformes: 1 },
+  ];
+
+  it('a filial com raiz lê o da empresa; a sem raiz, o dela; filial de outra empresa não pega o de ninguém', () => {
+    expect(desempenhoDaFilial({ id: 'filial-x', empresa_id: 'empresa-a' }, lista)?.entregas).toBe(4);
+    expect(desempenhoDaFilial({ id: 'forn-pf' }, lista)?.entregas).toBe(1);
+    expect(desempenhoDaFilial({ id: 'forn-pf', empresa_id: 'empresa-b' }, lista)).toBeUndefined();
+  });
+
+  it('o texto diz os quatro números, com singular e plural; sem entrega, diz que não houve', () => {
+    expect(textoDoDesempenho(lista[0])).toBe(
+      'Nos últimos 12 meses: 4 entregas avaliadas — 3 no prazo, 4 inteiras, 1 conforme com a OC e a ECR.',
+    );
+    expect(textoDoDesempenho(lista[1])).toBe(
+      'Nos últimos 12 meses: 1 entrega avaliada — 1 no prazo, 1 inteira, 1 conforme com a OC e a ECR.',
+    );
+    expect(textoDoDesempenho(undefined)).toBe('Nenhuma entrega avaliada nos últimos 12 meses.');
+    expect(textoDoDesempenho({ entregas: 0, noPrazo: 0, inteiras: 0, conformes: 0 })).toBe(
+      'Nenhuma entrega avaliada nos últimos 12 meses.',
+    );
   });
 });

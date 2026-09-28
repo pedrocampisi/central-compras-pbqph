@@ -7,6 +7,8 @@
  * - Em material, as ECRs para que a empresa é qualificada. O "Qualificar
  *   agora" já traz marcadas as da OC somadas às que ela tinha.
  * - A nota aparece enquanto se marca, com o mínimo da categoria.
+ * - Ao lado dos critérios, as entregas avaliadas nos últimos 12 meses
+ *   (D604 §3.3): a pessoa marca, o sistema mostra o que aconteceu.
  *
  * Quem calcula a nota, o vencimento e a situação é o banco: a tela só mostra
  * o que ele vai calcular. A caixa não decide nada sobre a OC — devolve o que
@@ -44,6 +46,8 @@ interface Props {
   ecrsMarcadas: readonly number[];
   /** O motivo de a caixa ter aberto (a frase da trava), quando houver. */
   porque?: string;
+  /** O desempenho dos últimos 12 meses, em texto (`textoDoDesempenho`). */
+  desempenho?: string;
   titulo?: string;
   aoGravar: (r: QualificacaoGravada) => void | Promise<void>;
   aoVoltar: () => void;
@@ -51,7 +55,9 @@ interface Props {
 
 type Marca = { atende: boolean | null; motivo: string };
 
-export function QualificarDialogo({ filial, categoria, ecrs, ecrsMarcadas, porque, titulo, aoGravar, aoVoltar }: Props) {
+export function QualificarDialogo({
+  filial, categoria, ecrs, ecrsMarcadas, porque, desempenho, titulo, aoGravar, aoVoltar,
+}: Props) {
   const hoje = hojeEmSaoPaulo();
   const [marcas, setMarcas] = useState<Marca[]>(() => categoria.criterios.map(() => ({ atende: null, motivo: '' })));
   const [marcadas, setMarcadas] = useState<number[]>(() => [...ecrsMarcadas]);
@@ -114,6 +120,11 @@ export function QualificarDialogo({ filial, categoria, ecrs, ecrsMarcadas, porqu
         {porque && (
           <p className={styles.porque} data-porque="">
             {porque}
+          </p>
+        )}
+        {desempenho && (
+          <p className={styles.desempenho} data-desempenho="">
+            {desempenho}
           </p>
         )}
 

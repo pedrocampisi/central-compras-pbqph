@@ -235,3 +235,13 @@
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
+
+/* O selo da qualificação embaixo do fornecedor (CTO-D604 §3.4). */
+.seloDoFornecedor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.ecrsDoSelo { font-size: 11px; color: var(--text-muted); }

@@ -11,11 +11,15 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
+import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { seloDaFilial } from '../../domain/qualificacao';
+import { SeloDaQualificacao } from './SeloDaQualificacao';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
 
 export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
+  const qualificacoes = useQualificacaoStore((s) => s.dados);
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
   const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
@@ -86,6 +90,21 @@ export function FornecedoresPage() {
         f.endereco.cidade
           ? `${f.endereco.cidade}${f.endereco.uf ? `/${f.endereco.uf}` : ''}`
           : '—',
+    },
+    {
+      // O selo de material para quem fornece material; para quem só presta
+      // serviço, o de serviço (D613 §2). As cinco ficam na ficha da empresa.
+      key: 'qualificacao',
+      label: 'Qualificação',
+      render: (f) => {
+        const categoria = f.fornece_material === false && f.presta_servico ? 'servico' : 'material';
+        return (
+          <SeloDaQualificacao
+            selo={qualificacoes ? seloDaFilial(f, qualificacoes.linhas, categoria) : null}
+            rotulo={categoria === 'servico' ? 'Serviço' : undefined}
+          />
+        );
+      },
     },
     {
       key: 'ativo',

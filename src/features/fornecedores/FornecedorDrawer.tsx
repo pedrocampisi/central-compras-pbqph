@@ -18,6 +18,10 @@ import { podeEditar } from '../../services/supabase/auth';
 import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
+import { seloDaFilial } from '../../domain/qualificacao';
+import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { SeloDaQualificacao } from './SeloDaQualificacao';
+import { FichaDaEmpresa } from './FichaDaEmpresa';
 
 interface Props {
   open: boolean;
@@ -53,6 +57,8 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);
   const editaOk = podeEditar(perfil?.papel);
+  const qualificacoes = useQualificacaoStore((s) => s.dados);
+  const [fichaAberta, setFichaAberta] = useState(false);
 
   function set<K extends keyof Fornecedor>(key: K, value: Fornecedor[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -138,6 +144,22 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
           onChange={(e) => set('ie', e.target.value)}
         />
       </FieldGroup>
+
+      {/* A qualificação é da empresa, e mora na ficha dela (CTO-D613 §2). */}
+      {!isNew && fornecedor && (
+        <FieldGroup title="Qualificação">
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+            <SeloDaQualificacao
+              selo={qualificacoes ? seloDaFilial(fornecedor, qualificacoes.linhas) : null}
+              rotulo="Material"
+            />
+            <Button variant="outline" size="sm" onClick={() => setFichaAberta(true)}>
+              Abrir a ficha da empresa
+            </Button>
+          </div>
+        </FieldGroup>
+      )}
+      {fichaAberta && fornecedor && <FichaDaEmpresa filial={fornecedor} aoFechar={() => setFichaAberta(false)} />}
 
       <FieldGroup title="Contato">
         <Field

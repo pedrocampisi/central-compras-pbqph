@@ -41,9 +41,12 @@ import { verifyHandlePermission } from '../../services/storage/permissions';
 import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
 import type { QualificacaoGravada } from '../../services/supabase/qualificacao';
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
-import { ecrsDoQualificarAgora } from '../../domain/qualificacao';
+import {
+  desempenhoDaFilial, ecrsDoQualificarAgora, nomeDasEcrs, seloDaFilial, textoDoDesempenho,
+} from '../../domain/qualificacao';
 import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
 import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
+import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
 import { recarregarDados } from '../../services/supabase/sync';
 import { podeEditar, podeEmitirOc } from '../../services/supabase/auth';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -804,6 +807,9 @@ export function NovaOcPage() {
       ].filter(Boolean).join(' · ')
     : undefined;
 
+  // O selo de material da empresa escolhida (D604 §3.4): o que a emissão vai conferir.
+  const seloDoEscolhido = fornecedorEscolhido && qualificacoes ? seloDaFilial(fornecedorEscolhido, qualificacoes.linhas) : null;
+
   function escolherEmpresaNaOc(chave: string) {
     if (!ocEditing) return;
     const id = escolherEmpresa(empresas.find((g) => g.chave === chave), ocEditing.fornecedor_id);
@@ -899,6 +905,14 @@ export function NovaOcPage() {
             valor={chaveEscolhida}
             onEscolher={escolherEmpresaNaOc}
           />
+          {fornecedorEscolhido && (
+            <span className={styles.seloDoFornecedor} data-selo-do-fornecedor="">
+              <SeloDaQualificacao selo={seloDoEscolhido} rotulo="Material" />
+              {seloDoEscolhido && seloDoEscolhido.ecrs.length > 0 && (
+                <span className={styles.ecrsDoSelo}>{nomeDasEcrs(seloDoEscolhido.ecrs)}</span>
+              )}
+            </span>
+          )}
         </FieldShell>
 
         <FieldShell
@@ -1051,6 +1065,7 @@ export function NovaOcPage() {
           ecrs={data.ecrs}
           ecrsMarcadas={qualificando.ecrs}
           porque={qualificando.porque}
+          desempenho={textoDoDesempenho(desempenhoDaFilial(filialDaOc, qualificacoes?.desempenho ?? []))}
           aoGravar={depoisDeQualificar}
           aoVoltar={() => setQualificando(null)}
         />

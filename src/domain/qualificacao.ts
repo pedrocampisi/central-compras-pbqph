@@ -121,6 +121,37 @@ export function historicoDaFilial(
     .sort(maisRecente);
 }
 
+/** Os números da `desempenho_12_meses` (contrato §3): as entregas avaliadas no último ano. */
+export interface NumerosDoDesempenho {
+  entregas: number;
+  noPrazo: number;
+  inteiras: number;
+  conformes: number;
+}
+
+/**
+ * O desempenho que vale para a filial: o da empresa dela, quando tem raiz; o
+ * dela mesma, só quando não tem — o mesmo sujeito para quem a qualificação é
+ * gravada.
+ */
+export function desempenhoDaFilial<T extends { empresaRaizId: string | null; fornecedorId: string | null }>(
+  f: SujeitoDaFilial,
+  lista: readonly T[],
+): T | undefined {
+  return lista.find((d) => (f.empresa_id ? d.empresaRaizId === f.empresa_id : d.fornecedorId === f.id));
+}
+
+/** A prova ao lado dos critérios, ao requalificar (D604 §3.3): a pessoa marca, o sistema mostra o que aconteceu. */
+export function textoDoDesempenho(d: NumerosDoDesempenho | undefined): string {
+  if (!d || d.entregas === 0) return 'Nenhuma entrega avaliada nos últimos 12 meses.';
+  const n = (q: number, um: string, varios: string) => `${q} ${q === 1 ? um : varios}`;
+  return (
+    `Nos últimos 12 meses: ${n(d.entregas, 'entrega avaliada', 'entregas avaliadas')} — ` +
+    `${d.noPrazo} no prazo, ${n(d.inteiras, 'inteira', 'inteiras')}, ` +
+    `${n(d.conformes, 'conforme', 'conformes')} com a OC e a ECR.`
+  );
+}
+
 /**
  * Para quem a qualificação nova é gravada (contrato §2): a empresa, quando a
  * filial tem raiz; o próprio fornecedor, só quando não tem (o banco recusa
