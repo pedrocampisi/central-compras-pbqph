@@ -305,10 +305,14 @@ export interface ErroDoBanco {
   hint?: string | null;
 }
 
-/** A trava da emissão no banco (23514): o motivo vem na própria mensagem. */
+/**
+ * A trava da emissão no banco (23514). A mensagem já é frase de gente ("A OC
+ * … não pode ser emitida: <motivo>.") e a dica diz o que fazer: as duas vão
+ * como vieram, sem prefixo que repita o "não pode ser emitida".
+ */
 export function fraseDaTravaDoBanco(e: ErroDoBanco): string {
   const dica = e.hint?.trim() ? ` ${e.hint.trim()}` : '';
-  return `O banco não deixou emitir: ${e.message.replace(/\.$/, '')}.${dica}`;
+  return `${e.message.trim().replace(/\.$/, '')}.${dica}`;
 }
 
 export function fraseDaRecusaDaQualificacao(e: ErroDoBanco): string {

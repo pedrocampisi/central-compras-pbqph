@@ -175,7 +175,7 @@ describe('as recusas do banco (contrato de 28/09 §2 e §4), em frase de gente',
         hint: 'Qualifique a empresa antes.',
       }),
     ).toBe(
-      'O banco não deixou emitir: A OC 2026/009 não pode ser emitida: a empresa está sem qualificação de material. Qualifique a empresa antes.',
+      'A OC 2026/009 não pode ser emitida: a empresa está sem qualificação de material. Qualifique a empresa antes.',
     );
   });
 

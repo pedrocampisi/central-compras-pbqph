@@ -8,7 +8,8 @@
 import type { Fornecedor, OrdemCompra } from '../../domain/types';
 import type { StatusOc } from '../../domain/constants';
 import { travaDaFilial } from '../../domain/fornecedores';
-import { definirStatusOc, ConflitoDeVersao } from '../../services/supabase/dados';
+import { definirStatusOc, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
+import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
 import { recarregarDados } from '../../services/supabase/sync';
 
 type Avisar = (texto: string, tom: 'success' | 'warning' | 'error') => void;
@@ -23,6 +24,9 @@ export async function mudarStatusDaOc(
   if (status === 'emitida') {
     const trava = travaDaFilial(fornecedores.find((f) => f.id === oc.fornecedor_id), 'emitir');
     if (trava) { avisar(trava, 'warning'); return; }
+    // Material controlado só com empresa qualificada para as ECRs dele (CTO-D605).
+    const q = qualificacaoParaEmitir(oc, fornecedores);
+    if (q.trava) { avisar(q.trava, 'warning'); return; }
   }
   try {
     // Comando estreito: muda o status e nada mais. Vai com a versão que esta
@@ -38,7 +42,7 @@ export async function mudarStatusDaOc(
       'success',
     );
   } catch (err) {
-    if (err instanceof ConflitoDeVersao) {
+    if (err instanceof ConflitoDeVersao || err instanceof TravaDoBanco) {
       avisar(err.message, 'warning');
       return;
     }

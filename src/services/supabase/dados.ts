@@ -23,6 +23,7 @@ import type {
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
+import { fraseDaTravaDoBanco, type ErroDoBanco } from '../../domain/qualificacao';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import { obraDaMascara } from '../storage/umaObra';
@@ -430,6 +431,17 @@ export interface OcGravada {
 /** Erro de gravação concorrente: outra pessoa salvou esta OC antes de você. */
 export class ConflitoDeVersao extends Error {}
 
+/**
+ * A trava da emissão no banco recusou (CTO-D609: 23514, com a dica). A frase
+ * já vem pronta para a pessoa. Um 23514 SEM dica é um CHECK comum do banco, e
+ * sobe como falha de sempre.
+ */
+export class TravaDoBanco extends Error {}
+
+function recusaDaTrava(error: ErroDoBanco): TravaDoBanco | null {
+  return error.code === '23514' && error.hint?.trim() ? new TravaDoBanco(fraseDaTravaDoBanco(error)) : null;
+}
+
 function paraOcGravada(linha: Record<string, unknown>): OcGravada {
   return {
     id: String(linha['id']),
@@ -482,7 +494,7 @@ export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Pro
     // 40001 = serialization_failure: o banco recusou porque a OC mudou desde
     // que esta tela a leu. A mensagem já vem pronta para o usuário.
     if (error.code === '40001') throw new ConflitoDeVersao(error.message);
-    throw new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
+    throw recusaDaTrava(error) ?? new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
   }
   const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
   return paraOcGravada(linha);
@@ -507,7 +519,7 @@ export async function definirStatusOc(
   });
   if (error) {
     if (error.code === '40001') throw new ConflitoDeVersao(error.message);
-    throw new Error(`Falha ao alterar o status: ${error.message}`);
+    throw recusaDaTrava(error) ?? new Error(`Falha ao alterar o status: ${error.message}`);
   }
   const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
   return paraOcGravada(linha);
