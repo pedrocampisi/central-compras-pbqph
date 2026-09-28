@@ -2361,3 +2361,24 @@ um (o laboratório sem selo), consertado antes da carta.
 
 **O QUE FALTA:** a prova do Banco no ensaio com as travas ligadas; a perícia; a publicação, depois do editor, dos
 consertos e da máscara (D611). As travas ligam na produção no dia em que a D604 publicar, logo depois.
+
+## Decisão 61 — os quatro retoques antes da perícia, e o tempo real das tabelas novas · 28/09/2026
+
+**POR QUÊ (CTO-D614; carta do Banco de 28/09 §4):** o CTO conferiu o ramo `928320a` e pediu quatro retoques antes da
+perícia, para o perito ler o código final. O Banco mediu a publicação do tempo real: está vazia; no dia de publicar,
+entram as quatro tabelas.
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `ebbebb0`; NÃO publicado):**
+- **A gaveta não edita mais as ECRs do fornecedor.** Que ECR a empresa atende é a qualificação de material, a mesma que
+  a trava lê. A gaveta mostra uma linha só de leitura, e o `salvarFornecedor` não grava mais a `compras.fornecedor_ecrs`.
+  A carga ainda lê a tabela, e agora ninguém usa o que ela traz; o destino dela é decisão à parte.
+- **O PDF dos qualificados diz "Vence em até 30 dias";** o das avaliações leva a legenda C/NC em toda página.
+- **A frase da trava termina onde a pessoa resolve:** "qualifique aqui" dentro do "Qualificar agora"; "na ficha dela, em
+  Fornecedores" no resto. O Histórico mandava usar um botão que ele não tem.
+- **O tempo real escuta `compras.qualificacoes` e `compras.avaliacoes_entrega`,** sem filtro de obra. Antes do dia, é
+  silêncio.
+
+**AS TRAVAS:** 549 testes; 8 sabotagens, 8 vermelhas. CI verde (36461500482). 16 fotos novas, sem defeito.
+
+**O QUE FALTA:** a conferência do CTO; a perícia `fe119e6..ebbebb0` (4.471 linhas em `src` e testes); a publicação,
+depois do editor, dos consertos e da máscara; no mesmo dia, o aviso ao Banco, que liga as travas e o tempo real.
