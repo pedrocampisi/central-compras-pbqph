@@ -80,6 +80,27 @@ function ehCarta(caminho) {
 
 const dizer = (caminho) => relative(CASA, caminho).split('\\').join('/');
 
+/**
+ * As gavetas de perícia (CTO-D612). A perícia é de fora, nasce fechada e
+ * ninguém escreve dentro dela (lei 2, item 12) — nem para pôr o `> ` que o
+ * topo da casa pede. O perito segue o topo do guia (`COMO_FAZER_UMA_PERICIA.md`,
+ * "O topo do arquivo, obrigatório"): seis campos em negrito, sem `> `. Então,
+ * SÓ nestas duas gavetas, a régua é a do guia, e é inteira: os seis campos.
+ * Sem o "Commit periciado", a perícia volta — e aqui reprova.
+ */
+const GAVETAS_DE_PERICIA = ['docs/Pericias', 'docs/Arquivo_Morto/Pericias'];
+const TOPO_DA_PERICIA = ['Data', 'Quem fez', 'Estado', 'Escopo', 'Commit periciado', 'NÃO foi olhado'];
+
+function ehPericia(caminho) {
+  return GAVETAS_DE_PERICIA.includes(posix.dirname(dizer(caminho)));
+}
+
+/** A linha `Campo:` do topo: a da casa (`> **Campo:**`) ou, na perícia, a do guia (`**Campo:**`). */
+function linhaDoTopo(md, campo) {
+  const prefixo = ehPericia(md) ? '\\*\\*' : '> *\\**';
+  return new RegExp(`^${prefixo}${campo}:?\\**(.*)$`, 'mi');
+}
+
 /** Alvos `.md` de links markdown relativos, sem âncora e sem http. */
 function linksMd(texto) {
   const alvos = [];
@@ -103,9 +124,8 @@ function cabecalhoEmTodoDocumento(mds) {
   for (const md of mds) {
     if (ehCarta(md)) continue; // decisão 13: o estado da carta é a gaveta dela
     const topo = readFileSync(md, 'utf8').split('\n').slice(0, 14).join('\n');
-    const falta = ['Data', 'Estado', 'Escopo'].filter(
-      (campo) => !new RegExp(`^> *\\**${campo}:?\\**`, 'mi').test(topo),
-    );
+    const campos = ehPericia(md) ? TOPO_DA_PERICIA : ['Data', 'Estado', 'Escopo'];
+    const falta = campos.filter((campo) => !linhaDoTopo(md, campo).test(topo));
     if (falta.length) faltando.push(`${dizer(md)} (falta ${falta.join(', ')})`);
   }
   return faltando.length
@@ -119,7 +139,7 @@ function estadoValido(mds) {
   for (const md of mds) {
     if (ehCarta(md)) continue;
     const topo = readFileSync(md, 'utf8').split('\n').slice(0, 14).join('\n');
-    const linha = topo.match(/^> *\**Estado:?\**(.*)$/mi);
+    const linha = topo.match(linhaDoTopo(md, 'Estado'));
     if (!linha) continue; // a trava 1 já cuida disto
     const valor = linha[1].replace(/\*/g, '').trim();
     if (!ESTADOS.some((e) => valor.toUpperCase().startsWith(e))) {
