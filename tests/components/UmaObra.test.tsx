@@ -18,6 +18,11 @@ const banco = vi.hoisted(() => {
       { id: 'oc-1', numero: '2026/001', ano: 2026, sequencial: 1, status: 'emitida', data: '2026-09-01', intervencao_id: 'obra-a', itens: [] },
       { id: 'oc-2', numero: '2026/002', ano: 2026, sequencial: 2, status: 'emitida', data: '2026-09-02', intervencao_id: 'obra-b', itens: [] },
     ],
+    // As tratativas abertas (D604) também são por obra; sem número de OC, para não aparecerem nas buscas por texto.
+    'compras.tratativas_abertas': [
+      { avaliacao_id: 7, oc_id: 'oc-1', intervencao_id: 'obra-a', nao_conformes: 2 },
+      { avaliacao_id: 8, oc_id: 'oc-2', intervencao_id: 'obra-b', nao_conformes: 2 },
+    ],
   };
   const estado = {
     pode: true,
@@ -100,6 +105,7 @@ import { ABA_INICIAL, useUiStore, type TabId } from '../../src/stores/useUiStore
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUmaObraStore } from '../../src/stores/useUmaObraStore';
+import { useQualificacaoStore } from '../../src/stores/useQualificacaoStore';
 import { janelaEscolhida, type MascaraDeObra } from '../../src/domain/umaObra';
 import { normalizeOC } from '../../src/domain/normalize';
 import { recarregarDados } from '../../src/services/supabase/sync';
@@ -518,15 +524,74 @@ describe('Perícia 28/09 (fe119e6), achado 4 — um campo da janela apagado, e o
   });
 });
 
-/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): as medidas, SEM conserto. */
+/**
+ * Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): medidas na decisão
+ * 62, TRAVAS desde o conserto (CTO-D620).
+ */
 describe('Perícia 28/09 (fornecedores), achado 1 — o aviso das avaliações de entrega com a máscara ligada', () => {
-  it.fails('dentro da janela, o aviso de avaliacoes_entrega pede só a obra, como o das OCs', async () => {
+  const avisoDe = (tabela: string) => banco.estado.avisos.filter((a) => a['table'] === tabela).at(-1)!;
+
+  it('dentro da janela, o aviso de avaliacoes_entrega pede só a obra, como o das OCs; o de qualificacoes, não (é da empresa)', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-16T15:00:00Z');
     useUmaObraStore.getState().conferir();
     await abrir();
-    const aviso = banco.estado.avisos.find((a) => a['table'] === 'avaliacoes_entrega')!;
+    const aviso = avisoDe('avaliacoes_entrega');
     expect(aviso).toBeTruthy();
     expect(aviso['filter']).toBe('intervencao_id=eq.obra-a');
+    expect(avisoDe('qualificacoes')['filter']).toBeUndefined();
+  });
+
+  it('o canal é refeito quando a máscara vira: liga com o filtro, desliga sem ele', async () => {
+    await armadaParaAuditoria();
+    relogio('2026-11-16T02:59:00Z');
+    useUmaObraStore.getState().conferir();
+    await abrir();
+    expect(avisoDe('avaliacoes_entrega')['filter']).toBeUndefined();
+
+    relogio('2026-11-16T03:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(avisoDe('avaliacoes_entrega')['filter']).toBe('intervencao_id=eq.obra-a');
+
+    relogio('2026-11-18T03:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(avisoDe('avaliacoes_entrega')['filter']).toBeUndefined();
+  });
+});
+
+describe('Perícia 28/09 (fe119e6), achado 1, no ramo da D604 — as tratativas abertas também são por obra', () => {
+  it('ao ligar, as tratativas de outra obra saem da loja na hora, sem esperar a carga', () => {
+    const tratativa = (avaliacaoId: number, intervencaoId: string) => ({ avaliacaoId, intervencaoId }) as never;
+    useQualificacaoStore.getState().definir({
+      linhas: [], categorias: [], desempenho: [], tratativas: [tratativa(7, 'obra-a'), tratativa(8, 'obra-b')],
+    });
+    localStorage.setItem('oc-mostrar-uma-obra', JSON.stringify(AUDITORIA));
+    relogio('2026-11-16T15:00:00Z');
+    useUmaObraStore.getState().conferir();
+    expect(useQualificacaoStore.getState().dados!.tratativas.map((t) => t.avaliacaoId)).toEqual([7]);
+  });
+
+  it('ao ligar, a carga das qualificações pedida antes da virada, sem filtro, não traz de volta a tratativa da outra obra', async () => {
+    await abrir();
+    const avaliacoes = () => useQualificacaoStore.getState().dados!.tratativas.map((t) => t.avaliacaoId);
+    expect(avaliacoes()).toEqual([7, 8]);
+    banco.estado.segurar = (r) => r.tabela === 'compras.tratativas_abertas' && r.filtros.length === 0;
+    const velha = recarregarDados();
+    await act(async () => {});
+    expect(banco.estado.presos.length).toBe(1);
+
+    await armadaParaAuditoria();
+    relogio('2026-11-16T15:00:00Z');
+    await act(async () => useUmaObraStore.getState().conferir());
+    await act(async () => {});
+    expect(avaliacoes()).toEqual([7]);
+
+    await act(async () => {
+      banco.estado.presos.shift()!();
+      await velha;
+    });
+    expect(avaliacoes()).toEqual([7]);
   });
 });

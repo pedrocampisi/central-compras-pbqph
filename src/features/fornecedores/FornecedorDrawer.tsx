@@ -18,7 +18,7 @@ import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
 import { ecrsDaGaveta, seloDaFilial } from '../../domain/qualificacao';
-import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { FichaDaEmpresa } from './FichaDaEmpresa';
 
@@ -55,7 +55,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
   const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);
   const editaOk = podeEditar(perfil?.papel);
-  const qualificacoes = useQualificacaoStore((s) => s.dados);
+  const qualificacoes = useQualificacoesDoDia();
   const [fichaAberta, setFichaAberta] = useState(false);
 
   function set<K extends keyof Fornecedor>(key: K, value: Fornecedor[K]) {

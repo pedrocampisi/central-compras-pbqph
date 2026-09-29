@@ -277,15 +277,15 @@ describe('D604 — as três escritas, com as chaves do contrato', () => {
   });
 });
 
-/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): a medida, SEM conserto. */
+/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): medida na decisão 62, TRAVA desde o conserto (CTO-D620). */
 describe('Perícia 28/09 (fornecedores), achado 5 — o desempenho com mais linhas que o teto da API', () => {
-  it.fails('1.001 sujeitos com entregas e teto de 1.000: o 1.001º não vira "nenhuma entrega"', async () => {
+  it('1.001 sujeitos com entregas e teto de 1.000: o 1.001º não vira "nenhuma entrega"', async () => {
     banco.estado.teto = 1000;
     banco.TABELAS['desempenho_12_meses'] = Array.from({ length: 1001 }, (_, i) => ({
       empresa_raiz_id: `empresa-${i + 1}`, fornecedor_id: null, entregas: 2, no_prazo: 2, inteiras: 2, conformes: 2,
     }));
-    const r = await carregarQualificacoes().catch((e: unknown) => (e instanceof Error ? e : new Error(String(e))));
-    if (r instanceof Error) return; // recusar a carga incompleta também é certo
+    const r = await carregarQualificacoes();
+    expect(r.desempenho).toHaveLength(1001);
     const d = desempenhoDaFilial({ id: 'filial-x', empresa_id: 'empresa-1001' }, r.desempenho);
     expect(textoDoDesempenho(d)).not.toBe('Nenhuma entrega avaliada nos últimos 12 meses.');
   });
@@ -298,5 +298,26 @@ describe('Perícia 28/09 (fornecedores), achado 5 — o desempenho com mais linh
     const r = await carregarQualificacoes();
     const d = desempenhoDaFilial({ id: 'filial-x', empresa_id: 'empresa-1000' }, r.desempenho);
     expect(textoDoDesempenho(d)).toContain('2 entregas avaliadas');
+  });
+
+  it('a resposta que para antes da contagem: a carga recusa, e nunca diz "nenhuma entrega"', async () => {
+    banco.estado.teto = 1000;
+    banco.TABELAS['desempenho_12_meses'] = Array.from({ length: 1001 }, (_, i) => ({
+      empresa_raiz_id: `empresa-${i + 1}`, fornecedor_id: null, entregas: 2, no_prazo: 2, inteiras: 2, conformes: 2,
+    }));
+    // A segunda página volta vazia, embora a contagem diga 1.001.
+    const consulta = banco.consulta;
+    vi.spyOn(banco, 'consulta').mockImplementation((t: string) => {
+      const c = consulta(t);
+      if (t !== 'desempenho_12_meses') return c;
+      const range = c['range'] as (a: number, b: number) => unknown;
+      c['range'] = (a: number, b: number) => (a >= 1000 ? range(5000, 5999) : range(a, b));
+      return c;
+    });
+    try {
+      await expect(carregarQualificacoes()).rejects.toThrow(/desempenho dos fornecedores veio incompleta \(1000 de 1001\)/);
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

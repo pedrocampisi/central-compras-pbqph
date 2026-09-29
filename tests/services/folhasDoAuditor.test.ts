@@ -18,6 +18,31 @@ function textoDaPagina(doc: jsPDF, pagina: number): string {
 const textoTodo = (doc: jsPDF) =>
   Array.from({ length: doc.getNumberOfPages() }, (_, i) => textoDaPagina(doc, i + 1)).join(' ');
 
+/**
+ * O texto com os sinais de volta, pelo gabarito escrito à mão da fonte Symbol
+ * da Adobe (e não pela tabela do código): o trecho na Symbol é lido pelo
+ * código dela, "\xb3" → "≥". Cada trecho desenhado entra separado por "|".
+ */
+const NA_SYMBOL_DA_ADOBE: Record<number, string> = { 0xb3: '≥', 0xa3: '≤', 0xae: '→', 0x6d: 'μ' };
+function textoComSinais(doc: jsPDF): string {
+  doc.setFont('symbol', 'normal');
+  const symbol = String(doc.getFont().id);
+  const partes: string[] = [];
+  for (let p = 1; p <= doc.getNumberOfPages(); p++) {
+    const conteudo = (doc.internal as unknown as { pages: string[][] }).pages[p]!.join('\n');
+    let fonte = '';
+    for (const m of conteudo.matchAll(/\/(F\d+) [\d.]+ Tf|\(((?:\\.|[^\\)])*)\) Tj/g)) {
+      if (m[1]) {
+        fonte = m[1];
+        continue;
+      }
+      const t = m[2]!.replace(/\\(.)/g, '$1');
+      partes.push(fonte === symbol ? Array.from(t, (c) => NA_SYMBOL_DA_ADOBE[c.charCodeAt(0)] ?? c).join('') : t);
+    }
+  }
+  return partes.join('|');
+}
+
 const filial = (id: string, empresa: string | undefined, nome: string, apelido?: string): Fornecedor => ({
   ...normalizeFornecedor({ id, razao_social: nome }),
   empresa_id: empresa,
@@ -150,7 +175,7 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
   const OCS = [{ id: 'oc-1', numero: '2026/001', fornecedor_id: 'f1' }];
   const OBRAS = [{ id: 'obra-1', nome: 'Obra de teste' }];
 
-  it.fails('achado 4: "≥" e "≤" da observação não saem como "?" no gerador real', () => {
+  it('achado 4: "≥" e "≤" da observação não saem como "?" no gerador real', () => {
     const linhas = linhasDasAvaliacoes(
       [avaliacao({ observacao: 'medida ≥ 30 mm' }), avaliacao({ observacao: 'medida ≤ 10 mm' })],
       OCS, FORNECEDORES, OBRAS,
@@ -161,13 +186,39 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
     expect(texto).not.toContain('medida ? 10 mm');
   });
 
+  it('achado 4, a trava: o "≥" e o "≤" saem na Symbol, lidos de dentro do PDF, e a folha diz de que obra é', () => {
+    const linhas = linhasDasAvaliacoes(
+      [avaliacao({ observacao: 'medida ≥ 30 mm' }), avaliacao({ observacao: 'medida ≤ 10 mm' })],
+      OCS, FORNECEDORES, OBRAS,
+    );
+    const texto = textoComSinais(pdfDasAvaliacoes(linhas, 'Obra → teste', '2026-09-28', null));
+    expect(texto).toContain('medida |≥| 30 mm');
+    expect(texto).toContain('medida |≤| 10 mm');
+    expect(texto).toContain('Obra: Obra |→| teste');
+  });
+
+  it('achado 4: a observação longa com sinal quebra em linhas, sem perder letra nem sinal', () => {
+    const longa = 'o lote veio com resistência ≥ 30 MPa em todos os corpos de prova, e o abatimento ≤ 10 cm em todas as betoneiras do dia';
+    const linhas = linhasDasAvaliacoes([avaliacao({ observacao: longa })], OCS, FORNECEDORES, OBRAS);
+    const texto = textoComSinais(pdfDasAvaliacoes(linhas, null, '2026-09-28', null));
+    const semCortes = texto.replace(/\|/g, ' ').replace(/ +/g, ' ');
+    for (const palavra of longa.split(' ')) expect(semCortes, palavra).toContain(palavra);
+    expect(texto).not.toContain('?');
+  });
+
+  it('a lista de qualificados passa pelo mesmo caminho: o tipo com sinal sai na Symbol', () => {
+    const secoes = secoesDosQualificados([linha({ tipo: 'Aço CA-50 Ø ≥ 10 mm' })], CATEGORIAS, FORNECEDORES);
+    const texto = textoComSinais(pdfDosQualificados(secoes, '2026-09-28', null));
+    expect(texto).toContain('Aço CA-50 Ø |≥| 10 mm');
+  });
+
   const ciencia = (cienciaEm: string) =>
     linhasDasAvaliacoes(
       [avaliacao({ prazoConforme: false, integridadeConforme: false, tratativa: 'trocado', cienciaPorNome: 'Revisor', cienciaEm })],
       OCS, FORNECEDORES, OBRAS,
     )[0]!.at(-1);
 
-  it.fails('achado 7: a ciência às 21:30 de 28/09 em Brasília, escrita em UTC, sai 28/09', () => {
+  it('achado 7: a ciência às 21:30 de 28/09 em Brasília, escrita em UTC, sai 28/09', () => {
     expect(ciencia('2026-09-29T00:30:00Z')).toBe('Revisor, 28/09/2026');
   });
 

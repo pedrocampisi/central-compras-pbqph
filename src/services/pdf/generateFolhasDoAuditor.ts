@@ -3,14 +3,16 @@
  * (o que a FO 8.4.1.1 é hoje) e as avaliações de entrega. O que vai em cada
  * célula mora em `domain/folhasDoAuditor` — aqui é só o desenho.
  *
- * Paisagem, a mesma biblioteca e o mesmo azul do PDF da OC. O texto passa
- * pela Helvetica (`paraAHelvetica`): letra que ela não desenha vira a troca
- * conhecida, nunca um quadrado em branco.
+ * Paisagem, a mesma biblioteca e o mesmo azul do PDF da OC. O texto sai pelo
+ * caminho de todo PDF da casa (`textoComSinais`, CTO-D620): os sinais das
+ * observações ("≥", "≤") na Symbol, e o resto pela Helvetica, onde letra que
+ * ela não desenha vira a troca conhecida, nunca um quadrado em branco.
  */
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable/es';
 import { paraAHelvetica } from '../../domain/letrasDoPdf';
+import { celulasComSinais, escritaComSinais } from './textoComSinais';
 import type { SecaoDosQualificados } from '../../domain/folhasDoAuditor';
 import { dataBr } from '../../domain/qualificacao';
 import { loadCampisiLogo } from './generateOcPdf';
@@ -37,13 +39,12 @@ function cabecalho(doc: jsPDF, logo: string | null, titulo: string, subtitulo: s
       /* a marca é decorativa */
     }
   }
+  const { desenha } = escritaComSinais(doc);
   doc.setTextColor(0, 0, 0);
-  doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text(paraAHelvetica(titulo), pw / 2, 11, { align: 'center' });
-  doc.setFont('helvetica', 'normal');
+  desenha(titulo, pw / 2, 11, 'bold', 'center');
   doc.setFontSize(8.5);
-  doc.text(paraAHelvetica(subtitulo), pw / 2, 16, { align: 'center' });
+  desenha(subtitulo, pw / 2, 16, 'normal', 'center');
   doc.text('CAMPISI ENGENHARIA', MARGEM + 15, 11);
   doc.text(`Emitida em ${dataBr(hoje)}`, pw - MARGEM, 11, { align: 'right' });
   doc.setDrawColor(...AZUL);
@@ -64,8 +65,6 @@ function numerarPaginas(doc: jsPDF): void {
   }
 }
 
-const H = (linhas: string[][]) => linhas.map((l) => l.map(paraAHelvetica));
-
 /**
  * A lista de qualificados: uma seção por aba da FO 8.4.1.1, com o nome dos
  * três critérios no cabeçalho de cada uma. Seção sem ninguém diz isso, em
@@ -84,13 +83,13 @@ export function pdfDosQualificados(
     const material = s.categoria === 'material';
     autoTable(doc, {
       head: [
-        [{ content: paraAHelvetica(s.nome.toUpperCase()), colSpan: material ? 10 : 9, styles: { halign: 'left', fillColor: [230, 238, 247], textColor: 20 } }],
-        H([[
+        [{ content: s.nome.toUpperCase(), colSpan: material ? 10 : 9, styles: { halign: 'left', fillColor: [230, 238, 247], textColor: 20 } }],
+        [
           'Fornecedor', 'Tipo', 'Qualificada em', 'Requalificar em',
           ...s.criterios, 'Nota', 'Situação', ...(material ? ['Permissão p/ material controlado'] : []),
-        ]])[0]!,
+        ],
       ],
-      body: s.linhas.length > 0 ? H(s.linhas) : [[{ content: 'Nenhuma empresa qualificada nesta categoria.', colSpan: material ? 10 : 9 }]],
+      body: s.linhas.length > 0 ? s.linhas : [[{ content: 'Nenhuma empresa qualificada nesta categoria.', colSpan: material ? 10 : 9 }]],
       startY: y,
       margin: { top: 25, left: MARGEM, right: MARGEM, bottom: 12 },
       styles: { fontSize: 7.5, cellPadding: 1.4, overflow: 'linebreak' },
@@ -106,6 +105,7 @@ export function pdfDosQualificados(
         8: { cellWidth: 24 },
       },
       didDrawPage: () => cabecalho(doc, logo, titulo, subtitulo, hoje),
+      ...celulasComSinais(doc, paraAHelvetica),
     });
     y = doc.lastAutoTable.finalY + 6;
   });
@@ -125,11 +125,11 @@ export function pdfDasAvaliacoes(
   // A legenda vai em toda página: o auditor lê a folha sem a tela na frente (CTO-D614 §2.3).
   const subtitulo = `${obra ? `Obra: ${obra}` : 'Todas as obras'}   ·   C = Conforme · NC = Não Conforme`;
   autoTable(doc, {
-    head: H([[
+    head: [[
       'OC', 'Fornecedor', 'Obra', 'NF', 'Recebida em', 'Prazo', 'Integridade', 'OC / ECR',
       'Observação e tratativa', 'Avaliada por', 'Ciência',
-    ]]),
-    body: linhas.length > 0 ? H(linhas.map((l) => [...l])) : [[{ content: 'Nenhuma entrega avaliada.', colSpan: 11 }]],
+    ]],
+    body: linhas.length > 0 ? linhas.map((l) => [...l]) : [[{ content: 'Nenhuma entrega avaliada.', colSpan: 11 }]],
     startY: 25,
     margin: { top: 25, left: MARGEM, right: MARGEM, bottom: 12 },
     styles: { fontSize: 7.5, cellPadding: 1.4, overflow: 'linebreak' },
@@ -147,6 +147,7 @@ export function pdfDasAvaliacoes(
       10: { cellWidth: 28 },
     },
     didDrawPage: () => cabecalho(doc, logo, titulo, subtitulo, hoje),
+    ...celulasComSinais(doc, paraAHelvetica),
   });
   numerarPaginas(doc);
   return doc;

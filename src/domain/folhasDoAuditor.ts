@@ -11,8 +11,9 @@
  *   máscara da D599 ligada, a carga já trouxe só as da obra.
  */
 
+import { hojeEmSaoPaulo } from './ecr';
 import { agruparPorEmpresa } from './fornecedores';
-import { dataBr, nomeDasEcrs, type Categoria, type LinhaDeQualificacao, type Situacao } from './qualificacao';
+import { dataBr, nomeDasEcrs, pedeTratativa, type Categoria, type LinhaDeQualificacao, type Situacao } from './qualificacao';
 import type { Fornecedor, Obra, OrdemCompra } from './types';
 
 const SITUACAO: Record<Situacao, string> = {
@@ -84,6 +85,23 @@ export interface AvaliacaoParaFolha {
 
 const C = (ok: boolean) => (ok ? 'C' : 'NC');
 
+/**
+ * A coluna da ciência. "Aberta" só do que o Painel e a ciência oferecem: com
+ * tratativa e duas ou mais "Não Conforme", a condição da `tratativas_abertas`
+ * (perícia 28/09, B6). A data da ciência é a de Brasília (B7).
+ */
+function cienciaDaFolha(a: AvaliacaoParaFolha): string {
+  if (!a.tratativa) return '—';
+  if (a.cienciaPorNome) return `${a.cienciaPorNome}, ${dataBr(diaEmBrasilia(a.cienciaEm))}`;
+  return pedeTratativa(a) ? 'Aberta' : '—';
+}
+
+/** O dia, em Brasília, de um instante do banco: primeiro converte, depois corta (perícia 28/09, B7). */
+function diaEmBrasilia(instante: string): string {
+  const t = Date.parse(instante);
+  return Number.isNaN(t) ? instante.slice(0, 10) : hojeEmSaoPaulo(new Date(t));
+}
+
 /** OC, fornecedor, obra, NF, recebida em, prazo, integridade, OC/ECR, observação e tratativa, avaliada por, ciência. */
 export function linhasDasAvaliacoes(
   avaliacoes: readonly AvaliacaoParaFolha[],
@@ -107,7 +125,7 @@ export function linhasDasAvaliacoes(
       C(a.ocEcrConforme),
       [a.observacao, a.tratativa && `Tratativa: ${a.tratativa}`].filter(Boolean).join(' · ') || '—',
       a.avaliadoPorNome || '—',
-      a.tratativa ? (a.cienciaPorNome ? `${a.cienciaPorNome}, ${dataBr(a.cienciaEm.slice(0, 10))}` : 'Aberta') : '—',
+      cienciaDaFolha(a),
     ];
   });
 }

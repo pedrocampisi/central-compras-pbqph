@@ -17,7 +17,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button/Button';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import { hojeEmSaoPaulo } from '../../domain/ecr';
-import { naoConformes, pedeTratativa, problemaDaAvaliacao, type Avaliacao } from '../../domain/qualificacao';
+import { avaliacaoParaGravar, naoConformes, pedeTratativa, problemaDaAvaliacao, type Avaliacao } from '../../domain/qualificacao';
 import { registrarEntrega } from '../../services/supabase/qualificacao';
 import { recarregarDados } from '../../services/supabase/sync';
 import { useUiStore } from '../../stores/useUiStore';
@@ -69,7 +69,7 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
     setErro(null);
     setGravando(true);
     try {
-      const r = await registrarEntrega(oc.id, oc.versao, a);
+      const r = await registrarEntrega(oc.id, oc.versao, avaliacaoParaGravar(a));
       try {
         await recarregarDados();
       } catch {

@@ -11,8 +11,8 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
-import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
-import { CATEGORIAS, seloDaFilial } from '../../domain/qualificacao';
+import { useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
+import { CATEGORIAS, linhasDoDia, seloDaFilial } from '../../domain/qualificacao';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { secoesDosQualificados } from '../../domain/folhasDoAuditor';
 import { hojeEmSaoPaulo } from '../../domain/ecr';
@@ -23,7 +23,7 @@ import type { Fornecedor } from '../../domain/types';
 
 export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
-  const qualificacoes = useQualificacaoStore((s) => s.dados);
+  const qualificacoes = useQualificacoesDoDia();
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
   const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
@@ -58,9 +58,11 @@ export function FornecedoresPage() {
       return;
     }
     try {
+      // A situação do dia do clique: a lista pode ter sido aberta ontem (B3).
+      const hoje = hojeEmSaoPaulo();
       await baixarPdfDosQualificados(
-        secoesDosQualificados(qualificacoes.linhas, qualificacoes.categorias, data.fornecedores),
-        hojeEmSaoPaulo(),
+        secoesDosQualificados(linhasDoDia(qualificacoes.linhas, hoje), qualificacoes.categorias, data.fornecedores),
+        hoje,
       );
     } catch (err) {
       showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');

@@ -32,7 +32,8 @@ import {
   notaDoRodape,
   numeroDaSecao,
 } from '../../domain/ecr';
-import { LARGURA_NA_SYMBOL, paraAHelvetica, temSinal, trechosDoPdf, type Trecho } from '../../domain/letrasDoPdf';
+import { temSinal } from '../../domain/letrasDoPdf';
+import { escritaComSinais } from './textoComSinais';
 import { loadCampisiLogo } from './generateOcPdf';
 import { downloadBlob } from '../storage/download';
 
@@ -62,8 +63,6 @@ interface Pedaco {
   negrito: boolean;
 }
 
-type Estilo = 'normal' | 'bold';
-
 /** As palavras de uma linha, com o rótulo em negrito ("Lote:" + o texto). */
 function palavrasDoItem(item: EcrItem, tudoNegrito: boolean): Pedaco[] {
   const pedacos: Pedaco[] = [];
@@ -85,67 +84,8 @@ export function desenhaPdfDaEcr(ecr: Ecr, logo: string | null): jsPDF {
   const largura = pw - 2 * MARGEM;
 
   // ── Os sinais: o texto sem sinal é desenhado como sempre foi ──
-  /** A largura de um trecho, no tamanho de agora. A Symbol, pela tabela da Adobe. */
-  function larguraDoTrecho(t: Trecho, estilo: Estilo): number {
-    if (!t.sinal) {
-      doc.setFont('helvetica', estilo);
-      return doc.getTextWidth(t.texto);
-    }
-    const milesimos = Array.from(t.texto).reduce((s, c) => s + (LARGURA_NA_SYMBOL[c.charCodeAt(0)] ?? 1000), 0);
-    return ((milesimos / 1000) * doc.getFontSize()) / doc.internal.scaleFactor;
-  }
-  /** A largura de um texto no tamanho de agora, com os sinais na Symbol. */
-  function larguraDe(texto: string, estilo: Estilo): number {
-    if (!temSinal(texto)) {
-      doc.setFont('helvetica', estilo);
-      return doc.getTextWidth(paraAHelvetica(texto));
-    }
-    const w = trechosDoPdf(texto).reduce((s, t) => s + larguraDoTrecho(t, estilo), 0);
-    doc.setFont('helvetica', estilo);
-    return w;
-  }
-  /** Escreve um texto. Sem sinal, é a mesma chamada de antes: o PDF sai igual. */
-  function desenha(texto: string, x: number, y0: number, estilo: Estilo, align?: 'center' | 'right'): void {
-    if (!temSinal(texto)) {
-      doc.setFont('helvetica', estilo);
-      doc.text(paraAHelvetica(texto), x, y0, align ? { align } : undefined);
-      return;
-    }
-    const w = larguraDe(texto, estilo);
-    let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
-    for (const t of trechosDoPdf(texto)) {
-      const w = larguraDoTrecho(t, estilo);
-      doc.setFont(t.sinal ? 'symbol' : 'helvetica', t.sinal ? 'normal' : estilo);
-      doc.text(t.texto, cx, y0);
-      cx += w;
-    }
-    doc.setFont('helvetica', estilo);
-  }
-  /** As linhas de uma célula. Sem sinal, a quebra de sempre; com sinal, palavra por palavra. */
-  function quebra(texto: string, larguraUtil: number): string[] {
-    if (!temSinal(texto)) return doc.splitTextToSize(paraAHelvetica(texto), larguraUtil) as string[];
-    const linhas: string[] = [];
-    let atual = '';
-    for (const palavra of texto.split(' ')) {
-      const junto = atual ? `${atual} ${palavra}` : palavra;
-      if (larguraDe(junto, 'normal') <= larguraUtil) {
-        atual = junto;
-        continue;
-      }
-      if (atual) linhas.push(atual);
-      // A palavra que sozinha passa da largura é cortada letra a letra.
-      atual = '';
-      for (const c of palavra) {
-        if (atual && larguraDe(atual + c, 'normal') > larguraUtil) {
-          linhas.push(atual);
-          atual = '';
-        }
-        atual += c;
-      }
-    }
-    linhas.push(atual);
-    return linhas;
-  }
+  // O caminho mora em `textoComSinais`, o mesmo de todo PDF da casa (CTO-D620).
+  const { larguraDe, desenha, quebra } = escritaComSinais(doc);
 
   // ── A tabela de revisões: medida antes, porque ela marca o fim do texto ──
   doc.setFontSize(FONTE_DA_TABELA);

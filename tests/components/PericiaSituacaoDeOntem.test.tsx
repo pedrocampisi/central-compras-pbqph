@@ -4,7 +4,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 /**
  * Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores), achado 3: a
  * situação da qualificação é calculada pelo banco na leitura e guardada na
- * loja; a meia-noite de Brasília passa e ela fica. A medida, SEM conserto.
+ * loja; a meia-noite de Brasília passava e ela ficava.
+ * Medidas na decisão 62, TRAVAS desde o conserto (CTO-D620).
  * O esperado vem da data e da regra do contrato (`situacao_qualificacao`:
  * vencida quando vence antes de hoje; "vence em até 30 dias" quando vence até
  * hoje + 30), não de uma situação fabricada: a loja recebe o que o banco
@@ -25,6 +26,7 @@ vi.mock('../../src/services/pdf/generateFolhasDoAuditor', () => ({
 }));
 
 import { FornecedoresPage } from '../../src/features/fornecedores/FornecedoresPage';
+import { qualificacaoParaEmitir } from '../../src/features/ordens-compra/qualificacaoParaEmitir';
 import { normalizeFornecedor } from '../../src/domain/normalize';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
@@ -91,7 +93,7 @@ describe('Perícia 28/09 (fornecedores), achado 3 — a situação de ontem no P
     expect(linha).toContain('Vence em até 30 dias');
   });
 
-  it.fails('último dia válido, carregada às 23:59 de 28/09: às 00:01 de 29/09 o PDF diz "Vencida"', async () => {
+  it('último dia válido, carregada às 23:59 de 28/09: às 00:01 de 29/09 o PDF diz "Vencida"', async () => {
     carregar('2026-09-28', 'vence_em_30_dias');
     vi.setSystemTime(DEPOIS_DA_MEIA_NOITE);
     const { linha, hoje } = await pdfAgora();
@@ -99,18 +101,40 @@ describe('Perícia 28/09 (fornecedores), achado 3 — a situação de ontem no P
     expect(linha).toContain('Vencida');
   });
 
-  it.fails('o mesmo, no selo da lista aberta depois da meia-noite', async () => {
+  it('o mesmo, no selo da lista aberta depois da meia-noite', async () => {
     carregar('2026-09-28', 'vence_em_30_dias');
     vi.setSystemTime(DEPOIS_DA_MEIA_NOITE);
     const { lista } = await pdfAgora();
     expect(lista).toContain('Vencida desde 28/09/2026');
   });
 
-  it.fails('de 31 para 30 dias: vence em 29/10, carregada como "qualificada" em 28/09; às 00:01 de 29/09 "vence em até 30 dias"', async () => {
+  it('de 31 para 30 dias: vence em 29/10, carregada como "qualificada" em 28/09; às 00:01 de 29/09 "vence em até 30 dias"', async () => {
     carregar('2026-10-29', 'qualificada');
     vi.setSystemTime(DEPOIS_DA_MEIA_NOITE);
     const { linha, hoje } = await pdfAgora();
     expect(hoje).toBe('2026-09-29');
     expect(linha).toContain('Vence em até 30 dias');
+  });
+
+  it('a lista aberta às 23:59 muda o selo sozinha à meia-noite, sem recarga nem clique', async () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] });
+    vi.setSystemTime(ANTES_DA_MEIA_NOITE);
+    carregar('2026-09-28', 'vence_em_30_dias');
+    render(<FornecedoresPage />);
+    const linha = () => screen.getByText('Filial A (teste)').closest('tr')!.textContent;
+    expect(linha()).toContain('Vence em 28/09/2026');
+    await act(async () => vi.advanceTimersByTime(2 * 60_000));
+    expect(linha()).toContain('Vencida desde 28/09/2026');
+  });
+
+  it('a emissão depois da meia-noite: a trava lê a situação do dia, e recusa o que venceu ontem', () => {
+    carregar('2026-09-28', 'vence_em_30_dias');
+    const oc = { fornecedor_id: 'filial-a', itens: [{ ecr_id: 12 }] } as never;
+    expect(qualificacaoParaEmitir(oc, [FILIAL]).selo!.situacao).toBe('vence_em_30_dias');
+    vi.setSystemTime(DEPOIS_DA_MEIA_NOITE);
+    const q = qualificacaoParaEmitir(oc, [FILIAL]);
+    expect(q.selo!.situacao).toBe('vencida');
+    expect(q.trava).toContain('venceu em 28/09/2026');
   });
 });

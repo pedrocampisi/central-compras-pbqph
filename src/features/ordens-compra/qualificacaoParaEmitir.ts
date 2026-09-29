@@ -13,7 +13,8 @@
 
 import type { Fornecedor, OrdemCompra } from '../../domain/types';
 import { ecrsDaOc, seloDaFilial, travaDaQualificacao, type Selo } from '../../domain/qualificacao';
-import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { qualificacoesDoDia, useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { hojeEmSaoPaulo } from '../../domain/ecr';
 
 export interface QualificacaoParaEmitir {
   /** '' = pode emitir; senão, a frase para a pessoa, que termina mandando à ficha da empresa. */
@@ -31,7 +32,9 @@ export function qualificacaoParaEmitir(
   fornecedores: readonly Fornecedor[],
 ): QualificacaoParaEmitir {
   const ecrs = ecrsDaOc(oc.itens);
-  const dados = useQualificacaoStore.getState().dados;
+  // A situação de agora, e não a da carga: a meia-noite pode ter passado (B3).
+  const guardados = useQualificacaoStore.getState().dados;
+  const dados = guardados && qualificacoesDoDia(guardados, hojeEmSaoPaulo());
   const filial = fornecedores.find((f) => f.id === oc.fornecedor_id);
   const selo = dados && filial ? seloDaFilial(filial, dados.linhas) : null;
   return {

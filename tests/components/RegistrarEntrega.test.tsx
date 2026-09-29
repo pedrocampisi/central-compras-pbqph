@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 
 /**
@@ -256,7 +256,10 @@ describe('D604 §3.5 — o PDF das avaliações, pelo Histórico', () => {
   });
 });
 
-/** Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): as medidas, SEM conserto. */
+/**
+ * Perícia de 28/09 sobre `fe119e6..ebbebb0` (fornecedores): medidas na decisão
+ * 62, TRAVAS desde o conserto (CTO-D620).
+ */
 describe('Perícia 28/09 (fornecedores), achado 2 — o PDF das avaliações atravessando a virada da máscara', () => {
   const avaliacao = (id: number, intervencaoId: string) => ({
     id, ocId: '001', intervencaoId, notaFiscal: String(1000 + id), recebidoEm: '2026-09-20',
@@ -280,17 +283,27 @@ describe('Perícia 28/09 (fornecedores), achado 2 — o PDF das avaliações atr
     if (obra) for (const l of linhas) expect(l[2]).toBe(obra);
   };
 
-  it.fails('começou sem máscara, ligou na espera: o PDF não sai com o título da obra e linhas das duas', async () => {
+  const recusou = () =>
+    expect(avisos()).toContain('A opção "mostrar só uma obra" ligou ou desligou enquanto o PDF era preparado. Gere o PDF de novo.');
+
+  it('começou sem máscara, ligou na espera: o PDF não sai com o título da obra e linhas das duas', async () => {
     await gerarComAVirada(null, OBRA.id, [avaliacao(1, OBRA.id), avaliacao(2, 'obra-outra')]);
-    expect(banco.pdfs).toHaveLength(1);
-    const [linhas, obra] = banco.pdfs[0]! as [string[][], string | null];
-    expect(linhas).toHaveLength(2);
-    if (obra) for (const l of linhas) expect(l[2]).toBe(obra);
+    coerente(OBRA.nome);
+    expect(banco.pdfs).toHaveLength(0);
+    recusou();
   });
 
-  it.fails('começou com a máscara, desligou na espera: o PDF não sai como "todas as obras" com a lista de uma só', async () => {
+  it('a máscara não virou: o PDF sai, com o título dela e as linhas dela', async () => {
+    await gerarComAVirada(OBRA.id, OBRA.id, [avaliacao(1, OBRA.id)]);
+    expect(banco.pdfs).toHaveLength(1);
+    coerente(OBRA.nome);
+  });
+
+  it('começou com a máscara, desligou na espera: o PDF não sai como "todas as obras" com a lista de uma só', async () => {
     await gerarComAVirada(OBRA.id, null, [avaliacao(1, OBRA.id)]);
     coerente(OBRA.nome);
+    expect(banco.pdfs).toHaveLength(0);
+    recusou();
   });
 });
 
@@ -310,7 +323,7 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
     return banco.registrar.mock.calls[0]![2] as Record<string, unknown>;
   }
 
-  it.fails('com uma "Não Conforme" só, a linha do PDF não diz "Aberta" (o Painel e a ciência não a oferecem)', async () => {
+  it('com uma "Não Conforme" só, a linha do PDF não diz "Aberta" (o Painel e a ciência não a oferecem)', async () => {
     const enviado = await registrarComUmaSoNc();
     const [linha] = linhasDasAvaliacoes(
       [{ ocId: '001', intervencaoId: OBRA.id, avaliadoPorNome: 'Pessoa de teste', cienciaPorNome: '', cienciaEm: '', ...(enviado as object) } as never],
@@ -319,8 +332,51 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
     expect(linha!.at(-1)).not.toBe('Aberta');
   });
 
-  it('o que foi enviado: a tratativa escondida foi junto (o registro do achado, não a medida)', async () => {
+  it('o que vai ao banco: a tratativa escondida não vai junto', async () => {
     const enviado = await registrarComUmaSoNc();
-    expect(enviado).toMatchObject({ prazoConforme: true, integridadeConforme: true, ocEcrConforme: false, tratativa: 'devolvido ao fornecedor' });
+    expect(enviado).toMatchObject({ prazoConforme: true, integridadeConforme: true, ocEcrConforme: false, tratativa: '' });
+  });
+
+  it('o texto não se perde na caixa: voltando a duas "Não Conforme", a tratativa está lá', () => {
+    abrir();
+    responder([false, true, false]);
+    fireEvent.change(campo(/Tratativa/), { target: { value: 'devolvido ao fornecedor' } });
+    responder([true, true, false]);
+    responder([false, true, false]);
+    expect((campo(/Tratativa/) as HTMLTextAreaElement).value).toBe('devolvido ao fornecedor');
+  });
+
+  it('um registro antigo com texto e uma "Não Conforme" só: o PDF não diz "Aberta"', () => {
+    const [linha] = linhasDasAvaliacoes(
+      [{
+        ocId: '001', intervencaoId: OBRA.id, notaFiscal: '1', recebidoEm: '2026-09-20', prazoConforme: true,
+        integridadeConforme: true, ocEcrConforme: false, observacao: '', tratativa: 'sobrou', avaliadoPorNome: 'Pessoa de teste',
+        cienciaPorNome: '', cienciaEm: '',
+      }],
+      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA],
+    );
+    expect(linha!.at(-1)).toBe('—');
+  });
+});
+
+/**
+ * A Banco (D618 §5) recusa recebimento no futuro pelo dia de Brasília. Às 21h30
+ * de 28/09 em Brasília já é 29/09 em UTC: o dia que a caixa sugere tem de ser 28.
+ * A tela já estava certa (CTO-D621 §1); isto é a trava para continuar.
+ */
+describe('D618 §5 — das 21h à meia-noite, o recebimento sugerido é o dia de Brasília', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-29T00:30:00Z')); // 21h30 de 28/09 em Brasília
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('o recebimento sugerido é 28/09, e não o 29/09 que a Banco recusaria; o máximo do campo também', () => {
+    abrir();
+    const recebido = campo(/Recebido em/) as HTMLInputElement;
+    expect(recebido.value).toBe('2026-09-28');
+    expect(recebido.max).toBe('2026-09-28');
   });
 });

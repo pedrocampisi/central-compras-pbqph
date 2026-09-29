@@ -40,7 +40,7 @@ import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
 import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
 import type { QualificacaoGravada } from '../../services/supabase/qualificacao';
-import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
 import {
   desempenhoDaFilial, ecrsDoQualificarAgora, nomeDasEcrs, seloDaFilial, textoDoDesempenho,
 } from '../../domain/qualificacao';
@@ -338,7 +338,7 @@ function mensagemDaFalha(err: unknown): string {
 export function NovaOcPage() {
   const data = useDataStore((s) => s.data);
   const perfil = useAuthStore((s) => s.perfil);
-  const qualificacoes = useQualificacaoStore((s) => s.dados);
+  const qualificacoes = useQualificacoesDoDia();
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
   const startEditing = useOcEditingStore((s) => s.startEditing);

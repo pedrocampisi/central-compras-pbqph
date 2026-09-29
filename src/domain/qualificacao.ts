@@ -96,6 +96,34 @@ function vigentesDaFilial(f: SujeitoDaFilial, linhas: readonly LinhaDeQualificac
     .sort(maisRecente);
 }
 
+/** 'aaaa-mm-dd' mais `n` dias, no calendário (sem fuso: a data já é a de Brasília). */
+export function somaDias(dia: string, n: number): string {
+  const t = Date.parse(`${dia}T00:00:00Z`);
+  return new Date(t + n * 86_400_000).toISOString().slice(0, 10);
+}
+
+/**
+ * A situação no dia `hoje` (de Brasília), pela regra do contrato
+ * (`compras.situacao_qualificacao`): vencida quando vence antes de hoje; "vence
+ * em até 30 dias" quando vence até hoje + 30. A situação que veio na carga é a
+ * do dia da carga, e a meia-noite passa sem recarga (perícia 28/09, B3). Sem
+ * qualificação e desqualificada não dependem do dia: ficam como vieram.
+ */
+export function situacaoNoDia(l: { situacao: Situacao; venceEm: string | null }, hoje: string): Situacao {
+  if (l.situacao === 'sem_qualificacao' || l.situacao === 'desqualificada' || !l.venceEm) return l.situacao;
+  if (l.venceEm < hoje) return 'vencida';
+  if (l.venceEm <= somaDias(hoje, 30)) return 'vence_em_30_dias';
+  return 'qualificada';
+}
+
+/** As linhas com a situação do dia; a linha que não mudou segue a mesma. */
+export function linhasDoDia(linhas: readonly LinhaDeQualificacao[], hoje: string): LinhaDeQualificacao[] {
+  return linhas.map((l) => {
+    const situacao = situacaoNoDia(l, hoje);
+    return situacao === l.situacao ? l : { ...l, situacao };
+  });
+}
+
 /** O selo da filial numa categoria (material, por padrão: é o da Nova OC). */
 export function seloDaFilial(
   f: SujeitoDaFilial,
@@ -343,6 +371,15 @@ export function naoConformes(a: Pick<Avaliacao, 'prazoConforme' | 'integridadeCo
 /** Com duas ou mais "Não Conforme", a tratativa é obrigatória (PS.02, regra operacional). */
 export function pedeTratativa(a: Pick<Avaliacao, 'prazoConforme' | 'integridadeConforme' | 'ocEcrConforme'>): boolean {
   return naoConformes(a) >= 2;
+}
+
+/**
+ * O que vai ao banco: a tratativa só com duas ou mais "Não Conforme". Com
+ * menos, o campo some da tela e o texto que sobrou fica só na caixa, sem ir
+ * junto (perícia 28/09, B6): o Painel e a ciência não oferecem essa pendência.
+ */
+export function avaliacaoParaGravar(a: Avaliacao): Avaliacao {
+  return pedeTratativa(a) ? a : { ...a, tratativa: '' };
 }
 
 /** O que falta para gravar a avaliação, na ordem da tela ('' = pode). */

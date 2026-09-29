@@ -8,7 +8,10 @@
  * OC com ECR — falha fechada (perícia de 27/09, achado 5).
  */
 
+import { useMemo } from 'react';
 import { create } from 'zustand';
+import { linhasDoDia } from '../domain/qualificacao';
+import { useHojeEmSaoPaulo } from '../hooks/useHojeEmSaoPaulo';
 import type { DadosDaQualificacao } from '../services/supabase/qualificacao';
 
 interface QualificacaoState {
@@ -26,3 +29,15 @@ export const useQualificacaoStore = create<QualificacaoState>((set) => ({
   falhou: (erro) => set({ dados: null, erro }),
   esquecer: () => set({ dados: null, erro: '' }),
 }));
+
+/** As qualificações com a situação do dia `hoje` (perícia 28/09, B3). */
+export function qualificacoesDoDia(dados: DadosDaQualificacao, hoje: string): DadosDaQualificacao {
+  return { ...dados, linhas: linhasDoDia(dados.linhas, hoje) };
+}
+
+/** O que as telas leem: a loja, com a situação de hoje, redesenhada à meia-noite. */
+export function useQualificacoesDoDia(): DadosDaQualificacao | null {
+  const dados = useQualificacaoStore((s) => s.dados);
+  const hoje = useHojeEmSaoPaulo();
+  return useMemo(() => (dados ? qualificacoesDoDia(dados, hoje) : null), [dados, hoje]);
+}

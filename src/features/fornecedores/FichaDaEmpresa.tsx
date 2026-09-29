@@ -29,7 +29,7 @@ import type { CategoriaDaQualificacao, QualificacaoGravada } from '../../service
 import { recarregarDados } from '../../services/supabase/sync';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useDataStore } from '../../stores/useDataStore';
-import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
+import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
 import { useUiStore } from '../../stores/useUiStore';
 import type { Fornecedor } from '../../domain/types';
 import { QualificarDialogo } from './QualificarDialogo';
@@ -37,7 +37,7 @@ import { SeloDaQualificacao } from './SeloDaQualificacao';
 import styles from './FichaDaEmpresa.module.css';
 
 export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFechar: () => void }) {
-  const dados = useQualificacaoStore((s) => s.dados);
+  const dados = useQualificacoesDoDia();
   const erro = useQualificacaoStore((s) => s.erro);
   const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
   const perfil = useAuthStore((s) => s.perfil);

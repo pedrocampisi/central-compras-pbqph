@@ -149,7 +149,12 @@ export async function carregarQualificacoes(obra: string | null = obraDaMascara(
     (async () =>
       todasAsLinhas('tratativas abertas', (de, ate) =>
         (obra ? tratativas().eq('intervencao_id', obra) : tratativas()).order('avaliacao_id').range(de, ate)))(),
-    (async () => compras().from('desempenho_12_meses').select('*'))(),
+    // Uma empresa por linha, e pode passar do teto de mil linhas da API: vem
+    // por páginas, com a contagem, como as outras listas (perícia 28/09, B5).
+    (async () =>
+      todasAsLinhas('desempenho dos fornecedores', (de, ate) =>
+        compras().from('desempenho_12_meses').select('*', { count: 'exact' })
+          .order('empresa_raiz_id').order('fornecedor_id').range(de, ate)))(),
   ]);
   for (const r of [linhas, categorias, criterios, abertas, desempenho]) {
     if (r.error) throw new Error(`Falha ao carregar as qualificações: ${r.error.message}`);
@@ -287,8 +292,7 @@ export interface AvaliacaoGravada {
 }
 
 /** Todas as avaliações, pelo dia do recebimento; com a máscara, só as da obra dela. */
-export async function lerAvaliacoesDeEntrega(): Promise<AvaliacaoGravada[]> {
-  const obra = obraDaMascara();
+export async function lerAvaliacoesDeEntrega(obra: string | null = obraDaMascara()): Promise<AvaliacaoGravada[]> {
   const todas = () => compras().from('avaliacoes_entrega').select('*', { count: 'exact' });
   const r = await todasAsLinhas('avaliações de entrega', (de, ate) =>
     (obra ? todas().eq('intervencao_id', obra) : todas()).order('recebido_em').order('id').range(de, ate));

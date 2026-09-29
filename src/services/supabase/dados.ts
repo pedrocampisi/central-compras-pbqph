@@ -525,11 +525,17 @@ export function assinarMudancas(aoMudar: () => void): () => void {
     .on('postgres_changes', { event: '*', schema: 'core', table: 'fornecedores' }, aoMudar)
     // A qualificação e a avaliação de entrega gravadas por outra pessoa
     // (D604; a publicação liga no dia de publicar, carta do Banco de 28/09 §4).
-    // Sem filtro de obra, de propósito: a qualificação é da empresa, e um
-    // filtro por coluna que a tabela não tenha derrubaria o canal inteiro. O
-    // recarregar que o aviso dispara já aplica a máscara.
+    // A qualificação é da empresa: sem filtro de obra, porque a tabela não tem
+    // obra. A avaliação de entrega tem: com a máscara, o aviso pede só a obra,
+    // como o das OCs, porque o aviso já traz a linha inteira e a de outra obra
+    // não pode chegar ao navegador (perícia 28/09, B1). A máscara virou, o App
+    // refaz o canal.
     .on('postgres_changes', { event: '*', schema: 'compras', table: 'qualificacoes' }, aoMudar)
-    .on('postgres_changes', { event: '*', schema: 'compras', table: 'avaliacoes_entrega' }, aoMudar)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'compras', table: 'avaliacoes_entrega', ...(obra ? { filter: `intervencao_id=eq.${obra}` } : {}) },
+      aoMudar,
+    )
     .subscribe();
   return () => void supabase.removeChannel(canal);
 }

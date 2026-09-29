@@ -165,12 +165,18 @@ export function HistoricoPage() {
 
   /**
    * A folha do auditor das entregas (CTO-D604 §3.5): todas as avaliações, ou
-   * só as da obra da máscara da D599 — a leitura já filtra.
+   * só as da obra da máscara da D599 — a leitura já filtra. O título e as
+   * linhas vêm do mesmo retrato da máscara: se ela virou durante a leitura, o
+   * PDF não sai misturado (perícia 28/09, B2).
    */
   async function handlePdfDasAvaliacoes() {
     try {
-      const avaliacoes = await lerAvaliacoesDeEntrega();
       const mascara = obraDaMascara();
+      const avaliacoes = await lerAvaliacoesDeEntrega(mascara);
+      if (obraDaMascara() !== mascara) {
+        showToast('A opção "mostrar só uma obra" ligou ou desligou enquanto o PDF era preparado. Gere o PDF de novo.', 'warning');
+        return;
+      }
       await baixarPdfDasAvaliacoes(
         linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras),
         mascara ? (obraNome.get(mascara) ?? 'Obra da auditoria') : null,

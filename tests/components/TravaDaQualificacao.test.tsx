@@ -32,7 +32,8 @@ vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: () => grav
 import { NovaOcPage } from '../../src/features/ordens-compra/NovaOcPage';
 import { mudarStatusDaOc } from '../../src/features/ordens-compra/mudarStatusDaOc';
 import { TravaDoBanco } from '../../src/services/supabase/dados';
-import { QUALIFICACAO_SEM_CONFIRMACAO, type LinhaDeQualificacao, type Situacao } from '../../src/domain/qualificacao';
+import { QUALIFICACAO_SEM_CONFIRMACAO, somaDias, type LinhaDeQualificacao, type Situacao } from '../../src/domain/qualificacao';
+import { hojeEmSaoPaulo } from '../../src/domain/ecr';
 import { normalizeFornecedor, normalizeItem, normalizeOC, normalizeObra } from '../../src/domain/normalize';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
@@ -94,9 +95,21 @@ function oc(opcoes: { semEcr?: boolean } = {}) {
   });
 }
 
+/**
+ * O vencimento que dá a situação pedida HOJE, pela regra do contrato: a tela
+ * recalcula a situação pelo dia (perícia 28/09, B3), e uma situação fabricada
+ * contra a data não sobrevive a isso.
+ */
+function venceParaTer(situacao: Situacao): string {
+  const hoje = hojeEmSaoPaulo();
+  if (situacao === 'vence_em_30_dias') return somaDias(hoje, 10);
+  if (situacao === 'vencida') return '2026-05-07';
+  return somaDias(hoje, 200);
+}
+
 const linha = (situacao: Situacao, ecrs: number[]): LinhaDeQualificacao => ({
   id: 1, empresaRaizId: 'empresa-a', fornecedorId: null, categoria: 'material', tipo: '',
-  qualificadaEm: '2025-05-07', venceEm: '2026-05-07',
+  qualificadaEm: '2025-05-07', venceEm: venceParaTer(situacao),
   criterios: [{ atende: true, motivo: 'a' }, { atende: true, motivo: 'b' }, { atende: false, motivo: 'c' }],
   nota: 2, minimo: 2, qualificada: situacao !== 'desqualificada', qualificadoPorNome: '', origem: '',
   situacao, ecrs, vigente: true,
