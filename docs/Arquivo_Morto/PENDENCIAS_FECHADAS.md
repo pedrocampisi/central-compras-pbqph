@@ -6,6 +6,80 @@
 
 ---
 
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **a tela NO AR em `31557b08` (decisão 66); falta o lado do Banco: as travas e o tempo real, depois da conferência do CTO** — **FECHADA EM 28/09/2026: a tela NO AR em `31557b08` (decisão 66); as travas e o tempo real ligados pelo Banco às 22h42 (D626)**
+
+*Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
+**Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
+a D609 (as tabelas na produção, **as duas travas desligadas até a tela publicar**: a tela primeiro, a trava depois) e a D610
+(o tipo `laboratorio`; 2 pessoas físicas sem documento, qualificadas pelo `fornecedor_id`). **Quando começa:** depois do
+editor e da perícia da máscara, numa cópia nova. **O Banco pediu aviso** quando as telas estiverem prontas para teste.
+*Em 28/09 (D613):* o plano aceito com as quatro recomendações. O ramo cresce em `fe119e6` (por merge, e não recriado: o
+ramo já estava empurrado); a qualificação na ficha da empresa, com as cinco categorias e o selo na lista; as tratativas num
+bloco do Painel, só para quem revisa ECR; a locação sem OC fica para depois. A perícia deste ramo vai de `fe119e6` à ponta.
+A prova no ensaio é primeiro pelo lado do Banco. Já no ramo: as regras puras (`0318d8b`, 18 testes).
+*Em 28/09, 14h3x (decisão 60):* as telas prontas no ramo, `928320a`, CI verde, NÃO publicadas: a ficha da empresa,
+o selo, a trava com o "Qualificar agora", a avaliação na entrega, as tratativas no Painel e os dois PDFs do auditor. Tem
+540 testes e 39 sabotagens; as fotos estão em `docs/Capturas/2026-09-28_D604/`, no ramo. A carta ao CTO e ao Banco está na
+`Enviados/`. **Falta:**
+- a prova do Banco no ensaio, com as travas ligadas;
+- a perícia `fe119e6..928320a` (4.258 linhas);
+- a publicação, depois do editor, dos consertos e da máscara;
+- as travas ligadas na produção, logo depois de publicar.
+*Em 28/09, 14h5x (decisão 61):* a prova do Banco no ensaio passou, 38 de 38. Os quatro retoques da D614 estão no ramo
+`ebbebb0`, CI verde, NÃO publicados; o tempo real escuta as duas tabelas novas. **Falta:**
+- a conferência do CTO;
+- a perícia `fe119e6..ebbebb0`; a cópia fica parada até o relatório;
+- a publicação;
+- no mesmo dia, avisar o Banco, que liga as travas e o tempo real na produção e manda a hora.
+*Em 28/09 (D616):* os retoques conferidos e as 40 fotos aprovadas; a linha do tempo real fica. A perícia
+`fe119e6..ebbebb0` está com o Pedro; o relatório chega em `docs/Pericias/`. A cópia fica parada em `ebbebb0`. Quando
+chegar: medir cada achado (reproduziu, não reproduziu, não dá para medir), sem consertar antes da triagem do CTO.
+*Em 28/09, 20h5x (decisão 62):* as duas perícias medidas no ramo `d604-fornecedores` (`d504c0f`, CI verde), sem
+conserto: os 4 achados dos consertos e da máscara e os 7 da qualificação reproduziram. A carta ao CTO está na `Enviados/`.
+**Falta:**
+- a triagem do CTO;
+- os consertos que ela mandar;
+- a publicação, na ordem combinada, e no mesmo dia o aviso ao Banco.
+*Em 28/09, 21h (D620):* os onze aceitos, zero falsos; a medida no ramo vale. Os consertos do A nascem no `d599-uma-obra`
+(cópia `OC_uma-obra`), que depois entra por merge no `d604-fornecedores`, onde nascem os do B. A família da máscara vem
+primeiro (A1, A2, B1, B2). O B4 e o B5 são de família: varrer o `src/` e dizer os outros casos. Uma carta por ramo. As
+perícias foram para o `Arquivo_Morto/Pericias/`.
+*Em 28/09, 21h4x (decisão 63):* os onze achados consertados, e as medidas viraram travas.
+- **O `d599-uma-obra`, ponta `d0b244b`:** A1 a A4, e o Duplicar da D621. CI verde, 350 linhas.
+- **O `d604-fornecedores`, ponta `1be6d46`:** B1 a B7, e a busca das famílias, que achou o PDF da OC. CI verde, 1.332
+  linhas.
+- As duas cartas ao CTO estão na `Enviados/`.
+
+**Falta:**
+- a conferência do CTO;
+- a perícia pequena do `d604-fornecedores`;
+- a publicação na ordem da D620, e no mesmo dia o aviso ao Banco.
+*Em 28/09 (D622, D623, decisão 64):* o `d599-uma-obra` foi ao ar em `533138c7`, conferido por fora; a cópia
+`OC_uma-obra` foi tirada.
+*Em 28/09, 22h3x (D624, decisão 65):* a perícia pequena caiu. Pela lei 3 §9.5 nova, conserto de perícia não chama perícia
+nova. O ciclo `format` ↔ `ecr` saiu no `fd6ad34`, CI verde.
+
+**Falta:**
+- a ordem da D604;
+- a publicação da tela, com o "Qualificar agora";
+- a conferência do CTO no ar;
+- só então o roteiro do Banco, que liga as travas e o tempo real.
+*Em 28/09, 22h3x (D625, decisão 66):* a tela NO AR em `31557b08`, versão `20260929013715-5567871`. O desfazer é
+`533138c7`. O banco não mudou.
+
+**Falta:**
+- a conferência do CTO no ar;
+- a carta dele ao Banco;
+- as travas e o tempo real ligados na produção.
+
+**Fecha quando** o Banco avisar que ligou.
+*Em 28/09, 22h4x (D626, cópia):* o CTO conferiu a tela no ar por fora e mandou o Banco ligar as travas e o tempo real
+na produção. Nada é pedido a esta casa. A D626 fica na caixa até a resposta do Banco.
+*Em 28/09, 22h42 (D626 do Banco):* as duas travas ligadas na produção (`D` → `O`) e as quatro tabelas no tempo real.
+A bateria do Banco deu 39 de 39. O desfazer está provado e não foi rodado. **Fechada.**
+
+---
+
 ### 20. D599 — mostrar só uma obra, para a auditoria de 16 e 17/11 · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 28/09/2026: NO AR em `533138c7` (CTO-D622, decisão 64); o desfazer é `080168b8`**
 
 *Aberta em 27/09/2026 (decisão 57).* **Onde mora:** o ramo **`d599-uma-obra`**, empurrado, **fora do `main`**, feito
