@@ -4,14 +4,16 @@
  * tempos: a máscara liga sozinha no começo da janela e desliga sozinha no fim,
  * e a tela recarrega os dados na virada.
  *
- * O filtro em si não mora aqui: mora na busca (`carregarDados`). Esta loja só
- * diz à tela quando recarregar e o que mostrar em Configurações.
+ * O filtro em si mora na busca (`carregarDados`). Esta loja diz à tela quando
+ * recarregar e o que mostrar em Configurações; e, no instante em que liga,
+ * tira da tela o que já estava carregado de outra obra.
  */
 
 import { create } from 'zustand';
-import { type MascaraDeObra, ligadaAgora } from '../domain/umaObra';
+import { type MascaraDeObra, ligadaAgora, soDaObra } from '../domain/umaObra';
 import type { OrdemCompra } from '../domain/types';
 import { apagarMascara, gravarMascara, lerMascara } from '../services/storage/umaObra';
+import { useDataStore } from './useDataStore';
 import { useOcEditingStore } from './useOcEditingStore';
 import { useUiStore } from './useUiStore';
 
@@ -39,6 +41,12 @@ export const useUmaObraStore = create<UmaObraState>((set, get) => ({
   conferir(agora = new Date()) {
     const novo = estado(agora);
     const s = get();
+    // Ligou (ou trocou de obra): a outra obra sai da tela já, sem esperar a
+    // busca filtrada que a virada pede (perícia 28/09, A1).
+    if (novo.obraAtiva && novo.obraAtiva !== s.obraAtiva) {
+      const { data } = useDataStore.getState();
+      if (data) useDataStore.setState({ data: soDaObra(data, novo.obraAtiva) });
+    }
     if (novo.obraAtiva !== s.obraAtiva || JSON.stringify(novo.armada) !== JSON.stringify(s.armada)) set(novo);
     guardarOuDevolverRascunho(get().obraAtiva);
   },

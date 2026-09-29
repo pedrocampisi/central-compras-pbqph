@@ -160,6 +160,15 @@ describe('D589 — o PDF diz o que falta, e não quebra', () => {
 });
 
 /**
+ * O gabarito da leitura, escrito à mão da codificação da fonte Symbol da
+ * Adobe, e não tirado da tabela `SINAIS` que está sob teste (perícia 28/09,
+ * A3): se alguém trocar um código lá, a leitura daqui acusa.
+ */
+const NA_SYMBOL_DA_ADOBE: Record<number, string> = {
+  0xb3: '≥', 0xa3: '≤', 0xbb: '≈', 0xb9: '≠', 0xae: '→', 0xac: '←', 0x6d: 'μ', 0x44: 'Δ', 0x57: 'Ω',
+};
+
+/**
  * O texto de uma página com os sinais de volta: o que foi desenhado na Symbol
  * é lido pelo código dela ("\xb3" → "≥").
  */
@@ -175,7 +184,7 @@ function textoComSinais(doc: jsPDF, pagina: number): string {
       continue;
     }
     const t = m[2]!.replace(/\\(.)/g, '$1');
-    partes.push(fonte === symbol ? Array.from(t, (c) => SINAL_DO_CODIGO[c.charCodeAt(0)] ?? c).join('') : t);
+    partes.push(fonte === symbol ? Array.from(t, (c) => NA_SYMBOL_DA_ADOBE[c.charCodeAt(0)] ?? c).join('') : t);
   }
   // Cada trecho é um desenho próprio; a leitura os junta com um espaço só.
   return partes.join(' ').replace(/ +/g, ' ');

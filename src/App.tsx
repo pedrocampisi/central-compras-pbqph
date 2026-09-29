@@ -17,6 +17,7 @@ import { useOcEditingStore } from './stores/useOcEditingStore';
 import { abaQueExiste, useUiStore, type TabId } from './stores/useUiStore';
 import { useAuthStore } from './stores/useAuthStore';
 import { esquecerRascunhoGuardado, useUmaObraStore } from './stores/useUmaObraStore';
+import { proximaVirada } from './domain/umaObra';
 import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
 
 // Services
@@ -117,16 +118,34 @@ export default function App() {
 
   // ── "Mostrar só uma obra" (CTO-D599): o relógio da máscara ─────────────────
   // Ela liga e desliga sozinha: a tela confere de tempos em tempos, e quando a
-  // pessoa volta à janela. Na virada, os dados recarregam (abaixo).
+  // pessoa volta à janela. Quando uma borda da janela está a menos de uma volta
+  // do relógio, a virada fica marcada para o instante dela (perícia 28/09, A2).
+  // Na virada, os dados recarregam (abaixo).
   const obraAtiva = useUmaObraStore((s) => s.obraAtiva);
   useEffect(() => {
-    const conferir = () => useUmaObraStore.getState().conferir();
+    const VOLTA = 15_000;
+    let borda: ReturnType<typeof setTimeout> | null = null;
+    let bordaEm = 0;
+    const conferir = () => {
+      useUmaObraStore.getState().conferir();
+      const agora = new Date();
+      const proxima = proximaVirada(useUmaObraStore.getState().armada, agora);
+      if (proxima === null || proxima === bordaEm || proxima - agora.getTime() > VOLTA * 2) return;
+      if (borda) clearTimeout(borda);
+      bordaEm = proxima;
+      borda = setTimeout(() => {
+        borda = null;
+        bordaEm = 0; // se chegar adiantado, a conferência marca de novo
+        conferir();
+      }, proxima - agora.getTime());
+    };
     conferir();
-    const relogio = setInterval(conferir, 15_000);
+    const relogio = setInterval(conferir, VOLTA);
     document.addEventListener('visibilitychange', conferir);
     window.addEventListener('focus', conferir);
     return () => {
       clearInterval(relogio);
+      if (borda) clearTimeout(borda);
       document.removeEventListener('visibilitychange', conferir);
       window.removeEventListener('focus', conferir);
     };
