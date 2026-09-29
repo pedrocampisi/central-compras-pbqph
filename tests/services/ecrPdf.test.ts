@@ -8,8 +8,9 @@ import { describe, expect, it } from 'vitest';
 import type jsPDF from 'jspdf';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { desenhaPdfDaEcr, paraAFonteDoPdf } from '../../src/services/pdf/generateEcrPdf';
-import { secoesDoBanco } from '../../src/domain/ecr';
+import { desenhaPdfDaEcr } from '../../src/services/pdf/generateEcrPdf';
+import { LARGURA_NA_SYMBOL, SINAL_DO_CODIGO, paraAHelvetica, trechosDoPdf } from '../../src/domain/letrasDoPdf';
+import { problemasDaRevisao, secoesDoBanco } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
 import type { Ecr, EcrRevisao } from '../../src/domain/types';
 import ecrs from '../fixtures/ecrs-03-e-08.json';
@@ -119,7 +120,7 @@ describe('D589 — um texto que passa de uma página', () => {
     const linhas = secoes.flatMap((s) => s.itens);
     expect(linhas).toHaveLength(24);
     for (const l of linhas) {
-      const palavras = junta(paraAFonteDoPdf(l.rotulo ? `${l.rotulo}: ${l.texto}` : l.texto));
+      const palavras = junta(paraAHelvetica(l.rotulo ? `${l.rotulo}: ${l.texto}` : l.texto));
       expect(tudo.split(palavras).length - 1, palavras).toBe(3);
     }
   });
@@ -145,7 +146,202 @@ describe('D589 — o PDF diz o que falta, e não quebra', () => {
     expect(t).toContain('Aprovado por');
   });
 
-  it('um caractere que a fonte não tem vira "?", e nunca some calado', () => {
-    expect(paraAFonteDoPdf('a→b ᶟ – “x”')).toBe('a?b ³ – “x”');
+  // A regra mudou com a perícia de 27/09 (achado 3): a seta, que virava "?",
+  // agora vai na Symbol. O "?" fica para o que nenhuma das duas fontes tem, e
+  // que o editor recusa — só chega ao PDF texto que não passou por ele.
+  it('a seta vai na Symbol; o "ᶟ" sai "³"; e o que nenhuma fonte tem vira "?", e nunca some calado', () => {
+    expect(trechosDoPdf('a→b ᶟ – “x”')).toEqual([
+      { texto: 'a', sinal: false },
+      { texto: '\xae', sinal: true },
+      { texto: 'b ³ – “x”', sinal: false },
+    ]);
+    expect(trechosDoPdf('a☃b')).toEqual([{ texto: 'a?b', sinal: false }]);
+  });
+});
+
+/**
+ * O gabarito da leitura, escrito à mão da codificação da fonte Symbol da
+ * Adobe, e não tirado da tabela `SINAIS` que está sob teste (perícia 28/09,
+ * A3): se alguém trocar um código lá, a leitura daqui acusa.
+ */
+const NA_SYMBOL_DA_ADOBE: Record<number, string> = {
+  0xb3: '≥', 0xa3: '≤', 0xbb: '≈', 0xb9: '≠', 0xae: '→', 0xac: '←', 0x6d: 'μ', 0x44: 'Δ', 0x57: 'Ω',
+};
+
+/**
+ * O texto de uma página com os sinais de volta: o que foi desenhado na Symbol
+ * é lido pelo código dela ("\xb3" → "≥").
+ */
+function textoComSinais(doc: jsPDF, pagina: number): string {
+  const conteudo = (doc.internal as unknown as { pages: string[][] }).pages[pagina]!.join('\n');
+  doc.setFont('symbol', 'normal');
+  const symbol = String(doc.getFont().id);
+  let fonte = '';
+  const partes: string[] = [];
+  for (const m of conteudo.matchAll(/\/(F\d+) [\d.]+ Tf|\(((?:\\.|[^\\)])*)\) Tj/g)) {
+    if (m[1]) {
+      fonte = m[1];
+      continue;
+    }
+    const t = m[2]!.replace(/\\(.)/g, '$1');
+    partes.push(fonte === symbol ? Array.from(t, (c) => NA_SYMBOL_DA_ADOBE[c.charCodeAt(0)] ?? c).join('') : t);
+  }
+  // Cada trecho é um desenho próprio; a leitura os junta com um espaço só.
+  return partes.join(' ').replace(/ +/g, ' ');
+}
+
+// Perícia do Codex, 27/09/2026, achado 3 — medida na D603, TRAVA desde a D607.
+// A medida de antes juntava três coisas; a D607 pede cada uma: "≥" e "≤" SE
+// IMPRIMEM (e o editor os aceita), a quebra de linha não passa no editor, e o
+// que nenhuma fonte desenha também não.
+describe('Perícia 27/09, achado 3 — o que o editor aceita, o PDF imprime', () => {
+  const comAPrimeiraSecao = (itens: { rotulo: string | null; texto: string; numerado: boolean }[]) => {
+    const vigente = ecr(0);
+    const nova = vigente.secoes!.map((s, i) => (i === 0 ? { ...s, itens } : s));
+    return { vigente, nova, problemas: problemasDaRevisao(vigente.secoes!, nova, vigente.revisao) };
+  };
+
+  it('"≥" e "≤" (e os outros sinais da Symbol): o editor aceita, e o PDF os imprime, no corpo e no histórico', () => {
+    const { vigente, nova, problemas } = comAPrimeiraSecao([
+      { rotulo: null, texto: 'Resistência ≥ 30 MPa', numerado: true },
+      { rotulo: null, texto: 'Abatimento ≤ 10 cm', numerado: true },
+      { rotulo: 'Ø', texto: 'tolerância ± 3 mm, ∆ ≈ 0,5 %, µ e μ, 20 °C → 25 °C', numerado: true },
+    ]);
+    expect(problemas).toEqual([]);
+
+    const historico = [{ ...HISTORICO[0]!, descricao: 'Fck ≥ 30 MPa' }];
+    const doc = desenhaPdfDaEcr({ ...vigente, secoes: nova, revisoes: historico }, null);
+    const tudo = textoComSinais(doc, 1);
+    for (const t of ['Resistência ≥ 30 MPa', 'Abatimento ≤ 10 cm', 'Ø:', '± 3 mm,', '≈ 0,5 %', 'µ e μ', '20 °C → 25 °C', 'Fck ≥ 30 MPa']) {
+      expect(tudo, t).toContain(t);
+    }
+    expect(textoDaPagina(doc, 1)).not.toMatch(/Resistência \? |Abatimento \? /);
+  });
+
+  it('cada sinal tem a largura dele medida (a tabela da biblioteca dá 580 para quase todos)', () => {
+    for (const codigo of Object.keys(SINAL_DO_CODIGO)) expect(LARGURA_NA_SYMBOL[Number(codigo)], codigo).toBeGreaterThan(0);
+  });
+
+  it('a palavra depois da seta começa depois do fim da seta (987 milésimos, e não 580)', () => {
+    const { vigente, nova } = comAPrimeiraSecao([{ rotulo: null, texto: '32 °C → rejeitar', numerado: true }]);
+    const conteudo = (desenhaPdfDaEcr({ ...vigente, secoes: nova }, null).internal as unknown as { pages: string[][] }).pages[1]!.join('\n');
+    const x = (t: string) => Number(new RegExp(`([\\d.]+) [\\d.]+ Td\\n\\(${t}\\) Tj`).exec(conteudo)![1]);
+    const tamanho = 9.5; // pt, a letra do corpo
+    expect(x('rejeitar') - x('\xae')).toBeGreaterThanOrEqual(0.987 * tamanho);
+  });
+
+  it('a quebra de linha dentro da linha: o editor recusa, aponta a linha e diz o que fazer', () => {
+    const { problemas } = comAPrimeiraSecao([{ rotulo: null, texto: 'Linha um\nLinha dois', numerado: true }]);
+    expect(problemas).toEqual([
+      {
+        secao: 0,
+        linha: 0,
+        frase: 'Seção 01, a linha 1 tem uma quebra de linha: cada linha da ECR é uma linha só. Para outra, use "Pôr linha".',
+      },
+    ]);
+  });
+
+  it('o que nenhuma das duas fontes desenha: o editor recusa e diz qual é', () => {
+    const { problemas } = comAPrimeiraSecao([
+      { rotulo: 'Lote', texto: 'Conferir ☃ e ✓ no recebimento\tagora', numerado: true },
+    ]);
+    expect(problemas.map((p) => p.frase)).toEqual([
+      'Seção 01, a linha "Lote" tem os caracteres "☃", "✓" e um caractere invisível, que o PDF não imprime: troque ou apague.',
+    ]);
+  });
+});
+
+// Perícia do Codex, 27/09/2026, achado 7 — MEDIDA, não conserto (CTO-D603).
+// O "como conferir" do perito: uma ECR sintética com 50 linhas curtas de
+// histórico, e outra com uma descrição longa; olhar ONDE os textos caem na
+// página. O certo: a tabela de revisões fica abaixo do texto do corpo, sem
+// cobrir o cabeçalho nem o conteúdo (o corpo começa a 36 mm do topo).
+describe('Perícia 27/09, achado 7 — o histórico que cresce no rodapé', () => {
+  const MM = 72 / 25.4;
+  /** Cada texto de uma página e a altura dele, em mm a partir do topo. */
+  function textosComAltura(doc: jsPDF, pagina: number): { texto: string; mm: number }[] {
+    const ph = doc.internal.pageSize.getHeight() * MM;
+    const conteudo = (doc.internal as unknown as { pages: string[][] }).pages[pagina]!.join('\n');
+    return [...conteudo.matchAll(/[\d.]+ ([\d.]+) Td\n\(((?:\\.|[^\\)])*)\) Tj/g)].map((m) => ({
+      texto: m[2]!.replace(/\\(.)/g, '$1'),
+      mm: Math.round(((ph - Number(m[1])) / MM) * 10) / 10,
+    }));
+  }
+  const DA_TABELA = /^(Revisão|Data|Descrição|Revisado por|Aprovado por|Revisor de teste|Aprovador de teste|Emissão Inicial|15\/04\/2026|\d\d)$|^Revisão sintética|^Descrição longa|^palavra|^As revisões \d\d a \d\d estão|^A Rev\. \d\d está/;
+  const DO_CABECALHO = 26; // o cabeçalho vai até ~21 mm; o corpo começa a 36
+  /** Por página: onde começa a tabela, e quantos textos do corpo caem nela ou abaixo dela. */
+  function medida(revisoes: EcrRevisao[]) {
+    const doc = desenhaPdfDaEcr(ecr(0, { revisoes }), null);
+    const paginas = Array.from({ length: doc.getNumberOfPages() }, (_, i) => {
+      const t = textosComAltura(doc, i + 1);
+      const topo = Math.min(...t.filter((x) => DA_TABELA.test(x.texto)).map((x) => x.mm));
+      const corpo = t.filter((x) => x.mm >= DO_CABECALHO && !DA_TABELA.test(x.texto) && !/^Página /.test(x.texto));
+      return { topo, corpoNaTabela: corpo.filter((x) => x.mm >= topo - 1).length, corpo: corpo.length };
+    });
+    const ruins = paginas.filter((p) => p.topo < 36 || p.corpoNaTabela > 0);
+    return { paginas: paginas.length, topoDaTabelaNaPagina1: paginas[0]!.topo, paginasComSobreposicao: ruins.length, pagina1: paginas[0] };
+  }
+  const umaRevisao = (i: number, descricao = `Revisão sintética ${i}`): EcrRevisao => ({
+    revisao: String(i).padStart(2, '0'), data: '2026-04-15', descricao, revisado_por: 'Revisor de teste', aprovado_por: 'Aprovador de teste',
+  });
+
+  it('a régua da medida: com a revisão de hoje, nada se sobrepõe', () => {
+    const m = medida(HISTORICO);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+  });
+
+  /** Os textos da tabela nas páginas do histórico inteiro (as do fim, com o título). */
+  function noHistoricoCompleto(doc: jsPDF): string[] {
+    const n = doc.getNumberOfPages();
+    const paginas = Array.from({ length: n }, (_, i) => textoDaPagina(doc, i + 1));
+    const primeira = paginas.findIndex((t) => t.includes('HISTÓRICO DE REVISÕES'));
+    if (primeira < 0) return [];
+    return paginas.slice(primeira).flatMap((_, i) => textosComAltura(doc, primeira + i + 1).map((x) => x.texto));
+  }
+
+  it('com 50 revisões curtas, a tabela não cobre o cabeçalho nem o corpo', () => {
+    const m = medida(Array.from({ length: 50 }, (_, i) => umaRevisao(i)));
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+    // O corpo da ECR 03 volta a caber numa página; o histórico vem depois.
+    expect(m.pagina1!.corpo).toBeGreaterThan(20);
+  });
+
+  it('com 50 revisões: o rodapé mostra as últimas que cabem e diz onde estão as outras; o fim tem as 50', () => {
+    const revisoes = Array.from({ length: 50 }, (_, i) => umaRevisao(i));
+    const doc = desenhaPdfDaEcr(ecr(0, { revisoes }), null);
+    const p1 = textosComAltura(doc, 1).map((x) => x.texto);
+    // Dez de uma linha cabem sozinhas; com a linha da nota, nove: da 41 à 49.
+    expect(p1).toContain('As revisões 00 a 40 estão no histórico completo, no fim deste documento.');
+    expect(p1.filter((t) => /^\d\d$/.test(t))).toEqual(Array.from({ length: 9 }, (_, i) => String(41 + i)));
+    const fim = noHistoricoCompleto(doc);
+    expect(fim.filter((t) => /^\d\d$/.test(t))).toEqual(revisoes.map((r) => r.revisao));
+    // A cabeça da tabela se repete em cada página do histórico.
+    const paginasDoHistorico = doc.getNumberOfPages() - 1;
+    expect(paginasDoHistorico).toBeGreaterThan(1);
+    expect(fim.filter((t) => t === 'Revisado por')).toHaveLength(paginasDoHistorico);
+  });
+
+  // A descrição tem limite desde a D607: 500, na tela e no banco (D608).
+  const comDescricaoDe = (letras: number) => medida([umaRevisao(0, `Descrição longa ${'palavra '.repeat(letras / 8)}`.trim())]);
+  it('com a descrição no tamanho máximo (500), cabe no rodapé', () => {
+    const m = comDescricaoDe(500);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+    expect(m.paginas).toBe(1);
+  });
+
+  it('com dez revisões de descrição máxima, nada se sobrepõe, e todas estão no histórico do fim', () => {
+    const revisoes = Array.from({ length: 10 }, (_, i) => umaRevisao(i, `Descrição longa ${'palavra '.repeat(60)}`.trim()));
+    const m = medida(revisoes);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
+    const doc = desenhaPdfDaEcr(ecr(0, { revisoes }), null);
+    expect(noHistoricoCompleto(doc).filter((t) => /^\d\d$/.test(t))).toEqual(revisoes.map((r) => r.revisao));
+  });
+
+  // Uma descrição de 2.000 ou 6.000 letras (as medidas da D603) já não pode
+  // nascer: a tela e o banco param em 500. Se uma assim chegasse, o rodapé
+  // mostraria só a nota, e ela iria para o histórico do fim.
+  it('uma descrição que não cabe nem sozinha no rodapé: o rodapé fica com a nota, sem sobrepor nada', () => {
+    const m = comDescricaoDe(2000);
+    expect(m.paginasComSobreposicao, JSON.stringify(m)).toBe(0);
   });
 });

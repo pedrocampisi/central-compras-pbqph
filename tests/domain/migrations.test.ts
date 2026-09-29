@@ -199,22 +199,11 @@ describe('Round-trip com fixture de produção', () => {
       expect(typeof ecr.id).toBe('number');
       expect(typeof ecr.nome).toBe('string');
       expect(typeof ecr.codigo).toBe('string');
-      expect(Array.isArray(ecr.normas)).toBe(true);
-      expect(typeof ecr.objetivo).toBe('string');
-      expect(Array.isArray(ecr.ensaios)).toBe(true);
-      expect(Array.isArray(ecr.criterios_recebimento)).toBe(true);
       expect(Array.isArray(ecr.materiais)).toBe(true);
-    }
-  });
-
-  it('normas dos ECRs são objetos com codigo e titulo', () => {
-    const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as unknown;
-    const data = normalizeData(runMigrations(raw));
-
-    for (const ecr of data.ecrs) {
-      for (const norma of ecr.normas) {
-        expect(typeof norma.codigo).toBe('string');
-        expect(typeof norma.titulo).toBe('string');
+      // O degrau v2 → v3 ainda acrescenta os campos velhos, e o formato de
+      // dados os descarta (CTO-D596).
+      for (const campo of ['objetivo', 'escopo', 'normas', 'ensaios', 'criterios_recebimento']) {
+        expect(campo in ecr, campo).toBe(false);
       }
     }
   });

@@ -3,6 +3,10 @@
  * Acrescenta campos ricos nos ECRs: objetivo, escopo, ensaios[], amostragem,
  * registros[], responsabilidades, observacoes — todos com defaults vazios.
  * O conteúdo real foi preenchido via script de extração dos documentos DOCX.
+ *
+ * Esses campos saíram do código em 27/09/2026 (CTO-D596): o texto da ECR é o
+ * das `secoes`. Este passo fica, porque é um degrau da escada de formatos dos
+ * arquivos antigos (v1 → v5); o que ele acrescenta, o `normalizeEcr` descarta.
  */
 
 type Raw = Record<string, unknown>;

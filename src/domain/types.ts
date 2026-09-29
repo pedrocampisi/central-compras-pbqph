@@ -90,31 +90,6 @@ export interface Obra {
   atualizado_em: string;
 }
 
-export interface NormaTecnica {
-  codigo: string;
-  titulo: string;
-}
-
-export interface DocumentoObrigatorio {
-  nome: string;
-  periodicidade: string;
-  observacao: string;
-}
-
-export interface CriterioRecebimento {
-  criterio: string;
-  tolerancia: string;
-  metodo: string;
-  registro: string;
-}
-
-export interface Ensaio {
-  nome: string;
-  metodo: string;
-  periodicidade: string;
-  amostragem: string;
-}
-
 export interface Material {
   id: string;
   descricao: string;
@@ -153,17 +128,7 @@ export interface Ecr {
   codigo: string;
   nome: string;
   categoria: string;
-  objetivo: string;
-  escopo: string;
-  normas: NormaTecnica[];
   unidades_padrao: string[];
-  documentos_obrigatorios: DocumentoObrigatorio[];
-  criterios_recebimento: CriterioRecebimento[];
-  ensaios: Ensaio[];
-  amostragem: string;
-  registros: string[];
-  responsabilidades: string;
-  observacoes: string;
   materiais: Material[];
   /** A revisão vigente ("00"); `null` se a ECR ainda não foi carregada. */
   revisao: string | null;
@@ -171,8 +136,8 @@ export interface Ecr {
   emitida_em: string | null;
   /**
    * As cinco seções da ECR, na ordem do documento (CTO-D586). `null` se a ECR
-   * ainda não foi carregada. Os campos de antes (objetivo, escopo, normas…)
-   * ficam até a carta que tira as colunas: a tela não os lê mais.
+   * ainda não foi carregada. Os dez campos de antes (objetivo, escopo,
+   * normas…) saíram do código (CTO-D596): o texto da ECR é só este.
    */
   secoes: EcrSecao[] | null;
   /**

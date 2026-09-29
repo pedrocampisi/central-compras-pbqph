@@ -16,6 +16,7 @@
 
 import type { Ecr, EcrItem, EcrRevisao, EcrSecao } from './types';
 import { formatDate } from './format';
+import { letrasQueOPdfNaoImprime } from './letrasDoPdf';
 
 /** Os cinco títulos, na ordem do documento. */
 export const TITULOS_DA_ECR = [
@@ -58,6 +59,17 @@ export const NENHUMA_REVISAO = 'Nenhuma revisão registrada.';
 
 /** O cabeçalho do PDF, como o do documento. */
 export const CABECALHO_DO_PDF = 'ECR – ESPECIFICAÇÃO DE COMPRA E RECEBIMENTO';
+
+/** O título das páginas do fim do PDF, quando o histórico não cabe no rodapé (achado 7). */
+export const TITULO_DO_HISTORICO = 'HISTÓRICO DE REVISÕES';
+
+/** A linha do rodapé que diz onde estão as revisões que não couberam nele. */
+export function notaDoRodape(revisoes: readonly EcrRevisao[], escondidas: number): string {
+  const [primeira, ultima] = [revisoes[0]?.revisao ?? '', revisoes[escondidas - 1]?.revisao ?? ''];
+  return escondidas === 1
+    ? `A Rev. ${primeira} está no histórico completo, no fim deste documento.`
+    : `As revisões ${primeira} a ${ultima} estão no histórico completo, no fim deste documento.`;
+}
 
 /**
  * As seções como vieram do banco, ou `null` se não vieram (ECR ainda não
@@ -124,6 +136,11 @@ export function numeroDaSecao(indice: number): string {
   return `${String(indice + 1).padStart(2, '0')}.`;
 }
 
+/** O número da seção dentro de uma frase, sem o ponto do documento: "Seção 02, …". */
+export function numeroNaFrase(indice: number): string {
+  return String(indice + 1).padStart(2, '0');
+}
+
 /** A linha do histórico como a tabela a mostra: a data em dd/mm/aaaa, "—" sem data. */
 export function linhaDoHistorico(r: EcrRevisao): string[] {
   return [r.revisao, r.data ? formatDate(r.data) : '—', r.descricao, r.revisado_por, r.aprovado_por];
@@ -157,4 +174,195 @@ export function linhaDoDocumento(item: EcrItem): string {
 export function nomeDoPdfDaEcr(ecr: Pick<Ecr, 'codigo' | 'nome' | 'revisao'>): string {
   const nome = `${ecr.codigo} - ${ecr.nome}`.replace(/[\\/:*?"<>|]/g, '-').trim();
   return ecr.revisao ? `${nome} - Rev ${ecr.revisao}.pdf` : `${nome}.pdf`;
+}
+
+// ── A revisão (CTO-D589 §4.2): só o Pedro edita, e salvar é aprovar ─────────
+//
+// A tela confere as mesmas regras da `compras.revisar_ecr` ANTES de mandar
+// (D593 §1): as mesmas seções, com os mesmos títulos e na mesma ordem; cada
+// seção com pelo menos uma linha; o texto com letra; o rótulo em branco ou com
+// letra; e o texto diferente do vigente. O banco confere de novo — a tela só
+// poupa a pessoa de uma recusa.
+
+const LETRA = /\p{L}/u;
+
+/** Uma linha nova, em branco, na lista. */
+export function linhaNova(): EcrItem {
+  return { rotulo: null, texto: '', numerado: true };
+}
+
+/**
+ * O texto como vai ao banco: sem espaço nas pontas do texto e do rótulo, e o
+ * rótulo em branco vira `null` (o banco recusa rótulo sem letra). Espaço de
+ * dentro fica como está.
+ */
+export function limparParaGravar(secoes: readonly EcrSecao[]): EcrSecao[] {
+  return secoes.map((s) => ({
+    titulo: s.titulo,
+    itens: s.itens.map((i) => {
+      const rotulo = i.rotulo?.trim() ?? '';
+      return { rotulo: rotulo === '' ? null : rotulo, texto: i.texto.trim(), numerado: i.numerado };
+    }),
+  }));
+}
+
+/** O mesmo texto, depois de limpo (é o que o banco compara). */
+export function mesmoTexto(a: readonly EcrSecao[], b: readonly EcrSecao[]): boolean {
+  return JSON.stringify(limparParaGravar(a)) === JSON.stringify(limparParaGravar(b));
+}
+
+export interface ProblemaDaRevisao {
+  /** O índice da seção, ou `null` quando o problema é do texto inteiro. */
+  secao: number | null;
+  /** O índice da linha, ou `null` quando o problema é da seção. */
+  linha: number | null;
+  frase: string;
+}
+
+/** "o caractere "☃"", "os caracteres "☃" e "✓"", "um caractere invisível". */
+export function nomeDasLetras(letras: readonly string[]): string {
+  const nomes = letras.map((c) => (/\p{C}/u.test(c) ? 'um caractere invisível' : `"${c}"`));
+  const unicos = [...new Set(nomes)];
+  if (unicos.length === 1) return unicos[0]!.startsWith('"') ? `o caractere ${unicos[0]}` : unicos[0]!;
+  return `os caracteres ${unicos.slice(0, -1).join(', ')} e ${unicos[unicos.length - 1]}`;
+}
+
+/** O que impede a revisão de ir ao banco. Lista vazia: pode ir. */
+export function problemasDaRevisao(
+  vigente: readonly EcrSecao[],
+  nova: readonly EcrSecao[],
+  revisaoVigente: string | null,
+): ProblemaDaRevisao[] {
+  const limpa = limparParaGravar(nova);
+  const problemas: ProblemaDaRevisao[] = [];
+  if (limpa.length !== vigente.length || limpa.some((s, i) => s.titulo !== vigente[i]!.titulo)) {
+    return [{ secao: null, linha: null, frase: 'As seções têm de ser as mesmas da ECR, com os mesmos títulos e na mesma ordem.' }];
+  }
+  limpa.forEach((s, i) => {
+    const n = numeroNaFrase(i);
+    if (s.itens.length === 0) {
+      problemas.push({ secao: i, linha: null, frase: `A seção ${n} precisa de pelo menos uma linha.` });
+    }
+    s.itens.forEach((it, j) => {
+      // A linha pelo rótulo, quando tem: é assim que o Pedro a reconhece.
+      const qual = it.rotulo && LETRA.test(it.rotulo) ? `a linha "${it.rotulo}"` : `a linha ${j + 1}`;
+      if (!LETRA.test(it.texto)) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual} está sem texto: escreva o texto ou tire a linha.` });
+      }
+      if (it.rotulo !== null && !LETRA.test(it.rotulo)) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual}: o rótulo precisa ter uma letra, ou ficar em branco.` });
+      }
+      // O que o PDF não desenharia não entra (perícia de 27/09, achado 3).
+      const junto = `${it.rotulo ?? ''} ${it.texto}`;
+      if (/[\r\n]/.test(junto)) {
+        problemas.push({
+          secao: i,
+          linha: j,
+          frase: `Seção ${n}, ${qual} tem uma quebra de linha: cada linha da ECR é uma linha só. Para outra, use "Pôr linha".`,
+        });
+      }
+      const fora = letrasQueOPdfNaoImprime(junto.replace(/[\r\n]/g, ''));
+      if (fora.length > 0) {
+        problemas.push({ secao: i, linha: j, frase: `Seção ${n}, ${qual} tem ${nomeDasLetras(fora)}, que o PDF não imprime: troque ou apague.` });
+      }
+    });
+  });
+  if (problemas.length === 0 && mesmoTexto(vigente, limpa)) {
+    problemas.push({
+      secao: null,
+      linha: null,
+      frase: `O texto está igual ao da revisão ${revisaoVigente ?? 'vigente'}: não há o que revisar.`,
+    });
+  }
+  return problemas;
+}
+
+/** A revisão que o salvar cria: "00" → "01", "09" → "10". */
+export function proximaRevisao(revisao: string | null): string {
+  const n = Number.parseInt(revisao ?? '', 10);
+  return String((Number.isNaN(n) ? -1 : n) + 1).padStart(2, '0');
+}
+
+/** Hoje em São Paulo (AAAA-MM-DD): é a data que o banco põe na revisão. */
+export function hojeEmSaoPaulo(agora: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(agora);
+}
+
+/** O que a tela mostra antes de gravar: "Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você." */
+export function resumoDaRevisao(revisao: string | null, hojeIso: string): string {
+  return `Rev. ${revisao ?? '—'} → ${proximaRevisao(revisao)}, emitida hoje (${formatDate(hojeIso)}), aprovada por você.`;
+}
+
+/** A frase para a pessoa quando o banco recusa a revisão, pelo código da recusa. */
+/**
+ * A descrição da revisão, a frase da coluna "Descrição" do histórico: no
+ * máximo 500 caracteres, contados sem os espaços das pontas (contrato do
+ * Banco da D607 §3; perícia de 27/09, achado 7 — sem limite, uma descrição
+ * enorme empurrava o rodapé do PDF para fora da folha).
+ */
+export const LIMITE_DA_DESCRICAO = 500;
+
+/** Uma linha só: quebra de linha e espaço repetido viram um espaço. */
+export function descricaoParaGravar(descricao: string): string {
+  return descricao.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * O rascunho que partiu de uma revisão que já não é a vigente (perícia de
+ * 27/09, achado 2): gravar desfaria, sem ninguém ver, o que a revisão nova
+ * mudou. A tela recusa antes, e o banco recusa de novo (40001).
+ */
+export const RASCUNHO_VELHO =
+  'Esta ECR foi revisada depois que você abriu o rascunho, e ele partiu de uma revisão que já não vale. ' +
+  'Gravar agora desfaria a revisão nova. Copie o que quiser guardar, clique em "Cancelar" e abra a ECR de novo.';
+
+/** A ECR vigente já não é a de onde o rascunho partiu. */
+export function rascunhoVelho(ecr: Pick<Ecr, 'revisao' | 'secoes'>, revisaoDeOrigem: string | null, vigente: readonly EcrSecao[]): boolean {
+  return (ecr.revisao ?? '') !== (revisaoDeOrigem ?? '') || !ecr.secoes || !mesmoTexto(ecr.secoes, vigente);
+}
+
+export function fraseDaRecusaDaRevisao(codigo: string | undefined, mensagem: string): string {
+  switch (codigo) {
+    case '42501':
+      return 'Só o Pedro revisa uma ECR. A revisão não foi gravada.';
+    case 'P0002':
+      return 'Esta ECR não existe mais no banco. Recarregue a página. A revisão não foi gravada.';
+    case '40001':
+      return `${RASCUNHO_VELHO} A revisão não foi gravada.`;
+    case '55000':
+      return 'A revisão vigente desta ECR não tem o texto guardado no histórico, e revisar agora perderia esse texto. A revisão não foi gravada.';
+    case '22023':
+      return `O banco recusou a revisão: ${mensagem}`;
+    default:
+      return `Falha ao gravar a revisão: ${mensagem}`;
+  }
+}
+
+// As mudanças no rascunho — sempre uma cópia nova, nunca o original.
+
+type Secoes = readonly EcrSecao[];
+
+function naSecao(secoes: Secoes, s: number, f: (itens: EcrItem[]) => EcrItem[]): EcrSecao[] {
+  return secoes.map((sec, i) => (i === s ? { ...sec, itens: f([...sec.itens]) } : sec));
+}
+
+export function mudaLinha(secoes: Secoes, s: number, l: number, parte: Partial<EcrItem>): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => itens.map((it, j) => (j === l ? { ...it, ...parte } : it)));
+}
+
+export function poeLinha(secoes: Secoes, s: number): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => [...itens, linhaNova()]);
+}
+
+export function tiraLinha(secoes: Secoes, s: number, l: number): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => itens.filter((_, j) => j !== l));
+}
+
+export function moveLinha(secoes: Secoes, s: number, l: number, para: -1 | 1): EcrSecao[] {
+  return naSecao(secoes, s, (itens) => {
+    const k = l + para;
+    if (k < 0 || k >= itens.length) return itens;
+    [itens[l], itens[k]] = [itens[k]!, itens[l]!];
+    return itens;
+  });
 }

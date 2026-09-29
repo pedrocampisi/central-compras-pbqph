@@ -94,3 +94,28 @@
   align-items: center;
   gap: 8px;
 }
+
+/* ── Mostrar só uma obra (CTO-D599) ───────────────────────────────────────── */
+
+/* "Mostrar só uma obra" grava, e o resto da tela não: uma linha a separa (CTO-D601). */
+.opcaoSeparada {
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--borda);
+}
+.estadoDaMascara {
+  flex: 1 1 240px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.erroDaMascara {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 12.5px;
+  color: var(--erro);
+}

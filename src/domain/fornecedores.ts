@@ -46,14 +46,25 @@ export const EMITIR_BLOQUEADA =
   'Esta filial está bloqueada para compra nova. Escolha a empresa de novo no campo Fornecedor: ' +
   'a OC passa para a filial principal.';
 
+export const EMITIR_SEM_CONFIRMACAO =
+  'Não deu para confirmar se esta filial pode receber compra nova: o cadastro dela não chegou inteiro. ' +
+  'Recarregue a página e tente de novo.';
+
 /**
  * A trava da filial bloqueada (CTO-D545): o rascunho SALVA — quem abriu uma OC
  * antiga não perde o que digitou —, mas não EMITE. O `bloqueado_para_compra_nova`
  * marca CNPJ baixado na Receita, e nenhum gatilho do banco o lê: se a tela não
  * travar, ninguém trava. Devolve a mensagem da recusa, ou '' quando pode.
+ *
+ * A trava falha FECHADA (perícia de 27/09, achado 5; CTO-D607): só emite a
+ * filial que o banco disse que NÃO está bloqueada. A coluna é `not null` no
+ * banco; o bloqueio desconhecido — a filial que não veio na lista, ou a linha
+ * resolvida que não chegou — é carga incompleta, e carga incompleta não emite.
  */
 export function travaDaFilial(f: Fornecedor | undefined, acao: 'salvar' | 'emitir'): string {
-  if (acao === 'emitir' && f?.bloqueado_para_compra_nova === true) return EMITIR_BLOQUEADA;
+  if (acao !== 'emitir') return '';
+  if (f?.bloqueado_para_compra_nova === true) return EMITIR_BLOQUEADA;
+  if (f?.bloqueado_para_compra_nova !== false) return EMITIR_SEM_CONFIRMACAO;
   return '';
 }
 

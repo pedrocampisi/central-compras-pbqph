@@ -2301,6 +2301,47 @@ verdade: a primeira é do Pedro.
 **AS FOTOS:** `docs/Capturas/2026-09-27_D596/` — 7 estados, a 1920 e a 375; dados de antes da D592 (a ECR 02 com a
 linha "Dimensão" vazia), funções do banco falsas.
 
+## Decisão 57 — mostrar só uma obra, para a auditoria do PBQP-H · 27/09/2026
+
+**POR QUÊ (CTO-D599, palavra do Pedro):** na auditoria de 16 e 17/11, a tela mostra só a obra auditada. É uma máscara:
+o banco não muda, e os outros computadores continuam vendo tudo.
+
+**O QUE MUDOU (no ramo `d599-uma-obra`, `f7d5a53`, feito na cópia `Copias_de_trabalho\OC_uma-obra`; NÃO publicado):**
+- **Em Configurações, "Mostrar só uma obra":** só para quem a `core.pode_revisar_ecr()` diz sim. A obra sai da lista;
+  a janela vem preenchida com 16/11/2026 00:00 a 17/11/2026 23:59, no relógio de Brasília, nunca no do computador.
+  "Armar", "Ver agora (ensaio)" (até 23:59 do dia), "Desligar agora"/"Desarmar". Passado o fim, desarma sozinha.
+- **Guardada só neste navegador** (`localStorage` `oc-mostrar-uma-obra`), conferida lendo de volta: navegador que não
+  guarda não liga, e diz por quê.
+- **O filtro num ponto só:** `carregarDados` pede a obra pelo id e as OCs pela `intervencao_id`; o aviso de mudanças
+  escuta só ela. Toda tela lê dali. Os totais são somados no navegador (o `oc_totais` não é lido), então obedecem.
+- **O rascunho da Nova OC de outra obra** sai da tela quando a máscara liga, e volta quando ela desliga.
+- **Nenhuma marca fora de Configurações.** Fornecedores, ECRs e o número da OC não mudam. Banco: nada.
+
+**AS TRAVAS:** 397 testes (eram 368): o App inteiro sobre um banco falso que registra o filtro de cada busca; os
+limites 23:59:59 de 15/11 e 00:00:00 de 18/11; o teste do relógio roda com o computador em UTC (o fuso muda antes de
+qualquer import). 13 sabotagens novas mordendo; as 97 de antes também, rodadas na cópia.
+
+**AS FOTOS:** `docs/Capturas/2026-09-27_D599/` — 10 estados, a 1920 e a 375; quatro obras inventadas.
+
+**A LINHA DO §9.5:** 981 linhas novas fora de `docs\` contra `7edb715`; 2.304 contra o `main`, somada a tela de editar,
+que já espera o perito. A perícia é decisão do CTO.
+
+## Decisão 58 — a máscara aprovada, com o retoque em Configurações · 27/09/2026
+
+**POR QUÊ (CTO-D601):** o aviso "Somente leitura — as configurações ainda não é gravado" ficava logo abaixo do "Armar".
+Quem lê entende que a opção recém-armada não grava, e é o contrário.
+
+**O QUE MUDOU (no ramo `d599-uma-obra`, `feefada`; NÃO publicado):** a opção "Mostrar só uma obra" fechada por uma
+linha, separada do resto; o aviso depois dela, dizendo "o resto desta tela"; o subtítulo "Mostrar só uma obra, textos
+legais e integração com IA." O componente do aviso não mudou. Fotos 01a, 01b e 01c refeitas.
+
+**AS TRAVAS:** 398 testes (uma trava nova: o aviso fora da opção e depois dela); 3 sabotagens novas mordendo.
+
+**DECIDIDO PELO CTO NA MESMA CARTA:** as datas da auditoria ficam no código só como sugestão de preenchimento; o
+lockfile e os restos antigos esperam a triagem da perícia de código.
+
+**A LINHA DO §9.5:** 1.003 linhas novas fora de `docs\` contra `7edb715` (eram 981; o retoque somou 22). Passa do portão
+por 3; dito na carta, e a decisão é do CTO.
 ## Decisão 59 — os sete achados da perícia consertados · 28/09/2026
 
 **POR QUÊ (CTO-D607):** a perícia do Codex achou sete defeitos, a D603 mediu os sete, e o CTO aceitou todos (zero falsos).

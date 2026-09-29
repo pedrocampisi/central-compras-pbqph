@@ -10,6 +10,9 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 const baixar = vi.fn<(ecr: unknown) => Promise<void>>(async () => {});
 vi.mock('../../src/services/pdf/generateEcrPdf', () => ({ baixarPdfDaEcr: (e: unknown) => baixar(e) }));
+// Nada aqui fala com o banco (o .env.local aponta para a produção): quem pergunta se pode revisar ouve "não".
+vi.mock('../../src/services/supabase/ecrs', () => ({ podeRevisarEcr: async () => false, revisarEcr: vi.fn() }));
+vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: vi.fn() }));
 
 import { CatalogoPage } from '../../src/features/catalogo-ecr/CatalogoPage';
 import { useDataStore } from '../../src/stores/useDataStore';
@@ -27,7 +30,7 @@ function ecr(i: 0 | 1, extra: Partial<Ecr> = {}): Ecr {
       codigo: e.codigo,
       nome: i === 0 ? 'Concreto Usinado' : 'Revestimento de Parede e Piso',
       categoria: 'Estrutura',
-      // Os campos de antes continuam no banco; a tela não os mostra mais.
+      // Os campos de antes: o banco ainda pode mandá-los, e nem o código nem a tela os leem (CTO-D596).
       objetivo: 'OBJETIVO VELHO',
       escopo: 'ESCOPO VELHO',
       normas: [{ codigo: 'NBR VELHA', titulo: 'norma velha' }],

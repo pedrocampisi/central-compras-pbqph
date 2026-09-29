@@ -154,7 +154,8 @@ describe('COLUNAS_DA_FORNECEDORES — a OC pede só o que usa da crua', () => {
 
   it('o pedido de verdade usa a lista — e nenhum pedido à fornecedores pede *', () => {
     const dados = readFileSync('src/services/supabase/dados.ts', 'utf-8');
-    expect(dados).toMatch(/from\('fornecedores'\)\s*\.select\(COLUNAS_DA_FORNECEDORES\.join\(', '\)\)/);
+    // O `{ count: 'exact' }` é da carga em páginas (perícia de 27/09, achado 5).
+    expect(dados).toMatch(/from\('fornecedores'\)\s*\.select\(COLUNAS_DA_FORNECEDORES\.join\(', '\)(, \{ count: 'exact' \})?\)/);
     expect(dados).not.toMatch(/from\('fornecedores'\)\s*\.select\(\s*['"`][^'"`]*\*/);
   });
 
