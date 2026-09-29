@@ -2485,3 +2485,34 @@ Histórico, que datava a OC em UTC das 21h à meia-noite (e isso está no ar).
 - a conferência do CTO e a perícia pequena do `d604-fornecedores`;
 - a publicação, na ordem da D620: primeiro o `d599-uma-obra`, antes de 06/11; depois o `d604-fornecedores`, e no mesmo
   dia o Banco liga as travas e o tempo real (o das avaliações só depois do B1 no ar).
+
+## Decisão 64 — no ar: o editor da ECR, a máscara da auditoria e os consertos do A · 28/09/2026
+
+**POR QUÊ (CTO-D622):** o CTO conferiu por fora os dois ramos da decisão 63 e mandou publicar o `d599-uma-obra`. O
+`d604-fornecedores` fica parado para a perícia pequena.
+
+**O QUE MUDOU:** o ramo `d599-uma-obra` (`d0b244b`) entrou no `main` em `f5b15eb`, sem conflito, e o diff fora de
+`docs/` é vazio. Tem 453 testes, tipos e lint limpos, e o `conferir` deu 7 de 7.
+- **Publicado:** `533138c7-896a-4e32-b342-762c1b580373`, versão `20260929004914-f5b15eb`, com 100% do tráfego.
+- **O desfazer é `080168b8`.** O banco não mudou.
+- **Foram juntos ao ar:**
+  - o editor da ECR, com os consertos da D607;
+  - a opção "mostrar só uma obra";
+  - os consertos A1 a A4;
+  - o dia de Brasília no Duplicar (D621).
+
+**A MEDIDA POR FORA:**
+- O `versao.txt` trouxe a versão nova na primeira leitura.
+- No pacote servido, cada frase apareceu:
+  - "aprovada por você" (o editor): 1 vez;
+  - "Mostrar só uma obra": 2 vezes;
+  - "A máscara não foi ligada.": 1 vez;
+  - "Preencha as datas e as horas." (o A4): 1 vez.
+- Nenhuma das quatro existia no `34ee3ff`, que estava no ar.
+- **Logado:** não medido. O olho é do Pedro.
+
+**DAQUI EM DIANTE:**
+- As pendências 19 e 20 fecharam.
+- A cópia `OC_uma-obra` sai por `git worktree remove` quando o CTO disser.
+- O `d604-fornecedores` espera o relatório do perito, sem ninguém tocar na cópia.
+- O ciclo `format` ↔ `ecr` sai depois da perícia.

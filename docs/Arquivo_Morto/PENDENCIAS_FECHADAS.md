@@ -6,6 +6,34 @@
 
 ---
 
+### 20. D599 — mostrar só uma obra, para a auditoria de 16 e 17/11 · **no ramo, esperando a carta do CTO para publicar** — **FECHADA EM 28/09/2026: NO AR em `533138c7` (CTO-D622, decisão 64); o desfazer é `080168b8`**
+
+*Aberta em 27/09/2026 (decisão 57).* **Onde mora:** o ramo **`d599-uma-obra`**, empurrado, **fora do `main`**, feito
+na cópia `C:\Users\Pedro Paulo\Softwares\Copias_de_trabalho\OC_uma-obra` (sai só por `git worktree remove`). As
+fotos estão em `docs/Capturas/2026-09-27_D599/`. **Fecha quando:** a carta do CTO mandar publicar, depois da tela de
+editar (pendência 19), **até 06/11**, para o ensaio do Pedro até 09/11. **Se a perícia consertar o `d589-editar-ecr`,**
+o conserto vem para este ramo.
+*Em 27/09 (decisão 58):* aprovada pela D601, com o retoque em Configurações (`feefada`). **A linha medida passou para
+1.003 contra `7edb715`:** acima do portão por 3, e o CTO decide se vai ao perito.
+
+---
+
+### 19. D596 §3 + D589 §4.2 — a tela de editar a ECR e os dez campos fora do código · **consertos conferidos; esperando a perícia única sobre `fe119e6`** — **FECHADA EM 28/09/2026: NO AR em `533138c7` (CTO-D622, decisão 64); o desfazer é `080168b8`**
+
+*Aberta em 27/09/2026 (decisão 56).* **Onde mora:** o ramo **`d589-editar-ecr`**, commit **`7edb715`**, empurrado,
+**fora do `main`**. As fotos estão em `docs/Capturas/2026-09-27_D596/`. **Fecha quando:** a carta do CTO mandar
+publicar. O desfazer será a `080168b8`. **Depois dela:** a primeira revisão de verdade é do Pedro.
+*Em 27/09, 22h (D603):* a perícia do Codex chegou (sete achados). Medidos no ramo, commit `5f287cd`, só testes:
+os sete reproduzem (o 5 no banco falso, o 6 por mutação). **Nada consertado:** espera a triagem do CTO.
+*Em 28/09 (D607, decisão 59):* os sete aceitos e consertados no ramo, commit **`97226b3`**, empurrado; levados à cópia
+`OC_uma-obra` por merge (`fe119e6`). 412 testes, zero `it.fails`. **1.185 linhas novas** contra `5f287cd`, acima do portão
+de mil (lei 3 §9.5): o CTO decide se vai perícia antes. **Fecha quando:** a carta do CTO mandar publicar e o editor estiver no ar.
+*Em 28/09 (D611):* conferidos. Por passar de mil, vai **uma perícia só** sobre a cópia `OC_uma-obra` em `fe119e6`
+(escopo `7edb715..fe119e6`: consertos, medidas, máscara e merge); o Pedro dispara. A cópia fica parada em `fe119e6` e o ramo
+em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem consertar. Editor, consertos e máscara vão ao ar juntos.
+
+---
+
 ### 18. D586 + D588 + D589 + D593 — a tela de ler as ECRs, o PDF delas e o PDF da OC comprimido · **aprovado pela D593; esperando a ordem de publicar** — **FECHADA EM 27/09/2026: NO AR em `080168b8` (CTO-D594, decisão 55); o desfazer é `b2c4cf79`. A tela de editar segue aberta no ramo `d589-editar-ecr`**
 
 *Aberta em 27/09/2026 (decisão 53; decisão 54).* **Onde mora:** o ramo **`d586-ecrs-do-sgq`**, commit **`ba53d2f`**,
