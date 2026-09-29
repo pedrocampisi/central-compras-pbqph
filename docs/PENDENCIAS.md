@@ -234,7 +234,7 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados das duas perícias aceitos pela D620; consertando: primeiro o `d599-uma-obra`, depois o `d604-fornecedores`**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados consertados nos dois ramos (decisão 63), NÃO publicados; o `d604-fornecedores` vai à perícia pequena**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -272,6 +272,16 @@ conserto: os 4 achados dos consertos e da máscara e os 7 da qualificação repr
 (cópia `OC_uma-obra`), que depois entra por merge no `d604-fornecedores`, onde nascem os do B. A família da máscara vem
 primeiro (A1, A2, B1, B2). O B4 e o B5 são de família: varrer o `src/` e dizer os outros casos. Uma carta por ramo. As
 perícias foram para o `Arquivo_Morto/Pericias/`.
+*Em 28/09, 21h4x (decisão 63):* os onze achados consertados, e as medidas viraram travas.
+- **O `d599-uma-obra`, ponta `d0b244b`:** A1 a A4, e o Duplicar da D621. CI verde, 350 linhas.
+- **O `d604-fornecedores`, ponta `1be6d46`:** B1 a B7, e a busca das famílias, que achou o PDF da OC. CI verde, 1.332
+  linhas.
+- As duas cartas ao CTO estão na `Enviados/`.
+
+**Falta:**
+- a conferência do CTO;
+- a perícia pequena do `d604-fornecedores`;
+- a publicação na ordem da D620, e no mesmo dia o aviso ao Banco.
 
 ---
 

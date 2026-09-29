@@ -2399,3 +2399,48 @@ errado para `avaliacoes_entrega`: a tabela tem a obra.
 comum e falhou na linha da medida. As duas mutações voltaram com o mesmo sha256.
 
 **O QUE FALTA:** a triagem do CTO; os consertos que ela mandar; a publicação, na ordem combinada.
+
+## Decisão 63 — os onze achados consertados, nos dois ramos · 28/09/2026
+
+**POR QUÊ (CTO-D620 e D621):** o CTO aceitou os onze achados das duas perícias (zero falsos) e mandou consertar. Os do A
+(consertos e máscara) nascem no `d599-uma-obra`, que entra por merge no `d604-fornecedores`, onde nascem os do B
+(qualificação dos fornecedores). O B4 e o B5 são de família: varrer o `src/` inteiro. A D621 somou o Duplicar do
+Histórico, que datava a OC em UTC das 21h à meia-noite (e isso está no ar).
+
+**O QUE MUDOU (NÃO publicado):**
+- **`d599-uma-obra`, ponta `d0b244b`:**
+  - A1: a máscara tira a outra obra da tela na hora, e a resposta pedida noutro estado da máscara vai fora.
+  - A2: um despertador no instante da borda da janela.
+  - A3: o gabarito dos sinais escrito à mão, da Symbol da Adobe.
+  - A4: dia ou hora apagados não lançam exceção.
+  - D621: o Duplicar e o `todayIso` pelo dia de Brasília; a casa tem um "hoje" só.
+  - O `main` entrou por merge, para o lock da D612 (o CI estava vermelho por isso).
+- **`d604-fornecedores`, ponta `1be6d46`:**
+  - B1: o canal das avaliações com o filtro da obra.
+  - B2: o PDF das avaliações com um retrato só da máscara, ou recusa.
+  - B3: a situação da qualificação pela regra do contrato no dia de Brasília, virando à meia-noite.
+  - B4: o texto livre dos PDFs pelos trechos, num módulo só (`textoComSinais.ts`).
+  - B5: o desempenho pelo `todasAsLinhas`.
+  - B6: a tratativa escondida não vai ao banco.
+  - B7: Brasília antes de cortar a data.
+- **A busca das famílias:**
+  - B4 achou o PDF da OC (no ar): a descrição, as observações, as condições e o texto da qualidade; um "≥" estragava a
+    frase inteira. Consertado pelo mesmo módulo. Sem sinal, o PDF sai idêntico byte a byte.
+  - B5 não achou outro caso.
+
+**AS TRAVAS:**
+- `d599-uma-obra`: 453 testes, 34 arquivos.
+- `d604-fornecedores`: 589 testes, 45 arquivos.
+- Nos dois: tipos e lint limpos; o pacote pelo PowerShell; CI verde (36504042795 e 36504138138).
+- Os 17 `it.fails` viraram testes comuns.
+- 22 sabotagens, 22 vermelhas, todas com o mesmo sha256: 7 no d599 (A e D621) e 15 no d604.
+
+**AS LINHAS:**
+- `d599-uma-obra`: 350 contra `fe119e6`. Sem perícia pequena.
+- `d604-fornecedores`: 1.332 contra `ebbebb0`, acima de 1.000. Vai à perícia pequena, que o CTO prepara e o Pedro
+  dispara.
+
+**O QUE FALTA:**
+- a conferência do CTO e a perícia pequena do `d604-fornecedores`;
+- a publicação, na ordem da D620: primeiro o `d599-uma-obra`, antes de 06/11; depois o `d604-fornecedores`, e no mesmo
+  dia o Banco liga as travas e o tempo real (o das avaliações só depois do B1 no ar).
