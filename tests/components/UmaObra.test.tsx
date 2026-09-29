@@ -362,9 +362,9 @@ describe('D599 §2.5 — o rascunho da Nova OC de outra obra não reabre com a m
 });
 
 /**
- * Perícia de 28/09 sobre `fe119e6` (consertos e máscara): as medidas, SEM
- * conserto. Cada uma é escrita pelo lado do certo e fica `it.fails` enquanto o
- * defeito existir; no dia do conserto ela acusa, o `.fails` sai e ela vira trava.
+ * Perícia de 28/09 sobre `fe119e6` (consertos e máscara): medidas na decisão
+ * 62, TRAVAS desde o conserto (CTO-D620). Cada uma foi escrita pelo lado do
+ * certo e ficou `it.fails` enquanto o defeito existiu.
  */
 describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não pode entrar na tela', () => {
   const soltarTudo = async () => {
@@ -374,7 +374,7 @@ describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não 
   };
   afterEach(soltarTudo);
 
-  it.fails('ao ligar, enquanto a busca filtrada não volta, a outra obra já não está na tela', async () => {
+  it('ao ligar, enquanto a busca filtrada não volta, a outra obra já não está na tela', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-16T02:59:50Z');
     useUmaObraStore.getState().conferir();
@@ -391,7 +391,7 @@ describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não 
     expect(pagina().textContent).not.toContain('2026/002');
   });
 
-  it.fails('ao ligar, uma carga SEM filtro que termina depois da filtrada não traz a outra obra de volta', async () => {
+  it('ao ligar, uma carga SEM filtro que termina depois da filtrada não traz a outra obra de volta', async () => {
     await abrir();
     banco.estado.segurar = (r) => r.tabela === 'compras.ordens_compra' && r.filtros.length === 0;
     const velha = recarregarDados(); // o Recarregar, ou um aviso do tempo real, antes da virada
@@ -411,7 +411,7 @@ describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não 
     expect(pagina().textContent).not.toContain('2026/002');
   });
 
-  it.fails('ao desligar, uma carga FILTRADA que termina depois não esconde de novo as outras obras', async () => {
+  it('ao desligar, uma carga FILTRADA que termina depois não esconde de novo as outras obras', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-17T15:00:00Z');
     useUmaObraStore.getState().conferir();
@@ -436,14 +436,21 @@ describe('Perícia 28/09 (fe119e6), achado 1 — a carga de outro contexto não 
 
 describe('Perícia 28/09 (fe119e6), achado 2 — a virada da janela pelo relógio do aplicativo, sem chamar a conferência por fora', () => {
   beforeEach(() => {
-    vi.useRealTimers(); // o de fora só finge a data; aqui o intervalo também
-    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+    vi.useRealTimers(); // o de fora só finge a data; aqui o relógio da tela também
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] });
   });
+  // Com o setTimeout falso, o `findByText` não espera: a carga do banco falso
+  // anda só por promessas, e basta deixá-las correr.
+  async function abrirComORelogioFalso() {
+    render(<App />);
+    for (let i = 0; i < 10; i++) await act(async () => {});
+    expect(screen.getByText('Últimas Ordens de Compra')).toBeInTheDocument();
+  }
 
-  it.fails('dois segundos depois de 00:00 de 16/11, a máscara já está ligada', async () => {
+  it('dois segundos depois de 00:00 de 16/11, a máscara já está ligada', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-16T02:59:59Z');
-    await abrir();
+    await abrirComORelogioFalso();
     expect(pagina().textContent).toContain('2026/002');
     await act(async () => vi.advanceTimersByTime(2_000));
     expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
@@ -452,15 +459,15 @@ describe('Perícia 28/09 (fe119e6), achado 2 — a virada da janela pelo relógi
   it('o controle: até 15 segundos depois ela liga sozinha (o atraso tem teto)', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-16T02:59:59Z');
-    await abrir();
+    await abrirComORelogioFalso();
     await act(async () => vi.advanceTimersByTime(15_000));
     expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
   });
 
-  it.fails('no término: dois segundos depois de 00:00 de 18/11, a máscara já está desligada', async () => {
+  it('no término: dois segundos depois de 00:00 de 18/11, a máscara já está desligada', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-18T02:59:59Z');
-    await abrir();
+    await abrirComORelogioFalso();
     expect(useUmaObraStore.getState().obraAtiva).toBe('obra-a');
     await act(async () => vi.advanceTimersByTime(2_000));
     expect(useUmaObraStore.getState().obraAtiva).toBeNull();
@@ -469,7 +476,7 @@ describe('Perícia 28/09 (fe119e6), achado 2 — a virada da janela pelo relógi
   it('o controle do término: até 15 segundos depois ela desliga sozinha', async () => {
     await armadaParaAuditoria();
     relogio('2026-11-18T02:59:59Z');
-    await abrir();
+    await abrirComORelogioFalso();
     await act(async () => vi.advanceTimersByTime(15_000));
     expect(useUmaObraStore.getState().obraAtiva).toBeNull();
   });
@@ -498,13 +505,13 @@ describe('Perícia 28/09 (fe119e6), achado 4 — um campo da janela apagado, e o
     return erros;
   }
 
-  it.fails('sem o dia: nenhuma exceção, e a mensagem pede o dia', async () => {
+  it('sem o dia: nenhuma exceção, e a mensagem pede o dia', async () => {
     const erros = await armarCom('Liga em (dia)');
     expect(erros).toEqual([]);
     expect(screen.getByRole('alert').textContent).toMatch(/dia|data/i);
   });
 
-  it.fails('sem a hora: o mesmo', async () => {
+  it('sem a hora: o mesmo', async () => {
     const erros = await armarCom('Liga em (hora)');
     expect(erros).toEqual([]);
     expect(screen.getByRole('alert').textContent).toMatch(/hora/i);

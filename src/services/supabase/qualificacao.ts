@@ -134,8 +134,7 @@ function paraDesempenho(l: Record<string, unknown>): Desempenho {
 }
 
 /** Tudo o que as telas da qualificação leem, numa carga só. Falha sobe: quem chama decide. */
-export async function carregarQualificacoes(): Promise<DadosDaQualificacao> {
-  const obra = obraDaMascara();
+export async function carregarQualificacoes(obra: string | null = obraDaMascara()): Promise<DadosDaQualificacao> {
   const tratativas = () => compras().from('tratativas_abertas').select('*', { count: 'exact' });
   // Cada pedido dentro de um `async`: um erro na hora de montar a consulta vira
   // recusa que o Promise.all recebe, e não deixa os pedidos já saídos falhando

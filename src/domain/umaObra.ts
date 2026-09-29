@@ -9,6 +9,8 @@
  * Lógica pura: nada aqui sabe de tela, de banco ou do navegador.
  */
 
+import type { Data } from './types';
+
 export const FUSO_DA_MASCARA = 'America/Sao_Paulo';
 
 export interface MascaraDeObra {
@@ -55,6 +57,9 @@ export function instanteEmBrasilia(dia: string, hora: string): Date {
   const [a, m, d] = dia.split('-').map(Number);
   const [h, mi] = hora.split(':').map(Number);
   const ingenuo = Date.UTC(a!, m! - 1, d!, h!, mi!);
+  // Campo apagado na tela: o instante inválido segue adiante, e quem arma diz o
+  // que falta. O relógio de Brasília lançaria exceção com ele (perícia 28/09, A4).
+  if (Number.isNaN(ingenuo)) return new Date(NaN);
   // Duas voltas: a segunda acerta o caso de o deslocamento mudar no meio.
   const primeira = ingenuo - deslocamento(ingenuo);
   return new Date(ingenuo - deslocamento(primeira));
@@ -93,6 +98,31 @@ export function ligadaAgora(m: MascaraDeObra | null, agora: Date): boolean {
   if (!m) return false;
   const t = agora.getTime();
   return Date.parse(m.inicio) <= t && t < Date.parse(m.fim);
+}
+
+/**
+ * A próxima borda da janela depois de agora (o começo, ou o fim), em
+ * milissegundos, ou `null` sem nada adiante. A tela marca a virada para esse
+ * instante, e não para a próxima volta do relógio (perícia 28/09, A2).
+ */
+export function proximaVirada(m: MascaraDeObra | null, agora: Date): number | null {
+  if (!m) return null;
+  const t = agora.getTime();
+  const bordas = [Date.parse(m.inicio), Date.parse(m.fim)].filter((b) => b > t);
+  return bordas.length ? Math.min(...bordas) : null;
+}
+
+/**
+ * Os dados já carregados, só com a obra: o que a tela mostra no instante em
+ * que a máscara liga, antes de a busca filtrada voltar (perícia 28/09, A1). As
+ * mesmas duas listas que a busca filtra; o resto não é por obra.
+ */
+export function soDaObra(data: Data, obraId: string): Data {
+  return {
+    ...data,
+    obras: data.obras.filter((o) => o.id === obraId),
+    ordens_compra: data.ordens_compra.filter((oc) => oc.obra_id === obraId),
+  };
 }
 
 /** Passou do fim: a opção se desarma sozinha. */

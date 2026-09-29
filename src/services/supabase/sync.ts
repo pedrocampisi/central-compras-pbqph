@@ -12,15 +12,28 @@
 
 import { carregarDados } from './dados';
 import { carregarQualificacoes } from './qualificacao';
+import { obraDaMascara } from '../storage/umaObra';
 import { useDataStore } from '../../stores/useDataStore';
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
 
+/**
+ * A resposta vale para a máscara em que foi pedida. Se ela virou durante a
+ * espera, a resposta é de outro contexto e vai fora, nos dois sentidos
+ * (perícia 28/09, A1): a virada já pediu a carga do contexto novo. As
+ * qualificações seguem a mesma regra, porque as tratativas são por obra.
+ */
 export async function recarregarDados(): Promise<void> {
-  const qualificacoes = carregarQualificacoes().then(
-    (q) => useQualificacaoStore.getState().definir(q),
-    (e: unknown) => useQualificacaoStore.getState().falhou(e instanceof Error ? e.message : String(e)),
+  const obra = obraDaMascara();
+  const valeAinda = () => obraDaMascara() === obra;
+  const qualificacoes = carregarQualificacoes(obra).then(
+    (q) => {
+      if (valeAinda()) useQualificacaoStore.getState().definir(q);
+    },
+    (e: unknown) => {
+      if (valeAinda()) useQualificacaoStore.getState().falhou(e instanceof Error ? e.message : String(e));
+    },
   );
-  const data = await carregarDados();
-  useDataStore.getState().setData(data, data.last_saved);
+  const data = await carregarDados(obra);
+  if (valeAinda()) useDataStore.getState().setData(data, data.last_saved);
   await qualificacoes;
 }

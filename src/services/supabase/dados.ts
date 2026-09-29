@@ -94,8 +94,7 @@ export async function todasAsLinhas<T>(
  * dela, e as outras nem chegam ao navegador. Toda tela lê daqui, então
  * nenhuma escapa. Fornecedores, ECRs e a numeração não são por obra.
  */
-export async function carregarDados(): Promise<Data> {
-  const obra = obraDaMascara();
+export async function carregarDados(obra: string | null = obraDaMascara()): Promise<Data> {
   // Uma consulta nova a cada página: a consulta do Supabase só se manda uma vez.
   const todasAsObras = () => core()
     .from('intervencoes')
