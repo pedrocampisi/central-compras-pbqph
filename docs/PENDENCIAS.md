@@ -234,13 +234,44 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **começada em 28/09 (D611 §3.4), na cópia `OC_fornecedores`, ramo `d604-fornecedores`**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados das duas perícias aceitos pela D620; consertando: primeiro o `d599-uma-obra`, depois o `d604-fornecedores`**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
 a D609 (as tabelas na produção, **as duas travas desligadas até a tela publicar**: a tela primeiro, a trava depois) e a D610
 (o tipo `laboratorio`; 2 pessoas físicas sem documento, qualificadas pelo `fornecedor_id`). **Quando começa:** depois do
 editor e da perícia da máscara, numa cópia nova. **O Banco pediu aviso** quando as telas estiverem prontas para teste.
+*Em 28/09 (D613):* o plano aceito com as quatro recomendações. O ramo cresce em `fe119e6` (por merge, e não recriado: o
+ramo já estava empurrado); a qualificação na ficha da empresa, com as cinco categorias e o selo na lista; as tratativas num
+bloco do Painel, só para quem revisa ECR; a locação sem OC fica para depois. A perícia deste ramo vai de `fe119e6` à ponta.
+A prova no ensaio é primeiro pelo lado do Banco. Já no ramo: as regras puras (`0318d8b`, 18 testes).
+*Em 28/09, 14h3x (decisão 60):* as telas prontas no ramo, `928320a`, CI verde, NÃO publicadas: a ficha da empresa,
+o selo, a trava com o "Qualificar agora", a avaliação na entrega, as tratativas no Painel e os dois PDFs do auditor. Tem
+540 testes e 39 sabotagens; as fotos estão em `docs/Capturas/2026-09-28_D604/`, no ramo. A carta ao CTO e ao Banco está na
+`Enviados/`. **Falta:**
+- a prova do Banco no ensaio, com as travas ligadas;
+- a perícia `fe119e6..928320a` (4.258 linhas);
+- a publicação, depois do editor, dos consertos e da máscara;
+- as travas ligadas na produção, logo depois de publicar.
+*Em 28/09, 14h5x (decisão 61):* a prova do Banco no ensaio passou, 38 de 38. Os quatro retoques da D614 estão no ramo
+`ebbebb0`, CI verde, NÃO publicados; o tempo real escuta as duas tabelas novas. **Falta:**
+- a conferência do CTO;
+- a perícia `fe119e6..ebbebb0`; a cópia fica parada até o relatório;
+- a publicação;
+- no mesmo dia, avisar o Banco, que liga as travas e o tempo real na produção e manda a hora.
+*Em 28/09 (D616):* os retoques conferidos e as 40 fotos aprovadas; a linha do tempo real fica. A perícia
+`fe119e6..ebbebb0` está com o Pedro; o relatório chega em `docs/Pericias/`. A cópia fica parada em `ebbebb0`. Quando
+chegar: medir cada achado (reproduziu, não reproduziu, não dá para medir), sem consertar antes da triagem do CTO.
+*Em 28/09, 20h5x (decisão 62):* as duas perícias medidas no ramo `d604-fornecedores` (`d504c0f`, CI verde), sem
+conserto: os 4 achados dos consertos e da máscara e os 7 da qualificação reproduziram. A carta ao CTO está na `Enviados/`.
+**Falta:**
+- a triagem do CTO;
+- os consertos que ela mandar;
+- a publicação, na ordem combinada, e no mesmo dia o aviso ao Banco.
+*Em 28/09, 21h (D620):* os onze aceitos, zero falsos; a medida no ramo vale. Os consertos do A nascem no `d599-uma-obra`
+(cópia `OC_uma-obra`), que depois entra por merge no `d604-fornecedores`, onde nascem os do B. A família da máscara vem
+primeiro (A1, A2, B1, B2). O B4 e o B5 são de família: varrer o `src/` e dizer os outros casos. Uma carta por ramo. As
+perícias foram para o `Arquivo_Morto/Pericias/`.
 
 ---
 

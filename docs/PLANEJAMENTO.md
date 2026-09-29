@@ -2371,3 +2371,72 @@ que decide se o editor precisa de perícia antes da produção. Não enxuguei pa
 
 **AS FOTOS:** `docs/Capturas/2026-09-28_D607/` — o PDF antes e depois (a ECR 03 igual; os sinais; 50 revisões de 30 páginas
 para 3).
+
+## Decisão 60 — as telas da qualificação e da entrega prontas no ramo · 28/09/2026
+
+**POR QUÊ (CTO-D604, D605, D606 e D613):** a auditoria do PBQP-H de 16/11 pede a qualificação dos fornecedores (FO
+8.4.1.1) e a avaliação de cada entrega (PS.02, 8.4.1.2) dentro do sistema, e a planilha se aposenta. O Banco já pôs as
+tabelas, as funções e a carga na produção, com as duas travas desligadas até a tela publicar (D609).
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `928320a`, na cópia `OC_fornecedores`, que cresce em `fe119e6`; NÃO
+publicado):**
+- **A ficha da empresa:** abre da gaveta de qualquer filial e traz as cinco categorias, o histórico e o Qualificar /
+  Requalificar. Ao requalificar, mostra o desempenho de 12 meses. O selo aparece na lista (a categoria certa para quem só
+  presta serviço) e na Nova OC.
+- **A trava (D605):** roda nas duas portas de emissão. Na Nova OC, a recusa abre o "Qualificar agora". Abaixo do mínimo
+  não emite, e a OC não é gravada. A 23514 do banco com dica vira aviso.
+- **A entrega:** o "Entregue" do Histórico abre a avaliação e grava numa escrita só, pela `registrar_entrega`. Com duas
+  "Não Conforme", a tratativa é obrigatória.
+- **As tratativas:** num bloco do Painel, só para quem revisa ECR, com o "Dar ciência".
+- **As folhas do auditor:** o PDF dos qualificados no desenho da FO 8.4.1.1, e o PDF das avaliações (só as da obra, com a
+  máscara).
+
+**AS TRAVAS:** 540 testes (98 novos); 39 sabotagens, 38 vermelhas e uma verde sem efeito (a regra está guardada duas
+vezes; dito na carta). CI verde no ramo.
+
+**O PORTÃO:** 4.258 linhas novas fora de `docs\` contra `fe119e6` (2.458 em `src`). A perícia vai de `fe119e6` a
+`928320a` (D613 §1); o CTO leva ao Pedro.
+
+**AS FOTOS:** `docs/Capturas/2026-09-28_D604/`, no ramo: 9 estados em 4 larguras, medidas sem defeito. A foto 01 achou
+um (o laboratório sem selo), consertado antes da carta.
+
+**O QUE FALTA:** a prova do Banco no ensaio com as travas ligadas; a perícia; a publicação, depois do editor, dos
+consertos e da máscara (D611). As travas ligam na produção no dia em que a D604 publicar, logo depois.
+
+## Decisão 61 — os quatro retoques antes da perícia, e o tempo real das tabelas novas · 28/09/2026
+
+**POR QUÊ (CTO-D614; carta do Banco de 28/09 §4):** o CTO conferiu o ramo `928320a` e pediu quatro retoques antes da
+perícia, para o perito ler o código final. O Banco mediu a publicação do tempo real: está vazia; no dia de publicar,
+entram as quatro tabelas.
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `ebbebb0`; NÃO publicado):**
+- **A gaveta não edita mais as ECRs do fornecedor.** Que ECR a empresa atende é a qualificação de material, a mesma que
+  a trava lê. A gaveta mostra uma linha só de leitura, e o `salvarFornecedor` não grava mais a `compras.fornecedor_ecrs`.
+  A carga ainda lê a tabela, e agora ninguém usa o que ela traz; o destino dela é decisão à parte.
+- **O PDF dos qualificados diz "Vence em até 30 dias";** o das avaliações leva a legenda C/NC em toda página.
+- **A frase da trava termina onde a pessoa resolve:** "qualifique aqui" dentro do "Qualificar agora"; "na ficha dela, em
+  Fornecedores" no resto. O Histórico mandava usar um botão que ele não tem.
+- **O tempo real escuta `compras.qualificacoes` e `compras.avaliacoes_entrega`,** sem filtro de obra. Antes do dia, é
+  silêncio.
+
+**AS TRAVAS:** 549 testes; 8 sabotagens, 8 vermelhas. CI verde (36461500482). 16 fotos novas, sem defeito.
+
+**O QUE FALTA:** a conferência do CTO; a perícia `fe119e6..ebbebb0` (4.471 linhas em `src` e testes); a publicação,
+depois do editor, dos consertos e da máscara; no mesmo dia, o aviso ao Banco, que liga as travas e o tempo real.
+
+## Decisão 62 — as duas perícias medidas, sem conserto · 28/09/2026
+
+**POR QUÊ (CTO-D611 e D616):** as duas perícias chegaram: a dos consertos e da máscara (`fe119e6`, 4 achados) e a da
+qualificação dos fornecedores (`fe119e6..ebbebb0`, 7 achados). A ordem do CTO: medir cada achado e não consertar nada
+antes da triagem dele.
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `d504c0f`; NÃO publicado):** só testes. São 17 `it.fails`, um por medida, e
+6 controles. Nenhuma linha de `src/`. Os 11 achados reproduziram; o 3 da primeira perícia, por mutação, e o 5 da
+segunda, no banco falso (o teto real da API não foi conferido). As medidas da primeira perícia foram feitas no ramo, que
+nessa parte é igual a `fe119e6`; a cópia `OC_uma-obra` continua congelada. O comentário do tempo real de `07385e9` estava
+errado para `avaliacoes_entrega`: a tabela tem a obra.
+
+**AS TRAVAS:** 572 testes, 43 arquivos; tipos e lint limpos; CI verde (36500646426). Cada medida rodou uma vez como teste
+comum e falhou na linha da medida. As duas mutações voltaram com o mesmo sha256.
+
+**O QUE FALTA:** a triagem do CTO; os consertos que ela mandar; a publicação, na ordem combinada.
