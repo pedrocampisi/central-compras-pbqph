@@ -15,7 +15,7 @@
  */
 
 import type { Ecr, EcrItem, EcrRevisao, EcrSecao } from './types';
-import { formatDate } from './format';
+import { formatDate, todayIso } from './format';
 import { letrasQueOPdfNaoImprime } from './letrasDoPdf';
 
 /** Os cinco títulos, na ordem do documento. */
@@ -283,9 +283,9 @@ export function proximaRevisao(revisao: string | null): string {
   return String((Number.isNaN(n) ? -1 : n) + 1).padStart(2, '0');
 }
 
-/** Hoje em São Paulo (AAAA-MM-DD): é a data que o banco põe na revisão. */
+/** Hoje em São Paulo (AAAA-MM-DD): é a data que o banco põe na revisão. O "hoje" da casa, do `format.ts`. */
 export function hojeEmSaoPaulo(agora: Date = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(agora);
+  return todayIso(agora);
 }
 
 /** O que a tela mostra antes de gravar: "Rev. 00 → 01, emitida hoje (27/09/2026), aprovada por você." */

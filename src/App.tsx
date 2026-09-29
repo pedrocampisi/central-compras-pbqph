@@ -19,6 +19,7 @@ import { useAuthStore } from './stores/useAuthStore';
 import { esquecerRascunhoGuardado, useUmaObraStore } from './stores/useUmaObraStore';
 import { proximaVirada } from './domain/umaObra';
 import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
+import { useQualificacaoStore } from './stores/useQualificacaoStore';
 
 // Services
 import { sessaoAtual, perfilAtual, sair, type Papel } from './services/supabase/auth';
@@ -186,6 +187,8 @@ export default function App() {
       esquecerRascunhoGuardado();
       // Idem o rascunho da ECR (perícia 27/09, achado 4).
       useRevisaoEcrStore.getState().fechar();
+      // E as qualificações que a conta anterior leu (CTO-D604).
+      useQualificacaoStore.getState().esquecer();
       setTab('dashboard');
       return;
     }

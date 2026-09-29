@@ -3,7 +3,7 @@
  * Portado de renderHistorico (CentralCompras-PBQPH.html).
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -25,6 +25,12 @@ import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
 import { marcarPdfGerado } from '../../services/supabase/dados';
 import { mudarStatusDaOc } from './mudarStatusDaOc';
+import { RegistrarEntregaDialogo } from './RegistrarEntregaDialogo';
+import { lerAvaliacoesDeEntrega } from '../../services/supabase/qualificacao';
+import { linhasDasAvaliacoes } from '../../domain/folhasDoAuditor';
+import { hojeEmSaoPaulo } from '../../domain/ecr';
+import { baixarPdfDasAvaliacoes } from '../../services/pdf/generateFolhasDoAuditor';
+import { obraDaMascara } from '../../services/storage/umaObra';
 import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
@@ -48,6 +54,8 @@ export function HistoricoPage() {
   const setHistFilter = useUiStore((s) => s.setHistFilter);
   const setTab = useUiStore((s) => s.setActiveTab);
   const showToast = useUiStore((s) => s.showToast);
+  /** A OC cuja entrega está sendo registrada (PS.02, CTO-D604 §3.2). */
+  const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
 
   // ── Lookups e filtros (memoizados — busca deixa de ser O(n×m) por tecla) ──
   const fornecedorNome = useMemo(
@@ -155,6 +163,30 @@ export function HistoricoPage() {
     await mudarStatusDaOc(oc, status, data!.fornecedores, showToast);
   }
 
+  /**
+   * A folha do auditor das entregas (CTO-D604 §3.5): todas as avaliações, ou
+   * só as da obra da máscara da D599 — a leitura já filtra. O título e as
+   * linhas vêm do mesmo retrato da máscara: se ela virou durante a leitura, o
+   * PDF não sai misturado (perícia 28/09, B2).
+   */
+  async function handlePdfDasAvaliacoes() {
+    try {
+      const mascara = obraDaMascara();
+      const avaliacoes = await lerAvaliacoesDeEntrega(mascara);
+      if (obraDaMascara() !== mascara) {
+        showToast('A opção "mostrar só uma obra" ligou ou desligou enquanto o PDF era preparado. Gere o PDF de novo.', 'warning');
+        return;
+      }
+      await baixarPdfDasAvaliacoes(
+        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras),
+        mascara ? (obraNome.get(mascara) ?? 'Obra da auditoria') : null,
+        hojeEmSaoPaulo(),
+      );
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
+  }
+
   /** Exporta as OCs visíveis (com filtros aplicados) em CSV compatível com Excel pt-BR. */
   function handleExportCsv() {
     const header = ['Número', 'Data', 'Fornecedor', 'Obra', 'Status', 'Qtd. Itens', 'Total (R$)'];
@@ -233,6 +265,9 @@ export function HistoricoPage() {
         <div style={{ display: 'flex', gap: 8 }}>
           <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => void handlePdfDasAvaliacoes()}>
+            <Icon name="file-text" size={13} /> PDF das avaliações
           </Button>
           <Button
             variant="primary"
@@ -313,9 +348,12 @@ export function HistoricoPage() {
               {o.status !== 'rascunho' && (
                 <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
               )}
-              {o.status === 'emitida' && gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'entregue')}>
-                  ✓ Entregue
+              {/* A entrega se registra com a avaliação do recebimento: a OC
+                  não vai a entregue sem ela (CTO-D604 §3.2). A já entregue
+                  aceita outra entrega — a parcial. */}
+              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && (
+                <Button variant="ghost" size="sm" onClick={() => setEntregando(o)}>
+                  {o.status === 'emitida' ? 'Entregue' : 'Outra entrega'}
                 </Button>
               )}
               {o.status !== 'cancelada' && gravaOk && (
@@ -325,6 +363,15 @@ export function HistoricoPage() {
               )}
             </div>
           )}
+        />
+      )}
+
+      {entregando && (
+        <RegistrarEntregaDialogo
+          oc={entregando}
+          fornecedor={fornecedorNome.get(entregando.fornecedor_id) ?? ''}
+          obra={obraNome.get(entregando.obra_id) ?? ''}
+          aoFechar={() => setEntregando(null)}
         />
       )}
     </div>

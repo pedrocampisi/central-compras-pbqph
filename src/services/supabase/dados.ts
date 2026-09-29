@@ -23,6 +23,7 @@ import type {
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
+import { fraseDaTravaDoBanco, type ErroDoBanco } from '../../domain/qualificacao';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
 import { obraDaMascara } from '../storage/umaObra';
@@ -53,7 +54,7 @@ const COLUNAS_DAS_ECRS =
 /** Linhas por pedido: o limite padrão da API do Supabase. */
 const PAGINA = 1000;
 
-interface Resposta<T> {
+export interface Resposta<T> {
   data: T[] | null;
   error: { message: string } | null;
   count?: number | null;
@@ -67,7 +68,7 @@ interface Resposta<T> {
  * metade. A consulta precisa de ordem com desempate (o id), senão as páginas
  * se sobrepõem.
  */
-async function todasAsLinhas<T>(
+export async function todasAsLinhas<T>(
   nome: string,
   pagina: (de: number, ate: number) => PromiseLike<Resposta<T>>,
 ): Promise<Resposta<T>> {
@@ -334,9 +335,11 @@ export async function salvarFornecedor(f: Fornecedor): Promise<string> {
     );
   }
 
-  const id = String((data as Record<string, unknown>)['id']);
-  await salvarEcrsDoFornecedor(id, f.ecrs_atende ?? []);
-  return id;
+  // As ECRs NÃO vão junto: desde 28/09 a resposta a "que ECR esta empresa
+  // atende" é a qualificação de material, a mesma que a trava lê, e ela muda
+  // na ficha da empresa. A `compras.fornecedor_ecrs` fica no banco como está;
+  // a tela não escreve mais nela (CTO-D614 §2.1).
+  return String((data as Record<string, unknown>)['id']);
 }
 
 /**
@@ -379,42 +382,6 @@ async function ensinarAMae(f: Fornecedor): Promise<true | null> {
   return decisao.materialDaFilial;
 }
 
-/**
- * Sincroniza quais ECRs o fornecedor atende.
- *
- * Grava a diferença — insere só o que foi marcado, apaga só o que foi
- * desmarcado — em vez de apagar tudo e reinserir. Apagar-e-reinserir abriria a
- * janela em que uma falha no meio deixa o fornecedor sem nenhum ECR, que é
- * exatamente o defeito que o banco acabou de fechar do lado das OCs.
- */
-async function salvarEcrsDoFornecedor(fornecedorId: string, desejados: number[]): Promise<void> {
-  const { data, error } = await compras()
-    .from('fornecedor_ecrs')
-    .select('ecr_id')
-    .eq('fornecedor_id', fornecedorId);
-  if (error) throw new Error(`Falha ao ler os ECRs do fornecedor: ${error.message}`);
-
-  const atuais = new Set(((data ?? []) as Record<string, unknown>[]).map((l) => Number(l['ecr_id'])));
-  const alvo = new Set(desejados);
-  const inserir = [...alvo].filter((id) => !atuais.has(id));
-  const remover = [...atuais].filter((id) => !alvo.has(id));
-
-  if (inserir.length) {
-    const { error: erroIns } = await compras()
-      .from('fornecedor_ecrs')
-      .insert(inserir.map((ecr_id) => ({ fornecedor_id: fornecedorId, ecr_id })));
-    if (erroIns) throw new Error(`Falha ao gravar os ECRs do fornecedor: ${erroIns.message}`);
-  }
-  if (remover.length) {
-    const { error: erroDel } = await compras()
-      .from('fornecedor_ecrs')
-      .delete()
-      .eq('fornecedor_id', fornecedorId)
-      .in('ecr_id', remover);
-    if (erroDel) throw new Error(`Falha ao remover os ECRs do fornecedor: ${erroDel.message}`);
-  }
-}
-
 /** Estado da OC como o banco devolveu depois de gravar. */
 export interface OcGravada {
   id: string;
@@ -428,6 +395,17 @@ export interface OcGravada {
 
 /** Erro de gravação concorrente: outra pessoa salvou esta OC antes de você. */
 export class ConflitoDeVersao extends Error {}
+
+/**
+ * A trava da emissão no banco recusou (CTO-D609: 23514, com a dica). A frase
+ * já vem pronta para a pessoa. Um 23514 SEM dica é um CHECK comum do banco, e
+ * sobe como falha de sempre.
+ */
+export class TravaDoBanco extends Error {}
+
+function recusaDaTrava(error: ErroDoBanco): TravaDoBanco | null {
+  return error.code === '23514' && error.hint?.trim() ? new TravaDoBanco(fraseDaTravaDoBanco(error)) : null;
+}
 
 function paraOcGravada(linha: Record<string, unknown>): OcGravada {
   return {
@@ -481,7 +459,7 @@ export async function salvarOrdemCompra(oc: OrdemCompra, requestId: string): Pro
     // 40001 = serialization_failure: o banco recusou porque a OC mudou desde
     // que esta tela a leu. A mensagem já vem pronta para o usuário.
     if (error.code === '40001') throw new ConflitoDeVersao(error.message);
-    throw new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
+    throw recusaDaTrava(error) ?? new Error(`Falha ao gravar a ordem de compra: ${error.message}`);
   }
   const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
   return paraOcGravada(linha);
@@ -506,7 +484,7 @@ export async function definirStatusOc(
   });
   if (error) {
     if (error.code === '40001') throw new ConflitoDeVersao(error.message);
-    throw new Error(`Falha ao alterar o status: ${error.message}`);
+    throw recusaDaTrava(error) ?? new Error(`Falha ao alterar o status: ${error.message}`);
   }
   const linha = (Array.isArray(data) ? data[0] : data) as Record<string, unknown>;
   return paraOcGravada(linha);
@@ -545,6 +523,19 @@ export function assinarMudancas(aoMudar: () => void): () => void {
       aoMudar,
     )
     .on('postgres_changes', { event: '*', schema: 'core', table: 'fornecedores' }, aoMudar)
+    // A qualificação e a avaliação de entrega gravadas por outra pessoa
+    // (D604; a publicação liga no dia de publicar, carta do Banco de 28/09 §4).
+    // A qualificação é da empresa: sem filtro de obra, porque a tabela não tem
+    // obra. A avaliação de entrega tem: com a máscara, o aviso pede só a obra,
+    // como o das OCs, porque o aviso já traz a linha inteira e a de outra obra
+    // não pode chegar ao navegador (perícia 28/09, B1). A máscara virou, o App
+    // refaz o canal.
+    .on('postgres_changes', { event: '*', schema: 'compras', table: 'qualificacoes' }, aoMudar)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'compras', table: 'avaliacoes_entrega', ...(obra ? { filter: `intervencao_id=eq.${obra}` } : {}) },
+      aoMudar,
+    )
     .subscribe();
   return () => void supabase.removeChannel(canal);
 }

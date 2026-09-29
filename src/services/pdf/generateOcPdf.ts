@@ -9,6 +9,8 @@ import jsPDF from 'jspdf';
 // para CommonJS, e a interop falha no bundle minificado de produção
 // com erro "(0, Et.default) is not a function".
 import autoTable from 'jspdf-autotable/es';
+import { temSinal } from '../../domain/letrasDoPdf';
+import { celulasComSinais, escritaComSinais } from './textoComSinais';
 import type { Data, Destinatario, OrdemCompra } from '../../domain/types';
 import { computeOcTotals } from '../../domain/compute';
 import { destinatarioParaImpressao, documentoRotulado, formatarDocumento } from '../../domain/destinatario';
@@ -92,8 +94,15 @@ function normalizeCondicoesContratacao(texto: string | undefined): string {
  * Recebe `oc` (a OC) e `data` (o estado completo com config, fornecedores, obras).
  */
 export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Blob> {
+  return desenhaPdfDaOc(oc, data, await loadCampisiLogo()).output('blob');
+}
+
+/**
+ * Desenha o PDF e devolve o documento (o teste lê o texto dele sem baixar).
+ * `logoDataUrl` é a marca em data URL, ou `null` (o PDF sai sem ela).
+ */
+export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string | null): JsPDFWithAutoTable {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' }) as JsPDFWithAutoTable;
-  const logoDataUrl = await loadCampisiLogo();
 
   // Resolução de destinatário, fornecedor e obra. O destinatário da nota é
   // o da OBRA (a fotografia gravada na emissão, ou o que a obra aponta hoje)
@@ -110,6 +119,15 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   const footerTextY = ph - 7;
   const contentBottomY = footerLineY - 4;
   let y = 12;
+
+  // O texto livre com sinal sai pelos trechos (CTO-D620 §2); sem sinal, a
+  // chamada de sempre, e o PDF sai igual.
+  const escrita = escritaComSinais(doc);
+  /** As linhas uma embaixo da outra, no espaçamento que o `doc.text` daria a elas. */
+  function escreveLinhas(linhas: string[], y0: number): void {
+    const entre = doc.getLineHeight() / doc.internal.scaleFactor;
+    linhas.forEach((l, k) => escrita.desenha(l, margin, y0 + k * entre, 'normal'));
+  }
 
   function ensureSpace(requiredHeight: number): void {
     if (y + requiredHeight <= contentBottomY) return;
@@ -242,6 +260,9 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
       8: { cellWidth: 22, halign: 'right' },
       9: { cellWidth: 19, halign: 'center' },
     },
+    // Descrição e observação com "≥" ou "≤" saem pelos trechos, os sinais na
+    // Symbol; sem sinal, a célula é a de sempre (CTO-D620 §2).
+    ...celulasComSinais(doc),
   });
   y = doc.lastAutoTable.finalY + 3;
   ensureSpace(34);
@@ -281,37 +302,41 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   drawBox(doc, margin, y, pw - 2 * margin, 7);
-  doc.text(
-    data.config.texto_qualidade || 'CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR',
-    margin + 2,
-    y + 5,
-  );
+  const textoQualidade = data.config.texto_qualidade || 'CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR';
+  if (temSinal(textoQualidade)) escrita.desenha(textoQualidade, margin + 2, y + 5, 'bold');
+  else doc.text(textoQualidade, margin + 2, y + 5);
   y += 12;
 
   // ── Observações ────────────────────────────────────────────────────────────
   if (oc.observacoes) {
-    const obsLines = doc.splitTextToSize(oc.observacoes, pw - 2 * margin) as string[];
+    const comSinal = temSinal(oc.observacoes);
+    const obsLines = comSinal
+      ? oc.observacoes.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, pw - 2 * margin))
+      : (doc.splitTextToSize(oc.observacoes, pw - 2 * margin) as string[]);
     ensureSpace(6 + obsLines.length * 4);
     doc.setFont('helvetica', 'bold');
     doc.text('OBSERVAÇÕES:', margin, y);
     y += 4;
     doc.setFont('helvetica', 'normal');
-    doc.text(obsLines, margin, y);
+    if (comSinal) escreveLinhas(obsLines, y);
+    else doc.text(obsLines, margin, y);
     y += obsLines.length * 4 + 2;
   }
 
   // ── Condições de contratação ───────────────────────────────────────────────
-  const cond = doc.splitTextToSize(
-    normalizeCondicoesContratacao(data.config.texto_condicoes_contratacao),
-    pw - 2 * margin,
-  ) as string[];
+  const textoCond = normalizeCondicoesContratacao(data.config.texto_condicoes_contratacao);
+  const condComSinal = temSinal(textoCond);
+  const cond = condComSinal
+    ? textoCond.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, pw - 2 * margin))
+    : (doc.splitTextToSize(textoCond, pw - 2 * margin) as string[]);
   ensureSpace(8 + cond.length * 3.4);
   doc.setFont('helvetica', 'bold');
   doc.text('CONDIÇÕES DE CONTRATAÇÃO:', margin, y);
   y += 4;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.text(cond, margin, y);
+  if (condComSinal) escreveLinhas(cond, y);
+  else doc.text(cond, margin, y);
   y += cond.length * 3.4 + 4;
 
   // ── Assinaturas ────────────────────────────────────────────────────────────
@@ -339,7 +364,7 @@ export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Bl
     drawFooter();
   }
 
-  return doc.output('blob');
+  return doc;
 }
 
 /**

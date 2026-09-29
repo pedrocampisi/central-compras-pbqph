@@ -38,7 +38,15 @@ import {
 import { CampoDeImportacao } from './CampoDeImportacao';
 import { getObraDirHandle } from '../../services/storage/handles';
 import { verifyHandlePermission } from '../../services/storage/permissions';
-import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao } from '../../services/supabase/dados';
+import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
+import type { QualificacaoGravada } from '../../services/supabase/qualificacao';
+import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
+import {
+  desempenhoDaFilial, ecrsDoQualificarAgora, nomeDasEcrs, seloDaFilial, textoDoDesempenho,
+} from '../../domain/qualificacao';
+import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
+import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
+import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
 import { recarregarDados } from '../../services/supabase/sync';
 import { podeEditar, podeEmitirOc } from '../../services/supabase/auth';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -330,6 +338,7 @@ function mensagemDaFalha(err: unknown): string {
 export function NovaOcPage() {
   const data = useDataStore((s) => s.data);
   const perfil = useAuthStore((s) => s.perfil);
+  const qualificacoes = useQualificacoesDoDia();
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
   const startEditing = useOcEditingStore((s) => s.startEditing);
@@ -374,6 +383,8 @@ export function NovaOcPage() {
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
+  /** O "Qualificar agora" aberto pela trava da emissão (CTO-D605): a frase e as ECRs já marcadas. */
+  const [qualificando, setQualificando] = useState<{ porque: string; ecrs: number[] } | null>(null);
   const initializedRef = useRef(false);
 
   // ── Inicialização ───────────────────────────────────────────────────────────
@@ -418,7 +429,7 @@ export function NovaOcPage() {
     (verbo: string, err: unknown) => {
       // O banco já devolve a frase pronta quando outra pessoa alterou a OC —
       // reescrevê-la só tiraria a informação de qual versão está onde.
-      if (err instanceof ConflitoDeVersao) {
+      if (err instanceof ConflitoDeVersao || err instanceof TravaDoBanco) {
         showToast(err.message, 'warning');
         return;
       }
@@ -469,6 +480,19 @@ export function NovaOcPage() {
       // A filial bloqueada NÃO emite — o banco não recusa, a trava é aqui (D545).
       const trava = travaDaFilial(data.fornecedores.find((f) => f.id === ocEditing.fornecedor_id), 'emitir');
       if (trava) { showToast(trava, 'warning'); return; }
+    }
+    {
+      // Material controlado só com empresa qualificada para as ECRs dele
+      // (CTO-D605). Recusou: abre o "Qualificar agora" na mesma tela. Sem o
+      // store carregado não há critério para mostrar — fica só o aviso.
+      const q = qualificacaoParaEmitir(ocEditing, data.fornecedores);
+      if (q.trava) {
+        const material = useQualificacaoStore.getState().dados?.categorias.find((c) => c.categoria === 'material');
+        if (q.selo && material) {
+          setQualificando({ porque: q.porqueDoQualificarAgora, ecrs: ecrsDoQualificarAgora(q.ecrs, q.selo.ecrs) });
+        } else showToast(q.trava, 'warning');
+        return;
+      }
     }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
@@ -784,6 +808,9 @@ export function NovaOcPage() {
       ].filter(Boolean).join(' · ')
     : undefined;
 
+  // O selo de material da empresa escolhida (D604 §3.4): o que a emissão vai conferir.
+  const seloDoEscolhido = fornecedorEscolhido && qualificacoes ? seloDaFilial(fornecedorEscolhido, qualificacoes.linhas) : null;
+
   function escolherEmpresaNaOc(chave: string) {
     if (!ocEditing) return;
     const id = escolherEmpresa(empresas.find((g) => g.chave === chave), ocEditing.fornecedor_id);
@@ -798,6 +825,28 @@ export function NovaOcPage() {
   // a pessoa preencha o formulário inteiro para tomar o erro no fim.
   const editaOk = podeEditar(perfil?.papel);
   const emiteOk = podeEmitirOc(perfil?.papel);
+
+  // O "Qualificar agora" gravou: com a nota no mínimo, a emissão segue sozinha
+  // (D605 §1) — e passa de novo pelas duas travas, agora com o store novo.
+  const filialDaOc = data.fornecedores.find((f) => f.id === ocEditing.fornecedor_id);
+  const categoriaMaterial = qualificacoes?.categorias.find((c) => c.categoria === 'material');
+  async function depoisDeQualificar(r: QualificacaoGravada) {
+    setQualificando(null);
+    try {
+      await recarregarDados();
+    } catch {
+      showToast('A qualificação foi gravada, mas a tela não recarregou. Recarregue a página antes de emitir.', 'warning');
+      return;
+    }
+    if (!r.qualificada) {
+      showToast(
+        `Qualificação gravada com nota ${r.nota} (o mínimo é ${r.minimo}): a empresa ficou desqualificada, e a OC não emite para ela.`,
+        'warning',
+      );
+      return;
+    }
+    await handleEmitir();
+  }
 
   return (
     <div className="section">
@@ -857,6 +906,14 @@ export function NovaOcPage() {
             valor={chaveEscolhida}
             onEscolher={escolherEmpresaNaOc}
           />
+          {fornecedorEscolhido && (
+            <span className={styles.seloDoFornecedor} data-selo-do-fornecedor="">
+              <SeloDaQualificacao selo={seloDoEscolhido} rotulo="Material" />
+              {seloDoEscolhido && seloDoEscolhido.ecrs.length > 0 && (
+                <span className={styles.ecrsDoSelo}>{nomeDasEcrs(seloDoEscolhido.ecrs)}</span>
+              )}
+            </span>
+          )}
         </FieldShell>
 
         <FieldShell
@@ -1001,6 +1058,19 @@ export function NovaOcPage() {
           <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
         </Button>
       </div>
+
+      {qualificando && filialDaOc && categoriaMaterial && (
+        <QualificarDialogo
+          filial={filialDaOc}
+          categoria={categoriaMaterial}
+          ecrs={data.ecrs}
+          ecrsMarcadas={qualificando.ecrs}
+          porque={qualificando.porque}
+          desempenho={textoDoDesempenho(desempenhoDaFilial(filialDaOc, qualificacoes?.desempenho ?? []))}
+          aoGravar={depoisDeQualificar}
+          aoVoltar={() => setQualificando(null)}
+        />
+      )}
     </div>
   );
 }

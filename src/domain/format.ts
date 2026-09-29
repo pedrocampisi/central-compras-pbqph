@@ -2,8 +2,6 @@
  * Helpers de formatação BR.
  */
 
-import { hojeEmSaoPaulo } from './ecr';
-
 export function formatBrl(n: number): string {
   if (!Number.isFinite(n)) return 'R$ 0,00';
   return n.toLocaleString('pt-BR', {
@@ -28,10 +26,11 @@ export function formatTimestamp(iso: string): string {
 
 /**
  * O dia de hoje (AAAA-MM-DD) é o de Brasília, qualquer que seja o relógio do
- * computador: a casa tem um "hoje" só, o `hojeEmSaoPaulo` (CTO-D621 §2).
+ * computador: a casa tem um "hoje" só, e é este (CTO-D621 §2). A conta mora
+ * aqui, no utilitário, e o domínio usa ele; nunca o contrário (CTO-D622 §2.1).
  */
-export function todayIso(): string {
-  return hojeEmSaoPaulo();
+export function todayIso(agora: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(agora);
 }
 
 export function nowIso(): string {

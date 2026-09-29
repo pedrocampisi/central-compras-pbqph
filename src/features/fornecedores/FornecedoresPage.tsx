@@ -11,15 +11,24 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
+import { useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
+import { CATEGORIAS, linhasDoDia, seloDaFilial } from '../../domain/qualificacao';
+import { SeloDaQualificacao } from './SeloDaQualificacao';
+import { secoesDosQualificados } from '../../domain/folhasDoAuditor';
+import { hojeEmSaoPaulo } from '../../domain/ecr';
+import { baixarPdfDosQualificados } from '../../services/pdf/generateFolhasDoAuditor';
+import { Icon } from '../../components/Icon/Icon';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { Fornecedor } from '../../domain/types';
 
 export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
+  const qualificacoes = useQualificacoesDoDia();
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
   const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
 
+  const showToast = useUiStore((s) => s.showToast);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Fornecedor | null>(null);
 
@@ -41,6 +50,24 @@ export function FornecedoresPage() {
     }
     return true;
   });
+
+  /** A folha do auditor (CTO-D604 §3.5): a FO 8.4.1.1 tirada do sistema, inteira. */
+  async function pdfDosQualificados() {
+    if (!qualificacoes || !data) {
+      showToast('As qualificações não carregaram. Recarregue a página para gerar o PDF.', 'warning');
+      return;
+    }
+    try {
+      // A situação do dia do clique: a lista pode ter sido aberta ontem (B3).
+      const hoje = hojeEmSaoPaulo();
+      await baixarPdfDosQualificados(
+        secoesDosQualificados(linhasDoDia(qualificacoes.linhas, hoje), qualificacoes.categorias, data.fornecedores),
+        hoje,
+      );
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
+  }
 
   function openNew() {
     setEditing(null);
@@ -88,6 +115,27 @@ export function FornecedoresPage() {
           : '—',
     },
     {
+      // Quem fornece material mostra o selo de material, o que a OC confere.
+      // Quem só presta serviço mostra a primeira categoria em que tem
+      // qualificação (serviço, laboratório, projeto, locação), com o nome
+      // dela; sem nenhuma, "Serviços: Sem qualificação" (D613 §2). As cinco
+      // ficam na ficha da empresa.
+      key: 'qualificacao',
+      label: 'Qualificação',
+      render: (f) => {
+        if (!qualificacoes) return <SeloDaQualificacao selo={null} />;
+        if (f.fornece_material !== false || !f.presta_servico) {
+          return <SeloDaQualificacao selo={seloDaFilial(f, qualificacoes.linhas)} />;
+        }
+        const comQualificacao = CATEGORIAS.filter((c) => c !== 'material').find(
+          (c) => seloDaFilial(f, qualificacoes.linhas, c).situacao !== 'sem_qualificacao',
+        );
+        const categoria = comQualificacao ?? 'servico';
+        const nome = qualificacoes.categorias.find((c) => c.categoria === categoria)?.nome ?? 'Serviço';
+        return <SeloDaQualificacao selo={seloDaFilial(f, qualificacoes.linhas, categoria)} rotulo={nome} />;
+      },
+    },
+    {
       key: 'ativo',
       label: 'Ativo',
       render: (f) => (
@@ -114,9 +162,14 @@ export function FornecedoresPage() {
             {filtered.length} de {data.fornecedores.length} cadastrado(s)
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={openNew}>
-          + Novo Fornecedor
-        </Button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <Button variant="outline" size="sm" onClick={() => void pdfDosQualificados()}>
+            <Icon name="file-text" size={13} /> PDF dos qualificados
+          </Button>
+          <Button variant="primary" size="sm" onClick={openNew}>
+            + Novo Fornecedor
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}

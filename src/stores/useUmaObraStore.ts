@@ -15,6 +15,7 @@ import type { OrdemCompra } from '../domain/types';
 import { apagarMascara, gravarMascara, lerMascara } from '../services/storage/umaObra';
 import { useDataStore } from './useDataStore';
 import { useOcEditingStore } from './useOcEditingStore';
+import { useQualificacaoStore } from './useQualificacaoStore';
 import { useUiStore } from './useUiStore';
 
 interface UmaObraState {
@@ -46,6 +47,12 @@ export const useUmaObraStore = create<UmaObraState>((set, get) => ({
     if (novo.obraAtiva && novo.obraAtiva !== s.obraAtiva) {
       const { data } = useDataStore.getState();
       if (data) useDataStore.setState({ data: soDaObra(data, novo.obraAtiva) });
+      // As tratativas abertas também são por obra (CTO-D604).
+      const q = useQualificacaoStore.getState().dados;
+      if (q) {
+        const tratativas = q.tratativas.filter((t) => t.intervencaoId === novo.obraAtiva);
+        useQualificacaoStore.getState().definir({ ...q, tratativas });
+      }
     }
     if (novo.obraAtiva !== s.obraAtiva || JSON.stringify(novo.armada) !== JSON.stringify(s.armada)) set(novo);
     guardarOuDevolverRascunho(get().obraAtiva);
