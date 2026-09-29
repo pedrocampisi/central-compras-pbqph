@@ -43,13 +43,6 @@ direção da carta** — não é preciso abrir para saber quem deve resposta:
 | [Enviados/](Enviados/) | **Eu pedi e ainda não me responderam.** Quem espera são eles |
 | [Arquivo_Morto/](Arquivo_Morto/) | Fechado. Serve para não tratar duas vezes; não serve para saber como as coisas estão hoje |
 
-**Perícias à espera da triagem do CTO** (lei 2, item 12: chegam fechadas, ninguém escreve dentro; triadas, vão para `Arquivo_Morto/Pericias/` com a linha no índice de lá):
-
-| Perícia | O que olhou |
-|---|---|
-| [Pericias/2026-09-28_pericia_codex_oc-consertos-e-mascara-da-auditoria.md](Pericias/2026-09-28_pericia_codex_oc-consertos-e-mascara-da-auditoria.md) | `fe119e6`: os sete consertos da D607 e a máscara de uma obra. Quatro achados, em medida |
-| [Pericias/2026-09-28_pericia_codex_oc-qualificacao-dos-fornecedores.md](Pericias/2026-09-28_pericia_codex_oc-qualificacao-dos-fornecedores.md) | `fe119e6..ebbebb0`: a qualificação dos fornecedores e a avaliação na entrega (D604). Sete achados, em medida |
-
 **Toda pendência que dependa do banco entra na caixa**, nunca em mensagem avulsa ao Pedro.
 
 **Não há tabela de cartas aqui, e é de propósito.** Os dois cadernos acumulativos que ocupavam

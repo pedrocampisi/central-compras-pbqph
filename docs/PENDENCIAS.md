@@ -234,7 +234,7 @@ em `97226b3`. O relatório chega na `docs\Pericias\` da casa: medir sem conserta
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **as duas perícias medidas no ramo (`d504c0f`): 11 achados, 11 reproduziram; esperando a triagem do CTO**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados das duas perícias aceitos pela D620; consertando: primeiro o `d599-uma-obra`, depois o `d604-fornecedores`**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -268,6 +268,10 @@ conserto: os 4 achados dos consertos e da máscara e os 7 da qualificação repr
 - a triagem do CTO;
 - os consertos que ela mandar;
 - a publicação, na ordem combinada, e no mesmo dia o aviso ao Banco.
+*Em 28/09, 21h (D620):* os onze aceitos, zero falsos; a medida no ramo vale. Os consertos do A nascem no `d599-uma-obra`
+(cópia `OC_uma-obra`), que depois entra por merge no `d604-fornecedores`, onde nascem os do B. A família da máscara vem
+primeiro (A1, A2, B1, B2). O B4 e o B5 são de família: varrer o `src/` e dizer os outros casos. Uma carta por ramo. As
+perícias foram para o `Arquivo_Morto/Pericias/`.
 
 ---
 
