@@ -2516,3 +2516,19 @@ Histórico, que datava a OC em UTC das 21h à meia-noite (e isso está no ar).
 - A cópia `OC_uma-obra` sai por `git worktree remove` quando o CTO disser.
 - O `d604-fornecedores` espera o relatório do perito, sem ninguém tocar na cópia.
 - O ciclo `format` ↔ `ecr` sai depois da perícia.
+
+## Decisão 65 — a perícia pequena cai; o ciclo do "hoje" sai · 28/09/2026
+
+**POR QUÊ (CTO-D624):** a lei 3 §9.5 mudou pela palavra do Pedro (`5d0154e`). A perícia agora é por movimento grande, de
+mais de mil linhas novas de código, sem contar testes. Conserto de perícia não chama perícia nova: a casa prova, e o CTO
+confere. O `d604-fornecedores` são consertos das duas perícias, então a perícia pequena não acontece.
+
+**O QUE MUDOU (no ramo `d604-fornecedores`, `fd6ad34`; NÃO publicado):**
+- A conta do fuso mora no `format.ts`, que não importa mais nada.
+- O `hojeEmSaoPaulo` chama o `todayIso`. Acabou o ciclo `format` ↔ `ecr` da decisão 63.
+- `tests/` não mudou.
+
+**AS TRAVAS:** 589 testes, tipos e lint limpos, CI verde (36508352211). 1 sabotagem (o relógio do computador), vermelha,
+com o mesmo sha256.
+
+**O QUE FALTA:** a ordem da D604. Primeiro a tela; depois o CTO confere no ar; só então o roteiro do Banco.

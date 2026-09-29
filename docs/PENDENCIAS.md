@@ -218,7 +218,7 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados consertados nos dois ramos (decisão 63), NÃO publicados; o `d604-fornecedores` vai à perícia pequena**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados consertados; o A no ar (decisão 64); o `d604-fornecedores` sem perícia pequena (D624), esperando a ordem de publicar**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -266,6 +266,16 @@ perícias foram para o `Arquivo_Morto/Pericias/`.
 - a conferência do CTO;
 - a perícia pequena do `d604-fornecedores`;
 - a publicação na ordem da D620, e no mesmo dia o aviso ao Banco.
+*Em 28/09 (D622, D623, decisão 64):* o `d599-uma-obra` foi ao ar em `533138c7`, conferido por fora; a cópia
+`OC_uma-obra` foi tirada.
+*Em 28/09, 22h3x (D624, decisão 65):* a perícia pequena caiu. Pela lei 3 §9.5 nova, conserto de perícia não chama perícia
+nova. O ciclo `format` ↔ `ecr` saiu no `fd6ad34`, CI verde.
+
+**Falta:**
+- a ordem da D604;
+- a publicação da tela, com o "Qualificar agora";
+- a conferência do CTO no ar;
+- só então o roteiro do Banco, que liga as travas e o tempo real.
 
 ---
 
