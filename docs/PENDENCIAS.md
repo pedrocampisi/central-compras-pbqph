@@ -285,6 +285,8 @@ nova. O ciclo `format` ↔ `ecr` saiu no `fd6ad34`, CI verde.
 - as travas e o tempo real ligados na produção.
 
 **Fecha quando** o Banco avisar que ligou.
+*Em 28/09, 22h4x (D626, cópia):* o CTO conferiu a tela no ar por fora e mandou o Banco ligar as travas e o tempo real
+na produção. Nada é pedido a esta casa. A D626 fica na caixa até a resposta do Banco.
 
 ---
 
