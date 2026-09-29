@@ -2532,3 +2532,35 @@ confere. O `d604-fornecedores` são consertos das duas perícias, então a perí
 com o mesmo sha256.
 
 **O QUE FALTA:** a ordem da D604. Primeiro a tela; depois o CTO confere no ar; só então o roteiro do Banco.
+
+## Decisão 66 — no ar: a avaliação dos fornecedores (D604) · 28/09/2026
+
+**POR QUÊ (CTO-D625):** o ciclo foi conferido (decisão 65), e o CTO mandou publicar o `d604-fornecedores`.
+
+**O QUE MUDOU:** o ramo (`fd6ad34`) entrou no `main` em `5567871`, sem conflito, e o diff fora de `docs/` é vazio.
+Tem 589 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (36508750419).
+- **Publicado:** `31557b08-6879-4285-b09c-84db826b94bd`, versão `20260929013715-5567871`, com 100% do tráfego.
+- **O desfazer é `533138c7`.**
+- **O banco não mudou:** as travas e o tempo real ligam depois da conferência do CTO, pela carta dele ao Banco.
+- **Foram juntos ao ar:**
+  - a ficha da empresa com a qualificação;
+  - a trava da emissão com o "Qualificar agora";
+  - a avaliação na entrega;
+  - as tratativas no Painel;
+  - os dois PDFs do auditor;
+  - os sete consertos do B;
+  - o PDF da OC com os sinais.
+
+**A MEDIDA POR FORA:**
+- O `versao.txt` trouxe a versão nova na primeira leitura.
+- No pacote servido, cada frase nova apareceu 1 vez:
+  - "A qualificação é da empresa: vale para todas as filiais dela.";
+  - "Qualificar agora";
+  - "enquanto o PDF era preparado".
+- Nenhuma das três existia no `f5b15eb`.
+- As frases da D622 continuam lá.
+- **Logado:** não medido.
+
+**DAQUI EM DIANTE:**
+- A pendência 21 fecha quando o Banco ligar as travas.
+- A cópia `OC_fornecedores` foi desligada por `git worktree remove`. Apagar a sobra da pasta espera o Pedro.

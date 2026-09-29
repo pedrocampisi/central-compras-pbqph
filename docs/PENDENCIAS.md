@@ -218,7 +218,7 @@ para quem usa o software. O que está no ar já está no ar, servido pela Cloudf
 
 ---
 
-### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **os onze achados consertados; o A no ar (decisão 64); o `d604-fornecedores` sem perícia pequena (D624), esperando a ordem de publicar**
+### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **a tela NO AR em `31557b08` (decisão 66); falta o lado do Banco: as travas e o tempo real, depois da conferência do CTO**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".
 **Onde está o que chegou:** na `Devolucoes`: as cartas D604, D605 e D606 do CTO, o plano do Banco, o contrato do Banco (D604),
@@ -276,6 +276,15 @@ nova. O ciclo `format` ↔ `ecr` saiu no `fd6ad34`, CI verde.
 - a publicação da tela, com o "Qualificar agora";
 - a conferência do CTO no ar;
 - só então o roteiro do Banco, que liga as travas e o tempo real.
+*Em 28/09, 22h3x (D625, decisão 66):* a tela NO AR em `31557b08`, versão `20260929013715-5567871`. O desfazer é
+`533138c7`. O banco não mudou.
+
+**Falta:**
+- a conferência do CTO no ar;
+- a carta dele ao Banco;
+- as travas e o tempo real ligados na produção.
+
+**Fecha quando** o Banco avisar que ligou.
 
 ---
 
