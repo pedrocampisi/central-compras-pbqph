@@ -2682,3 +2682,30 @@ pendência 1.
   - as 004 e 005 somem da tela pelo tempo real;
   - o PDF das 28 filiais passa a imprimir a razão social da Receita.
 - **Código:** nenhum. **O banco não mudou por mim.**
+
+## Decisão 72 — o PDF da OC com o quadro PARA A NOTA FISCAL, no ramo · 30/09/2026
+
+**POR QUÊ (CTO-D655, pedido direto do Pedro; a pausa sai só para este item):** um dos objetivos principais da OC é o
+vendedor pôr na nota fiscal o endereço da obra. É por ele que a Central_Financeiro acha a obra: pelo CNO, pelo CEP, pelo
+nome e pelo logradouro.
+
+**O QUE MUDOU**, no ramo `d655-pdf-obra-na-nota` (`893e411`), **fora do `main` e NÃO publicado**:
+- **O quadro PARA A NOTA FISCAL** vem no alto da página 1, em destaque. Ele traz a ordem de escrever no campo
+  INFORMAÇÕES COMPLEMENTARES, o texto pronto e o local de entrega. O texto sai de `src/domain/notaFiscal.ts`, que é
+  lógica pura.
+- **O destinatário** ficou menor e abaixo do quadro, e o título diz de quem é o endereço.
+- **O ENTREGAR EM** foi para dentro do quadro.
+- **As condições** agora são 5: o item 1 nomeia o campo certo, e o antigo item 5 saiu porque repetia o quadro.
+- **Um lembrete** vai no rodapé de toda página.
+- **O CNO** agora vem de `intervencoes.cno`. Até hoje o PDF imprimia como CNO a inscrição da Prefeitura (7 de 11
+  obras). As telas de Obras dizem "CNO".
+- **A prova:**
+  - 630 testes (eram 614);
+  - cinco sabotagens vermelhas;
+  - CI verde (36755275450);
+  - cinco casos, antes e depois lado a lado, em `docs/Capturas/2026-09-30_D655/` no ramo.
+- **O banco não mudou.**
+
+**A CÓPIA D652 DO BANCO** (a filial INAPTA bloqueada) foi lida e arquivada. Da OC: nada a fazer.
+
+**DAQUI EM DIANTE:** a conferência do CTO, o Pedro vê os PDFs, e a publicação só com a carta curta do CTO.
