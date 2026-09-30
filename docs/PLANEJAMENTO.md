@@ -2589,3 +2589,27 @@ telas duplicado (na barra do alto e no cabeçalho da página).
 apelido (18 no texto exato). São 30 empresas, todas ativas. Nada foi consertado.
 
 **DAQUI EM DIANTE:** publicar pela emenda 3 depois da linha do CTO sobre as fotos, e mandar o `versao.txt`.
+
+## Decisão 68 — no ar: fornecedores por empresa e o título uma vez (D641 e D643) · 29/09/2026
+
+**POR QUÊ (CTO-D644):** o CTO aceitou as fotos e as duas decisões da carta (a marca da busca só quando separa; o CNPJ
+numa linha), e o `Agente.md`. O arranjo do protótipo fica como está.
+
+**O QUE MUDOU:**
+- **A junção:** o ramo (`4ca0741`) entrou no `main` em `aa5c687`, sem conflito, e o diff fora de `docs/` é vazio.
+- **A bateria:** 609 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (36660127605).
+- **Publicado:** `d7e5e46e-0231-42ef-ae3d-72cd8cb1dd81`, versão `20260930023029-aa5c687`, com 100% do tráfego.
+- **O desfazer é `31557b08`.**
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA:**
+- O `versao.txt` trouxe a versão nova na primeira leitura.
+- No pacote servido, cada frase nova apareceu 1 vez: "achada pela busca" e o texto novo da busca. Nenhuma das duas
+  existia no `c0f0899`.
+- "Qualificar agora" (D604) continua lá.
+- **Logado:** não medido.
+
+**DAQUI EM DIANTE:**
+- Três retoques da D644 §4 num ramo novo (pendência 23), com teste, sabotagem e fotos. Não publico antes da linha do
+  CTO.
+- A medida das 30 filiais foi ao Banco pela D645. Esta casa não faz nada nela.

@@ -6,6 +6,17 @@
 
 ---
 
+### 22. D641 + D643 — fornecedores por empresa e o título uma vez · **no ramo, esperando a linha do CTO sobre as fotos** — **FECHADA EM 29/09/2026: NO AR em `d7e5e46e` (CTO-D644, decisão 68); o desfazer é `31557b08`**
+
+*Aberta em 29/09/2026 (decisão 67).* **Onde mora:** o ramo **`d641-fornecedores-por-empresa`** (`4ca0741`), empurrado,
+**fora do `main`**, na cópia `C:\Users\Pedro Paulo\Softwares\Copias_de_trabalho\OC_empresas` (sai só por `git worktree
+remove`). **As fotos:** `docs/Capturas/2026-09-29_D641_D643/`. **A carta:**
+`Enviados/2026-09-29_de_Ordem_de_Compra_para_CTO_D641-D643-fornecedores-por-empresa-e-o-titulo-uma-vez.md`.
+**Fecha quando:** o CTO der a linha sobre as fotos; aí publico pela emenda 3 e mando o `versao.txt`. **Sem perícia**
+(poucas linhas, D641 §3).
+
+---
+
 ### 21. D604 + D605 + D606 — a avaliação dos fornecedores para a auditoria de 16/11 · **a tela NO AR em `31557b08` (decisão 66); falta o lado do Banco: as travas e o tempo real, depois da conferência do CTO** — **FECHADA EM 28/09/2026: a tela NO AR em `31557b08` (decisão 66); as travas e o tempo real ligados pelo Banco às 22h42 (D626)**
 
 *Aberta em 28/09/2026 (decisão 59).* **O que é:** as telas da qualificação e da avaliação na entrega, e o "Qualificar agora".

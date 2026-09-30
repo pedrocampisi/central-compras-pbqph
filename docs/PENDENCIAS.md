@@ -44,14 +44,19 @@ A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu
 
 ## 🔴 Abertas
 
-### 22. D641 + D643 — fornecedores por empresa e o título uma vez · **no ramo, esperando a linha do CTO sobre as fotos**
+### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **a fazer, num ramo novo a partir do `main` publicado**
 
-*Aberta em 29/09/2026 (decisão 67).* **Onde mora:** o ramo **`d641-fornecedores-por-empresa`** (`4ca0741`), empurrado,
-**fora do `main`**, na cópia `C:\Users\Pedro Paulo\Softwares\Copias_de_trabalho\OC_empresas` (sai só por `git worktree
-remove`). **As fotos:** `docs/Capturas/2026-09-29_D641_D643/`. **A carta:**
-`Enviados/2026-09-29_de_Ordem_de_Compra_para_CTO_D641-D643-fornecedores-por-empresa-e-o-titulo-uma-vez.md`.
-**Fecha quando:** o CTO der a linha sobre as fotos; aí publico pela emenda 3 e mando o `versao.txt`. **Sem perícia**
-(poucas linhas, D641 §3).
+*Aberta em 29/09/2026 (decisão 68).* **O que é:**
+1. As larguras das colunas de Fornecedores fixas: o cabeçalho não anda entre a lista, a busca e os filtros.
+2. O cartão "Fornecedores" do Dashboard conta empresas (a regra da D501).
+3. A caixa "Buscar ECR…" do Catálogo segue o tema escuro.
+
+**A prova:**
+- um teste com sabotagem para cada retoque;
+- as fotos `01`, `04` e `06` em 1366 e 1920, e o Dashboard e o Catálogo no claro e no escuro.
+
+**Fecha quando:** o CTO der a linha e a publicação sair. Sem perícia.
+**A carta:** `Devolucoes/2026-09-29_de_CTO_para_Ordem_de_Compra_D644-fotos-aceitas-publique-e-tres-retoques-depois.md`.
 
 ---
 
