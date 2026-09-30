@@ -1,6 +1,6 @@
 ﻿# Agente.md — Central de Compras PBQP-H
 
-> **Data:** 26/09/2026
+> **Data:** 29/09/2026
 > **Estado:** VALE HOJE
 > **Escopo:** arquitetura, contratos e constantes das duas branches, com a **seção 0** vencendo sobre o resto. **NÃO** guarda o *motivo* das decisões — isso é `PLANEJAMENTO.md`.
 
@@ -15,16 +15,18 @@
 > (decisão 29). A comparação "duas versões" abaixo virou **história**: ela conta como era até
 > 04/09, e não é mais instrução. A coluna `main` de ontem descreve um programa que ninguém usa.
 
-> **Como ler esta seção agora:** a coluna `migracao-supabase` é **a arquitetura de hoje, na
-> `main`**. A coluna `main` é o programa antigo, de arquivo JSON, que não está no ar em lugar
-> nenhum. Trocar os títulos das colunas é conserto de verdade e **não foi feito**, porque a casa
-> está pausada desde 04/09 — está anotado, e não escondido.
+> **Como ler esta seção agora:** a coluna da direita é **a arquitetura de hoje, na `main`**. A
+> coluna da esquerda é o programa antigo, de arquivo JSON, que não está no ar em lugar nenhum.
+> Os títulos das colunas foram trocados em 29/09/2026 (CTO-D641).
 
-As seções 1–8 descrevem a arquitetura **da branch `main`** (JSON via File
-System Access API, sem login). Na branch `migracao-supabase` valem estas
-diferenças; onde houver conflito, o que está aqui na seção 0 vence:
+**As seções 1–8 são HISTÓRIA:** descrevem a versão do arquivo (JSON via File System Access
+API, sem login), que era a `main` até 04/09/2026. **A `main` de hoje é a versão com banco**, e
+o `App.tsx` não importa nada da camada de arquivo (`services/storage/*`,
+`useFileHandleStore`, `useAutoSave`, `useDirtyGuard`) — o grafo da seção 2 e o fluxo da seção 5
+contam como era. O código dessa camada ainda está no repositório, sem ser carregado pela tela;
+ele sai com a CTO-D639 (17/11/2026). Onde houver conflito, o que está aqui na seção 0 vence:
 
-| Assunto | `main` | `migracao-supabase` |
+| Assunto | versão do arquivo (até 04/09, fora do ar) | `main` de hoje (banco) |
 |---|---|---|
 | Fonte da verdade | `services/storage/fileSystem.ts` | `services/supabase/dados.ts` (`carregarDados`, `salvarOrdemCompra`, `definirStatusOc`, `marcarPdfGerado`, `salvarFornecedor`) |
 | Auth | inexistente | `services/supabase/auth.ts` — `perfilAtual()`, `podeEditar()`, `podeEmitirOc()`; espelho do RLS, não a trava |
@@ -148,6 +150,10 @@ aplicativo depois da troca. O contrato foi conferido campo a campo por leitura
 no banco, o que é outra coisa.
 
 ## 1. Stack e dependências
+
+> ⚠️ **Daqui até o fim da seção 8 é história da versão do arquivo** (ver seção 0). A `main` de
+> hoje é o banco: onde estas seções falarem de JSON, handle, Ctrl+S ou `App.tsx` carregando o
+> arquivo, isso não roda mais.
 
 | Lib | Versão | Uso |
 |---|---|---|

@@ -69,7 +69,7 @@ describe('D585 — a aba Prestadores saiu', () => {
     localStorage.setItem('central-compras-ui-v1', JSON.stringify({ activeTab: 'prestadores' }));
     useUiStore.setState({ activeTab: 'prestadores' as never });
     await abrirOc();
-    expect(screen.getByText('Dashboard', { selector: '[class*="topbarTitle"]' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByText('Últimas Ordens de Compra')).toBeInTheDocument();
   });
 

@@ -68,16 +68,6 @@ const NAV_SISTEMA: NavItem[] = [
   { id: 'config', label: 'Configurações', icon: 'settings' },
 ];
 
-const TAB_TITLES: Record<TabId, string> = {
-  dashboard: 'Dashboard',
-  'nova-oc': 'Nova Ordem de Compra',
-  historico: 'Histórico de OCs',
-  fornecedores: 'Fornecedores',
-  obras: 'Obras',
-  catalogo: 'Catálogo ECR',
-  config: 'Configurações',
-};
-
 const PAPEL_LABEL: Record<Papel, string> = {
   admin: 'Administrador',
   engenharia: 'Engenharia',
@@ -379,10 +369,9 @@ export default function App() {
       <div className={styles.mainWrapper}>
         {/* Topbar */}
         <header className={styles.topbar}>
-          <div>
-            <div className={styles.topbarContext}>Central de Compras</div>
-            <div className={styles.topbarTitle}>{TAB_TITLES[activeTab]}</div>
-          </div>
+          {/* O nome da tela mora no cabeçalho da página, uma vez só (CTO-D643):
+              a barra diz de que sistema é, e o estado do banco. */}
+          <div className={styles.topbarContext}>Central de Compras</div>
           <div className={styles.topbarRight}>
             <div className={styles.syncChip}>
               <span className={styles.chipDot} />

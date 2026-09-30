@@ -32,10 +32,7 @@ function bloco(css: string, cabeca: string) {
 }
 
 const estreita = bloco(semComentario, '@media (max-width: 900px)');
-const maisEstreita = bloco(semComentario, '@media (max-width: 700px)');
-const base = [estreita, maisEstreita]
-  .sort((a, b) => b.de - a.de)
-  .reduce((css, b) => css.slice(0, b.de) + css.slice(b.ate), semComentario);
+const base = semComentario.slice(0, estreita.de) + semComentario.slice(estreita.ate);
 
 type Regra = { seletores: string[]; corpo: string };
 const regrasDe = (css: string): Regra[] =>
@@ -80,7 +77,6 @@ function respiroDeLado(regrasEmOrdem: Regra[], seletor: string) {
 
 const naBase = regrasDe(base);
 const naEstreita = [...naBase, ...regrasDe(estreita.miolo)];
-const naMaisEstreita = [...naEstreita, ...regrasDe(maisEstreita.miolo)];
 
 describe('D579 — o topo não prende a altura na tela estreita', () => {
   it('a 900px ou menos o topo cresce com o que tem dentro', () => {
@@ -93,10 +89,10 @@ describe('D579 — o topo não prende a altura na tela estreita', () => {
     expect(vale(naEstreita, '.topbar', 'flex-wrap')).toBe('wrap');
   });
 
-  it('a 700px ou menos o título diminui', () => {
-    expect(px(vale(naMaisEstreita, '.topbarTitle', 'font-size'))).toBeLessThan(
-      px(vale(naBase, '.topbarTitle', 'font-size')),
-    );
+  // "A 700px ou menos o título diminui" saiu com a D643: a barra não tem mais o
+  // título da tela, que mora no cabeçalho da página (TituloUmaVez.test.tsx).
+  it('a barra não tem regra de título: o nome da tela saiu dela (CTO-D643)', () => {
+    expect(semComentario).not.toContain('.topbarTitle');
   });
 });
 
@@ -120,6 +116,5 @@ describe('D579 — a 1280 e a 1920 nada muda', () => {
     expect(vale(naBase, '.topbar', 'height')).toBe('68px');
     expect(vale(naBase, '.topbar', 'flex-wrap')).toBeUndefined();
     expect(vale(naBase, '.sfIdentidade', 'flex-direction')).toBeUndefined();
-    expect(vale(naBase, '.topbarTitle', 'font-size')).toBe('26px');
   });
 });

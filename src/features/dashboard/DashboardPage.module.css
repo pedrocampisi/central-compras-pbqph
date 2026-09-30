@@ -64,3 +64,8 @@
 @media (max-width: 1080px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+/* O cabeçalho da tela (CTO-D643): o título, com o mesmo respiro das faixas. */
+.cabeca {
+  margin-bottom: 16px;
+}
