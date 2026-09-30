@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
 
 /**
  * CTO-D641: a tela de Fornecedores por empresa. A palavra do Pedro, com a foto
@@ -222,5 +223,41 @@ describe('CTO-D641 — a filial sem empresa', () => {
     expect(within(beta).queryByRole('button', { name: /abrir/ })).toBeNull();
     fireEvent.click(within(beta).getByRole('button', { name: 'Editar' }));
     expect(screen.getByDisplayValue('beta@exemplo.invalid')).toBeTruthy();
+  });
+});
+
+describe('CTO-D644 — as colunas não andam', () => {
+  // O jsdom não mede tela: a trava olha as duas coisas que fixam a largura —
+  // as seis colunas declaradas (sempre as mesmas) e a tabela de layout fixo.
+  const colunas = () => [...document.querySelectorAll('table colgroup col')].map((c) => c.className);
+
+  it('as seis colunas são as mesmas na lista, na busca com a empresa fechada e no filtro', () => {
+    const { unmount } = render(<FornecedoresPage />);
+    const naLista = colunas();
+    expect(naLista).toHaveLength(6);
+    unmount();
+
+    buscar('Ube'); // duas empresas, nenhuma aberta: a cena em que o cabeçalho mais andava
+    const b = render(<FornecedoresPage />);
+    expect(colunas()).toEqual(naLista);
+    b.unmount();
+
+    buscar('');
+    filtrar('inativos');
+    render(<FornecedoresPage />);
+    expect(colunas()).toEqual(naLista);
+  });
+
+  it('a tabela é de layout fixo, e cada coluna de dado tem largura em px (a empresa fica com o resto)', () => {
+    const css = readFileSync('src/features/fornecedores/FornecedoresPage.module.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const regra = (classe: string) => css.match(new RegExp(`\\.${classe}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+    expect(regra('tabela')).toMatch(/table-layout:\s*fixed/);
+    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo', 'colAcoes']) {
+      expect(regra(c), c).toMatch(/width:\s*\d+px/);
+    }
+    const tsx = readFileSync('src/features/fornecedores/FornecedoresPage.tsx', 'utf-8');
+    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo', 'colAcoes']) {
+      expect(tsx, c).toContain(`styles.${c}`);
+    }
   });
 });
