@@ -15,6 +15,7 @@ import type { Data, Destinatario, OrdemCompra } from '../../domain/types';
 import { computeOcTotals } from '../../domain/compute';
 import { destinatarioParaImpressao, documentoRotulado, formatarDocumento } from '../../domain/destinatario';
 import { formatBrl, formatDate } from '../../domain/format';
+import { textoParaANotaFiscal } from '../../domain/notaFiscal';
 import { drawBox, addrLine } from './helpers';
 import { downloadBlob } from '../storage/download';
 import { corpoDaTabelaDeItens } from './tabelaDeItens';
@@ -40,14 +41,24 @@ function destinatarioDoc(d: Destinatario | undefined): string {
 const LOGO_PATH = `${import.meta.env.BASE_URL}brazao1.png`;
 let logoDataUrlPromise: Promise<string | null> | null = null;
 
+// O item 1 nomeia o campo da nota (CTO-D655): "rodapé" não é campo de nota
+// eletrônica; o texto livre dela é o INFORMAÇÕES COMPLEMENTARES, no quadro
+// "Dados adicionais". O antigo item 5 (número da OC e obra/CNO) saiu: o quadro
+// do alto da página já leva os dois, e o item 1 manda escrevê-lo.
+const ITEM_1 =
+  '1) Escrever no campo INFORMAÇÕES COMPLEMENTARES da Nota Fiscal o texto do quadro PARA A NOTA FISCAL, no alto ' +
+  'da página 1: a obra, o endereço com o CEP, o CNO (quando houver) e o número desta OC. O local de entrega é o ' +
+  'endereço da obra.';
 const DEFAULT_CONDICOES_CONTRATACAO = [
-  '1) Constar o nome e endereço da obra no rodapé da Nota Fiscal.',
+  ITEM_1,
   '2) Caso o pagamento seja em carteira, incluir os dados bancários no corpo da NF.',
   '3) Informar que o emitente desta OC é consumidor final, quando aplicável.',
   '4) É proibida a negociação de títulos com terceiros sem autorização prévia.',
-  '5) Constar o número desta Ordem de Compra e o nome da obra/CNO no documento fiscal.',
-  '6) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL.',
+  '5) ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL.',
 ].join('\n');
+
+/** Azul da casa no PDF (o mesmo da linha do cabeçalho e da tabela). */
+const AZUL: [number, number, number] = [11, 105, 183];
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -72,6 +83,7 @@ export async function loadCampisiLogo(): Promise<string | null> {
 function normalizeCondicoesContratacao(texto: string | undefined): string {
   const base = texto?.trim() ? texto : DEFAULT_CONDICOES_CONTRATACAO;
   return base
+    .replace(/^1\) Constar o nome e endereço da obra no rodapé da Nota Fiscal\.$/m, ITEM_1)
     .replace(
       /Informar que a CONRAD DUARTE é consumidora final \(alíquota ICMS cheia\)\./gi,
       'Informar que o emitente desta OC é consumidor final, quando aplicável.',
@@ -139,8 +151,16 @@ export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string 
     doc.setDrawColor(215);
     doc.setLineWidth(0.2);
     doc.line(margin, footerLineY, pw - margin, footerLineY);
+    // A lembrança da nota em toda página (CTO-D655 §4.5), numa linha.
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.8);
+    doc.setTextColor(...AZUL);
+    doc.text(
+      'NA NOTA FISCAL: o endereço da obra vai no campo INFORMAÇÕES COMPLEMENTARES (quadro PARA A NOTA FISCAL, página 1)',
+      pw / 2,
+      footerLineY + 4,
+      { align: 'center' },
+    );
     doc.setTextColor(70);
     doc.text(
       'ESSA ORDEM DE COMPRA DEVE SER ENVIADA JUNTAMENTE À NF NA ENTREGA DO MATERIAL',
@@ -176,25 +196,107 @@ export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string 
   doc.line(margin, y + 8, pw - margin, y + 8);
   y += 13;
 
+  // ── Para a nota fiscal ─────────────────────────────────────────────────────
+  // A coisa mais visível da página (CTO-D655): o vendedor tem de escrever o
+  // endereço da obra na nota, e a Central_Financeiro acha a obra por ele. A
+  // instrução nomeia o campo; o texto vem pronto para copiar; o local de
+  // entrega é o mesmo endereço (o antigo ENTREGAR EM mora aqui agora).
+  {
+    const largura = pw - 2 * margin;
+    const textoDaNota = textoParaANotaFiscal(ob, oc.numero);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    const comSinal = temSinal(textoDaNota);
+    const linhasDaNota = comSinal
+      ? escrita.quebra(textoDaNota, largura - 10)
+      : (doc.splitTextToSize(textoDaNota, largura - 10) as string[]);
+    const entre = 4.6;
+    const telefone = ob?.telefone?.trim() ? ` Telefone da obra: ${ob.telefone.trim()}.` : '';
+    const entrega = `Local de entrega: este mesmo endereço, o da obra.${telefone}`;
+    // Empresa na nota: o endereço dela continua o do cadastro. A obra nunca
+    // vai no lugar do endereço do destinatário (CTO-D655, o cuidado do texto).
+    const cuidado =
+      d?.tipo === 'pj'
+        ? 'Não troque o endereço do destinatário pelo da obra: o da empresa, no quadro FATURAR PARA, continua o do ' +
+          'cadastro dela. O endereço da obra vai só nas informações complementares e no local de entrega.'
+        : '';
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.8);
+    const linhasDoCuidado = cuidado ? (doc.splitTextToSize(cuidado, largura - 6) as string[]) : [];
+    const alturaDoTexto = linhasDaNota.length * entre + 4;
+    const altura = 13 + alturaDoTexto + 6 + linhasDoCuidado.length * 3.4 + 1;
+
+    doc.setFillColor(234, 242, 251);
+    doc.setDrawColor(...AZUL);
+    doc.setLineWidth(0.8);
+    doc.rect(margin, y, largura, altura, 'FD');
+    doc.setTextColor(...AZUL);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
+    doc.text('PARA A NOTA FISCAL', margin + 3, y + 5.5);
+    doc.setFontSize(7.5);
+    doc.text('LEIA ANTES DE EMITIR A NOTA', pw - margin - 3, y + 5.5, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Escreva no campo INFORMAÇÕES COMPLEMENTARES da nota fiscal o texto abaixo:', margin + 3, y + 10.5);
+
+    const yTexto = y + 13;
+    doc.setFillColor(255, 255, 255);
+    doc.setLineWidth(0.3);
+    doc.rect(margin + 3, yTexto, largura - 6, alturaDoTexto, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    if (comSinal) {
+      linhasDaNota.forEach((l, k) => escrita.desenha(l, margin + 5, yTexto + 4.8 + k * entre, 'bold'));
+    } else {
+      linhasDaNota.forEach((l, k) => doc.text(l, margin + 5, yTexto + 4.8 + k * entre));
+    }
+
+    let yDepois = yTexto + alturaDoTexto + 4.2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text(entrega, margin + 3, yDepois);
+    if (linhasDoCuidado.length) {
+      yDepois += 3.8;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.8);
+      doc.setTextColor(60);
+      doc.text(linhasDoCuidado, margin + 3, yDepois);
+      doc.setTextColor(0, 0, 0);
+    }
+    y += altura + 3;
+  }
+
   // ── Faturar para ───────────────────────────────────────────────────────────
   // Quem recebe a nota: o destinatário cadastrado na obra. Nome, documento e
-  // o endereço que o cadastro tiver (pessoa física pode não ter).
+  // o endereço que o cadastro tiver (pessoa física pode não ter). Menor que o
+  // quadro da nota, e o título diz de quem é o endereço ("os dois, com
+  // destaque na obra", palavra do Pedro, CTO-D655).
   doc.setDrawColor(180);
   doc.setLineWidth(0.2);
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin, y, pw - 2 * margin, 24);
-  doc.text('FATURAR PARA', margin + 2, y + 4);
+  drawBox(doc, margin, y, pw - 2 * margin, 19.6);
+  const tituloDoDestinatario = 'FATURAR PARA — DESTINATÁRIO DA NOTA';
+  doc.text(tituloDoDestinatario, margin + 2, y + 3.8);
+  // A nota cinza começa onde o título acaba, medido, e não num ponto fixo.
+  const fimDoTitulo = margin + 2 + doc.getTextWidth(tituloDoDestinatario) + 3;
   doc.setFont('helvetica', 'normal');
-  doc.text(`Razão Social / Nome: ${safeStr(d?.nome)}`, margin + 2, y + 8);
-  doc.text(destinatarioDoc(d), margin + 2, y + 12);
-  doc.text(`Data: ${formatDate(oc.data)}`, margin + 120, y + 12);
-  doc.text(`Endereço: ${addrLine(d?.endereco)}`, margin + 2, y + 16);
-  doc.text(`Bairro: ${safeStr(d?.endereco?.bairro)}`, margin + 2, y + 20);
-  doc.text(`Cidade: ${safeStr(d?.endereco?.cidade)}`, margin + 70, y + 20);
-  doc.text(`UF: ${safeStr(d?.endereco?.uf)}`, margin + 120, y + 20);
-  doc.text(`CEP: ${safeStr(d?.endereco?.cep)}`, margin + 140, y + 20);
-  y += 26;
+  doc.setFontSize(6.8);
+  doc.setTextColor(90);
+  doc.text('(endereço do cadastro do destinatário, não o da obra)', fimDoTitulo, y + 3.8);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(7.5);
+  doc.text(`Razão Social / Nome: ${safeStr(d?.nome)}`, margin + 2, y + 7.4);
+  doc.text(destinatarioDoc(d), margin + 2, y + 10.8);
+  doc.text(`Data: ${formatDate(oc.data)}`, margin + 120, y + 10.8);
+  doc.text(`Endereço do destinatário: ${addrLine(d?.endereco)}`, margin + 2, y + 14.2);
+  doc.text(`Bairro: ${safeStr(d?.endereco?.bairro)}`, margin + 2, y + 17.6);
+  doc.text(`Cidade: ${safeStr(d?.endereco?.cidade)}`, margin + 70, y + 17.6);
+  doc.text(`UF: ${safeStr(d?.endereco?.uf)}`, margin + 120, y + 17.6);
+  doc.text(`CEP: ${safeStr(d?.endereco?.cep)}`, margin + 140, y + 17.6);
+  y += 21.6;
 
   // ── Condição de Pagamento ──────────────────────────────────────────────────
   doc.setFont('helvetica', 'bold');
@@ -220,22 +322,9 @@ export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string 
   doc.text(`E-mail: ${safeStr(f?.email)}`, margin + 70, y + 24);
   y += 28;
 
-  // ── Entregar em ────────────────────────────────────────────────────────────
-  // O endereço da obra. O "endereço de cobrança" do escritório saiu junto com
-  // os emitentes: a cobrança é para quem fatura, e está no bloco de cima.
-  doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin, y, pw - 2 * margin, 22);
-  doc.text('ENTREGAR EM', margin + 2, y + 4);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Obra: ${safeStr(ob?.nome)}`, margin + 2, y + 8);
-  doc.text(`CNO/CEI: ${safeStr(ob?.cei)}`, margin + 120, y + 8);
-  doc.text(`Endereço: ${addrLine(ob?.endereco)}`, margin + 2, y + 12);
-  doc.text(`Bairro: ${safeStr(ob?.endereco?.bairro)}`, margin + 2, y + 16);
-  doc.text(`Cidade: ${safeStr(ob?.endereco?.cidade)}`, margin + 70, y + 16);
-  doc.text(`UF: ${safeStr(ob?.endereco?.uf)}`, margin + 120, y + 16);
-  doc.text(`CEP: ${safeStr(ob?.endereco?.cep)}`, margin + 140, y + 16);
-  doc.text(`Telefone: ${safeStr(ob?.telefone)}`, margin + 2, y + 20);
-  y += 24;
+  // (O antigo ENTREGAR EM, com o endereço da obra, se fundiu no quadro PARA A
+  // NOTA FISCAL, no alto: o endereço da obra não aparece duas vezes
+  // competindo, CTO-D655 §4.3.)
 
   // ── Tabela de itens ────────────────────────────────────────────────────────
   const head = [['Item', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit', 'IPI%', 'Desc%', 'Total', 'Prazo']];

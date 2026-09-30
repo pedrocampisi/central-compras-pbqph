@@ -57,7 +57,7 @@ export function ObrasPage() {
         <div>
           <strong>{o.nome}</strong>
           {o.cei && (
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>CEI: {o.cei}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>CNO: {o.cei}</div>
           )}
         </div>
       ),
