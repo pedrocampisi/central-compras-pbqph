@@ -245,14 +245,6 @@
   text-transform: uppercase;
   color: var(--terra);
 }
-.topbarTitle {
-  font-family: var(--fonte-display);
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: -0.015em;
-  color: var(--texto);
-  line-height: 1.15;
-}
 .topbarRight {
   display: flex;
   align-items: center;
@@ -360,11 +352,5 @@
   .mainContent {
     padding-left: 20px;
     padding-right: 20px;
-  }
-}
-
-@media (max-width: 700px) {
-  .topbarTitle {
-    font-size: 20px;
   }
 }

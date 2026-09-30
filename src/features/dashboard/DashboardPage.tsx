@@ -86,6 +86,13 @@ export function DashboardPage() {
 
   return (
     <div>
+      {/* O título da tela, uma vez só (CTO-D643): antes, só a barra do alto o dizia. */}
+      <div className={`section-header ${styles.cabeca}`}>
+        <div>
+          <h2>Dashboard</h2>
+        </div>
+      </div>
+
       {/* O que espera ação vem primeiro: só para quem revisa ECR (CTO-D613 §3). */}
       <TratativasAbertas />
 

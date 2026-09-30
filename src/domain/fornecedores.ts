@@ -161,7 +161,7 @@ export function ordemDoCnpj(cnpj: string | undefined): number | null {
  * "ArcelorMittal Brasil S/A" são o MESMO nome escrito de dois jeitos: a
  * comparação ignora caixa, acento, pontuação e espaço.
  */
-function razoesDistintas(filiais: Fornecedor[]): string[] {
+export function razoesDistintas(filiais: Fornecedor[]): string[] {
   const vistas = new Map<string, string>();
   for (const f of filiais) {
     const r = f.razao_social.trim();
@@ -254,6 +254,123 @@ export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
       raiz.length === 8 ? `CNPJ ${raiz.slice(0, 2)}.${raiz.slice(2, 5)}.${raiz.slice(5)}` : g.chave;
     return { ...o, detalhe: [o.detalhe, marca].filter(Boolean).join(' · ') };
   });
+}
+
+// ---------------------------------------------------------------------------
+// A tela de Fornecedores por empresa (CTO-D641, 29/09/2026)
+//
+// A palavra do Pedro, com a foto da busca de uma empresa: "aqui ainda está com
+// as filiais". Três linhas, uma por filial, com o mesmo selo. A empresa entra
+// uma vez; as filiais abrem dentro dela. A regra é a da D501: onde a filial não
+// importa, entra a empresa como um todo.
+// ---------------------------------------------------------------------------
+
+export type FiltroDeAtivo = 'todos' | 'ativos' | 'inativos';
+
+export interface EmpresasDaTela {
+  /** As empresas que a tela mostra, na ordem do apelido. */
+  empresas: EmpresaDaLista[];
+  /** Quantas empresas há no cadastro inteiro. */
+  total: number;
+  /** As filiais que casaram com a busca por um dado DELAS (e não só pelo apelido). */
+  casadas: Set<string>;
+}
+
+/** Os dados de uma filial que a busca olha: razão social, fantasia, CNPJ, e-mail e cidade. */
+function filialCasa(f: Fornecedor, termo: string, digitos: string): boolean {
+  const texto = [f.razao_social, f.nome_fantasia, f.email, f.endereco?.cidade ?? '']
+    .map((t) => normalizarBusca(t ?? ''))
+    .some((t) => t.includes(termo));
+  if (texto) return true;
+  const cnpj = (f.cnpj ?? '').replace(/\D/g, '');
+  return (digitos.length > 0 && cnpj.includes(digitos)) || (f.cnpj ?? '').includes(termo);
+}
+
+/**
+ * O que a tela de Fornecedores mostra (CTO-D641 §2):
+ *   - uma empresa por linha, pelo `agruparPorEmpresa`;
+ *   - "Ativos": a empresa com ALGUMA filial ativa; "Inativos": a empresa com
+ *     alguma filial inativa — a filial desativada continua achável;
+ *   - a busca acha pelo apelido e por razão social, fantasia, CNPJ, e-mail e
+ *     cidade de qualquer filial. O CNPJ acha com ou sem a pontuação.
+ */
+export function empresasDaTela(lista: Fornecedor[], busca: string, filtro: FiltroDeAtivo): EmpresasDaTela {
+  const grupos = agruparPorEmpresa(lista);
+  const termo = normalizarBusca(busca.trim());
+  // Só dígitos e pontuação de documento: a busca é por CNPJ.
+  const digitos = /^[\d.\-/\s]+$/.test(busca.trim()) ? busca.replace(/\D/g, '') : '';
+  const casadas = new Set<string>();
+  const empresas = grupos.filter((g) => {
+    if (filtro === 'ativos' && !g.filiais.some((f) => f.ativo)) return false;
+    if (filtro === 'inativos' && !g.filiais.some((f) => !f.ativo)) return false;
+    if (!termo) return true;
+    const porFilial = g.filiais.filter((f) => filialCasa(f, termo, digitos));
+    // A marca aponta a filial que a busca separou das irmãs. Quando todas
+    // casam (o nome está na razão e no e-mail de cada uma), marcar todas não
+    // diz nada: nenhuma é marcada.
+    if (porFilial.length < g.filiais.length) for (const f of porFilial) casadas.add(f.id);
+    const porApelido = g.filiais.some((f) => normalizarBusca(f.empresa_apelido ?? '').includes(termo));
+    return porFilial.length > 0 || porApelido || normalizarBusca(g.apelido).includes(termo);
+  });
+  return { empresas, total: grupos.length, casadas };
+}
+
+/**
+ * A linha menor da empresa, como a da Nova OC (`opcoesDeEmpresa`): a razão
+ * social (uma vez; as distintas, se as filiais tiverem razões diferentes),
+ * menos quando ela é o próprio apelido, e depois "N filiais · cidades" — ou,
+ * com uma filial só, a cidade dela.
+ */
+export function resumoDaEmpresa(g: EmpresaDaLista): string {
+  const apelido = normalizarBusca(g.apelido).replace(/[^a-z0-9]/g, '');
+  const razoes = razoesDistintas(g.filiais).filter(
+    (r) => normalizarBusca(r).replace(/[^a-z0-9]/g, '') !== apelido,
+  );
+  const cidades = [
+    ...new Map(g.filiais.map((f) => [normalizarBusca(cidadeUf(f)), cidadeUf(f)])).values(),
+  ].filter(Boolean);
+  const onde =
+    g.filiais.length > 1
+      ? [`${g.filiais.length} filiais`, emLista(cidades)].filter(Boolean).join(' · ')
+      : (cidades[0] ?? '');
+  return [razoes.join(' / '), onde].filter(Boolean).join(' · ');
+}
+
+/** "Ativo", "Inativo", ou "N de M ativas" quando as filiais discordam. */
+export function ativoDaEmpresa(g: EmpresaDaLista): { texto: string; ativo: boolean | 'misto' } {
+  const ativas = g.filiais.filter((f) => f.ativo).length;
+  if (ativas === g.filiais.length) return { texto: 'Ativo', ativo: true };
+  if (ativas === 0) return { texto: 'Inativo', ativo: false };
+  return { texto: `${ativas} de ${g.filiais.length} ativas`, ativo: 'misto' };
+}
+
+function ruaDa(f: Fornecedor): string {
+  const e = f.endereco;
+  const rua = [e?.logradouro?.trim(), e?.numero?.trim()].filter(Boolean).join(', ');
+  return [rua, e?.bairro?.trim()].filter(Boolean).join(' · ');
+}
+
+/**
+ * Onde fica a filial, entre as irmãs (como na D542):
+ *   1. a cidade/UF;
+ *   2. se uma irmã está na mesma cidade, a rua e o número (e o bairro);
+ *   3. se ainda empata (as duas sem rua), "matriz" ou "filial nº N".
+ * Os quatro últimos dígitos do CNPJ nunca: o CNPJ inteiro já está na linha.
+ */
+export function localDaFilial(f: Fornecedor, irmas: Fornecedor[]): string {
+  const cidade = cidadeUf(f);
+  const partes = [cidade || 'Sem cidade no cadastro'];
+  const mesmaCidade = irmas.filter(
+    (o) => o.id !== f.id && normalizarBusca(cidadeUf(o)) === normalizarBusca(cidade),
+  );
+  if (mesmaCidade.length > 0) {
+    const rua = ruaDa(f);
+    if (rua) partes.push(rua);
+    const empata = mesmaCidade.some((o) => normalizarBusca(ruaDa(o)) === normalizarBusca(rua));
+    const n = ordemDoCnpj(f.cnpj);
+    if (empata && n !== null) partes.push(n === 1 ? 'matriz' : `filial nº ${n}`);
+  }
+  return partes.join(' · ');
 }
 
 /**

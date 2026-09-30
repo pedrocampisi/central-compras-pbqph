@@ -1,0 +1,116 @@
+/* A tela de Fornecedores por empresa (CTO-D641): a empresa uma vez, as filiais
+ * dentro, recuadas. A tabela é a densa do padrão (DataTable.module.css); aqui
+ * fica só o que é da empresa aberta. */
+
+.empresa {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+/* O nome da empresa com filiais é o botão que abre e fecha: a seta diz isso. */
+.abrir {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.abrir:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
+  border-radius: var(--raio-pequeno);
+}
+.seta {
+  flex: none;
+  margin-top: 2px;
+  color: var(--texto-muted);
+  transition: transform var(--transicao);
+}
+.setaAberta {
+  transform: rotate(180deg);
+}
+/* A empresa de uma filial só não abre nada: o lugar da seta fica vazio, para
+ * os nomes alinharem na coluna. */
+.semSeta {
+  flex: none;
+  width: 16px;
+}
+.nome {
+  font-weight: 600;
+  color: var(--texto);
+}
+.resumo {
+  margin-top: 1px;
+  font-size: 11.5px;
+  color: var(--texto-muted);
+}
+
+/* A filial, dentro da empresa aberta: recuada, com o fio à esquerda. */
+.filial td {
+  background: var(--fundo);
+}
+.filial td:first-child {
+  padding-left: 36px;
+  box-shadow: inset 26px 0 0 var(--fundo), inset 28px 0 0 var(--borda-forte);
+}
+.local {
+  font-size: 12.5px;
+  color: var(--texto);
+}
+.razaoDaFilial {
+  margin-top: 1px;
+  font-size: 11.5px;
+  color: var(--texto-muted);
+}
+/* A filial que a busca achou: a marca da casa no fio, e o texto que diz. */
+.casou td:first-child {
+  box-shadow: inset 26px 0 0 var(--fundo), inset 29px 0 0 var(--marca);
+}
+.achada {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: var(--raio-pill);
+  background: var(--marca-fraca);
+  color: var(--marca);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: 1px;
+}
+
+.cnpj {
+  white-space: nowrap;
+}
+.contato {
+  font-size: 12px;
+}
+.telefone {
+  font-size: 11px;
+  color: var(--texto-muted);
+}
+.ativo {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--sucesso);
+  white-space: nowrap;
+}
+.inativo {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--texto-muted);
+  white-space: nowrap;
+}
+.misto {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--aviso);
+  white-space: nowrap;
+}
