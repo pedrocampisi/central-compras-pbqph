@@ -183,3 +183,17 @@ describe('D589 — o botão do PDF em cada ECR', () => {
     expect(screen.queryByRole('button', { name: /^PDF da / })).toBeNull();
   });
 });
+
+describe('CTO-D644 — a busca do Catálogo segue o tema', () => {
+  // No escuro, a caixa solta (estilo no próprio elemento, sem fundo) ficava
+  // branca no meio da tela. Agora é a barra de busca das outras listas, cujas
+  // cores vêm dos tokens do tema.
+  it('é a mesma barra das outras listas: com nome, sem estilo solto, e ainda filtra', () => {
+    montar([ecr(0), ecr(1)]);
+    const caixa = screen.getByRole('searchbox', { name: 'Buscar ECR…' });
+    expect(caixa.getAttribute('style')).toBeNull();
+    fireEvent.change(caixa, { target: { value: 'revestimento' } });
+    expect(screen.queryByText('Concreto Usinado')).toBeNull();
+    expect(screen.getByText('Revestimento de Parede e Piso')).toBeTruthy();
+  });
+});

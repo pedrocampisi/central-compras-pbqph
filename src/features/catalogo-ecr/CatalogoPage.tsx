@@ -30,6 +30,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { EditorDaEcr } from './EditorDaEcr';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
+import { ListToolbar } from '../../components/ListToolbar/ListToolbar';
 import styles from './CatalogoPage.module.css';
 
 /** A linha como o documento a escreve, com o rótulo em negrito. */
@@ -244,12 +245,12 @@ export function CatalogoPage() {
           </p>
         </div>
       </div>
-      <input
-        type="search"
-        placeholder="Buscar ECR..."
-        value={search}
-        onChange={(e) => setCatalogoFilter({ search: e.target.value })}
-        style={{ width: '100%', marginBottom: 14, padding: '9px 11px', border: '1.5px solid var(--border)', borderRadius: 7, fontSize: 13 }}
+      {/* A mesma busca das outras listas (CTO-D644): a caixa solta, com estilo
+          no próprio elemento e sem fundo, ficava branca no tema escuro. */}
+      <ListToolbar
+        searchValue={search}
+        searchPlaceholder="Buscar ECR…"
+        onSearchChange={(v) => setCatalogoFilter({ search: v })}
       />
       {ecrs.map((ecr) => (
         <EcrCard key={ecr.id} ecr={ecr} podeRevisar={podeRevisar} />

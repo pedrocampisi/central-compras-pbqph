@@ -1,6 +1,6 @@
 /**
  * Aba Dashboard — resumo de OCs recentes e indicadores.
- * Cards: total de OCs, emitidas, rascunhos, volume, fornecedores ativos, obras ativas.
+ * Cards: total de OCs, emitidas, rascunhos, volume, fornecedores ativos (empresas), obras ativas.
  * Listas: últimas 8 OCs, top 5 fornecedores por valor e OCs por obra.
  * No topo, para quem revisa ECR, as tratativas abertas (CTO-D613 §3).
  *
@@ -12,6 +12,7 @@ import styles from './DashboardPage.module.css';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { computeOcTotals } from '../../domain/compute';
+import { agruparPorEmpresa } from '../../domain/fornecedores';
 import { formatBrl, formatDate } from '../../domain/format';
 import { Pill } from '../../components/Pill/Pill';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -116,7 +117,12 @@ export function DashboardPage() {
         </div>
         <div className={styles.tile}>
           <small>Fornecedores</small>
-          <div className={styles.tileValue}>{data.fornecedores.filter((f) => f.ativo).length}</div>
+          {/* Conta EMPRESAS com alguma filial ativa, como a lista de Fornecedores
+              (CTO-D644; a regra da D501): três filiais da mesma empresa são um
+              fornecedor. Contava filiais. */}
+          <div className={styles.tileValue} data-fornecedores-ativos>
+            {agruparPorEmpresa(data.fornecedores.filter((f) => f.ativo)).length}
+          </div>
         </div>
         <div className={styles.tile}>
           <small>Obras ativas</small>

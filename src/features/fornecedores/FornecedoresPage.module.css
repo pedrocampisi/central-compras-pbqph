@@ -2,6 +2,30 @@
  * dentro, recuadas. A tabela é a densa do padrão (DataTable.module.css); aqui
  * fica só o que é da empresa aberta. */
 
+/* As colunas não andam (CTO-D644): com a largura calculada pelo conteúdo, o
+ * cabeçalho "CNPJ" mudava de lugar entre a lista, a busca e os filtros. Agora
+ * as larguras são fixas e a empresa fica com o resto; abaixo do mínimo, a
+ * tabela rola dentro da própria caixa, como antes. */
+.tabela {
+  table-layout: fixed;
+  min-width: 1000px;
+}
+.colCnpj {
+  width: 170px;
+}
+.colContato {
+  width: 240px;
+}
+.colQualificacao {
+  width: 190px;
+}
+.colAtivo {
+  width: 120px;
+}
+.colAcoes {
+  width: 80px;
+}
+
 .empresa {
   display: flex;
   align-items: flex-start;
@@ -91,6 +115,7 @@
 }
 .contato {
   font-size: 12px;
+  overflow-wrap: anywhere;
 }
 .telefone {
   font-size: 11px;
