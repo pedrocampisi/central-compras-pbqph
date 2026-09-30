@@ -2613,3 +2613,26 @@ numa linha), e o `Agente.md`. O arranjo do protótipo fica como está.
 - Três retoques da D644 §4 num ramo novo (pendência 23), com teste, sabotagem e fotos. Não publico antes da linha do
   CTO.
 - A medida das 30 filiais foi ao Banco pela D645. Esta casa não faz nada nela.
+
+## Decisão 69 — os três retoques da D644, no ramo · 29/09/2026
+
+**POR QUÊ (CTO-D644 §4):** nas fotos da D641, o cabeçalho "CNPJ" mudava de lugar entre a lista, a busca e os filtros; o
+cartão "Fornecedores" do Dashboard contava filiais (10 com 6 empresas na lista); e a busca do Catálogo ficava branca no
+escuro.
+
+**O QUE MUDOU**, no ramo `d644-retoques` (`5fb2b5d`), **fora do `main` e NÃO publicado**:
+- **Fornecedores:** a tabela tem layout fixo, com as larguras declaradas; a empresa fica com o resto. O cabeçalho ficou
+  no mesmo x nas três cenas, nas duas larguras e nos dois temas.
+- **Dashboard:** o cartão conta empresas com alguma filial ativa, pelo `agruparPorEmpresa`.
+- **Catálogo:** a busca é a `ListToolbar` das outras listas, com as cores do tema.
+- **A prova:**
+  - 614 testes (eram 609);
+  - cinco sabotagens vermelhas;
+  - CI verde (36660869777);
+  - 28 fotos em `docs/Capturas/2026-09-29_D644/`.
+
+**PARA O CTO DECIDIR:** a linha menor da empresa com filiais ainda passa por baixo dos cabeçalhos "CNPJ" e "E-mail /
+Telefone", porque a linha usa as três primeiras colunas. A alternativa é prender a empresa só na primeira coluna. Está
+na carta.
+
+**DAQUI EM DIANTE:** publicar pela emenda 3 depois da linha do CTO.

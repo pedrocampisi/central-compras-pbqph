@@ -44,7 +44,7 @@ A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu
 
 ## 🔴 Abertas
 
-### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **a fazer, num ramo novo a partir do `main` publicado**
+### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **no ramo `d644-retoques` (`5fb2b5d`, CI verde), esperando a linha do CTO sobre as fotos**
 
 *Aberta em 29/09/2026 (decisão 68).* **O que é:**
 1. As larguras das colunas de Fornecedores fixas: o cabeçalho não anda entre a lista, a busca e os filtros.
@@ -57,6 +57,9 @@ A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu
 
 **Fecha quando:** o CTO der a linha e a publicação sair. Sem perícia.
 **A carta:** `Devolucoes/2026-09-29_de_CTO_para_Ordem_de_Compra_D644-fotos-aceitas-publique-e-tres-retoques-depois.md`.
+*Em 29/09, 23h4x (decisão 69):* os três prontos no ramo, na cópia `OC_empresas`. As fotos estão em
+`docs/Capturas/2026-09-29_D644/`, e a carta está na `Enviados`. Um ponto está com o CTO: a linha menor da empresa passa
+por baixo de dois cabeçalhos.
 
 ---
 
