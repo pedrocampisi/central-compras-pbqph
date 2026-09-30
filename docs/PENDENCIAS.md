@@ -38,35 +38,12 @@ mais barato que carta apontando para o item errado.
    CONTINUA ... responder carta que chegar. Pausa nao e' silencio
 ```
 
-A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu.
+~~A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu.~~ **Fechada em 30/09/2026**
+(decisão 71): as 004 e 005 saíram pela palavra nova do Pedro, e a 008 e a 009 provaram a emissão.
 
 ---
 
 ## 🔴 Abertas
-
-### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
-
-*Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
-
-
-**Evidência nova, medida pelo `CTO` no banco de produção em 02/09/2026:** existem **2 ordens de
-compra** (2026/004 e 2026/005, ambas de 08/08) e o **contador está em 7** — os números 006 e 007
-foram gastos em 13/08 sem OC sobrevivente, que é o `reservar_numero_oc` **funcionando como
-projetado**: rascunho abandonado queima número, e é isso que impede dois computadores de emitirem
-a mesma OC.
-
-✅ **O Pedro decidiu em 02/09/2026:** a primeira OC de verdade sai **`2026/008`**. As 004 e 005
-ficam como estão, os números 006 e 007 ficam queimados, **ninguém limpa nada**.
-
-⚠️ **Isto não fecha o item.** O que estava em aberto do lado do banco fechou; o que continua aberto
-é o que sempre foi meu: **provar na tela** que esta versão emite. A evidência de hoje prova que a
-numeração do banco funciona, **não** que esta tela funciona.
-
-**O ensaio de 03/09 andou com este item, sem fechar.** Com o aplicativo no ar em
-`compras.campisi.workers.dev`, ficou provado que **a tela carrega e alcança o banco**: uma chamada
-a `/auth/v1/token`, e a recusa voltou como frase de gente. **Emitir continua sem prova** — exige
-estar dentro, e eu não tenho senha nem uso a de ninguém. **Quem fecha este item é uma pessoa com
-conta**, emitindo uma OC de ensaio e conferindo o número e o PDF.
 
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 

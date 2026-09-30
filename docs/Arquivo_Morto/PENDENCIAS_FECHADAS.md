@@ -6,6 +6,45 @@
 
 ---
 
+### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc` — **FECHADA EM 30/09/2026: as 004 e 005 saíram pela palavra nova do Pedro (D642, D651); a emissão provada pela 2026/008 e pela 2026/009, emitidas pela equipe com o PDF**
+
+*Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.
+
+
+**Evidência nova, medida pelo `CTO` no banco de produção em 02/09/2026:** existem **2 ordens de
+compra** (2026/004 e 2026/005, ambas de 08/08) e o **contador está em 7** — os números 006 e 007
+foram gastos em 13/08 sem OC sobrevivente, que é o `reservar_numero_oc` **funcionando como
+projetado**: rascunho abandonado queima número, e é isso que impede dois computadores de emitirem
+a mesma OC.
+
+✅ **O Pedro decidiu em 02/09/2026:** a primeira OC de verdade sai **`2026/008`**. As 004 e 005
+ficam como estão, os números 006 e 007 ficam queimados, **ninguém limpa nada**.
+
+⚠️ **Isto não fecha o item.** O que estava em aberto do lado do banco fechou; o que continua aberto
+é o que sempre foi meu: **provar na tela** que esta versão emite. A evidência de hoje prova que a
+numeração do banco funciona, **não** que esta tela funciona.
+
+**O ensaio de 03/09 andou com este item, sem fechar.** Com o aplicativo no ar em
+`compras.campisi.workers.dev`, ficou provado que **a tela carrega e alcança o banco**: uma chamada
+a `/auth/v1/token`, e a recusa voltou como frase de gente. **Emitir continua sem prova** — exige
+estar dentro, e eu não tenho senha nem uso a de ninguém. **Quem fecha este item é uma pessoa com
+conta**, emitindo uma OC de ensaio e conferindo o número e o PDF.
+
+**O fecho, em 30/09/2026 (decisão 71):**
+- **A palavra de 02/09 ("as 004 e 005 ficam como estão, ninguém limpa nada") foi trocada pelo Pedro.** Na janela do
+  Banco, às 08h4x, ele digitou: "sim, pode apagar as OCs 2026/004 e 2026/005". O Banco apagou as duas às 08:41:25, com
+  a cópia no desfazer (não rodado), e o CTO conferiu por fora (D642, D651).
+- **O que era meu, provar que esta versão emite, também fechou, pela equipe e não por mim.** Medido no banco de
+  produção, só leitura, em 30/09:
+  - a 2026/008 foi emitida em 26/09, com o PDF gerado e 5 itens;
+  - a 2026/009 foi emitida em 30/09, com o PDF gerado e 1 item;
+  - o contador está em 9: os números vieram do banco, na emissão;
+  - não há outra OC na produção.
+  Uma pessoa com conta emitiu por esta tela, com número e PDF, que era exatamente o que o item pedia.
+- **Não abri os PDFs nem vi a tela logada.** A prova é o registro do banco, não o meu olho.
+
+---
+
 ### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **no ramo `d644-retoques` (`5fb2b5d`, CI verde), esperando a linha do CTO sobre as fotos** — **FECHADA EM 30/09/2026: NO AR em `69af6378` (CTO-D647, decisão 70); o desfazer é `d7e5e46e`**
 
 

@@ -2663,3 +2663,22 @@ filiais continua nas três primeiras colunas.
 
 **DAQUI EM DIANTE:** a conferência do CTO por fora. A cópia `OC_empresas` e os dois ramos já podem sair, só por
 `git worktree remove`.
+
+## Decisão 71 — a pendência 1 fecha: as 004 e 005 saíram, e a 008 e a 009 provaram a emissão · 30/09/2026
+
+**POR QUÊ (aviso do CTO, D651, por campainha):** o Banco apagou da produção as OCs 2026/004 e 2026/005 às 08:41:25, com
+o "sim" do Pedro digitado na janela dele (D642). Isso troca a palavra de 02/09 ("ninguém limpa nada"), que morava na
+pendência 1.
+
+**O QUE MUDOU:**
+- **A pendência 1 fechou inteira, e não só a parte das 004 e 005.** O que era meu, provar que esta versão emite,
+  também está provado, pela equipe:
+  - a 2026/008 foi emitida em 26/09 e a 2026/009 em 30/09;
+  - as duas têm o PDF gerado;
+  - o contador está em 9 (medido no banco de produção, só leitura).
+- **Não vi a tela logada nem abri os PDFs.** A prova é o registro do banco.
+- **As duas cartas do Banco** (D642 e D645, cópias para a OC) foram lidas e arquivadas. Nenhuma pede trabalho desta
+  casa:
+  - as 004 e 005 somem da tela pelo tempo real;
+  - o PDF das 28 filiais passa a imprimir a razão social da Receita.
+- **Código:** nenhum. **O banco não mudou por mim.**
