@@ -2564,3 +2564,28 @@ Tem 589 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde
 **DAQUI EM DIANTE:**
 - A pendência 21 fecha quando o Banco ligar as travas.
 - A cópia `OC_fornecedores` foi desligada por `git worktree remove`. Apagar a sobra da pasta espera o Pedro.
+
+## Decisão 67 — fornecedores por empresa e o título uma vez, no ramo · 29/09/2026
+
+**POR QUÊ (CTO-D641 e CTO-D643):** a aba Fornecedores repetia a empresa uma vez por filial, e o Pedro viu o título das
+telas duplicado (na barra do alto e no cabeçalho da página).
+
+**O QUE MUDOU**, no ramo `d641-fornecedores-por-empresa` (`548b165`, `4ca0741`), **fora do `main` e NÃO publicado**:
+- **Fornecedores:** uma linha por empresa, com as filiais dentro, recuadas; ativo "N de M ativas"; a busca por qualquer
+  filial abre a empresa sozinha quando dá uma só.
+- **A marca "achada pela busca"** só aparece quando separa uma filial das irmãs. Se todas casam, nenhuma é marcada. Foi
+  decisão minha, vista na foto; está na carta para o CTO conferir.
+- **O título** mora só no cabeçalho da página. A barra ficou com "Central de Compras" e o estado do banco. O Dashboard
+  ganhou o seu título na página.
+- **O `docs/Agente.md`:** as seções 1–8 são a história da versão do arquivo, e a `main` é o banco. O código da camada de
+  arquivo fica para a D639 (17/11).
+- **A prova:**
+  - 609 testes (eram 589);
+  - seis sabotagens vermelhas;
+  - CI verde;
+  - 77 fotos em `docs/Capturas/2026-09-29_D641_D643/`.
+
+**A MEDIDA DA D641 §4** (só leitura, no `banco-principal`): de 214 filiais com empresa, 30 têm a razão social igual ao
+apelido (18 no texto exato). São 30 empresas, todas ativas. Nada foi consertado.
+
+**DAQUI EM DIANTE:** publicar pela emenda 3 depois da linha do CTO sobre as fotos, e mandar o `versao.txt`.
