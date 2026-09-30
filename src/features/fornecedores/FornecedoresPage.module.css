@@ -86,6 +86,9 @@
   vertical-align: 1px;
 }
 
+.cnpj {
+  white-space: nowrap;
+}
 .contato {
   font-size: 12px;
 }

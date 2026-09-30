@@ -305,7 +305,10 @@ export function empresasDaTela(lista: Fornecedor[], busca: string, filtro: Filtr
     if (filtro === 'inativos' && !g.filiais.some((f) => !f.ativo)) return false;
     if (!termo) return true;
     const porFilial = g.filiais.filter((f) => filialCasa(f, termo, digitos));
-    for (const f of porFilial) casadas.add(f.id);
+    // A marca aponta a filial que a busca separou das irmãs. Quando todas
+    // casam (o nome está na razão e no e-mail de cada uma), marcar todas não
+    // diz nada: nenhuma é marcada.
+    if (porFilial.length < g.filiais.length) for (const f of porFilial) casadas.add(f.id);
     const porApelido = g.filiais.some((f) => normalizarBusca(f.empresa_apelido ?? '').includes(termo));
     return porFilial.length > 0 || porApelido || normalizarBusca(g.apelido).includes(termo);
   });

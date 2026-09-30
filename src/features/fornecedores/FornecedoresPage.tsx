@@ -37,10 +37,10 @@ import tabela from '../../components/DataTable/DataTable.module.css';
 import styles from './FornecedoresPage.module.css';
 import type { Fornecedor } from '../../domain/types';
 
-/** O CNPJ com a pontuação: o banco guarda só os dígitos. */
+/** O CNPJ com a pontuação: o banco guarda só os dígitos. Numa linha só: partido no hífen, ele se lê errado. */
 function cnpjDe(f: Fornecedor) {
   if (!f.cnpj) return '—';
-  return <span className="doc">{formatarDocumento(f.cnpj, 'pj')}</span>;
+  return <span className={`doc ${styles.cnpj}`}>{formatarDocumento(f.cnpj, 'pj')}</span>;
 }
 
 function contatoDe(f: Fornecedor) {

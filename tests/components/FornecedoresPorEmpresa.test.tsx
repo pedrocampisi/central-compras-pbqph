@@ -169,6 +169,15 @@ describe('CTO-D641 — a busca', () => {
     expect(filiais().filter((l) => l.dataset.achada)).toHaveLength(0);
   });
 
+  it('pela razão social que as três filiais têm: acha e abre, e não marca nenhuma (marcar todas não separa nenhuma)', () => {
+    buscar('aurora tintas ltda');
+    render(<FornecedoresPage />);
+    expect(empresas().map((l) => l.dataset.empresa)).toEqual(['emp-aurora']);
+    expect(filiais()).toHaveLength(3);
+    expect(filiais().filter((l) => l.dataset.achada)).toHaveLength(0);
+    expect(screen.queryByText('achada pela busca')).toBeNull();
+  });
+
   it('pela cidade, sem acento: acha a empresa da filial de lá', () => {
     buscar('uberlandia');
     render(<FornecedoresPage />);
