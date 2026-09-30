@@ -6,6 +6,26 @@
 
 ---
 
+### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **no ramo `d644-retoques` (`5fb2b5d`, CI verde), esperando a linha do CTO sobre as fotos** — **FECHADA EM 30/09/2026: NO AR em `69af6378` (CTO-D647, decisão 70); o desfazer é `d7e5e46e`**
+
+
+*Aberta em 29/09/2026 (decisão 68).* **O que é:**
+1. As larguras das colunas de Fornecedores fixas: o cabeçalho não anda entre a lista, a busca e os filtros.
+2. O cartão "Fornecedores" do Dashboard conta empresas (a regra da D501).
+3. A caixa "Buscar ECR…" do Catálogo segue o tema escuro.
+
+**A prova:**
+- um teste com sabotagem para cada retoque;
+- as fotos `01`, `04` e `06` em 1366 e 1920, e o Dashboard e o Catálogo no claro e no escuro.
+
+**Fecha quando:** o CTO der a linha e a publicação sair. Sem perícia.
+**A carta:** `Devolucoes/2026-09-29_de_CTO_para_Ordem_de_Compra_D644-fotos-aceitas-publique-e-tres-retoques-depois.md`.
+*Em 29/09, 23h4x (decisão 69):* os três prontos no ramo, na cópia `OC_empresas`. As fotos estão em
+`docs/Capturas/2026-09-29_D644/`, e a carta está na `Enviados`. Um ponto está com o CTO: a linha menor da empresa passa
+por baixo de dois cabeçalhos.
+
+---
+
 ### 22. D641 + D643 — fornecedores por empresa e o título uma vez · **no ramo, esperando a linha do CTO sobre as fotos** — **FECHADA EM 29/09/2026: NO AR em `d7e5e46e` (CTO-D644, decisão 68); o desfazer é `31557b08`**
 
 *Aberta em 29/09/2026 (decisão 67).* **Onde mora:** o ramo **`d641-fornecedores-por-empresa`** (`4ca0741`), empurrado,

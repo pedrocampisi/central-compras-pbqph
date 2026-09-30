@@ -44,25 +44,6 @@ A pendência 1 fica porque ela **é do Pedro e não minha**: espera ele, não eu
 
 ## 🔴 Abertas
 
-### 23. D644 §4 — três retoques: colunas fixas em Fornecedores, o cartão do Dashboard contando empresas, a busca do Catálogo no escuro · **no ramo `d644-retoques` (`5fb2b5d`, CI verde), esperando a linha do CTO sobre as fotos**
-
-*Aberta em 29/09/2026 (decisão 68).* **O que é:**
-1. As larguras das colunas de Fornecedores fixas: o cabeçalho não anda entre a lista, a busca e os filtros.
-2. O cartão "Fornecedores" do Dashboard conta empresas (a regra da D501).
-3. A caixa "Buscar ECR…" do Catálogo segue o tema escuro.
-
-**A prova:**
-- um teste com sabotagem para cada retoque;
-- as fotos `01`, `04` e `06` em 1366 e 1920, e o Dashboard e o Catálogo no claro e no escuro.
-
-**Fecha quando:** o CTO der a linha e a publicação sair. Sem perícia.
-**A carta:** `Devolucoes/2026-09-29_de_CTO_para_Ordem_de_Compra_D644-fotos-aceitas-publique-e-tres-retoques-depois.md`.
-*Em 29/09, 23h4x (decisão 69):* os três prontos no ramo, na cópia `OC_empresas`. As fotos estão em
-`docs/Capturas/2026-09-29_D644/`, e a carta está na `Enviados`. Um ponto está com o CTO: a linha menor da empresa passa
-por baixo de dois cabeçalhos.
-
----
-
 ### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc`
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.

@@ -2636,3 +2636,30 @@ Telefone", porque a linha usa as três primeiras colunas. A alternativa é prend
 na carta.
 
 **DAQUI EM DIANTE:** publicar pela emenda 3 depois da linha do CTO.
+
+## Decisão 70 — no ar: os três retoques da D644 · 30/09/2026
+
+**POR QUÊ (CTO-D647):** o CTO aceitou os três retoques. O ponto da carta ficou como estava: a linha menor da empresa com
+filiais continua nas três primeiras colunas.
+
+**O QUE MUDOU:**
+- **A junção:** o ramo `d644-retoques` (`5fb2b5d`) entrou no `main` em `f8fd0e9`, sem conflito, e o diff fora de
+  `docs/` é vazio.
+- **A bateria:** 614 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (36661153078).
+- **Publicado** às 23h43 de 29/09: `69af6378-61d2-44a6-aebc-7a15d436e972`, versão `20260930024337-f8fd0e9`, com 100%
+  do tráfego.
+- **O desfazer é `d7e5e46e`.**
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA** (refeita na manhã de 30/09, porque a sessão caiu no meio da primeira):
+- O `versao.txt` servido é o novo.
+- No pacote servido:
+  - a busca nova do Catálogo aparece 1 vez, e a caixa solta de antes, 0;
+  - o cartão que conta empresas aparece 1 vez;
+  - `table-layout:fixed` aparece 1 vez no CSS;
+  - "achada pela busca" (D641) continua lá.
+- Nenhum dos três marcadores novos existia no `aa5c687`.
+- **Logado:** não medido.
+
+**DAQUI EM DIANTE:** a conferência do CTO por fora. A cópia `OC_empresas` e os dois ramos já podem sair, só por
+`git worktree remove`.
