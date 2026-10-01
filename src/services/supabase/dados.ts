@@ -99,7 +99,7 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
   const todasAsObras = () => core()
     .from('intervencoes')
     .select(
-      'id, descricao_curta, ativa, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
+      'id, descricao_curta, ativa, cno, pasta_caminho, criado_em, atualizado_em, imovel:imoveis(*), ' +
       'nf_empresa:empresas!intervencoes_nf_empresa_id_fkey(razao_social, cnpj, logradouro, numero, complemento, bairro, cidade, uf, cep), ' +
       'nf_cliente:clientes!intervencoes_nf_cliente_id_fkey(nome, documento, tipo_pessoa, logradouro, numero, complemento, bairro, cidade, uf, cep)',
       { count: 'exact' },
@@ -231,7 +231,11 @@ function paraObra(l: Record<string, unknown>): Obra {
   return {
     id: String(l['id']),                       // id da INTERVENÇÃO
     nome: vazio(l['descricao_curta']) || vazio(im['nome_referencia']),
-    cei: vazio(im['cadastro_imobiliario']),
+    // O CNO da obra, da intervenção (CTO-D655). Até 30/09 vinha do
+    // `cadastro_imobiliario` do imóvel, que é a inscrição da PREFEITURA, e o PDF
+    // o imprimia como "CNO/CEI". Na nota, o CNO é o primeiro degrau da
+    // Central_Financeiro para achar a obra: número errado ali é pior que nada.
+    cei: vazio(l['cno']),
     endereco: paraEndereco(im),
     destinatario: destinatarioDaLinhaDaObra(l),
     telefone: vazio(im['proprietario_telefone']),

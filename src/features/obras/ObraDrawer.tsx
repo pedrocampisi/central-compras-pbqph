@@ -132,7 +132,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
           onChange={(e) => set('nome', e.target.value)}
         />
         <Field
-          label="CEI / Matrícula"
+          label="CNO"
           value={form.cei}
           placeholder="000.000.000/00-0"
           onChange={(e) => set('cei', e.target.value)}
