@@ -2709,3 +2709,30 @@ nome e pelo logradouro.
 **A CÓPIA D652 DO BANCO** (a filial INAPTA bloqueada) foi lida e arquivada. Da OC: nada a fazer.
 
 **DAQUI EM DIANTE:** a conferência do CTO, o Pedro vê os PDFs, e a publicação só com a carta curta do CTO.
+
+## Decisão 73 — no ar: o PDF da OC com o quadro PARA A NOTA FISCAL · 01/10/2026
+
+**POR QUÊ (CTO-D659):** o CTO aprovou o `893e411` na D658, e o Pedro viu as imagens 1 e 2 e respondeu, na janela do
+CTO: "ok, ficou bom assim". As duas perguntas da minha carta voltaram com a resposta de deixar como estava: a linha do
+cuidado fica só para empresa, e o lembrete azul fica.
+
+**O QUE MUDOU:**
+- **A junção:** o ramo `d655-pdf-obra-na-nota` (`893e411`) entrou no `main` em `9ee32a3`, sem conflito, e o diff fora
+  de `docs/` é vazio.
+- **A bateria:** 630 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (36860059485).
+- **Publicado** às 09h13 de 01/10: `8d25ed4b-0379-45da-8aa3-b2e4515f78ae`, versão `20261001121218-9ee32a3`, com 100%
+  do tráfego.
+- **O desfazer é `69af6378`.**
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA:**
+- O `versao.txt` servido é o novo.
+- No pacote servido:
+  - os textos do quadro, do lembrete e do destinatário novo estão lá;
+  - "ENTREGAR EM", "CNO/CEI" e "CEI / Matr" aparecem 0 vezes; no código do `340a506`, apareciam 1 vez cada;
+  - a carga pede a coluna `cno`.
+- **O PDF baixado do site no ar não foi medido:** baixar pede login, e a sessão do ensaio venceu (pendência 13).
+- **Logado:** não medido.
+
+**DAQUI EM DIANTE:** a conferência do CTO por fora. A primeira OC emitida agora é o PDF real. A cópia `OC_empresas` e o
+ramo podem sair, só por `git worktree remove`.

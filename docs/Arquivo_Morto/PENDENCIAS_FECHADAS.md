@@ -6,6 +6,15 @@
 
 ---
 
+### 24. O PDF novo da OC (D655) no ramo, esperando o CTO e o Pedro — **FECHADA EM 01/10/2026: NO AR em `8d25ed4b` (CTO-D659, decisão 73); o desfazer é `69af6378`**
+
+*Aberta em 30/09/2026, na decisão 72.* O quadro PARA A NOTA FISCAL e o CNO certo estão no ramo `d655-pdf-obra-na-nota`
+(`893e411`), com o CI verde e NÃO publicados. **Espera:** o CTO conferir, o Pedro ver os PDFs em
+`docs/Capturas/2026-09-30_D655/` e a carta curta de publicar. Aí é a emenda 3: juntar, a bateria, publicar pelo
+PowerShell e medir por fora.
+
+---
+
 ### 1. Provar na tela: ninguém emitiu OC por este aplicativo depois da troca para `salvar_oc` — **FECHADA EM 30/09/2026: as 004 e 005 saíram pela palavra nova do Pedro (D642, D651); a emissão provada pela 2026/008 e pela 2026/009, emitidas pela equipe com o PDF**
 
 *Meu, quando houver conta de ensaio.* Transcrito do `INDICE.md` em 20/08/2026, sem alteração.

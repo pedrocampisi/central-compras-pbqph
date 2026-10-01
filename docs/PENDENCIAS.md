@@ -208,15 +208,6 @@ segurou).
 
 ---
 
-### 24. O PDF novo da OC (D655) no ramo, esperando o CTO e o Pedro
-
-*Aberta em 30/09/2026, na decisão 72.* O quadro PARA A NOTA FISCAL e o CNO certo estão no ramo `d655-pdf-obra-na-nota`
-(`893e411`), com o CI verde e NÃO publicados. **Espera:** o CTO conferir, o Pedro ver os PDFs em
-`docs/Capturas/2026-09-30_D655/` e a carta curta de publicar. Aí é a emenda 3: juntar, a bateria, publicar pelo
-PowerShell e medir por fora.
-
----
-
 ## Onde estão as fechadas
 
 Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.
