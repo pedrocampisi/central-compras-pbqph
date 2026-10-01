@@ -2766,3 +2766,35 @@ resposta dele à tela no menu, igual à planilha: "pode, vamos ver se fica melho
 - **O banco não mudou.**
 
 **DAQUI EM DIANTE:** o CTO confere as fotos e o ramo, e a publicação só sai com a carta curta dele.
+
+## Decisão 75 — no ar: a tela Qualificação · 01/10/2026
+
+**POR QUÊ (CTO-D662):** o CTO leu o diff do `7821938` fora de `docs/` e conferiu na produção, só lendo:
+- as 9 linhas de Materiais estão qualificadas e todas têm ECR, então a Permissão diz "Sim" nas 9;
+- em Projetos há 3 vencidas, e não 4: duas são da mesma empresa (D618).
+
+Ele aprovou e mandou publicar. O retoque opcional dele, o selo que quebrava em 1920 com espaço sobrando, entrou na
+mesma publicação porque era só estilo.
+
+**O QUE MUDOU:**
+- **O retoque** é uma regra só de estilo: de 1600px para cima, o selo da Situação não quebra.
+  - As 22 fotos de 1366 e 375 saíram iguais, byte a byte, às aprovadas.
+  - As de 1920 foram trocadas, e entraram a 01 e a 04 em 1920 escuro.
+  - O ramo foi para `f8c9153`, com o CI verde (36865046753).
+- **A junção:** o ramo entrou no `main` em `9d9e973`, e nada fora de `docs/` difere do ramo.
+- **A bateria:** 657 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (36865296129).
+- **Publicado** às 09h59 de 01/10: `aeec3fcc-bf11-4840-9749-5ac793f9f238`, versão `20261001125909-9d9e973`, com 100%
+  do tráfego.
+- **O desfazer é `8d25ed4b`.**
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA**, no que o site serve:
+- o `versao.txt` é o novo;
+- a frase nova da trava aparece 1 vez, e a velha, 0;
+- a linha do alto da tela, "Permissão para compra", "Cadastrar novo fornecedor" e "Só quem emite OC qualifica" estão
+  lá;
+- a regra do selo também (`@media (width>=1600px)`).
+- **Logado:** não medido (pendência 13).
+
+**DAQUI EM DIANTE:** o CTO avisa o Pedro, e ele vê a tela no ar com os dados de verdade. A cópia `OC_empresas` e o ramo
+podem sair, só por `git worktree remove`, com o sim do Pedro.
