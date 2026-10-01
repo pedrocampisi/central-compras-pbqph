@@ -22,17 +22,16 @@ import {
   nomeDasEcrs,
   seloDaFilial,
   textoDoDesempenho,
-  textoDoSelo,
 } from '../../domain/qualificacao';
 import { podeEmitirOc } from '../../services/supabase/auth';
 import type { CategoriaDaQualificacao, QualificacaoGravada } from '../../services/supabase/qualificacao';
-import { recarregarDados } from '../../services/supabase/sync';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useDataStore } from '../../stores/useDataStore';
 import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
 import { useUiStore } from '../../stores/useUiStore';
 import type { Fornecedor } from '../../domain/types';
 import { QualificarDialogo } from './QualificarDialogo';
+import { depoisDeQualificar as avisarDepoisDeQualificar } from './depoisDeQualificar';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import styles from './FichaDaEmpresa.module.css';
 
@@ -50,18 +49,7 @@ export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFec
 
   async function depoisDeQualificar(c: CategoriaDaQualificacao, r: QualificacaoGravada) {
     setQualificando(null);
-    try {
-      await recarregarDados();
-    } catch {
-      showToast('A qualificação foi gravada, mas a tela não recarregou. Recarregue a página.', 'warning');
-      return;
-    }
-    showToast(
-      r.qualificada
-        ? `${c.nome}: ${textoDoSelo({ situacao: r.situacao, qualificadaEm: null, venceEm: r.venceEm, ecrs: [] })}.`
-        : `${c.nome}: nota ${r.nota} (o mínimo é ${r.minimo}) — a empresa ficou desqualificada.`,
-      r.qualificada ? 'success' : 'warning',
-    );
+    await avisarDepoisDeQualificar(c, r, showToast);
   }
 
   return createPortal(

@@ -26,6 +26,8 @@ interface Props {
   open: boolean;
   fornecedor: Fornecedor | null;   // null = novo
   onClose: () => void;
+  /** O cadastro novo gravou: o id do banco (a tela Qualificação volta para qualificar, CTO-D661 §4.7). */
+  aoCriar?: (id: string) => void;
 }
 
 function emptyFornecedor(): Fornecedor {
@@ -47,7 +49,7 @@ function emptyFornecedor(): Fornecedor {
   };
 }
 
-export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
+export function FornecedorDrawer({ open, fornecedor, onClose, aoCriar }: Props) {
   // O drawer é montado apenas quando aberto (render condicional na página),
   // então o estado inicial do form já reflete o fornecedor correto.
   const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
@@ -74,10 +76,11 @@ export function FornecedorDrawer({ open, fornecedor, onClose }: Props) {
     setSalvando(true);
     try {
       // Grava direto no banco; a lista é recarregada de lá em seguida.
-      await salvarFornecedor({ ...form, atualizado_em: nowIso() });
+      const id = await salvarFornecedor({ ...form, atualizado_em: nowIso() });
       await recarregarDados();
       showToast(fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor criado.', 'success');
       onClose();
+      if (!fornecedor) aoCriar?.(id);
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Falha ao gravar fornecedor.', 'error');
     } finally {

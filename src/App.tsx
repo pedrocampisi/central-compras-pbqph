@@ -43,6 +43,7 @@ import { DashboardPage } from './features/dashboard/DashboardPage';
 import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
 import { FornecedoresPage } from './features/fornecedores/FornecedoresPage';
+import { QualificacaoPage } from './features/qualificacao/QualificacaoPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
@@ -60,6 +61,8 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'nova-oc', label: 'Nova OC', icon: 'plus' },
   { id: 'historico', label: 'Histórico', icon: 'history' },
   { id: 'fornecedores', label: 'Fornecedores', icon: 'users' },
+  // A FO 8.4.1.1 no menu (CTO-D661): a qualificação achada sem passar pela ficha.
+  { id: 'qualificacao', label: 'Qualificação', icon: 'selo' },
   { id: 'obras', label: 'Obras', icon: 'building' },
   { id: 'catalogo', label: 'Catálogo ECR', icon: 'clipboard' },
 ];
@@ -403,6 +406,7 @@ export default function App() {
               {activeTab === 'nova-oc'       && <NovaOcPage />}
               {activeTab === 'historico'     && <HistoricoPage />}
               {activeTab === 'fornecedores'  && <FornecedoresPage />}
+              {activeTab === 'qualificacao'  && <QualificacaoPage />}
               {activeTab === 'obras'         && <ObrasPage />}
               {activeTab === 'catalogo'      && <CatalogoPage />}
               {activeTab === 'config'        && <ConfigPage />}

@@ -22,6 +22,15 @@ export type Situacao = 'qualificada' | 'vence_em_30_dias' | 'vencida' | 'desqual
 /** As duas situações com que a OC com ECR emite (contrato §2, `qualificacao_da_oc`). */
 const EMITE_COM: readonly Situacao[] = ['qualificada', 'vence_em_30_dias'];
 
+/**
+ * A OC com ECR emite com esta situação? É a regra da trava da emissão
+ * (`travaDaQualificacao`), e a "Permissão para compra" da tela Qualificação
+ * lê esta mesma função (CTO-D661 §4.5): nunca uma conta à parte.
+ */
+export function emiteComASituacao(s: Situacao): boolean {
+  return EMITE_COM.includes(s);
+}
+
 /** A qualificação que vale para uma empresa numa categoria (a `vigente` da vista). */
 export interface Selo {
   situacao: Situacao;
@@ -256,14 +265,16 @@ export const QUALIFICACAO_SEM_CONFIRMACAO =
 /**
  * Onde a pessoa resolve, que é o fim da frase da trava (CTO-D614 §2.4):
  * dentro do "Qualificar agora", qualifica ali mesmo; fora dele (o Histórico,
- * ou a Nova OC quando o diálogo não abre), na ficha da empresa. Mandar usar o
- * "Qualificar agora" a quem já está nele, ou a quem está numa tela sem ele,
- * é mandar procurar um botão que não está na frente.
+ * ou a Nova OC quando o diálogo não abre), na tela Qualificação, do menu
+ * (CTO-D661 §4.12; até 01/10 mandava à ficha da empresa, cinco passos
+ * adentro de Fornecedores). Mandar usar o "Qualificar agora" a quem já está
+ * nele, ou a quem está numa tela sem ele, é mandar procurar um botão que não
+ * está na frente.
  */
 export type OndeQualifica = 'aqui' | 'na_ficha';
 const COMO_RESOLVER: Record<OndeQualifica, string> = {
   aqui: 'Qualifique aqui para emitir, ou volte e salve como rascunho.',
-  na_ficha: 'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
+  na_ficha: 'Qualifique a empresa na tela Qualificação, no menu, e emita de novo.',
 };
 
 /**
@@ -280,7 +291,7 @@ export function travaDaQualificacao(
   if (ecrs.length === 0) return '';
   // Sem as qualificações carregadas, não se sabe: a trava falha fechada, como a da filial (perícia de 27/09, achado 5).
   if (!selo) return QUALIFICACAO_SEM_CONFIRMACAO;
-  if (!EMITE_COM.includes(selo.situacao)) {
+  if (!emiteComASituacao(selo.situacao)) {
     const porque =
       selo.situacao === 'vencida'
         ? `a qualificação de material da empresa venceu em ${dataBr(selo.venceEm)}`

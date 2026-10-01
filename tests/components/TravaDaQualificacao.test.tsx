@@ -318,7 +318,7 @@ describe('D605 — a porta "emitida" do Histórico', () => {
     expect(gravacoes.status).not.toHaveBeenCalled();
     expect(avisar.mock.calls[0]![0]).toContain('não tem qualificação de material');
     // O Histórico não tem o "Qualificar agora": a frase manda à ficha da empresa.
-    expect(avisar.mock.calls[0]![0]).toContain('Qualifique a empresa na ficha dela, em Fornecedores');
+    expect(avisar.mock.calls[0]![0]).toContain('Qualifique a empresa na tela Qualificação, no menu');
     expect(avisar.mock.calls[0]![0]).not.toContain('Qualificar agora');
   });
 

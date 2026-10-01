@@ -1,0 +1,261 @@
+/* A tela Qualificação (CTO-D661): as abas da FO 8.4.1.1 e a tabela da planilha. Só tokens; sem animação. */
+
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--borda);
+}
+.aba {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+.aba:hover { color: var(--texto); }
+.abaAtiva {
+  color: var(--texto);
+  border-bottom-color: var(--acento);
+}
+.conta {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--raio-pill);
+  background: var(--marca-fraca);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--texto-suave);
+}
+.pede {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: var(--raio-pill);
+  background: var(--erro-bg);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--erro);
+}
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 12px;
+}
+.barra > :first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.soLeitura {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.semCarga {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+
+/* A planilha tem doze colunas: aqui elas se apertam para caber em 1366 sem esconder a situação.
+ * O cabeçalho quebra; a célula tem menos respiro; o nome fica preso à esquerda quando a tabela rola. */
+.tabela td { vertical-align: top; }
+.tabela tbody td { padding: 10px 8px; }
+.tabela thead th {
+  padding: 0 8px 8px;
+  white-space: normal;
+  letter-spacing: 0.06em;
+  vertical-align: bottom;
+}
+.tabela th:first-child,
+.tabela td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--painel);
+}
+.tabela tbody tr:hover td:first-child { background: var(--painel); }
+
+/* O que pede ação salta aos olhos: a borda da esquerda na cor da situação. */
+.linha[data-situacao='vencida'] > td:first-child,
+.linha[data-situacao='desqualificada'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--erro);
+}
+.linha[data-situacao='vence_em_30_dias'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--aviso);
+}
+
+.nome {
+  min-width: 136px;
+  max-width: 200px;
+  font-weight: 600;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+.tipo {
+  min-width: 92px;
+  max-width: 150px;
+  color: var(--texto);
+}
+.ecrs {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+/* O cabeçalho do critério: o texto da planilha, em até duas linhas; inteiro no passar do mouse. */
+.tabela thead th.criterioTh {
+  min-width: 70px;
+  max-width: 120px;
+}
+.criterioTexto {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+}
+.marca {
+  padding: 2px 6px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pill);
+  background: var(--painel);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--erro);
+  cursor: pointer;
+}
+.marca[data-atende] { color: var(--sucesso); }
+.marca:hover { border-color: var(--borda-forte); }
+
+.nota {
+  min-width: 96px;
+  max-width: 130px;
+  font-weight: 600;
+}
+.minimo {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+.entregas {
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--texto-suave);
+}
+/* O selo de sempre; aqui ele pode quebrar em duas linhas, para a coluna não empurrar a tabela. */
+.situacao { min-width: 118px; max-width: 140px; }
+.situacao > span { white-space: normal; }
+/* Em tela larga sobra espaço: o selo volta a uma linha só (CTO-D662). Abaixo disso, nada muda. */
+@media (min-width: 1600px) {
+  .situacao { max-width: none; }
+  .situacao > span { white-space: nowrap; }
+}
+.acoesDaLinha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  font-weight: 400;
+}
+.acoesDaLinha button {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+.permissao {
+  font-weight: 700;
+  color: var(--erro);
+}
+.permissao[data-pode] { color: var(--sucesso); }
+.fora {
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--texto-suave);
+}
+
+.detalhe td {
+  background: var(--fundo);
+}
+.criterios {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--texto);
+}
+.quem {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+/* O "+ Qualificar fornecedor": a escolha. O fundo escuro é o do ConfirmDialog. */
+.escolher {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+  padding: 22px;
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-elevada);
+}
+.escolherTitulo {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.campo {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+.pista {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--acento-texto);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

@@ -56,10 +56,10 @@ beforeEach(() => {
 });
 
 describe('D585 — a aba Prestadores saiu', () => {
-  it('o menu não tem "Prestadores", e as outras sete abas ficam', async () => {
+  it('o menu não tem "Prestadores", e as outras abas ficam (a Qualificação entrou depois de Fornecedores, D661)', async () => {
     const menu = await abrirOc();
     const abas = within(menu).getAllByRole('button').map((b) => b.textContent?.trim());
-    expect(abas).toEqual(['Dashboard', 'Nova OC', 'Histórico', 'Fornecedores', 'Obras', 'Catálogo ECR', 'Configurações']);
+    expect(abas).toEqual(['Dashboard', 'Nova OC', 'Histórico', 'Fornecedores', 'Qualificação', 'Obras', 'Catálogo ECR', 'Configurações']);
     expect(screen.queryByText(/Prestadores/)).toBeNull();
   });
 

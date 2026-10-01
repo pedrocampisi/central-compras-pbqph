@@ -18,7 +18,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { FornecedorDrawer } from './FornecedorDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import { useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
-import { CATEGORIAS, linhasDoDia, seloDaFilial } from '../../domain/qualificacao';
+import { CATEGORIAS, seloDaFilial } from '../../domain/qualificacao';
 import {
   ativoDaEmpresa,
   empresasDaTela,
@@ -29,9 +29,7 @@ import {
 } from '../../domain/fornecedores';
 import { formatarDocumento } from '../../domain/destinatario';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
-import { secoesDosQualificados } from '../../domain/folhasDoAuditor';
-import { hojeEmSaoPaulo } from '../../domain/ecr';
-import { baixarPdfDosQualificados } from '../../services/pdf/generateFolhasDoAuditor';
+import { pdfDosQualificados } from './depoisDeQualificar';
 import { Icon } from '../../components/Icon/Icon';
 import tabela from '../../components/DataTable/DataTable.module.css';
 import styles from './FornecedoresPage.module.css';
@@ -81,24 +79,6 @@ export function FornecedoresPage() {
   const aberta = (g: EmpresaDaLista) => mapa[g.chave] ?? sozinha;
   const alternar = (g: EmpresaDaLista) =>
     setAbertas({ busca: search, mapa: { ...mapa, [g.chave]: !aberta(g) } });
-
-  /** A folha do auditor (CTO-D604 §3.5): a FO 8.4.1.1 tirada do sistema, inteira. */
-  async function pdfDosQualificados() {
-    if (!qualificacoes || !data) {
-      showToast('As qualificações não carregaram. Recarregue a página para gerar o PDF.', 'warning');
-      return;
-    }
-    try {
-      // A situação do dia do clique: a lista pode ter sido aberta ontem (B3).
-      const hoje = hojeEmSaoPaulo();
-      await baixarPdfDosQualificados(
-        secoesDosQualificados(linhasDoDia(qualificacoes.linhas, hoje), qualificacoes.categorias, data.fornecedores),
-        hoje,
-      );
-    } catch (err) {
-      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
-    }
-  }
 
   function openNew() {
     setEditing(null);
@@ -246,7 +226,7 @@ export function FornecedoresPage() {
           </p>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          <Button variant="outline" size="sm" onClick={() => void pdfDosQualificados()}>
+          <Button variant="outline" size="sm" onClick={() => void pdfDosQualificados(qualificacoes, data.fornecedores, showToast)}>
             <Icon name="file-text" size={13} /> PDF dos qualificados
           </Button>
           <Button variant="primary" size="sm" onClick={openNew}>
