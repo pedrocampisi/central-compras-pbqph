@@ -138,12 +138,12 @@ describe('CTO-D661 — as cinco abas', () => {
 });
 
 describe('CTO-D661 — as colunas da planilha', () => {
-  it('Materiais: as colunas na ordem, com a Permissão para compra no fim', () => {
+  it('Materiais: as colunas na ordem, com a Permissão para compra no fim (as ações embaixo do nome)', () => {
     render(<QualificacaoPage />);
     expect(cabecalho()).toEqual([
       'Fornecedor', 'Tipo', 'Qualificada em', 'Requalificar em',
       '1. Atende a ECR', '2. Menor preço', '3. Prazo',
-      'Nota de desempenho', 'Entregas (12 meses)', 'Situação', 'Permissão para compra', 'Ações',
+      'Nota de desempenho', 'Situação', 'Permissão para compra',
     ]);
     const a = linhaDe('empresa-a').textContent!;
     expect(a).toContain('Alfa (teste)');
@@ -151,7 +151,10 @@ describe('CTO-D661 — as colunas da planilha', () => {
     expect(a).toContain('07/05/2026');
     expect(a).toContain('07/05/2027');
     expect(a).toContain('2 de 3mínimo 2');
-    expect(a).toContain('4 entregas: 3 no prazo, 3 conformes');
+    // As entregas dos últimos 12 meses, curtas, na coluna da nota; inteiras no passar do mouse.
+    const entregas = linhaDe('empresa-a').querySelector<HTMLElement>('[data-entregas]')!;
+    expect(entregas.textContent).toBe('4 entregas, 3 no prazo');
+    expect(entregas.title).toBe('Nos últimos 12 meses: 4 entregas avaliadas — 3 no prazo, 4 inteiras, 3 conformes com a OC e a ECR.');
     expect(a).toContain('Qualificada até 05/2027');
     expect(within(linhaDe('empresa-a')).getByText('Sim')).toBeTruthy();
     expect(within(linhaDe('empresa-b')).getByText('Não')).toBeTruthy();
@@ -163,7 +166,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     fireEvent.click(aba('controle_tecnologico'));
     expect(cabecalho()).toEqual([
       'Fornecedor', 'Qualificada em', 'Requalificar em', '1. Acreditação', '2. NBR 17025', '3. ISO 9001',
-      'Desempenho', 'Entregas (12 meses)', 'Situação', 'Ações',
+      'Desempenho', 'Situação',
     ]);
   });
 

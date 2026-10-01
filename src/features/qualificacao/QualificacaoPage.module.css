@@ -73,8 +73,24 @@
   color: var(--erro);
 }
 
+/* A planilha tem doze colunas: aqui elas se apertam para caber em 1366 sem esconder a situação.
+ * O cabeçalho quebra; a célula tem menos respiro; o nome fica preso à esquerda quando a tabela rola. */
 .tabela td { vertical-align: top; }
-.tabela tbody td { padding-top: 10px; padding-bottom: 10px; }
+.tabela tbody td { padding: 10px 8px; }
+.tabela thead th {
+  padding: 0 8px 8px;
+  white-space: normal;
+  letter-spacing: 0.06em;
+  vertical-align: bottom;
+}
+.tabela th:first-child,
+.tabela td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--painel);
+}
+.tabela tbody tr:hover td:first-child { background: var(--painel); }
 
 /* O que pede ação salta aos olhos: a borda da esquerda na cor da situação. */
 .linha[data-situacao='vencida'] > td:first-child,
@@ -86,13 +102,15 @@
 }
 
 .nome {
-  min-width: 160px;
+  min-width: 136px;
+  max-width: 200px;
   font-weight: 600;
   color: var(--texto);
   overflow-wrap: anywhere;
 }
 .tipo {
-  min-width: 120px;
+  min-width: 92px;
+  max-width: 150px;
   color: var(--texto);
 }
 .ecrs {
@@ -103,10 +121,8 @@
 
 /* O cabeçalho do critério: o texto da planilha, em até duas linhas; inteiro no passar do mouse. */
 .tabela thead th.criterioTh {
-  white-space: normal;
-  min-width: 96px;
-  max-width: 150px;
-  vertical-align: bottom;
+  min-width: 70px;
+  max-width: 120px;
 }
 .criterioTexto {
   display: -webkit-box;
@@ -117,13 +133,14 @@
   line-height: 1.35;
 }
 .marca {
-  padding: 2px 8px;
+  padding: 2px 6px;
   border: 1px solid var(--borda);
   border-radius: var(--raio-pill);
   background: var(--painel);
   font: inherit;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
+  line-height: 1.3;
   white-space: nowrap;
   color: var(--erro);
   cursor: pointer;
@@ -131,16 +148,37 @@
 .marca[data-atende] { color: var(--sucesso); }
 .marca:hover { border-color: var(--borda-forte); }
 
-.nota { white-space: nowrap; font-weight: 600; }
+.nota {
+  min-width: 96px;
+  max-width: 130px;
+  font-weight: 600;
+}
 .minimo {
   font-size: 11.5px;
   font-weight: 400;
   color: var(--texto-suave);
 }
 .entregas {
-  min-width: 130px;
-  font-size: 12.5px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.35;
   color: var(--texto-suave);
+}
+/* O selo de sempre; aqui ele pode quebrar em duas linhas, para a coluna não empurrar a tabela. */
+.situacao { min-width: 118px; max-width: 140px; }
+.situacao > span { white-space: normal; }
+.acoesDaLinha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  font-weight: 400;
+}
+.acoesDaLinha button {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12px;
 }
 .permissao {
   font-weight: 700;

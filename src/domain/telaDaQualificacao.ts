@@ -109,8 +109,8 @@ export function linhasDaTela(
     );
 }
 
-/** O desempenho dos últimos 12 meses em uma linha curta, para a coluna da tabela. */
+/** O desempenho dos últimos 12 meses, curto, embaixo da nota; o inteiro (`textoDoDesempenho`) vai no passar do mouse. */
 export function desempenhoCurto(d: NumerosDoDesempenho | undefined): string {
   if (!d || d.entregas === 0) return 'Sem entregas';
-  return `${d.entregas} ${d.entregas === 1 ? 'entrega' : 'entregas'}: ${d.noPrazo} no prazo, ${d.conformes} ${d.conformes === 1 ? 'conforme' : 'conformes'}`;
+  return `${d.entregas} ${d.entregas === 1 ? 'entrega' : 'entregas'}, ${d.noPrazo} no prazo`;
 }

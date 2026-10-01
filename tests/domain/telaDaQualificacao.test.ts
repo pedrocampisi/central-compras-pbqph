@@ -161,7 +161,7 @@ describe('CTO-D661 — as linhas da tela Qualificação', () => {
 
   it('o desempenho curto', () => {
     expect(desempenhoCurto(undefined)).toBe('Sem entregas');
-    expect(desempenhoCurto({ entregas: 1, noPrazo: 1, inteiras: 1, conformes: 1 })).toBe('1 entrega: 1 no prazo, 1 conforme');
-    expect(desempenhoCurto({ entregas: 4, noPrazo: 3, inteiras: 4, conformes: 2 })).toBe('4 entregas: 3 no prazo, 2 conformes');
+    expect(desempenhoCurto({ entregas: 1, noPrazo: 1, inteiras: 1, conformes: 1 })).toBe('1 entrega, 1 no prazo');
+    expect(desempenhoCurto({ entregas: 4, noPrazo: 3, inteiras: 4, conformes: 2 })).toBe('4 entregas, 3 no prazo');
   });
 });

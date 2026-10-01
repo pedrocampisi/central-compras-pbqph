@@ -110,7 +110,7 @@ export function QualificacaoPage() {
     else showToast('O fornecedor foi criado, mas não apareceu na lista. Recarregue a página e qualifique de novo.', 'warning');
   }
 
-  const colunas = 10 + (comTipo ? 1 : 0) + (material ? 1 : 0);
+  const colunas = 8 + (comTipo ? 1 : 0) + (material ? 1 : 0);
 
   return (
     <div className="section">
@@ -208,10 +208,8 @@ export function QualificacaoPage() {
                       </th>
                     ))}
                     <th>{comTipo ? 'Nota de desempenho' : 'Desempenho'}</th>
-                    <th>Entregas (12 meses)</th>
                     <th>Situação</th>
                     {material && <th>Permissão para compra</th>}
-                    <th className={tabela.actionsCol}>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -222,7 +220,27 @@ export function QualificacaoPage() {
                     const alternar = () => setAberta(aberto ? null : l.chave);
                     const linha = (
                       <tr key={l.chave} data-linha={l.chave} data-situacao={v.situacao} className={styles.linha}>
-                        <td className={styles.nome}>{l.nome}</td>
+                        {/* As ações moram embaixo do nome, que fica preso à esquerda: com a tabela
+                            rolada para o lado, o "Requalificar" continua à vista. */}
+                        <td className={styles.nome}>
+                          {l.nome}
+                          <div className={styles.acoesDaLinha}>
+                            {l.filial && podeQualificar && (
+                              <Button variant="outline" size="sm" onClick={() => setQualificando(l.filial)}>
+                                Requalificar
+                              </Button>
+                            )}
+                            {l.filial ? (
+                              <Button variant="ghost" size="sm" onClick={() => setFicha(l.filial)}>
+                                Histórico
+                              </Button>
+                            ) : (
+                              <span className={styles.fora} title="Esta empresa não tem filial no cadastro da OC.">
+                                fora do cadastro
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         {comTipo && (
                           <td className={styles.tipo}>
                             {v.tipo || '—'}
@@ -252,14 +270,15 @@ export function QualificacaoPage() {
                             </td>
                           );
                         })}
+                        {/* A nota dos critérios, e embaixo as entregas dos últimos 12 meses: a prova do que se marcou. */}
                         <td className={styles.nota}>
                           {v.nota} de {v.criterios.length || 3}
                           <div className={styles.minimo}>mínimo {v.minimo}</div>
+                          <div className={styles.entregas} title={textoDoDesempenho(d)} data-entregas="">
+                            {desempenhoCurto(d)}
+                          </div>
                         </td>
-                        <td className={styles.entregas} title={textoDoDesempenho(d)}>
-                          {desempenhoCurto(d)}
-                        </td>
-                        <td>
+                        <td className={styles.situacao}>
                           <SeloDaQualificacao selo={{ situacao: v.situacao, qualificadaEm: v.qualificadaEm, venceEm: v.venceEm, ecrs: v.ecrs }} />
                         </td>
                         {material && (
@@ -269,24 +288,6 @@ export function QualificacaoPage() {
                             </span>
                           </td>
                         )}
-                        <td>
-                          <div className={tabela.rowActions}>
-                            {l.filial && podeQualificar && (
-                              <Button variant="outline" size="sm" onClick={() => setQualificando(l.filial)}>
-                                Requalificar
-                              </Button>
-                            )}
-                            {l.filial ? (
-                              <Button variant="ghost" size="sm" onClick={() => setFicha(l.filial)}>
-                                Histórico
-                              </Button>
-                            ) : (
-                              <span className={styles.fora} title="Esta empresa não tem filial no cadastro da OC.">
-                                fora do cadastro
-                              </span>
-                            )}
-                          </div>
-                        </td>
                       </tr>
                     );
                     if (!aberto) return [linha];
