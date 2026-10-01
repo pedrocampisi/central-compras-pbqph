@@ -208,6 +208,15 @@ segurou).
 
 ---
 
+### 25. A tela Qualificação (D661) no ramo, esperando o CTO
+
+*Aberta em 01/10/2026, na decisão 74.* A tela no menu, igual à planilha FO 8.4.1.1, está no ramo
+`d661-tela-qualificacao` (`7821938`), com o CI verde e NÃO publicada. **Espera:** o CTO conferir as fotos em
+`docs/Capturas/2026-10-01_D661/` e o ramo, e a carta curta de publicar. Aí é a emenda 3: juntar, a bateria, publicar
+pelo PowerShell e medir por fora.
+
+---
+
 ## Onde estão as fechadas
 
 Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.

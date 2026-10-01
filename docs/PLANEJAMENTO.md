@@ -2736,3 +2736,33 @@ cuidado fica só para empresa, e o lembrete azul fica.
 
 **DAQUI EM DIANTE:** a conferência do CTO por fora. A primeira OC emitida agora é o PDF real. A cópia `OC_empresas` e o
 ramo podem sair, só por `git worktree remove`.
+
+## Decisão 74 — a tela Qualificação, igual à planilha FO 8.4.1.1, no ramo · 01/10/2026
+
+**POR QUÊ (CTO-D661, palavra do Pedro de hoje; a pausa sai só para este item):** foi a terceira vez que o Pedro
+perguntou onde se qualifica fornecedor. O caminho tinha cinco passos e escondia a qualificação na ficha da empresa. A
+resposta dele à tela no menu, igual à planilha: "pode, vamos ver se fica melhor".
+
+**O QUE MUDOU**, no ramo `d661-tela-qualificacao` (`7821938`), **fora do `main` e NÃO publicado**:
+- **"Qualificação" no menu**, abaixo de Fornecedores:
+  - cinco abas na ordem da planilha;
+  - uma linha por empresa, com a qualificação que vale;
+  - as colunas da planilha;
+  - em Materiais, a Permissão para compra.
+- **A regra das linhas é lógica pura**, em `src/domain/telaDaQualificacao.ts`:
+  - **quem diz qual vale é a `vigente` do banco**, não a data;
+  - a Permissão sai de `emiteComASituacao`, a mesma função que a trava da emissão passou a usar, e pede ao menos uma
+    ECR.
+- **"+ Qualificar fornecedor" e "Requalificar" abrem o mesmo `QualificarDialogo`.**
+  - O fornecedor fora do cadastro se cadastra pela mesma gaveta, que ganhou o `aoCriar`, e volta para qualificar.
+  - Só quem emite OC qualifica.
+- **A frase da trava** agora manda à tela nova.
+- **A prova:**
+  - 657 testes (eram 630);
+  - seis sabotagens vermelhas;
+  - CI verde (36863827719);
+  - 66 fotos com dados inventados em `docs/Capturas/2026-10-01_D661/` no ramo.
+- **O tamanho:** +887 linhas de código, abaixo das mil da lei, então sem perícia.
+- **O banco não mudou.**
+
+**DAQUI EM DIANTE:** o CTO confere as fotos e o ramo, e a publicação só sai com a carta curta dele.
