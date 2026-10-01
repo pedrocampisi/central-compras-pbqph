@@ -168,6 +168,11 @@
 /* O selo de sempre; aqui ele pode quebrar em duas linhas, para a coluna não empurrar a tabela. */
 .situacao { min-width: 118px; max-width: 140px; }
 .situacao > span { white-space: normal; }
+/* Em tela larga sobra espaço: o selo volta a uma linha só (CTO-D662). Abaixo disso, nada muda. */
+@media (min-width: 1600px) {
+  .situacao { max-width: none; }
+  .situacao > span { white-space: nowrap; }
+}
 .acoesDaLinha {
   display: flex;
   flex-wrap: wrap;
