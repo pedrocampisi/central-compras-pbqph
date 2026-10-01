@@ -8,7 +8,7 @@ import type { StatusOc } from '../domain/constants';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
-export const ABAS = ['dashboard', 'nova-oc', 'historico', 'fornecedores', 'obras', 'catalogo', 'config'] as const;
+export const ABAS = ['dashboard', 'nova-oc', 'historico', 'fornecedores', 'qualificacao', 'obras', 'catalogo', 'config'] as const;
 export type TabId = (typeof ABAS)[number];
 
 /** A tela inicial: onde a OC abre, e para onde vai quem pede uma aba que não existe. */

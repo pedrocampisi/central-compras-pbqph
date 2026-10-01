@@ -37,7 +37,8 @@ export type IconName =
   | 'x'
   | 'alerta'
   | 'chevron'
-  | 'lapis';
+  | 'lapis'
+  | 'selo';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -174,6 +175,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
     <>
       <path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z" />
       <path d="M12 9.5v4M12 17h.01" />
+    </>
+  ),
+  // O selo da qualificação (CTO-D661): o menu Qualificação.
+  selo: (
+    <>
+      <path d="M12 3l2.3 1.7 2.9-.2.9 2.7 2.4 1.7-.9 2.7.9 2.7-2.4 1.7-.9 2.7-2.9-.2L12 21l-2.3-1.7-2.9.2-.9-2.7-2.4-1.7.9-2.7-.9-2.7 2.4-1.7.9-2.7 2.9.2z" />
+      <path d="M8.8 12.2l2.2 2.2 4.2-4.4" />
     </>
   ),
 };

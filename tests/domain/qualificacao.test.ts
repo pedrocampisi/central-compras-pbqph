@@ -74,19 +74,19 @@ describe('D605 — a trava da emissão, a mesma conta da qualificacao_da_oc do b
   it('vencida, desqualificada ou sem qualificação: não emite, e a frase diz por quê e o que fazer', () => {
     expect(travaDaQualificacao(selo({ situacao: 'vencida', venceEm: '2026-08-04', ecrs: [12] }), [12])).toBe(
       'Esta OC tem material controlado (ECR 12), e a qualificação de material da empresa venceu em 04/08/2026. ' +
-        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
+        'Qualifique a empresa na tela Qualificação, no menu, e emita de novo.',
     );
     expect(travaDaQualificacao(selo({ situacao: 'desqualificada' }), [12])).toContain('está desqualificada');
     expect(travaDaQualificacao(SEM_QUALIFICACAO, [5, 12])).toBe(
       'Esta OC tem material controlado (ECRs 05 e 12), e a empresa não tem qualificação de material. ' +
-        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
+        'Qualifique a empresa na tela Qualificação, no menu, e emita de novo.',
     );
   });
 
   it('qualificada, mas não para uma ECR da OC (D606 1): não emite, e a frase nomeia só a que falta', () => {
     expect(travaDaQualificacao(selo({ situacao: 'qualificada', ecrs: [12] }), [12, 19])).toBe(
       'A empresa está qualificada, mas não para a ECR 19 desta OC. ' +
-        'Qualifique a empresa na ficha dela, em Fornecedores, e emita de novo.',
+        'Qualifique a empresa na tela Qualificação, no menu, e emita de novo.',
     );
     expect(travaDaQualificacao(selo({ situacao: 'qualificada', ecrs: [] }), [5, 19])).toContain('as ECRs 05 e 19');
   });
