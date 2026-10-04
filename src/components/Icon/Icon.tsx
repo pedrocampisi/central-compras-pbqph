@@ -39,7 +39,8 @@ export type IconName =
   | 'chevron'
   | 'lapis'
   | 'selo'
-  | 'check';
+  | 'check'
+  | 'camera';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -187,6 +188,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
   ),
   // O PDF da OC está na pasta da obra (CTO-D685): o ✓ do Histórico.
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  // A foto da nota, na tela do mestre (CTO-D693).
+  camera: (
+    <>
+      <path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 16, className }: IconProps) {
