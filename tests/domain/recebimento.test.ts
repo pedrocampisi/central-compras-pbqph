@@ -164,11 +164,17 @@ describe('a régua da fila: espera ou para (carta da OC D697 §4, confirmada pel
 describe('as obras do mestre', () => {
   const cartao = (intervencaoId: string, obra: string) => ({ intervencaoId, obra }) as CartaoAChegar;
 
-  it('o nome vem dos pedidos; a obra sem pedido a caminho fica, sem nome', () => {
-    expect(obrasDoMestre(['obra-1', 'obra-2'], [cartao('obra-1', 'Obra Um'), cartao('obra-1', 'Obra Um')])).toEqual([
-      { id: 'obra-1', nome: 'Obra Um' },
-      { id: 'obra-2', nome: '' },
+  it('o nome vem do banco, na ordem dele; a obra sem pedido a caminho também tem nome (Banco-D710)', () => {
+    const doBanco = [{ id: 'obra-2', nome: 'Obra A' }, { id: 'obra-1', nome: 'Obra B' }];
+    expect(obrasDoMestre(doBanco, [cartao('obra-1', 'Obra B'), cartao('obra-1', 'Obra B')])).toEqual([
+      { id: 'obra-2', nome: 'Obra A' },
+      { id: 'obra-1', nome: 'Obra B' },
     ]);
+  });
+
+  it('sem nome do banco, vale o do pedido; obra de pedido que o banco não mandou entra no fim, uma vez só', () => {
+    expect(obrasDoMestre([{ id: 'obra-1', nome: '' }], [cartao('obra-1', 'Obra Um'), cartao('obra-3', 'Obra Três')]))
+      .toEqual([{ id: 'obra-1', nome: 'Obra Um' }, { id: 'obra-3', nome: 'Obra Três' }]);
   });
 
   it('nenhuma obra: lista vazia', () => {

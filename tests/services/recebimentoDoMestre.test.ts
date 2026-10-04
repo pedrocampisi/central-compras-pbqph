@@ -120,11 +120,14 @@ describe('a lista do mestre (compras.material_a_chegar)', () => {
   });
 
   it('lê a lista e as obras dele numa volta só', async () => {
-    banco.respostas = [ok([{ oc_id: 'oc-1', intervencao_id: 'obra-1', obra: 'Obra de Teste', itens: [] }]), ok(['obra-1', 'obra-2'])];
+    banco.respostas = [
+      ok([{ oc_id: 'oc-1', intervencao_id: 'obra-1', obra: 'Obra de Teste', itens: [] }]),
+      ok([{ intervencao_id: 'obra-2', obra: 'Obra A' }, { intervencao_id: 'obra-1', obra: 'Obra de Teste' }, { obra: 'sem id' }]),
+    ];
     const l = await lerMaterialAChegar();
-    expect(banco.rpc.map((r) => `${r.esquema}.${r.nome}`)).toEqual(['compras.material_a_chegar', 'core.obras_do_mestre']);
+    expect(banco.rpc.map((r) => `${r.esquema}.${r.nome}`)).toEqual(['compras.material_a_chegar', 'core.obras_do_mestre_com_nome']);
     expect(l.cartoes.map((c) => c.ocId)).toEqual(['oc-1']);
-    expect(l.obras).toEqual(['obra-1', 'obra-2']);
+    expect(l.obras).toEqual([{ id: 'obra-2', nome: 'Obra A' }, { id: 'obra-1', nome: 'Obra de Teste' }]);
   });
 });
 

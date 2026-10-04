@@ -11,7 +11,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader } from '../../components/Loader/Loader';
 import { todayIso } from '../../domain/format';
-import { obrasDoMestre, type CartaoAChegar } from '../../domain/recebimento';
+import { obrasDoMestre, type CartaoAChegar, type ObraDoMestre } from '../../domain/recebimento';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
   lerMaterialAChegar, lerNumeroDaNotaNaFoto, registrarEntregaDoMestre, registrarSemPedidoDoMestre,
@@ -25,7 +25,7 @@ export const CHAVE_DA_LISTA = 'lista:ultima';
 
 interface ListaGuardada {
   cartoes: CartaoAChegar[];
-  obras: string[];
+  obras: ObraDoMestre[];
   lidaEm: string;
 }
 

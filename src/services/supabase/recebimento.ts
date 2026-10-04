@@ -3,7 +3,7 @@
  * D696; carta do Banco D697 §2):
  *
  *   a lista ............ compras.material_a_chegar  (o mestre vê só as obras dele)
- *   as obras dele ...... core.obras_do_mestre
+ *   as obras dele ...... core.obras_do_mestre_com_nome  (Banco-D710)
  *   a foto da nota ..... arquivar-documento, origem `recebimento-obra`
  *   o número na foto ... ler-documento, origem `ordem-compra`
  *   a entrega .......... compras.registrar_entrega  (sem versão: para o mestre não é conferida)
@@ -21,7 +21,7 @@ import { compras, core, supabase } from './client';
 import { todasAsLinhas } from './dados';
 import { paraBase64 } from '../../domain/pastaDaObra';
 import {
-  RecusaDefinitiva, oQueFazerComARecusa, oQueFazerComOStatus, type CartaoAChegar,
+  RecusaDefinitiva, oQueFazerComARecusa, oQueFazerComOStatus, type CartaoAChegar, type ObraDoMestre,
 } from '../../domain/recebimento';
 import type { Avaliacao } from '../../domain/qualificacao';
 
@@ -49,20 +49,22 @@ export function cartaoDaLinha(l: Record<string, unknown>): CartaoAChegar {
 
 export interface ListaDoMestre {
   cartoes: CartaoAChegar[];
-  /** As obras em que ele está hoje, inclusive a que não tem pedido a caminho. */
-  obras: string[];
+  /** As obras em que ele está hoje, com o nome, inclusive a que não tem pedido a caminho. */
+  obras: ObraDoMestre[];
 }
 
 export async function lerMaterialAChegar(): Promise<ListaDoMestre> {
   const [lista, obras] = await Promise.all([
     compras().rpc('material_a_chegar'),
-    core().rpc('obras_do_mestre'),
+    core().rpc('obras_do_mestre_com_nome'),
   ]);
   if (lista.error) throw new Error(lista.error.message);
   if (obras.error) throw new Error(obras.error.message);
   return {
     cartoes: ((lista.data ?? []) as Record<string, unknown>[]).map(cartaoDaLinha),
-    obras: ((obras.data ?? []) as unknown[]).map(txt).filter(Boolean),
+    obras: ((obras.data ?? []) as Record<string, unknown>[])
+      .map((o) => ({ id: txt(o['intervencao_id']), nome: txt(o['obra']) }))
+      .filter((o) => o.id),
   };
 }
 

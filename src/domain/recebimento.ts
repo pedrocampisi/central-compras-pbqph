@@ -124,21 +124,24 @@ export function quantidadeFalada(q: number): string {
   return Number.isInteger(q) ? String(q) : String(Math.round(q * 1000) / 1000).replace('.', ',');
 }
 
-/** Uma obra em que o mestre recebe; o nome pode faltar quando nenhum pedido dela está a caminho. */
+/** Uma obra em que o mestre recebe, com o nome que o banco dá (o mesmo da lista). */
 export interface ObraDoMestre {
   id: string;
   nome: string;
 }
 
 /**
- * As obras do mestre, com o nome que os pedidos trazem: ele não lê o cadastro
- * de obras (o papel dele fica fora das políticas, CTO-D693), e o nome chega
- * pela lista. Obra sem pedido a caminho fica sem nome.
+ * As obras do mestre. Ele não lê o cadastro de obras (o papel dele fica fora
+ * das políticas, CTO-D693): o nome vem da `obras_do_mestre_com_nome`, na
+ * ordem dela (Banco-D710), e, se faltar, do pedido da lista. A obra de um
+ * pedido que ainda está na lista entra mesmo que o banco já não a mande.
  */
-export function obrasDoMestre(ids: readonly string[], cartoes: readonly CartaoAChegar[]): ObraDoMestre[] {
-  const nomes = new Map(cartoes.map((c) => [c.intervencaoId, c.obra] as const));
-  const todas = [...new Set([...ids, ...cartoes.map((c) => c.intervencaoId)])].filter(Boolean);
-  return todas.map((id) => ({ id, nome: nomes.get(id) ?? '' }));
+export function obrasDoMestre(obras: readonly ObraDoMestre[], cartoes: readonly CartaoAChegar[]): ObraDoMestre[] {
+  const dosPedidos = new Map(cartoes.map((c) => [c.intervencaoId, c.obra] as const));
+  const nomes = new Map<string, string>();
+  for (const o of obras) if (o?.id && !nomes.has(o.id)) nomes.set(o.id, o.nome || dosPedidos.get(o.id) || '');
+  for (const [id, nome] of dosPedidos) if (id && !nomes.has(id)) nomes.set(id, nome);
+  return [...nomes].map(([id, nome]) => ({ id, nome }));
 }
 
 /** O banco disse não, e mandar de novo não muda: a fila para de tentar este. */

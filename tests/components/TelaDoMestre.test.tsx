@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CartaoAChegar } from '../../src/domain/recebimento';
 import { guardaNaMemoria } from '../../src/services/guardaDoAparelho';
@@ -61,7 +61,7 @@ const CARTAO: CartaoAChegar = {
 beforeEach(() => {
   celular.guarda = guardaNaMemoria();
   servico.lerMaterialAChegar.mockReset();
-  servico.lerMaterialAChegar.mockResolvedValue({ cartoes: [CARTAO], obras: ['obra-1'] });
+  servico.lerMaterialAChegar.mockResolvedValue({ cartoes: [CARTAO], obras: [{ id: 'obra-1', nome: 'Obra de Teste' }] });
   servico.registrarEntregaDoMestre.mockClear();
   login.papel = 'mestre';
   login.carregarDados.mockReset();
@@ -75,9 +75,22 @@ describe('a tela do mestre, ligada ao banco', () => {
     await waitFor(async () => expect(await celular.guarda!.ler(CHAVE_DA_LISTA)).toBeTruthy());
   });
 
+  it('a obra sem pedido a caminho aparece com o nome no "Em qual obra?" (Banco-D710)', async () => {
+    servico.lerMaterialAChegar.mockResolvedValue({
+      cartoes: [CARTAO],
+      obras: [{ id: 'obra-2', nome: 'Obra Sem Pedido' }, { id: 'obra-1', nome: 'Obra de Teste' }],
+    });
+    render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Chegou material sem pedido' }));
+    const grupo = await screen.findByRole('group', { name: 'Em qual obra?' });
+    expect(within(grupo).getAllByRole('button').map((b) => b.textContent?.trim())).toEqual([
+      'Obra Sem Pedido', 'Obra de Teste',
+    ]);
+  });
+
   it('sem sinal, com a lista guardada: mostra a de antes, e diz de que hora ela é', async () => {
     await celular.guarda!.gravar(CHAVE_DA_LISTA, {
-      cartoes: [CARTAO], obras: ['obra-1'], lidaEm: '2026-10-04T17:05:00.000Z',
+      cartoes: [CARTAO], obras: [{ id: 'obra-1', nome: 'Obra de Teste' }], lidaEm: '2026-10-04T17:05:00.000Z',
     });
     servico.lerMaterialAChegar.mockRejectedValue(new Error('Failed to fetch'));
     render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} />);
