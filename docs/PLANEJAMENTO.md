@@ -3032,3 +3032,40 @@ por isso ele mandou publicar só este conserto.
 - **A prova de verdade é a primeira recuperação real.** Se alguém disser que o link abriu a Central, avisa-se o CTO.
 
 **DAQUI EM DIANTE:** o CTO confere a versão no ar. O app do mestre (pendência 28) segue esperando a volta do Banco.
+
+## Decisão 84 — o ramo do mestre completo: a ligação, o escritório, a tela "Mestres" e o QR · 04/10/2026
+
+**POR QUÊ (CTO-D696 §5, D698; Banco D697):** o Banco fechou o ramo dele no ensaio (`dd852d2`) com o contrato inteiro:
+a lista, a entrega sem versão, a chave do envio, a fila do sem pedido e as três portas do acesso. Faltava a OC ligar
+nele, fazer o lado do escritório e a tela "Mestres", medir o iPhone e mandar as fotos.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`7bb679e`), **NÃO publicado**:
+- **A ligação:** a tela do mestre usa o contrato do Banco como está. A régua da fila é a tabela do §4 dele: espera,
+  tenta uma vez (`23505`) ou para e mostra. O envio parado fica à vista, com a mensagem.
+- **O escritório:**
+  - a aba "Recebimentos", com a fila do sem pedido, o "Ligar a uma OC" e o "Descartar" com motivo;
+  - a última entrega no Histórico;
+  - o "Chegou só uma parte" no "Registrar entrega".
+- **A tela "Mestres"** (admin e engenharia): cadastrar, pôr na obra e tirar, gerar o QR com o tempo que falta,
+  desligar e religar.
+- **O iPhone, medido na fonte da Apple (WWDC23):** o ícone não divide cookies nem memória com o Safari.
+  - O QR leva à OC com o código depois do `#`, e nada vai a servidor nenhum.
+  - No iPhone, fora do ícone, a OC não gasta o código e pede o ícone; o ícone lê o mesmo QR pela câmera e entra.
+  - No Android e no computador, entra na hora.
+- **Duas bibliotecas novas**, a confirmar pelo CTO: `qrcode-generator` 2.0.4 (MIT) e `jsqr` 1.4.0 (Apache-2.0). O
+  leitor fica num pedaço à parte (47 KB comprimidos).
+- **A prova:**
+  - 895 testes; tipos e lint limpos;
+  - 67 sabotagens novas, todas vermelhas;
+  - CI verde (37218498162);
+  - 22 fotos a 375, claro e escuro, de `10` a `20`, em `docs/Capturas/2026-10-04_D696/`, no ramo. A foto 12 achou a
+    lista do "Ligar" sem estilo, já corrigida.
+- **O tamanho:** cerca de 4.300 linhas de código e 2.500 de teste. A perícia do perito vem antes de publicar.
+- **O que não está provado:** um iPhone de verdade, e a entrada pelo código (`verifyOtp`) contra o login de verdade.
+  Esta casa não entra com senha: pedi ao Banco a prova no ensaio.
+- **As cartas:** ao CTO (`D696-o-ramo-completo-para-a-pericia`) e ao Banco (`D697-o-ramo-ligado-e-dois-pedidos`: a
+  prova da `verifyOtp` e o nome das obras do mestre).
+- **O banco não mudou.**
+
+**DAQUI EM DIANTE:** o CTO confere as fotos e as leva ao Pedro, e decide as bibliotecas; o Pedro dispara a perícia
+sobre os dois ramos; o Banco prova a `verifyOtp`. Publicar, só com carta do CTO, e com o ramo do Banco no ar antes.

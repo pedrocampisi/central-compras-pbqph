@@ -45,24 +45,37 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 28. O app do mestre de obra (D693, D696): a tela aprovada, o passo 1 no ramo, esperando a volta do Banco
+### 28. O app do mestre de obra (D693, D696): o ramo completo, esperando a perícia
 
-*Aberta em 04/10/2026, na decisão 80; atualizada na decisão 81.* A tela foi aprovada pelo CTO e pelo Pedro (D696). No
-ramo `d693-material-a-chegar` (`a77bfe1`), com o CI verde, NÃO publicados e NÃO ligados ao banco:
-- os dois retoques;
-- a "Entrega prevista";
-- o rascunho no celular, que vai sozinho quando o sinal volta.
+*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81 e 84.* No ramo `d693-material-a-chegar` (`7bb679e`),
+com o CI verde, **NÃO publicado**: a tela do mestre ligada ao contrato do Banco, o lado do escritório, a tela "Mestres"
+com o QR e o caminho do iPhone.
 
-**Espera:** a volta do Banco à carta D697 desta casa (a coluna `entrega_prevista`, a chave de cada envio, a versão) e
-o ramo dele.
+**Espera:**
+- o CTO: as fotos levadas ao Pedro, e a palavra sobre as duas bibliotecas;
+- o Pedro: a perícia do perito sobre os dois ramos (D698);
+- o Banco: a prova da `verifyOtp` com o código do link, no ensaio; e o nome das obras do mestre (não trava);
+- o ensaio num iPhone de verdade (pendência 31).
 
-**Falta:**
-- a ligação ao contrato;
-- o lado do escritório (o Histórico e a fila do sem pedido);
-- a tela "Mestres" com o QR, e o login dentro do ícone no iPhone, medido;
-- as fotos ao CTO;
-- o aviso de ramo completo, com o commit, para a perícia do perito (D698).
+**Falta:** publicar, só com carta do CTO, e com o ramo do Banco no ar antes.
 
+---
+
+### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
+
+*Aberta em 04/10/2026, na decisão 84.* Falhou uma vez na `main` (decisão 83) e uma vez no ramo do mestre, sempre no
+meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
+regra. **Falta:** achar a espera que está curta (`tests/components/TituloUmaVez.test.tsx`) e prová-la com a bateria
+rodando várias vezes seguidas.
+
+---
+
+### 31. O QR do mestre num iPhone de verdade
+
+*Aberta em 04/10/2026, na decisão 84.* O caminho do iPhone (o QR no Safari pede o ícone; o ícone lê o mesmo QR e
+entra) está provado em teste e nas fotos, sobre um banco falso. **Falta:** um ensaio de cinco minutos num iPhone, com
+um mestre de teste, depois da perícia e com o ramo do Banco no ar. **É de mão:** o Pedro, ou quem ele mandar, segura o
+aparelho.
 ---
 
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
