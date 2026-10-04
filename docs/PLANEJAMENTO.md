@@ -3069,3 +3069,20 @@ nele, fazer o lado do escritório e a tela "Mestres", medir o iPhone e mandar as
 
 **DAQUI EM DIANTE:** o CTO confere as fotos e as leva ao Pedro, e decide as bibliotecas; o Pedro dispara a perícia
 sobre os dois ramos; o Banco prova a `verifyOtp`. Publicar, só com carta do CTO, e com o ramo do Banco no ar antes.
+
+## Decisão 85 — o "Em qual obra?" com o nome de todas as obras do mestre · 04/10/2026
+
+**POR QUÊ (Banco-D710, CTO-D711):** o Banco provou no ensaio que o código do link entra pela `verifyOtp`, e o QR fica
+como está. E criou a `core.obras_do_mestre_com_nome()`. Até aqui, uma obra do mestre sem pedido a caminho aparecia
+como "Obra 2" no "Em qual obra?". O CTO pediu a troca antes de chamar o perito.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`99c0588`), **NÃO publicado**:
+- a lista do mestre lê as obras pela `obras_do_mestre_com_nome`: o nome vem do banco, na ordem dele;
+- sem nome do banco, vale o do pedido; a obra de um pedido que o banco não mandou entra no fim;
+- **a prova:** 897 testes; tipos e lint limpos; 7 sabotagens, todas vermelhas; CI verde (37220463205);
+- a foto `21_em_qual_obra_com_o_nome_375` (claro e escuro), em `docs/Capturas/2026-10-04_D696/`, no ramo: duas
+  obras, uma sem pedido a caminho, as duas com nome.
+- **O banco não mudou** por esta casa.
+
+**DAQUI EM DIANTE:** o CTO chama o perito com este commit. Depois, a triagem, o ensaio no iPhone e a publicação pela
+carta dele.
