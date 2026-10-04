@@ -93,6 +93,9 @@ export function avaliacaoDoMestre(
 /** Um pedido que o mestre espera, como o cartão mostra. */
 export interface CartaoAChegar {
   ocId: string;
+  /** A obra do pedido: é ela que a foto e a entrega levam ao banco. */
+  intervencaoId: string;
+  obra: string;
   numero: string;
   /** O apelido da empresa (D680), nunca a razão social comprida. */
   fornecedor: string;
@@ -119,4 +122,54 @@ export function diaCombinado(dia: string, hoje: string): string {
 /** A quantidade sem zeros à toa: 40, 2,5, 0,75. */
 export function quantidadeFalada(q: number): string {
   return Number.isInteger(q) ? String(q) : String(Math.round(q * 1000) / 1000).replace('.', ',');
+}
+
+/** Uma obra em que o mestre recebe; o nome pode faltar quando nenhum pedido dela está a caminho. */
+export interface ObraDoMestre {
+  id: string;
+  nome: string;
+}
+
+/**
+ * As obras do mestre, com o nome que os pedidos trazem: ele não lê o cadastro
+ * de obras (o papel dele fica fora das políticas, CTO-D693), e o nome chega
+ * pela lista. Obra sem pedido a caminho fica sem nome.
+ */
+export function obrasDoMestre(ids: readonly string[], cartoes: readonly CartaoAChegar[]): ObraDoMestre[] {
+  const nomes = new Map(cartoes.map((c) => [c.intervencaoId, c.obra] as const));
+  const todas = [...new Set([...ids, ...cartoes.map((c) => c.intervencaoId)])].filter(Boolean);
+  return todas.map((id) => ({ id, nome: nomes.get(id) ?? '' }));
+}
+
+/** O banco disse não, e mandar de novo não muda: a fila para de tentar este. */
+export class RecusaDefinitiva extends Error {}
+
+/**
+ * O que a fila faz com a resposta do banco que não foi sucesso — a tabela da
+ * carta da OC (D697 §4), confirmada pelo Banco com dois acréscimos:
+ *
+ *   sem resposta, 5xx, 40001, 40P01, 57014, conexão (08…), API (PGRST…) → espera
+ *   23505 → manda de novo UMA vez: é o mesmo envio chegando duas vezes ao
+ *           mesmo tempo, e a segunda recebe "já estava"
+ *   qualquer outro código do banco (42501, 55000, 22023, 23514, P0001,
+ *   P0002…) → para, e mostra a mensagem como veio
+ */
+export type OQueFazer = 'espera' | 'de-novo-uma-vez' | 'para';
+
+const ESPERA = new Set(['40001', '40P01', '57014']);
+
+export function oQueFazerComARecusa(codigo: string | null | undefined, status: number): OQueFazer {
+  if (status === 0 || status >= 500) return 'espera';
+  const c = (codigo ?? '').trim();
+  if (!c || ESPERA.has(c) || c.startsWith('08') || c.startsWith('PGRST')) return 'espera';
+  if (c === '23505') return 'de-novo-uma-vez';
+  return 'para';
+}
+
+/** O mesmo, para as funções de borda (a foto): só o status HTTP. */
+export function oQueFazerComOStatus(status: number): Exclude<OQueFazer, 'de-novo-uma-vez'> {
+  // 401: o crachá venceu no meio do caminho; a biblioteca renova, e a próxima volta passa.
+  // 408 e 429: o servidor pediu para esperar.
+  if (status === 0 || status >= 500 || status === 401 || status === 408 || status === 429) return 'espera';
+  return 'para';
 }

@@ -47,6 +47,7 @@ import { QualificacaoPage } from './features/qualificacao/QualificacaoPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
+import { TelaDoMestre } from './features/recebimento/TelaDoMestre';
 
 // ── Navegação da sidebar ──────────────────────────────────────────────────────
 
@@ -76,6 +77,7 @@ const PAPEL_LABEL: Record<Papel, string> = {
   engenharia: 'Engenharia',
   financeiro: 'Financeiro',
   leitura: 'Somente leitura',
+  mestre: 'Mestre de obra',
 };
 
 /** Iniciais para o avatar do rodapé (padrão: círculo com 2 letras). */
@@ -198,7 +200,8 @@ export default function App() {
         const p = await perfilAtual();
         if (!ativo) return;
         setPerfil(p);
-        if (p) await recarregarDados();
+        // O mestre não lê o cadastro nem as OCs (CTO-D693): a tela dele busca a própria lista.
+        if (p && p.papel !== 'mestre') await recarregarDados();
       } catch (err) {
         if (ativo) {
           setErroDados(err instanceof Error ? err.message : 'Falha ao carregar dados.');
@@ -212,6 +215,7 @@ export default function App() {
     // vários eventos seguidos (cabeçalho + itens) e uma recarga basta.
     let timer: ReturnType<typeof setTimeout> | null = null;
     const cancelarRealtime = assinarMudancas(() => {
+      if (useAuthStore.getState().perfil?.papel === 'mestre') return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         void recarregarDados().catch(() => {
@@ -279,6 +283,16 @@ export default function App() {
     return (
       <>
         <SemAcessoPage email={sessao.user.email ?? ''} onSair={() => void handleSair()} />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  // O mestre de obra: a tela dele, sem menu, e só ela (CTO-D693, D696).
+  if (perfil?.papel === 'mestre') {
+    return (
+      <>
+        <TelaDoMestre aoSair={() => void handleSair()} />
         <ToastContainer />
       </>
     );

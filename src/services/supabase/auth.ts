@@ -11,7 +11,17 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, core } from './client';
 
-export type Papel = 'admin' | 'engenharia' | 'financeiro' | 'leitura';
+/**
+ * `mestre` (CTO-D693): o mestre de obra. Fica fora das políticas do banco
+ * (`core.tem_acesso`): não lê o cadastro nem as OCs, só as funções da obra
+ * dele. Na tela, ele só vê "Material a chegar".
+ */
+export type Papel = 'admin' | 'engenharia' | 'financeiro' | 'leitura' | 'mestre';
+
+/** Admin e engenharia cadastram o mestre, põem na obra, geram o QR e desligam (D696 §4). */
+export function podeGerirMestre(papel: Papel | null | undefined): boolean {
+  return papel === 'admin' || papel === 'engenharia';
+}
 
 export interface PerfilUsuario {
   user_id: string;

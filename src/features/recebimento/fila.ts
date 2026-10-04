@@ -16,7 +16,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Avaliacao } from '../../domain/qualificacao';
-import type { CartaoAChegar, RespostasDoMestre } from '../../domain/recebimento';
+import { RecusaDefinitiva, type CartaoAChegar, type RespostasDoMestre } from '../../domain/recebimento';
 import type { GuardaDoAparelho } from '../../services/guardaDoAparelho';
 
 export interface SemPedido {
@@ -39,6 +39,9 @@ export interface EnvioDeRecebimento {
 export interface EnvioSemPedido {
   tipo: 'sem-pedido';
   chave: string;
+  /** O dia do "Pronto", e não o do envio: guardado sem sinal, vai depois com o dia em que chegou. */
+  recebidoEm: string;
+  intervencaoId: string;
   registro: SemPedido;
 }
 
@@ -51,8 +54,7 @@ export interface Guardado {
   motivo?: string;
 }
 
-/** O banco disse não, e mandar de novo não muda: a fila para de tentar este. */
-export class RecusaDefinitiva extends Error {}
+export { RecusaDefinitiva };
 
 /** O que ele preencheu no recebimento de um pedido, e ainda não foi. */
 export interface RascunhoDoReceber {
@@ -67,6 +69,8 @@ export interface RascunhoSemPedido {
   deQuem: string;
   oQueChegou: string;
   semEstrago: boolean | null;
+  /** A obra escolhida, quando ele tem mais de uma. */
+  obra?: string;
 }
 
 export const CHAVES = {
@@ -84,12 +88,19 @@ export const novaChave = () =>
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-export type Desfecho = { foi: true } | { foi: false; motivo?: string };
+/**
+ * `aviso`: foi, mas com recado para ele — a OC foi cancelada antes de a entrega
+ * chegar, e ela foi para o escritório resolver (D699 §2). Vem do banco, pronto.
+ */
+export type Desfecho = { foi: true; aviso?: string } | { foi: false; motivo?: string };
+
+/** Grava; devolve o recado do banco, quando há um. Lança `RecusaDefinitiva` quando repetir não muda. */
+export type Gravar<E> = (e: E) => Promise<string | void>;
 
 export function useFilaDoMestre(
   guarda: GuardaDoAparelho,
-  aoReceber: (e: EnvioDeRecebimento) => Promise<void>,
-  aoRegistrarSemPedido: (e: EnvioSemPedido) => Promise<void>,
+  aoReceber: Gravar<EnvioDeRecebimento>,
+  aoRegistrarSemPedido: Gravar<EnvioSemPedido>,
 ) {
   const [guardados, setGuardados] = useState<Guardado[]>([]);
   const ocupada = useRef(false);
@@ -110,9 +121,10 @@ export function useFilaDoMestre(
   const mandarUm = useCallback(
     async (g: Guardado): Promise<Desfecho> => {
       const k = CHAVES.fila + g.envio.chave;
+      let aviso: string | void;
       try {
-        if (g.envio.tipo === 'receber') await enviar.current.aoReceber(g.envio);
-        else await enviar.current.aoRegistrarSemPedido(g.envio);
+        if (g.envio.tipo === 'receber') aviso = await enviar.current.aoReceber(g.envio);
+        else aviso = await enviar.current.aoRegistrarSemPedido(g.envio);
       } catch (e) {
         if (!(e instanceof RecusaDefinitiva)) return { foi: false };
         await guarda.gravar(k, { ...g, estado: 'recusado', motivo: e.message } satisfies Guardado);
@@ -123,7 +135,7 @@ export function useFilaDoMestre(
         await guarda.apagar(CHAVES.receber(g.envio.cartao.ocId));
         await guarda.apagar(CHAVES.fotoDoReceber(g.envio.cartao.ocId));
       }
-      return { foi: true };
+      return aviso ? { foi: true, aviso } : { foi: true };
     },
     [guarda],
   );

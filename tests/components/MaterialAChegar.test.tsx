@@ -12,8 +12,12 @@ import { guardaNaMemoria, type GuardaDoAparelho } from '../../src/services/guard
  * app). Pedido, empresa e obra são INVENTADOS.
  */
 
+const OBRA = { id: 'obra-1', nome: 'Obra de Teste' };
+
 const CARTAO: CartaoAChegar = {
   ocId: 'oc-1',
+  intervencaoId: OBRA.id,
+  obra: OBRA.nome,
   numero: '2026/101',
   fornecedor: 'Fornecedor de Teste',
   combinadoPara: '2026-10-05',
@@ -27,7 +31,7 @@ afterEach(() => {
 
 function montar(extra: Partial<MaterialAChegarProps> = {}) {
   const props: MaterialAChegarProps = {
-    obra: 'Obra de Teste',
+    obras: [OBRA],
     hoje: '2026-10-05',
     cartoes: [CARTAO],
     lerNumeroDaNota: vi.fn(async () => '000123'),
@@ -364,6 +368,97 @@ describe('Material a chegar: sem pedido', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Abrir de novo' }));
     await screen.findByText('Chegou sem pedido');
     expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('321');
+  });
+});
+
+describe('Material a chegar: ligado ao banco (D696 §5.2)', () => {
+  it('a OC foi cancelada antes de o envio chegar: o "Pronto" mostra o recado do banco', async () => {
+    const msg = 'A OC 2026/101 foi cancelada antes deste recebimento chegar. Ele foi para o escritório resolver.';
+    montar({ aoReceber: vi.fn(async () => msg) });
+    await abrirEResponder(tudoSim);
+    escreverNumero('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(await screen.findByText(msg)).toBeTruthy();
+    expect(screen.queryByText('O escritório já vê.')).toBeNull();
+  });
+
+  async function preencherSemPedido(estrago: 'Sim' | 'Não') {
+    fireEvent.click(screen.getByRole('button', { name: 'Chegou material sem pedido' }));
+    await screen.findByText('Chegou sem pedido');
+    fireEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
+    const caixas = screen.getAllByRole('textbox');
+    fireEvent.change(caixas[0]!, { target: { value: '321' } });
+    fireEvent.change(caixas[caixas.length - 1]!, { target: { value: 'Areia' } });
+    responder('Chegou sem estrago?', estrago);
+  }
+
+  it('com mais de uma obra, o sem pedido pergunta "Em qual obra?", e vai com a que ele escolheu', async () => {
+    const p = montar({ obras: [OBRA, { id: 'obra-2', nome: 'Outra Obra' }] });
+    await preencherSemPedido('Sim');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(screen.getByRole('alert').textContent).toBe('Falta responder: Em qual obra?');
+    expect(p.aoRegistrarSemPedido).not.toHaveBeenCalled();
+    responder('Em qual obra?', 'Outra Obra');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Registrado.');
+    expect(p.aoRegistrarSemPedido).toHaveBeenCalledWith(
+      expect.objectContaining({ intervencaoId: 'obra-2', recebidoEm: '2026-10-05' }),
+    );
+  });
+
+  it('com uma obra só, não pergunta, e vai com ela', async () => {
+    const p = montar();
+    await preencherSemPedido('Não');
+    expect(screen.queryByRole('group', { name: 'Em qual obra?' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Registrado.');
+    expect(p.aoRegistrarSemPedido).toHaveBeenCalledWith(expect.objectContaining({ intervencaoId: OBRA.id }));
+  });
+
+  it('com mais de uma obra, o cartão diz de qual obra é o pedido', () => {
+    montar({ obras: [OBRA, { id: 'obra-2', nome: 'Outra Obra' }] });
+    const cartao = screen.getByRole('button', { name: /Toque para receber/ });
+    expect(within(cartao).getByText('Obra de Teste')).toBeTruthy();
+    cleanup();
+    montar();
+    expect(within(screen.getByRole('button', { name: /Toque para receber/ })).queryByText('Obra de Teste')).toBeNull();
+  });
+
+  it('em nenhuma obra: diz para falar com o engenheiro, e não oferece o sem pedido', () => {
+    montar({ obras: [], cartoes: [] });
+    expect(screen.getByText('Você ainda não está em nenhuma obra. Fale com o engenheiro.')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Chegou material sem pedido' })).toBeNull();
+  });
+
+  it('recusado, e o pedido saiu da lista (ele foi tirado da obra): fica à vista, e apagar pergunta antes', async () => {
+    let resposta: Error = new Error('sem rede');
+    const p = montar({ aoReceber: vi.fn(async () => Promise.reject(resposta)) });
+    await abrirEResponder(tudoSim);
+    escreverNumero('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Guardado no celular.');
+
+    // o pedido some da lista dele, e o banco recusa quando ele abre o app de novo
+    cleanup();
+    resposta = new RecusaDefinitiva('Este pedido não é da sua obra.');
+    render(<MaterialAChegar {...p} cartoes={[]} />);
+    expect(
+      await screen.findByText(
+        'O recebimento do pedido 2026/101 (Fornecedor de Teste) não foi: Este pedido não é da sua obra. Mostre ao engenheiro da obra.',
+      ),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar do celular' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Não, deixar' }));
+    expect(await p.guarda!.chaves('fila:')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar do celular' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sim, apagar' }));
+    await waitFor(() => expect(screen.queryByText(/O recebimento do pedido/)).toBeNull());
+    expect(await p.guarda!.chaves('fila:')).toEqual([]);
+  });
+
+  it('o recado da lista (sem sinal, é a de antes) aparece debaixo do título', () => {
+    montar({ aviso: 'Sem sinal. Esta é a lista das 14h05.' });
+    expect(screen.getByText('Sem sinal. Esta é a lista das 14h05.').getAttribute('role')).toBe('status');
   });
 });
 

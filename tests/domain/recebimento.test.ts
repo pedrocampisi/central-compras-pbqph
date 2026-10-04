@@ -9,6 +9,10 @@ import {
   oQueFalta,
   perguntaOQueAconteceu,
   quantidadeFalada,
+  obrasDoMestre,
+  oQueFazerComARecusa,
+  oQueFazerComOStatus,
+  type CartaoAChegar,
   type RespostasDoMestre,
 } from '../../src/domain/recebimento';
 
@@ -119,5 +123,50 @@ describe('a quantidade', () => {
     expect(quantidadeFalada(40)).toBe('40');
     expect(quantidadeFalada(2.5)).toBe('2,5');
     expect(quantidadeFalada(0.7500001)).toBe('0,75');
+  });
+});
+
+describe('a régua da fila: espera ou para (carta da OC D697 §4, confirmada pelo Banco)', () => {
+  it.each([
+    ['', 0, 'espera'],
+    ['', 503, 'espera'],
+    // o servidor fora, mesmo com código do banco: conexões esgotadas, erro interno
+    ['53300', 503, 'espera'],
+    ['XX000', 500, 'espera'],
+    ['40001', 409, 'espera'],
+    ['40P01', 409, 'espera'],
+    ['57014', 500, 'espera'],
+    ['08006', 400, 'espera'],
+    ['PGRST301', 401, 'espera'],
+    ['23505', 409, 'de-novo-uma-vez'],
+    ['42501', 403, 'para'],
+    ['55000', 400, 'para'],
+    ['22023', 400, 'para'],
+    ['23514', 400, 'para'],
+    ['P0001', 400, 'para'],
+    ['P0002', 400, 'para'],
+    ['XX000', 400, 'para'],
+  ])('código %s, HTTP %s → %s', (codigo, status, esperado) => {
+    expect(oQueFazerComARecusa(codigo, status)).toBe(esperado);
+  });
+
+  it('a função de borda: rede, servidor, crachá vencido e "espere" esperam; o resto para', () => {
+    expect([0, 401, 408, 429, 500, 502, 503].map(oQueFazerComOStatus)).toEqual(Array(7).fill('espera'));
+    expect([400, 403, 404, 409, 413].map(oQueFazerComOStatus)).toEqual(Array(5).fill('para'));
+  });
+});
+
+describe('as obras do mestre', () => {
+  const cartao = (intervencaoId: string, obra: string) => ({ intervencaoId, obra }) as CartaoAChegar;
+
+  it('o nome vem dos pedidos; a obra sem pedido a caminho fica, sem nome', () => {
+    expect(obrasDoMestre(['obra-1', 'obra-2'], [cartao('obra-1', 'Obra Um'), cartao('obra-1', 'Obra Um')])).toEqual([
+      { id: 'obra-1', nome: 'Obra Um' },
+      { id: 'obra-2', nome: '' },
+    ]);
+  });
+
+  it('nenhuma obra: lista vazia', () => {
+    expect(obrasDoMestre([], [])).toEqual([]);
   });
 });

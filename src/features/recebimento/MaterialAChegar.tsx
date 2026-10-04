@@ -18,27 +18,33 @@ import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
 import {
   PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, oQueAconteceuObrigatorio, oQueFalta,
-  perguntaOQueAconteceu, quantidadeFalada, type CartaoAChegar, type RespostasDoMestre,
+  perguntaOQueAconteceu, quantidadeFalada, type CartaoAChegar, type ObraDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
   CHAVES, novaChave, useFilaDoMestre, type Desfecho, type Envio, type EnvioDeRecebimento, type EnvioSemPedido,
-  type Guardado, type RascunhoDoReceber, type RascunhoSemPedido,
+  type Gravar, type Guardado, type RascunhoDoReceber, type RascunhoSemPedido,
 } from './fila';
 import styles from './MaterialAChegar.module.css';
 
 export type { EnvioDeRecebimento, EnvioSemPedido, SemPedido } from './fila';
 
 export interface MaterialAChegarProps {
-  obra: string;
+  /** As obras em que ele recebe. Com mais de uma, o "sem pedido" pergunta qual. */
+  obras: ObraDoMestre[];
   hoje: string;
   cartoes: CartaoAChegar[];
   /** Lê o número da nota na foto; '' quando não conseguiu. */
   lerNumeroDaNota: (foto: File) => Promise<string>;
-  /** Grava a entrega. Lança `RecusaDefinitiva` quando o banco diz não e repetir não muda. */
-  aoReceber: (envio: EnvioDeRecebimento) => Promise<void>;
-  aoRegistrarSemPedido: (envio: EnvioSemPedido) => Promise<void>;
+  /**
+   * Grava a entrega; devolve o recado do banco, quando há um. Lança
+   * `RecusaDefinitiva` quando o banco diz não e repetir não muda.
+   */
+  aoReceber: Gravar<EnvioDeRecebimento>;
+  aoRegistrarSemPedido: Gravar<EnvioSemPedido>;
   aoSair?: () => void;
+  /** Um recado sobre a lista, debaixo do título (por exemplo: sem sinal, é a lista de antes). */
+  aviso?: string;
   /** Onde guardar no celular; o IndexedDB do aparelho, se não vier. */
   guarda?: GuardaDoAparelho;
 }
@@ -67,6 +73,12 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   for (const g of fila.guardados) if (g.envio.tipo === 'receber') doCartao.set(g.envio.cartao.ocId, g);
   const esperando = fila.guardados.filter((g) => g.estado === 'esperando').length;
   const semPedidoRecusados = fila.guardados.filter((g) => g.envio.tipo === 'sem-pedido' && g.estado === 'recusado');
+  // O recusado cujo pedido saiu da lista (ele foi tirado da obra, por exemplo): não está no
+  // banco, e só existe neste celular. Fica à vista para ele mostrar ao engenheiro (D697 §4).
+  const naLista = new Set(props.cartoes.map((c) => c.ocId));
+  const recusadosForaDaLista = fila.guardados.filter(
+    (g) => g.envio.tipo === 'receber' && g.estado === 'recusado' && !naLista.has(g.envio.cartao.ocId),
+  );
 
   async function abrirCartao(c: CartaoAChegar) {
     const [rascunho, foto] = await Promise.all([
@@ -99,7 +111,7 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   const terminar = (titulo: string) => (_: Envio, d: Desfecho) =>
     setTela(
       d.foi
-        ? { tipo: 'pronto', titulo, texto: 'O escritório já vê.', guardou: false }
+        ? { tipo: 'pronto', titulo, texto: d.aviso || 'O escritório já vê.', guardou: false }
         : { tipo: 'pronto', ...GUARDADO, guardou: true },
     );
 
@@ -147,18 +159,26 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
     );
   }
 
-  const { obra, hoje, cartoes, aoSair } = props;
+  const { obras, hoje, cartoes, aoSair } = props;
+  const variasObras = obras.length > 1;
   return (
     <div className={styles.tela} data-tela-do-mestre="lista">
       <header className={styles.topo}>
-        <p className={styles.obra}>{obra}</p>
+        <p className={styles.obra}>{obras.map((o) => o.nome).filter(Boolean).join(' · ')}</p>
         <h1 className={styles.titulo}>Material a chegar</h1>
+        {props.aviso && (
+          <p className={styles.dica} role="status" data-aviso-da-lista>
+            {props.aviso}
+          </p>
+        )}
       </header>
 
       {/* No alto, à vista: com dez pedidos na lista, no pé ele não acharia (D696 §2.1). */}
-      <button type="button" className={styles.secundario} onClick={() => void abrirSemPedido()}>
-        Chegou material sem pedido
-      </button>
+      {obras.length > 0 && (
+        <button type="button" className={styles.secundario} onClick={() => void abrirSemPedido()}>
+          Chegou material sem pedido
+        </button>
+      )}
 
       {esperando > 0 && (
         <p className={styles.guardado} role="status" data-fila-do-mestre>
@@ -176,8 +196,16 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
         </div>
       ))}
 
+      {recusadosForaDaLista.map((g) => (
+        <RecusadoForaDaLista key={g.envio.chave} guardado={g} aoApagar={() => void fila.esquecer(g.envio.chave)} />
+      ))}
+
       {cartoes.length === 0 ? (
-        <p className={styles.vazio}>Nenhum material a chegar nesta obra.</p>
+        <p className={styles.vazio}>
+          {obras.length === 0
+            ? 'Você ainda não está em nenhuma obra. Fale com o engenheiro.'
+            : 'Nenhum material a chegar nesta obra.'}
+        </p>
       ) : (
         <ul className={styles.lista}>
           {cartoes.map((c) => {
@@ -187,7 +215,7 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
               return (
                 <li key={c.ocId}>
                   <div className={styles.cartaoGuardado}>
-                    <ResumoDoPedido cartao={c} hoje={hoje} />
+                    <ResumoDoPedido cartao={c} hoje={hoje} comObra={variasObras} />
                     <span className={styles.cartaoNota}>
                       <Icon name="history" size={18} /> Guardado no celular. Vai quando tiver sinal.
                     </span>
@@ -198,7 +226,7 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
             return (
               <li key={c.ocId}>
                 <button type="button" className={styles.cartao} onClick={() => void abrirCartao(c)}>
-                  <ResumoDoPedido cartao={c} hoje={hoje} />
+                  <ResumoDoPedido cartao={c} hoje={hoje} comObra={variasObras} />
                   {g?.estado === 'recusado' ? (
                     <span className={styles.cartaoRecusado}>Não foi: {g.motivo} Toque para ver.</span>
                   ) : (
@@ -240,10 +268,43 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   );
 }
 
-function ResumoDoPedido({ cartao: c, hoje }: { cartao: CartaoAChegar; hoje: string }) {
+/**
+ * O recebimento que o banco recusou e cujo pedido já não está na lista. Apagar
+ * pergunta antes: o que está aqui não chegou ao escritório.
+ */
+function RecusadoForaDaLista({ guardado: g, aoApagar }: { guardado: Guardado; aoApagar: () => void }) {
+  const [confirmar, setConfirmar] = useState(false);
+  if (g.envio.tipo !== 'receber') return null;
+  const c = g.envio.cartao;
+  return (
+    <div className={styles.aviso} role="alert" data-recusado-fora-da-lista>
+      <span>
+        O recebimento do pedido {c.numero} ({c.fornecedor}) não foi: {g.motivo} Mostre ao engenheiro da obra.
+      </span>
+      {confirmar ? (
+        <>
+          <span>Apagar do celular? Ele não chegou ao escritório.</span>
+          <button type="button" className={styles.link} onClick={() => setConfirmar(false)}>
+            Não, deixar
+          </button>
+          <button type="button" className={styles.link} onClick={aoApagar}>
+            Sim, apagar
+          </button>
+        </>
+      ) : (
+        <button type="button" className={styles.link} onClick={() => setConfirmar(true)}>
+          Apagar do celular
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ResumoDoPedido({ cartao: c, hoje, comObra = false }: { cartao: CartaoAChegar; hoje: string; comObra?: boolean }) {
   const dia = diaCombinado(c.combinadoPara, hoje);
   return (
     <span className={styles.resumo}>
+      {comObra && c.obra && <span className={styles.obraDoCartao}>{c.obra}</span>}
       <span className={styles.fornecedor}>{c.fornecedor}</span>
       <span className={styles.combinado}>
         {dia ? (
@@ -470,10 +531,14 @@ function FotoDaNota({
   );
 }
 
-/** O material que chegou sem pedido: a foto, de quem, o que chegou e se veio sem estrago. */
+/** O material que chegou sem pedido: a obra (se ele tem mais de uma), a foto, de quem, o que chegou e se veio sem estrago. */
 function ChegouSemPedido({
-  rascunho, foto: fotoGuardada, guarda, lerNumeroDaNota, mandar, esquecer, aoVoltar, aoTerminar,
-}: PassoProps & { rascunho?: RascunhoSemPedido; foto?: File }) {
+  obras, hoje, rascunho, foto: fotoGuardada, guarda, lerNumeroDaNota, mandar, esquecer, aoVoltar, aoTerminar,
+}: PassoProps & { obras: ObraDoMestre[]; hoje: string; rascunho?: RascunhoSemPedido; foto?: File }) {
+  const [obra, setObra] = useState(() => {
+    if (obras.length === 1) return obras[0]!.id;
+    return obras.some((o) => o.id === rascunho?.obra) ? (rascunho?.obra ?? '') : '';
+  });
   const [foto, setFoto] = useState<File | null>(fotoGuardada ?? null);
   const [numero, setNumero] = useState(rascunho?.numero ?? '');
   const [deQuem, setDeQuem] = useState(rascunho?.deQuem ?? '');
@@ -484,9 +549,9 @@ function ChegouSemPedido({
 
   useEffect(() => {
     void guarda
-      .gravar(CHAVES.semPedido, { numero, deQuem, oQueChegou, semEstrago } satisfies RascunhoSemPedido)
+      .gravar(CHAVES.semPedido, { numero, deQuem, oQueChegou, semEstrago, obra } satisfies RascunhoSemPedido)
       .catch(() => undefined);
-  }, [guarda, numero, deQuem, oQueChegou, semEstrago]);
+  }, [guarda, numero, deQuem, oQueChegou, semEstrago, obra]);
   useEffect(() => {
     void (foto ? guarda.gravar(CHAVES.fotoDoSemPedido, foto) : guarda.apagar(CHAVES.fotoDoSemPedido)).catch(
       () => undefined,
@@ -494,6 +559,8 @@ function ChegouSemPedido({
   }, [guarda, foto]);
 
   async function pronto() {
+    if (obras.length === 0) return setAviso('Você ainda não está em nenhuma obra. Fale com o engenheiro.');
+    if (!obra) return setAviso('Falta responder: Em qual obra?');
     if (!foto && !numero.trim()) return setAviso('Tire a foto da nota, ou escreva o número dela.');
     if (!oQueChegou.trim()) return setAviso('Conte o que chegou.');
     if (semEstrago === null) return setAviso('Falta responder: Chegou sem estrago?');
@@ -503,6 +570,8 @@ function ChegouSemPedido({
       const envio: EnvioSemPedido = {
         tipo: 'sem-pedido',
         chave: novaChave(),
+        recebidoEm: hoje,
+        intervencaoId: obra,
         registro: { foto, numeroDaNota: numero.trim(), deQuem: deQuem.trim(), oQueChegou: oQueChegou.trim(), comEstrago: !semEstrago },
       };
       const d = await mandar(envio);
@@ -531,6 +600,25 @@ function ChegouSemPedido({
         <h1 className={styles.titulo}>Chegou sem pedido</h1>
         <p className={styles.dica}>O escritório liga ao pedido certo depois.</p>
       </header>
+
+      {obras.length > 1 && (
+        <fieldset className={styles.pergunta}>
+          <legend className={styles.perguntaTexto}>Em qual obra?</legend>
+          <div className={styles.botoesEmPe}>
+            {obras.map((o, n) => (
+              <button
+                key={o.id}
+                type="button"
+                aria-pressed={obra === o.id}
+                className={`${styles.resposta} ${obra === o.id ? styles.sim : ''}`}
+                onClick={() => setObra(o.id)}
+              >
+                {o.nome || `Obra ${n + 1}`}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <FotoDaNota foto={foto} numero={numero} aoMudarFoto={setFoto} aoMudarNumero={setNumero} lerNumeroDaNota={lerNumeroDaNota} />
 
