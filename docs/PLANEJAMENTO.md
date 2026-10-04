@@ -2904,3 +2904,37 @@ publicar só este ramo.
 - **A prova de verdade é a primeira emissão real do Pedro;** o CTO confere a pasta da obra.
 
 **DAQUI EM DIANTE:** o CTO confere o ✓ no ar. A D693 (a tela "Material a chegar") vem a seguir.
+
+## Decisão 80 — a tela "Material a chegar", do mestre de obra: as fotos no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D693, palavra do Pedro):** sai o bot do Telegram. Quem recebe o material é o mestre de cada obra, numa
+tela simples no celular, só da obra dele, com preço e com o sem pedido. O primeiro passo são as fotos com dados de
+mentira, sem esperar o Banco: o CTO confere e leva ao Pedro, que diz se está simples o bastante.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`8ec0027`; as fotos são de `ea0f12b`), **fora do `main`, NÃO
+publicado e NÃO ligado ao banco**:
+- **A lógica pura (`src/domain/recebimento.ts`)** traduz a fala do mestre para o PS.02:
+  - as três perguntas do escritório, mais o "Chegou tudo? / Só uma parte", que é entrega parcial e não "Não";
+  - o "O que aconteceu?" vira observação, ou tratativa com dois ou mais "Não", pela mesma `pedeTratativa`.
+- **A tela (`src/features/recebimento/`)** tem quatro estados: a lista, o receber, o sem pedido e o pronto.
+  - Ela não fala com o banco: recebe os pedidos e as funções de gravar de quem a monta.
+  - Nenhuma palavra do escritório aparece; um teste confere.
+  - Letra de 18 px, botões de 64 px, uma ação laranja por tela, o Creme no claro e no escuro.
+  - Se a gravação falha, nada do que ele preencheu se perde enquanto a tela está aberta.
+- **A prova:**
+  - 737 testes (eram 712);
+  - 16 sabotagens vermelhas;
+  - CI verde (37209382216);
+  - 12 fotos a 375 em `docs/Capturas/2026-10-04_D693/`, no ramo.
+- **Um defeito achado ao escrever a carta:** sem data, o cartão dizia "Combinado para sem dia combinado". Consertado no
+  segundo commit, com teste.
+- **O tamanho:** 933 linhas novas fora dos testes. Com a ligação e o escritório, passa de mil: perícia pela §9.5.
+- **O banco não mudou.** O desenho do Banco (cópia da D693) cabe na tela como ela está.
+
+**DAQUI EM DIANTE:**
+- a conferência do CTO e a palavra do Pedro sobre as fotos;
+- depois, a volta do Banco aprovada, e a ligação:
+  - o contrato;
+  - o rascunho no aparelho, para o sinal fraco;
+  - o dia combinado, se vier a coluna;
+  - o Histórico e a fila do sem pedido.

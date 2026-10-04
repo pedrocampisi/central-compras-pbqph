@@ -45,6 +45,22 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
+### 28. A tela "Material a chegar", do mestre de obra (D693): as fotos no ramo, esperando o CTO e o Pedro
+
+*Aberta em 04/10/2026, na decisão 80.* A tela e a lógica estão no ramo `d693-material-a-chegar` (`8ec0027`), com 12
+fotos a 375, o CI verde, NÃO publicadas e NÃO ligadas ao banco. **Espera:**
+1. a conferência do CTO e a palavra do Pedro sobre as fotos;
+2. a volta do Banco aprovada, para a ligação.
+
+**Falta, na ligação:**
+- o contrato do Banco;
+- o rascunho no aparelho (o sinal fraco);
+- o dia combinado;
+- o lado do escritório (o Histórico e a fila do sem pedido);
+- a perícia da §9.5, porque vai passar de mil linhas.
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*
