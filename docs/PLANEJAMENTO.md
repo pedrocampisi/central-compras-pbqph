@@ -2904,3 +2904,131 @@ publicar só este ramo.
 - **A prova de verdade é a primeira emissão real do Pedro;** o CTO confere a pasta da obra.
 
 **DAQUI EM DIANTE:** o CTO confere o ✓ no ar. A D693 (a tela "Material a chegar") vem a seguir.
+
+## Decisão 80 — a tela "Material a chegar", do mestre de obra: as fotos no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D693, palavra do Pedro):** sai o bot do Telegram. Quem recebe o material é o mestre de cada obra, numa
+tela simples no celular, só da obra dele, com preço e com o sem pedido. O primeiro passo são as fotos com dados de
+mentira, sem esperar o Banco: o CTO confere e leva ao Pedro, que diz se está simples o bastante.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`8ec0027`; as fotos são de `ea0f12b`), **fora do `main`, NÃO
+publicado e NÃO ligado ao banco**:
+- **A lógica pura (`src/domain/recebimento.ts`)** traduz a fala do mestre para o PS.02:
+  - as três perguntas do escritório, mais o "Chegou tudo? / Só uma parte", que é entrega parcial e não "Não";
+  - o "O que aconteceu?" vira observação, ou tratativa com dois ou mais "Não", pela mesma `pedeTratativa`.
+- **A tela (`src/features/recebimento/`)** tem quatro estados: a lista, o receber, o sem pedido e o pronto.
+  - Ela não fala com o banco: recebe os pedidos e as funções de gravar de quem a monta.
+  - Nenhuma palavra do escritório aparece; um teste confere.
+  - Letra de 18 px, botões de 64 px, uma ação laranja por tela, o Creme no claro e no escuro.
+  - Se a gravação falha, nada do que ele preencheu se perde enquanto a tela está aberta.
+- **A prova:**
+  - 737 testes (eram 712);
+  - 16 sabotagens vermelhas;
+  - CI verde (37209382216);
+  - 12 fotos a 375 em `docs/Capturas/2026-10-04_D693/`, no ramo.
+- **Um defeito achado ao escrever a carta:** sem data, o cartão dizia "Combinado para sem dia combinado". Consertado no
+  segundo commit, com teste.
+- **O tamanho:** 933 linhas novas fora dos testes. Com a ligação e o escritório, passa de mil: perícia pela §9.5.
+- **O banco não mudou.** O desenho do Banco (cópia da D693) cabe na tela como ela está.
+
+**DAQUI EM DIANTE:**
+- a conferência do CTO e a palavra do Pedro sobre as fotos;
+- depois, a volta do Banco aprovada, e a ligação:
+  - o contrato;
+  - o rascunho no aparelho, para o sinal fraco;
+  - o dia combinado, se vier a coluna;
+  - o Histórico e a fila do sem pedido.
+
+## Decisão 81 — a tela do mestre aprovada; o passo 1 da D696 no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D696, D697 e D698):** o CTO viu as 12 fotos, e o Pedro disse "ok" às seis telas. O CTO pediu dois
+retoques. O Pedro decidiu pela "Entrega prevista" na OC e pelo acesso por QR, que o engenheiro também gera na obra. A
+ordem: primeiro o que não depende do Banco, depois a ligação, o escritório e a tela "Mestres". A perícia é do perito
+(o Codex), uma só, sobre os dois ramos completos (D698).
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`a77bfe1`), **NÃO publicado e NÃO ligado ao banco**:
+- **Os retoques:**
+  - "Chegou material sem pedido" fica no alto da lista;
+  - o "Sair" pergunta antes, porque sem senha voltar é pedir um QR novo.
+- **A "Entrega prevista":**
+  - um campo de data opcional na Nova OC;
+  - "ENTREGA PREVISTA" no PDF;
+  - a chave `entrega_prevista` no cabeçalho da `salvar_oc` e na leitura.
+  - **Espera a coluna do Banco.** Sem ela, a data se perderia sem aviso.
+- **O rascunho no celular** (`fila.ts`, `guardaDoAparelho.ts`):
+  - cada toque fica no IndexedDB do aparelho, com a foto;
+  - o "Pronto" guarda antes de mandar;
+  - sem sinal, manda sozinho ao abrir, quando a rede volta e a cada 30 s, com a mesma chave;
+  - a recusa do banco (`RecusaDefinitiva`) para a fila e mostra o motivo;
+  - o cartão guardado não abre, para não receber duas vezes.
+- **A prova:**
+  - 751 testes;
+  - 19 sabotagens vermelhas;
+  - CI verde (37210704505);
+  - o IndexedDB provado num navegador de verdade, a 375, com recarga, foto e volta do sinal;
+  - 6 fotos em `docs/Capturas/2026-10-04_D696/`, no ramo.
+- **A carta ao Banco (D697):**
+  - **O endereço do QR é `https://compras.campisi.com.br/`**, que já está na lista do Auth.
+    - O "Esqueci minha senha" da OC não diz para onde voltar, e por isso cai no `site_url`, que é o da Central.
+    - O "mesmo endereço do Esqueci" não serviria.
+  - **Os três pedidos:** a coluna `entrega_prevista`; a `chave` de cada envio, que devolve "já estava"; e a entrega do
+    mestre sem exigir a versão da OC.
+- **O tamanho:** cerca de 1.450 linhas novas fora dos testes, entre a D693 e a D696. A perícia do perito vem antes da
+  produção.
+
+**DAQUI EM DIANTE:**
+- a volta do Banco;
+- a ligação: a lista, a entrega, a foto, o sem pedido, a fila do escritório e o Histórico;
+- a tela "Mestres" com o QR, e o iPhone medido (o login dentro do ícone instalado);
+- as fotos ao CTO;
+- o aviso de ramo completo para a perícia.
+
+## Decisão 82 — o "Esqueci minha senha" volta para a OC: no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D700):** no trabalho do mestre, achei que o "Esqueci" da OC não diz para onde voltar. Por isso o link
+caía no endereço padrão do login, que é a Central. A pessoa gravava a senha lá e tinha de achar a OC sozinha, e a tela
+"Definir nova senha" da OC nunca rodou na produção. O CTO mandou consertar num ramo pequeno, separado do ramo do
+mestre.
+
+**O QUE MUDOU**, no ramo `d700-esqueci-volta-para-a-oc` (`bf1b026`), **NÃO publicado**:
+- **A linha:** `redirectTo: 'https://compras.campisi.com.br/'` no "Esqueci" e no "Primeiro acesso", que usam a mesma
+  chamada.
+- **A metade que recebe:** provada com o App de verdade e o evento de recuperação simulado.
+  - a tela abre, e não a lista;
+  - a senha vai ao login, e a pessoa entra;
+  - a falha diz o que houve e deixa tentar de novo.
+- **A prova:**
+  - 716 testes;
+  - 8 sabotagens vermelhas;
+  - CI verde (37211710363);
+  - 2 fotos a 375 em `docs/Capturas/2026-10-04_D700/`, no ramo.
+- **Sem e-mail real, sem senha digitada por agente.** O banco não mudou.
+
+**DAQUI EM DIANTE:** a conferência do CTO, depois a emenda 3. A primeira recuperação real é a prova final.
+
+## Decisão 83 — no ar: o "Esqueci minha senha" volta para a OC · 04/10/2026
+
+**POR QUÊ (CTO-D701):** o CTO conferiu o ramo `bf1b026` e o CI dele, leu a linha do `redirectTo` e os quatro testes
+da tela "Definir nova senha", e viu a foto a 375. Entre o que estava no ar e a base do ramo não havia código novo, e
+por isso ele mandou publicar só este conserto.
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes do pacote:** `003c223c` (a D691).
+- **A junção:** o ramo `d700-esqueci-volta-para-a-oc` (`bf1b026`) entrou no `main` em `c1bfbf5`, e nada fora de
+  `docs/` difere do ramo.
+- **A bateria:**
+  - a primeira rodada no `main` deu 1 vermelho em 716, no teste do título uma vez só (D643, a Nova OC);
+  - sozinho, ele passou três vezes; a bateria inteira de novo deu 716 de 716; o CI ficou verde (37212046780);
+  - o código é igual ao do ramo, e por isso li como teste que às vezes falha por tempo. Se voltar, vira pendência.
+- **Tipos e lint limpos, o `conferir` deu 7 de 7.**
+- **Publicado** às 12h14 de 04/10: `4da03d09-20ec-42fd-9f9b-8e1f60191c3b`, versão `20261004151414-c1bfbf5`, com 100%
+  do tráfego.
+- **O banco não mudou.** Nenhum e-mail saiu, e nenhum agente digitou senha.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e tudo responde 200;
+- o código que o site serve chama `resetPasswordForEmail(..., {redirectTo})` com `https://compras.campisi.com.br/`, e
+  tem a tela "Definir nova senha".
+- **A prova de verdade é a primeira recuperação real.** Se alguém disser que o link abriu a Central, avisa-se o CTO.
+
+**DAQUI EM DIANTE:** o CTO confere a versão no ar. O app do mestre (pendência 28) segue esperando a volta do Banco.

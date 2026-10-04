@@ -45,6 +45,26 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
+### 28. O app do mestre de obra (D693, D696): a tela aprovada, o passo 1 no ramo, esperando a volta do Banco
+
+*Aberta em 04/10/2026, na decisão 80; atualizada na decisão 81.* A tela foi aprovada pelo CTO e pelo Pedro (D696). No
+ramo `d693-material-a-chegar` (`a77bfe1`), com o CI verde, NÃO publicados e NÃO ligados ao banco:
+- os dois retoques;
+- a "Entrega prevista";
+- o rascunho no celular, que vai sozinho quando o sinal volta.
+
+**Espera:** a volta do Banco à carta D697 desta casa (a coluna `entrega_prevista`, a chave de cada envio, a versão) e
+o ramo dele.
+
+**Falta:**
+- a ligação ao contrato;
+- o lado do escritório (o Histórico e a fila do sem pedido);
+- a tela "Mestres" com o QR, e o login dentro do ícone no iPhone, medido;
+- as fotos ao CTO;
+- o aviso de ramo completo, com o commit, para a perícia do perito (D698).
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*

@@ -4,9 +4,13 @@ import userEvent from '@testing-library/user-event';
 
 // O envio é SIMULADO: nenhum e-mail sai daqui. Apertar com e-mail de verdade é
 // ato que sai da máquina, e é do Pedro, na conferência dele (CTO-D541).
-const resetPasswordForEmail = vi.fn<(email: string) => Promise<{ error: null }>>(async () => ({ error: null }));
+const resetPasswordForEmail = vi.fn<(email: string, opcoes?: { redirectTo?: string }) => Promise<{ error: null }>>(
+  async () => ({ error: null }),
+);
 vi.mock('../../src/services/supabase/client', () => ({
-  supabase: { auth: { resetPasswordForEmail: (e: string) => resetPasswordForEmail(e) } },
+  supabase: {
+    auth: { resetPasswordForEmail: (e: string, o?: { redirectTo?: string }) => resetPasswordForEmail(e, o) },
+  },
   core: () => ({}),
   compras: () => ({}),
 }));
@@ -42,7 +46,8 @@ describe('primeiro acesso — a própria frase e um botão para enviar (pendênc
     await userEvent.type(screen.getByLabelText('E-mail'), EMAIL);
     await userEvent.click(screen.getByRole('button', { name: 'Enviar link para criar minha senha' }));
     expect(resetPasswordForEmail).toHaveBeenCalledTimes(1);
-    expect(resetPasswordForEmail).toHaveBeenCalledWith(EMAIL);
+    // O link volta para a OC, e não para o endereço padrão do login, que é a Central (CTO-D700).
+    expect(resetPasswordForEmail).toHaveBeenCalledWith(EMAIL, { redirectTo: 'https://compras.campisi.com.br/' });
     expect(await screen.findByRole('status')).toHaveTextContent(/link para criar a sua senha/);
   });
 
@@ -60,7 +65,7 @@ describe('primeiro acesso — a própria frase e um botão para enviar (pendênc
     expect(screen.getByText(TEXTOS_DO_ACESSO.esqueci.frase)).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText('E-mail'), EMAIL);
     await userEvent.keyboard('{Enter}');
-    expect(resetPasswordForEmail).toHaveBeenCalledWith(EMAIL);
+    expect(resetPasswordForEmail).toHaveBeenCalledWith(EMAIL, { redirectTo: 'https://compras.campisi.com.br/' });
   });
 
   it('"Voltar para entrar" traz a Senha e o Entrar de volta', async () => {
