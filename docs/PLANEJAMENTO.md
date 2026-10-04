@@ -2982,3 +2982,26 @@ ordem: primeiro o que não depende do Banco, depois a ligação, o escritório e
 - a tela "Mestres" com o QR, e o iPhone medido (o login dentro do ícone instalado);
 - as fotos ao CTO;
 - o aviso de ramo completo para a perícia.
+
+## Decisão 82 — o "Esqueci minha senha" volta para a OC: no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D700):** no trabalho do mestre, achei que o "Esqueci" da OC não diz para onde voltar. Por isso o link
+caía no endereço padrão do login, que é a Central. A pessoa gravava a senha lá e tinha de achar a OC sozinha, e a tela
+"Definir nova senha" da OC nunca rodou na produção. O CTO mandou consertar num ramo pequeno, separado do ramo do
+mestre.
+
+**O QUE MUDOU**, no ramo `d700-esqueci-volta-para-a-oc` (`bf1b026`), **NÃO publicado**:
+- **A linha:** `redirectTo: 'https://compras.campisi.com.br/'` no "Esqueci" e no "Primeiro acesso", que usam a mesma
+  chamada.
+- **A metade que recebe:** provada com o App de verdade e o evento de recuperação simulado.
+  - a tela abre, e não a lista;
+  - a senha vai ao login, e a pessoa entra;
+  - a falha diz o que houve e deixa tentar de novo.
+- **A prova:**
+  - 716 testes;
+  - 8 sabotagens vermelhas;
+  - CI verde (37211710363);
+  - 2 fotos a 375 em `docs/Capturas/2026-10-04_D700/`, no ramo.
+- **Sem e-mail real, sem senha digitada por agente.** O banco não mudou.
+
+**DAQUI EM DIANTE:** a conferência do CTO, depois a emenda 3. A primeira recuperação real é a prova final.
