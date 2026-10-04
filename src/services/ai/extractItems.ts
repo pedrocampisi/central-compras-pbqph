@@ -13,6 +13,7 @@
 
 import type { Item } from '../../domain/types';
 import { normalizeItem } from '../../domain/normalize';
+import { desfazerEntidades } from '../../domain/entidades';
 import { UN_PADRAO } from '../../domain/constants';
 import { supabase } from '../supabase/client';
 import { MAX_PAGINAS, erroDaImagem, mensagemDePaginas } from '../../domain/importacao';
@@ -79,23 +80,26 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
   const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown; _meta?: unknown };
   const rawItems = (Array.isArray(p.itens) ? p.itens : []) as RawExtractedItem[];
   const confira: Record<string, string> = {};
+  // A leitura às vezes devolve "&#x3D;" no lugar de "=" (D680): desfaz aqui, na entrada.
+  const texto = (v: unknown) => desfazerEntidades(String(v ?? '')).trim();
   const itens = rawItems.map((it) => {
     const item = normalizeItem({
       ecr_id: it.ecr_id != null && Number(it.ecr_id) ? Number(it.ecr_id) : null,
-      descricao: String(it.descricao ?? '').trim(),
-      observacao: String(it.observacao ?? '').trim(),
+      descricao: texto(it.descricao),
+      observacao: texto(it.observacao),
       quantidade: Number(it.quantidade) || 0,
       unidade: normalizeUnit(it.unidade),
       preco_unit: Number(it.preco_unit) || 0,
       ipi_pct: Number(it.ipi_pct) || 0,
       desc_pct: Number(it.desc_pct) || 0,
     });
-    const duvida = typeof it.confira === 'string' ? it.confira.trim() : '';
+    const duvida = typeof it.confira === 'string' ? texto(it.confira) : '';
     if (duvida) confira[item.id] = duvida;
     return item;
   });
   const ignoradas = (Array.isArray(p.ignoradas) ? p.ignoradas : [])
-    .filter((l): l is string => typeof l === 'string' && l.trim() !== '');
+    .filter((l): l is string => typeof l === 'string' && l.trim() !== '')
+    .map(desfazerEntidades);
   return { itens, confira, ignoradas, leitor: leitorDaResposta(p._meta) };
 }
 

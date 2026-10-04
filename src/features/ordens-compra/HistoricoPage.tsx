@@ -35,9 +35,9 @@ import { recarregarDados } from '../../services/supabase/sync';
 import { ListToolbar, FilterSelect } from '../../components/ListToolbar/ListToolbar';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
 import {
-  agruparPorEmpresa, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
+  agruparPorEmpresa, apelidoDoFornecedor, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
 } from '../../domain/fornecedores';
-import { normalizarBusca } from '../../domain/pesquisa';
+import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -78,6 +78,10 @@ export function HistoricoPage() {
       ),
     [data],
   );
+  const fornecedorApelido = useMemo(
+    () => new Map((data?.fornecedores ?? []).map((f) => [f.id, apelidoDoFornecedor(f)])),
+    [data],
+  );
   const opcoesDeEmpresaDoFiltro = useMemo(
     () => opcoesDeEmpresa(agruparPorEmpresa(data?.fornecedores ?? [])),
     [data],
@@ -99,6 +103,19 @@ export function HistoricoPage() {
           o.numero.toLowerCase().includes(q) ||
           (fornecedorBusca.get(o.fornecedor_id) ?? '').includes(q),
       );
+      // A que bate melhor pelo fornecedor (o apelido, ou a razão social que a
+      // coluna mostra) ou pelo número no alto; a cancelada desce; na mesma nota,
+      // a mais nova primeiro, como sempre (D680).
+      list = pelaNota(
+        list,
+        (o) =>
+          notaDaBusca(histFilter.search, [
+            fornecedorApelido.get(o.fornecedor_id) ?? '',
+            fornecedorNome.get(o.fornecedor_id) ?? '',
+            o.numero,
+          ]),
+        (o) => o.status === 'cancelada',
+      );
     }
     if (histFilter.status) list = list.filter((o) => o.status === histFilter.status);
     // Por EMPRESA (D542): escolher a Império traz as OCs de todas as filiais dela.
@@ -107,7 +124,7 @@ export function HistoricoPage() {
     }
     if (histFilter.obra) list = list.filter((o) => o.obra_id === histFilter.obra);
     return list;
-  }, [data, histFilter, fornecedorBusca, empresaDoFornecedor]);
+  }, [data, histFilter, fornecedorBusca, fornecedorApelido, fornecedorNome, empresaDoFornecedor]);
 
   if (!data) return null;
 
@@ -141,7 +158,7 @@ export function HistoricoPage() {
   async function handleRegenPdf(oc: OrdemCompra) {
     try {
       const blob = await generateOcPdfBlob(oc, data!);
-      const fornNome = data!.fornecedores.find((f) => f.id === oc.fornecedor_id)?.razao_social ?? '';
+      const fornNome = apelidoDoFornecedor(data!.fornecedores.find((f) => f.id === oc.fornecedor_id));
       const filename = buildPdfFilename(oc, fornNome);
       await savePdfToFile(blob, filename);
       // Comando estreito: carimba a data e não toca em mais nada. Antes isto

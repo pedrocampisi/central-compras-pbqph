@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import type { Ecr, EcrItem } from '../../domain/types';
+import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 import {
   COLUNAS_DO_HISTORICO,
   HISTORICO,
@@ -226,12 +227,12 @@ export function CatalogoPage() {
 
   if (!data) return null;
 
-  const ecrs = search
-    ? data.ecrs.filter(
-        (e) =>
-          e.nome.toLowerCase().includes(search.toLowerCase()) ||
-          e.codigo.toLowerCase().includes(search.toLowerCase()) ||
-          e.categoria.toLowerCase().includes(search.toLowerCase()),
+  // A que bate melhor pelo nome ou pelo código no alto; a que casou só pela categoria, depois (D680).
+  const q = normalizarBusca(search);
+  const ecrs = q
+    ? pelaNota(
+        data.ecrs.filter((e) => [e.nome, e.codigo, e.categoria].some((t) => normalizarBusca(t).includes(q))),
+        (e) => notaDaBusca(search, [e.nome, e.codigo]),
       )
     : data.ecrs;
 

@@ -39,8 +39,12 @@ describe('CampoPesquisavel — pelo teclado (D541)', () => {
   it('setas andam na lista; Enter escolhe o destacado', async () => {
     const { campo, onEscolher } = montar();
     await userEvent.type(campo, 'e'); // as três têm "e"
+    // Desde a D680, a que começa pelo termo vem primeiro; as outras duas, na ordem de sempre.
+    expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Edifício São João', 'Residencial Jardim das Flores', 'Reforma Galpão Industrial',
+    ]);
     await userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
-    expect(onEscolher).toHaveBeenCalledWith('o3');
+    expect(onEscolher).toHaveBeenCalledWith('o2');
   });
 
   it('Esc fecha sem mudar nada, e o campo volta a mostrar a escolha de antes', async () => {

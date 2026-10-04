@@ -10,7 +10,7 @@
  */
 import type { Fornecedor, Obra } from './types';
 import { formatarDocumento } from './destinatario';
-import { normalizarBusca, type OpcaoPesquisavel } from './pesquisa';
+import { normalizarBusca, notaDaBusca, pelaNota, type OpcaoPesquisavel } from './pesquisa';
 
 /**
  * Quem entra na lista da OC: ativo E fornece material.
@@ -126,6 +126,15 @@ export function chaveDaEmpresa(f: Fornecedor): string {
   return f.empresa_id ? f.empresa_id : `filial:${f.id}`;
 }
 
+/**
+ * O nome pelo qual a equipe chama o fornecedor: o apelido da empresa; sem
+ * apelido, a razão social. É o do nome do PDF e o da nota da busca no
+ * Histórico (CTO-D680).
+ */
+export function apelidoDoFornecedor(f: Pick<Fornecedor, 'empresa_apelido' | 'razao_social'> | undefined): string {
+  return (f?.empresa_apelido ?? '').trim() || (f?.razao_social ?? '').trim();
+}
+
 const MINUSCULAS = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
 
 /**
@@ -232,6 +241,8 @@ export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
     if ((porApelido.get(normalizarBusca(g.apelido)) ?? 0) > 1) {
       detalhe = [razoesDistintas(g.filiais).join(' / '), detalhe].filter(Boolean).join(' · ');
     }
+    // Nenhuma filial que ainda receba OC: na busca, desce (D680).
+    const desce = g.filiais.every((f) => !f.ativo || f.bloqueado_para_compra_nova === true);
     return {
       valor: g.chave,
       rotulo: g.apelido,
@@ -239,6 +250,7 @@ export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
       termos: g.filiais
         .flatMap((f) => [f.razao_social, f.nome_fantasia, f.empresa_apelido ?? ''])
         .filter(Boolean),
+      ...(desce ? { desce } : {}),
     };
   });
 
@@ -312,7 +324,16 @@ export function empresasDaTela(lista: Fornecedor[], busca: string, filtro: Filtr
     const porApelido = g.filiais.some((f) => normalizarBusca(f.empresa_apelido ?? '').includes(termo));
     return porFilial.length > 0 || porApelido || normalizarBusca(g.apelido).includes(termo);
   });
-  return { empresas, total: grupos.length, casadas };
+  // Com busca, a que bate melhor pelo apelido (ou pelo CNPJ colado) vem no alto;
+  // a que não tem filial ativa desce na mesma nota (D680).
+  const ordem = termo
+    ? pelaNota(
+        empresas,
+        (g) => notaDaBusca(busca, [g.apelido], g.filiais.map((f) => f.cnpj ?? '')),
+        (g) => !g.filiais.some((f) => f.ativo),
+      )
+    : empresas;
+  return { empresas: ordem, total: grupos.length, casadas };
 }
 
 /**
@@ -405,7 +426,7 @@ export function escolherEmpresa(grupo: EmpresaDaLista | undefined, fornecedorAtu
   return filialPrincipal(grupo)?.id ?? '';
 }
 
-/** As opções da escolha de obra: o nome que a tela mostra. */
+/** As opções da escolha de obra: o nome que a tela mostra. A encerrada desce na busca (D680). */
 export function opcoesDeObra(lista: Obra[]): OpcaoPesquisavel[] {
-  return lista.map((o) => ({ valor: o.id, rotulo: o.nome }));
+  return lista.map((o) => ({ valor: o.id, rotulo: o.nome, ...(o.ativa ? {} : { desce: true }) }));
 }

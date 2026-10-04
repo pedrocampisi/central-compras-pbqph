@@ -12,6 +12,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ObraDrawer } from './ObraDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import type { Column } from '../../components/DataTable/DataTable';
+import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 import type { Obra } from '../../domain/types';
 
 export function ObrasPage() {
@@ -26,20 +27,19 @@ export function ObrasPage() {
 
   if (!data) return null;
 
-  const filtered = data.obras.filter((o) => {
+  const q = normalizarBusca(search);
+  const casadas = data.obras.filter((o) => {
     if (showAtivas === 'ativas' && !o.ativa) return false;
     if (showAtivas === 'inativas' && o.ativa) return false;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      return (
-        o.nome.toLowerCase().includes(q) ||
-        o.cei.toLowerCase().includes(q) ||
-        o.responsavel.toLowerCase().includes(q) ||
-        o.endereco.cidade.toLowerCase().includes(q)
-      );
+    if (q) {
+      return [o.nome, o.cei, o.responsavel, o.endereco.cidade].some((t) => normalizarBusca(t).includes(q));
     }
     return true;
   });
+  // A que bate melhor pelo nome (ou pelo CNO colado) no alto; a encerrada desce na mesma nota (D680).
+  const filtered = q
+    ? pelaNota(casadas, (o) => notaDaBusca(search, [o.nome], [o.cei]), (o) => !o.ativa)
+    : casadas;
 
   // Criar/excluir obra não existem nesta versão: a camada de dados não grava
   // obras no banco. O drawer abre só para consulta (e para conectar a pasta

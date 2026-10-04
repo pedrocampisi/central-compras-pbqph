@@ -277,3 +277,14 @@ describe('CTO-D661 — quem só lê', () => {
     expect(screen.getByRole('alert').textContent).toContain('As qualificações não carregaram (rede)');
   });
 });
+
+describe('CTO-D680 — a busca da Qualificação pelo que bate melhor', () => {
+  it('a empresa que começa pelo termo vem no alto; na mesma nota, a ordem da tela (o que pede ação primeiro)', () => {
+    render(<QualificacaoPage />);
+    const ordem = () => [...tabela().querySelectorAll('tbody tr[data-linha]')].map((tr) => tr.getAttribute('data-linha'));
+    expect(ordem()).toEqual(['empresa-b', 'empresa-c', 'empresa-a']);
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Buscar empresa ou tipo…' }), { target: { value: 'a' } });
+    // "Alfa" começa por "a" (nota 1); "Beta" e "Gama" só o têm no meio (nota 3).
+    expect(ordem()).toEqual(['empresa-a', 'empresa-b', 'empresa-c']);
+  });
+});

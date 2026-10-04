@@ -24,7 +24,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Icon } from '../../components/Icon/Icon';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
 import { agruparPorEmpresa, opcoesDeEmpresa } from '../../domain/fornecedores';
-import { normalizarBusca } from '../../domain/pesquisa';
+import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 import {
   CATEGORIAS,
   dataBr,
@@ -88,9 +88,12 @@ export function QualificacaoPage() {
 
   const todas = dados ? linhasDaTela(dados.linhas, aba, data.fornecedores) : [];
   const termo = normalizarBusca(busca);
-  const visiveis = todas.filter(
+  const casadas = todas.filter(
     (l) => (filtro === 'todas' || l.pedeAcao) && (!termo || normalizarBusca(`${l.nome} ${l.vale.tipo}`).includes(termo)),
   );
+  // Com busca, a empresa que bate melhor pelo nome vem no alto; o que casou só
+  // pelo tipo, depois. Na mesma nota fica a ordem da tela: o que pede ação primeiro (D680).
+  const visiveis = termo ? pelaNota(casadas, (l) => notaDaBusca(busca, [l.nome])) : casadas;
 
   function desempenhoDe(l: LinhaDaTela) {
     if (!dados) return undefined;
