@@ -47,14 +47,14 @@ mais barato que carta apontando para o item errado.
 
 ### 28. O app do mestre de obra (D693, D696): o ramo completo, esperando a perícia
 
-*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81 e 84.* No ramo `d693-material-a-chegar` (`7bb679e`),
+*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81 e 84, e pela D710 do CTO.* No ramo `d693-material-a-chegar` (`7bb679e`),
 com o CI verde, **NÃO publicado**: a tela do mestre ligada ao contrato do Banco, o lado do escritório, a tela "Mestres"
 com o QR e o caminho do iPhone.
 
 **Espera:**
-- o CTO: as fotos levadas ao Pedro, e a palavra sobre as duas bibliotecas;
-- o Pedro: a perícia do perito sobre os dois ramos (D698);
-- o Banco: a prova da `verifyOtp` com o código do link, no ensaio; e o nome das obras do mestre (não trava);
+- ~~o CTO: as fotos e as duas bibliotecas~~ — **conferido e aprovado na D710** (04/10);
+- o Banco: a prova da `verifyOtp` com o código do link, no ensaio; e o nome das obras do mestre;
+- depois deles, o Pedro: a perícia do perito sobre os ramos (D698, D710 §3);
 - o ensaio num iPhone de verdade (pendência 31).
 
 **Falta:** publicar, só com carta do CTO, e com o ramo do Banco no ar antes.
