@@ -1,9 +1,12 @@
 /**
  * Aba Histórico de OCs — filtros + ações: editar, duplicar, regerar PDF, excluir.
  * Portado de renderHistorico (CentralCompras-PBQPH.html).
+ *
+ * A coluna Pasta (CTO-D685): o ✓ de cada OC emitida cujo PDF está na pasta da
+ * obra, com o link, e o botão de mandar de novo pelo servidor.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -38,6 +41,8 @@ import {
   agruparPorEmpresa, apelidoDoFornecedor, chaveDaEmpresa, opcoesDeEmpresa, opcoesDeObra,
 } from '../../domain/fornecedores';
 import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
+import { entregarPdfDaOc, lerPdfsNaPasta } from '../../services/supabase/pastaDaObra';
+import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -56,6 +61,21 @@ export function HistoricoPage() {
   const showToast = useUiStore((s) => s.showToast);
   /** A OC cuja entrega está sendo registrada (PS.02, CTO-D604 §3.2). */
   const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
+  /** O ✓ de cada OC (D685); `null` enquanto não leu, ou se a leitura falhou: aí a coluna não aparece. */
+  const [naPasta, setNaPasta] = useState<Map<string, PdfNaPasta> | null>(null);
+  /** A OC que está indo para a pasta agora: o botão dela espera. */
+  const [mandando, setMandando] = useState<string | null>(null);
+
+  // Relê o ✓ quando os dados mudam: outra pessoa pode ter emitido, ou mandado de novo.
+  useEffect(() => {
+    let vivo = true;
+    void lerPdfsNaPasta().then((m) => {
+      if (vivo) setNaPasta(m);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [data]);
 
   // ── Lookups e filtros (memoizados — busca deixa de ser O(n×m) por tecla) ──
   const fornecedorNome = useMemo(
@@ -176,6 +196,27 @@ export function HistoricoPage() {
     }
   }
 
+  /**
+   * Manda o PDF para a pasta da obra pelo servidor (D685 §3.4). Ele substitui
+   * o arquivo que a casa gravou, e nunca cria cópia. Se falhar, o caminho de
+   * hoje, como na emissão.
+   */
+  async function handleMandarParaAPasta(oc: OrdemCompra) {
+    setMandando(oc.id);
+    try {
+      const blob = await generateOcPdfBlob(oc, data!);
+      const fornNome = apelidoDoFornecedor(data!.fornecedores.find((f) => f.id === oc.fornecedor_id));
+      const { resposta, caminho } = await entregarPdfDaOc(oc, blob, buildPdfFilename(oc, fornNome));
+      const aviso = avisoDoPdf(oc.numero, resposta, caminho, 'mandar');
+      showToast(aviso.texto, aviso.tom);
+      setNaPasta(await lerPdfsNaPasta());
+    } catch (err) {
+      showToast(`Erro ao gerar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    } finally {
+      setMandando(null);
+    }
+  }
+
   async function handleStatusChange(oc: OrdemCompra, status: StatusOc) {
     await mudarStatusDaOc(oc, status, data!.fornecedores, showToast);
   }
@@ -227,6 +268,67 @@ export function HistoricoPage() {
   // e o número da OC precisa continuar ocupado). Use "Cancelar" para
   // invalidar uma OC — ela permanece no histórico, como manda o PBQP-H.
 
+  /** O ✓ (D685): com o link para abrir o PDF na pasta; "Não está" só quando o ✓ foi lido. */
+  function seloDaPasta(o: OrdemCompra) {
+    if (!naPasta) return null;
+    const p = naPasta.get(o.id);
+    if (!p) return <span style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>Não está</span>;
+    const link = linkSeguro(p.webUrl);
+    const rotulo = (
+      <>
+        <Icon name="check" size={13} /> Na pasta
+      </>
+    );
+    return link ? (
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={`Abrir "${p.nome}" na pasta da obra`}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--success)', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}
+      >
+        {rotulo}
+      </a>
+    ) : (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--success)', fontSize: 12, whiteSpace: 'nowrap' }}>
+        {rotulo}
+      </span>
+    );
+  }
+
+  /**
+   * Debaixo do status, nas OCs emitidas (D685): o ✓ com o link e o botão de
+   * mandar. Fica na coluna Status e não numa coluna própria: com mais uma
+   * coluna a tabela não cabia mais a 1366, e as Ações rolavam para fora.
+   */
+  function pastaDaOc(o: OrdemCompra) {
+    if (o.status !== 'emitida' && o.status !== 'entregue') return null;
+    const selo = seloDaPasta(o);
+    if (!selo && !gravaOk) return null;
+    return (
+      <div data-pasta-da-oc style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, marginTop: 6 }}>
+        {selo}
+        {/* Só quem emite OC manda para a pasta: é o papel que a função exige (D682 §2). */}
+        {gravaOk && (
+          <Button
+            variant="ghost"
+            size="sm"
+            loading={mandando === o.id}
+            disabled={mandando !== null && mandando !== o.id}
+            title={
+              naPasta?.has(o.id)
+                ? 'Manda o PDF de novo para a pasta da obra: troca o arquivo que está lá, sem fazer cópia'
+                : 'Manda o PDF para a pasta da obra'
+            }
+            onClick={() => void handleMandarParaAPasta(o)}
+          >
+            {naPasta?.has(o.id) ? 'Reenviar' : 'Enviar'}
+          </Button>
+        )}
+      </div>
+    );
+  }
+
   // ── Columns ────────────────────────────────────────────────────────────────
 
   const columns: Column<OrdemCompra>[] = [
@@ -266,9 +368,17 @@ export function HistoricoPage() {
       ),
       align: 'right',
     },
-    { key: 'status', label: 'Status', render: (o) => <Pill status={o.status} /> },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (o) => (
+        <>
+          <Pill status={o.status} />
+          {pastaDaOc(o)}
+        </>
+      ),
+    },
   ];
-
   return (
     <div className="section">
       {/* Header */}
