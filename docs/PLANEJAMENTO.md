@@ -2881,3 +2881,26 @@ função `guardar-oc-na-obra` do Banco (D682) está na produção desde as 10h23
 - **O banco não mudou.** A função de verdade não foi chamada: a primeira emissão real do Pedro é a prova (D685 §4).
 
 **DAQUI EM DIANTE:** a conferência do CTO, e depois a publicação pela emenda 3.
+
+## Decisão 79 — no ar: o PDF da OC vai sozinho para a pasta da obra · 04/10/2026
+
+**POR QUÊ (CTO-D691):** o CTO rodou a bateria numa cópia do ramo (712 verdes, tipos limpos), leu o código e viu as
+fotos 01 a 03. Aceitou os dois desvios (o ✓ debaixo do status, e não numa coluna; o texto curto do botão) e mandou
+publicar só este ramo.
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes do pacote:** `ca08eeee` (a D680).
+- **A junção:** o ramo `d685-pdf-na-pasta-da-obra` (`b95634f`) entrou no `main` em `aeba5a9`, e nada fora de
+  `docs/` difere do ramo.
+- **A bateria:** 712 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (37208154061).
+- **Publicado** às 11h10 de 04/10: `003c223c-8f26-4921-b103-3f407935a693`, versão `20261004140940-aeba5a9`, com 100%
+  do tráfego.
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e tudo responde 200;
+- a chamada à função, a leitura do ✓, o "Na pasta", o "Reenviar" e o relógio de 30 s estão no código que o site serve.
+- **Logado:** não medido (pendência 13).
+- **A prova de verdade é a primeira emissão real do Pedro;** o CTO confere a pasta da obra.
+
+**DAQUI EM DIANTE:** o CTO confere o ✓ no ar. A D693 (a tela "Material a chegar") vem a seguir.

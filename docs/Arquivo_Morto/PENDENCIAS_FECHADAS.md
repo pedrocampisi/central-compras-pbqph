@@ -6,6 +6,15 @@
 
 ---
 
+### 27. O PDF da OC na pasta da obra (D685) no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `003c223c` (CTO-D691, decisão 79); o desfazer é `ca08eeee`**
+
+*Aberta em 04/10/2026, na decisão 78.* A emissão chama a `guardar-oc-na-obra` primeiro e só cai no caminho de hoje
+quando ela falha; o Histórico mostra o ✓ com o link e o "Enviar" / "Reenviar". Está no ramo
+`d685-pdf-na-pasta-da-obra` (`b95634f`), com o CI verde e NÃO publicado. **Espera:** a conferência do CTO. Depois vem
+a emenda 3, e a prova de verdade é a primeira emissão real do Pedro.
+
+---
+
 ### 26. A busca, o PDF com o apelido e os dois defeitos (D680) no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `ca08eeee` (CTO-D683, decisão 77); o desfazer é `aeec3fcc`**
 
 *Aberta em 04/10/2026, na decisão 76.* A régua da busca nas sete buscas, o nome do PDF pelo apelido, a trava da
