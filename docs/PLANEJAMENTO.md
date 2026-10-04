@@ -2851,3 +2851,33 @@ dele ao Banco_de_Dados, e a tela não espera por ela.
 - **Logado:** não medido (pendência 13). O CTO confere "co" na Nova OC pelo Chrome do Pedro, sem salvar nada.
 
 **DAQUI EM DIANTE:** o CTO confere no ar e avisa o Pedro. A D685 (o PDF vai sozinho para a pasta da obra) vem a seguir.
+
+## Decisão 78 — o PDF da OC vai sozinho para a pasta da obra, no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D685, palavra do Pedro de hoje):** "eu gostaria que vc guardado de forma automatica uma OC na pasta da
+OBRA via mircrosoft graph". Até aqui o PDF ia pela pasta ligada em cada navegador, e o celular não ligava nenhuma. A
+função `guardar-oc-na-obra` do Banco (D682) está na produção desde as 10h23 de hoje, com o ✓ em
+`compras.oc_pdf_na_pasta`.
+
+**O QUE MUDOU**, no ramo `d685-pdf-na-pasta-da-obra` (`b95634f`), **fora do `main` e NÃO publicado**:
+- **Ao emitir, o Graph primeiro:**
+  - a OC é gravada, e depois a função recebe o PDF e o nome com o apelido;
+  - com 200, não salva de novo;
+  - com qualquer outra resposta, ou nenhuma em 30 segundos, vai o caminho de hoje (a pasta do navegador ou o download);
+  - o aviso diz a frase da função;
+  - a emissão nunca desfaz por causa disso.
+- **No Histórico, debaixo do status:** "✓ Na pasta" com o link, e o "Enviar" / "Reenviar", que chama a função e
+  troca o arquivo sem fazer cópia.
+  - Não ficou numa coluna própria: com ela, a tabela não cabia a 1366.
+  - Quem só lê vê o ✓, mas não o botão.
+- **A chamada vai por `fetch`, como a `extrair-itens`,** e não pelo `functions.invoke`: o pedido é o mesmo, e o
+  `fetch` aceita o limite de tempo.
+- **A prova:**
+  - 712 testes (eram 689);
+  - 18 sabotagens vermelhas;
+  - CI verde (37207096754);
+  - 24 fotos com dados inventados em `docs/Capturas/2026-10-04_D685/`, no ramo.
+- **O tamanho:** +360 linhas de código, sem perícia.
+- **O banco não mudou.** A função de verdade não foi chamada: a primeira emissão real do Pedro é a prova (D685 §4).
+
+**DAQUI EM DIANTE:** a conferência do CTO, e depois a publicação pela emenda 3.

@@ -208,6 +208,15 @@ segurou).
 
 ---
 
+### 27. O PDF da OC na pasta da obra (D685) no ramo, esperando o CTO
+
+*Aberta em 04/10/2026, na decisão 78.* A emissão chama a `guardar-oc-na-obra` primeiro e só cai no caminho de hoje
+quando ela falha; o Histórico mostra o ✓ com o link e o "Enviar" / "Reenviar". Está no ramo
+`d685-pdf-na-pasta-da-obra` (`b95634f`), com o CI verde e NÃO publicado. **Espera:** a conferência do CTO. Depois vem
+a emenda 3, e a prova de verdade é a primeira emissão real do Pedro.
+
+---
+
 ## Onde estão as fechadas
 
 Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.
