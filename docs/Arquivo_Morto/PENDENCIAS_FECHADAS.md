@@ -6,6 +6,14 @@
 
 ---
 
+### 29. O "Esqueci minha senha" volta para a OC (D700), no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `4da03d09` (CTO-D701, decisão 83); o desfazer é `003c223c`**
+
+*Aberta em 04/10/2026, na decisão 82.* A linha do `redirectTo` e a prova da tela "Definir nova senha" estão no ramo
+`d700-esqueci-volta-para-a-oc` (`bf1b026`), com o CI verde e NÃO publicadas. **Espera:** a conferência do CTO; depois,
+a emenda 3 e a versão no ar.
+
+---
+
 ### 27. O PDF da OC na pasta da obra (D685) no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `003c223c` (CTO-D691, decisão 79); o desfazer é `ca08eeee`**
 
 *Aberta em 04/10/2026, na decisão 78.* A emissão chama a `guardar-oc-na-obra` primeiro e só cai no caminho de hoje

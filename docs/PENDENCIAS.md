@@ -45,14 +45,6 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 29. O "Esqueci minha senha" volta para a OC (D700), no ramo, esperando o CTO
-
-*Aberta em 04/10/2026, na decisão 82.* A linha do `redirectTo` e a prova da tela "Definir nova senha" estão no ramo
-`d700-esqueci-volta-para-a-oc` (`bf1b026`), com o CI verde e NÃO publicadas. **Espera:** a conferência do CTO; depois,
-a emenda 3 e a versão no ar.
-
----
-
 ### 28. O app do mestre de obra (D693, D696): a tela aprovada, o passo 1 no ramo, esperando a volta do Banco
 
 *Aberta em 04/10/2026, na decisão 80; atualizada na decisão 81.* A tela foi aprovada pelo CTO e pelo Pedro (D696). No

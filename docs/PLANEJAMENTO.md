@@ -3005,3 +3005,30 @@ mestre.
 - **Sem e-mail real, sem senha digitada por agente.** O banco não mudou.
 
 **DAQUI EM DIANTE:** a conferência do CTO, depois a emenda 3. A primeira recuperação real é a prova final.
+
+## Decisão 83 — no ar: o "Esqueci minha senha" volta para a OC · 04/10/2026
+
+**POR QUÊ (CTO-D701):** o CTO conferiu o ramo `bf1b026` e o CI dele, leu a linha do `redirectTo` e os quatro testes
+da tela "Definir nova senha", e viu a foto a 375. Entre o que estava no ar e a base do ramo não havia código novo, e
+por isso ele mandou publicar só este conserto.
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes do pacote:** `003c223c` (a D691).
+- **A junção:** o ramo `d700-esqueci-volta-para-a-oc` (`bf1b026`) entrou no `main` em `c1bfbf5`, e nada fora de
+  `docs/` difere do ramo.
+- **A bateria:**
+  - a primeira rodada no `main` deu 1 vermelho em 716, no teste do título uma vez só (D643, a Nova OC);
+  - sozinho, ele passou três vezes; a bateria inteira de novo deu 716 de 716; o CI ficou verde (37212046780);
+  - o código é igual ao do ramo, e por isso li como teste que às vezes falha por tempo. Se voltar, vira pendência.
+- **Tipos e lint limpos, o `conferir` deu 7 de 7.**
+- **Publicado** às 12h14 de 04/10: `4da03d09-20ec-42fd-9f9b-8e1f60191c3b`, versão `20261004151414-c1bfbf5`, com 100%
+  do tráfego.
+- **O banco não mudou.** Nenhum e-mail saiu, e nenhum agente digitou senha.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e tudo responde 200;
+- o código que o site serve chama `resetPasswordForEmail(..., {redirectTo})` com `https://compras.campisi.com.br/`, e
+  tem a tela "Definir nova senha".
+- **A prova de verdade é a primeira recuperação real.** Se alguém disser que o link abriu a Central, avisa-se o CTO.
+
+**DAQUI EM DIANTE:** o CTO confere a versão no ar. O app do mestre (pendência 28) segue esperando a volta do Banco.
