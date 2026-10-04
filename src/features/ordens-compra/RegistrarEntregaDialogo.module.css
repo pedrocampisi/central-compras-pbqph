@@ -67,6 +67,16 @@
 .pergunta legend { padding: 0 4px; font-weight: 700; }
 .pergunta label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 
+.marcar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--texto);
+  cursor: pointer;
+}
+.marcar input { margin-top: 2px; }
+
 .aviso {
   margin: 0;
   padding: 10px 12px;

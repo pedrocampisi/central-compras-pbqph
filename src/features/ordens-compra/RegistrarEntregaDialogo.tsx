@@ -49,6 +49,8 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
     observacao: '',
     tratativa: '',
   });
+  /** Só uma parte: a OC continua na lista do mestre, esperando o resto (CTO-D696 §3.2). */
+  const [soUmaParte, setSoUmaParte] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [gravando, setGravando] = useState(false);
 
@@ -69,7 +71,7 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
     setErro(null);
     setGravando(true);
     try {
-      const r = await registrarEntrega(oc.id, oc.versao, avaliacaoParaGravar(a));
+      const r = await registrarEntrega(oc.id, oc.versao, avaliacaoParaGravar(a), !soUmaParte);
       try {
         await recarregarDados();
       } catch {
@@ -127,6 +129,11 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
             </label>
           </fieldset>
         ))}
+
+        <label className={styles.marcar}>
+          <input type="checkbox" checked={soUmaParte} onChange={(e) => setSoUmaParte(e.target.checked)} />
+          Chegou só uma parte: a OC continua esperando o resto na obra
+        </label>
 
         <label className={styles.campo}>
           <span>Observação (opcional)</span>

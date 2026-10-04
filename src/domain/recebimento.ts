@@ -173,3 +173,73 @@ export function oQueFazerComOStatus(status: number): Exclude<OQueFazer, 'de-novo
   if (status === 0 || status >= 500 || status === 401 || status === 408 || status === 429) return 'espera';
   return 'para';
 }
+
+// ---------------------------------------------------------------------------
+// O escritório liga o "sem pedido" a uma OC (compras.ligar_sem_pedido)
+// ---------------------------------------------------------------------------
+
+/** O que o escritório responde ao ligar; a integridade é a que o mestre disse (D693 §7). */
+export interface RespostasDaLigacao {
+  ocId: string;
+  notaFiscal: string;
+  prazoConforme: boolean | null;
+  ocEcrConforme: boolean | null;
+  chegouTudo: boolean | null;
+  tratativa: string;
+}
+
+export const LIGACAO_VAZIA: RespostasDaLigacao = {
+  ocId: '', notaFiscal: '', prazoConforme: null, ocEcrConforme: null, chegouTudo: null, tratativa: '',
+};
+
+/** Quantos "Não Conforme", contando o estrago que o mestre viu. */
+export function naoConformesDaLigacao(r: RespostasDaLigacao, chegouComEstrago: boolean): number {
+  return [r.prazoConforme === false, chegouComEstrago, r.ocEcrConforme === false].filter(Boolean).length;
+}
+
+/** O que falta para ligar, na ordem da tela; '' quando pode. */
+export function problemaDaLigacao(
+  r: RespostasDaLigacao,
+  semPedido: { notaFiscal: string; chegouComEstrago: boolean },
+): string {
+  if (!r.ocId) return 'Escolha a OC.';
+  if (!semPedido.notaFiscal.trim() && !r.notaFiscal.trim()) {
+    return 'Escreva o número da nota: o mestre mandou só a foto.';
+  }
+  if (r.prazoConforme === null) return 'Responda: Prazo de entrega.';
+  if (r.ocEcrConforme === null) return 'Responda: Confere com a OC e com a ECR.';
+  if (r.chegouTudo === null) return 'Responda: Chegou tudo?';
+  if (naoConformesDaLigacao(r, semPedido.chegouComEstrago) >= 2 && !r.tratativa.trim()) {
+    return 'Com duas ou mais "Não Conforme", escreva a tratativa (PS.02).';
+  }
+  return '';
+}
+
+/**
+ * As OCs a que o recebimento pode ser ligado: da mesma obra, emitidas ou
+ * entregues (o banco recusa as outras). A que o mestre informou vem primeiro;
+ * depois, as mais novas.
+ */
+export function ocsParaLigar<T extends { id: string; obra_id: string; status: string; numero: string }>(
+  ocs: readonly T[],
+  obraId: string,
+  informada = '',
+): T[] {
+  return ocs
+    .filter((o) => o.obra_id === obraId && (o.status === 'emitida' || o.status === 'entregue'))
+    .sort((a, b) => Number(b.id === informada) - Number(a.id === informada) || b.numero.localeCompare(a.numero));
+}
+
+/** A última entrega de cada OC (pelo dia, depois pela ordem em que entrou): é a que o Histórico mostra. */
+export function ultimaEntregaPorOc<T extends { id: number; ocId: string; recebidoEm: string }>(
+  avaliacoes: readonly T[],
+): Map<string, T> {
+  const m = new Map<string, T>();
+  for (const a of avaliacoes) {
+    const antes = m.get(a.ocId);
+    if (!antes || a.recebidoEm > antes.recebidoEm || (a.recebidoEm === antes.recebidoEm && a.id > antes.id)) {
+      m.set(a.ocId, a);
+    }
+  }
+  return m;
+}

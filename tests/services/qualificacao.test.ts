@@ -116,7 +116,8 @@ beforeEach(() => {
     desempenho_12_meses: [{ empresa_raiz_id: 'empresa-a', entregas: 4, no_prazo: 3, inteiras: 4, conformes: 3 }],
     avaliacoes_entrega: [
       { id: 1, oc_id: 'oc-1', intervencao_id: 'obra-a', nota_fiscal: '10', recebido_em: '2026-09-01' },
-      { id: 2, oc_id: 'oc-2', intervencao_id: 'obra-b', nota_fiscal: '11', recebido_em: '2026-09-02' },
+      { id: 2, oc_id: 'oc-2', intervencao_id: 'obra-b', nota_fiscal: '11', recebido_em: '2026-09-02',
+        chegou_tudo: false, foto_documento_id: 'doc-1' },
     ],
   });
   banco.estado.mascara = null;
@@ -165,6 +166,12 @@ describe('D604 — a carga das qualificações', () => {
     expect((await lerAvaliacoesDeEntrega()).map((a) => a.id)).toEqual([1, 2]);
     banco.estado.mascara = 'obra-b';
     expect((await lerAvaliacoesDeEntrega()).map((a) => a.id)).toEqual([2]);
+  });
+
+  it('a entrega diz se chegou tudo (sem a coluna, é tudo) e traz a foto da nota do mestre (CTO-D696)', async () => {
+    const [a, b] = await lerAvaliacoesDeEntrega();
+    expect(a).toMatchObject({ chegouTudo: true, fotoDocumentoId: '' });
+    expect(b).toMatchObject({ chegouTudo: false, fotoDocumentoId: 'doc-1' });
   });
 });
 
@@ -252,6 +259,21 @@ describe('D604 — as três escritas, com as chaves do contrato', () => {
       },
     });
     expect(r).toMatchObject({ avaliacaoId: 5, status: 'entregue', versao: 4, tratativaAberta: false });
+  });
+
+  it('só uma parte (CTO-D696 §3.2): chegou_tudo falso vai junto; "tudo" não manda a chave', async () => {
+    banco.estado.resposta = {
+      data: { avaliacao_id: 6, status: 'entregue', versao: 5, entregue_em: '2026-10-04', nao_conformes: 0, tratativa_aberta: false },
+      error: null,
+    };
+    const a = {
+      notaFiscal: '1', recebidoEm: '2026-10-04', prazoConforme: true, integridadeConforme: true, ocEcrConforme: true,
+      observacao: '', tratativa: '',
+    };
+    await registrarEntrega('oc-1', 4, a, false);
+    await registrarEntrega('oc-1', 4, a, true);
+    expect((banco.estado.rpc[0]!.args['p'] as Record<string, unknown>)['chegou_tudo']).toBe(false);
+    expect('chegou_tudo' in (banco.estado.rpc[1]!.args['p'] as Record<string, unknown>)).toBe(false);
   });
 
   it('a versão velha (40001) diz o que fazer', async () => {

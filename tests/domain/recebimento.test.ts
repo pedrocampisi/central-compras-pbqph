@@ -12,6 +12,11 @@ import {
   obrasDoMestre,
   oQueFazerComARecusa,
   oQueFazerComOStatus,
+  LIGACAO_VAZIA,
+  naoConformesDaLigacao,
+  ocsParaLigar,
+  problemaDaLigacao,
+  ultimaEntregaPorOc,
   type CartaoAChegar,
   type RespostasDoMestre,
 } from '../../src/domain/recebimento';
@@ -168,5 +173,65 @@ describe('as obras do mestre', () => {
 
   it('nenhuma obra: lista vazia', () => {
     expect(obrasDoMestre([], [])).toEqual([]);
+  });
+});
+
+describe('o escritório liga o sem pedido a uma OC (CTO-D696 §5.2)', () => {
+  const pronta = { ...LIGACAO_VAZIA, ocId: 'oc-1', prazoConforme: true, ocEcrConforme: true, chegouTudo: true };
+  const comNota = { notaFiscal: '789', chegouComEstrago: false };
+
+  it('o estrago que o mestre viu conta como "Não Conforme"; "só uma parte" não conta', () => {
+    expect(naoConformesDaLigacao(pronta, false)).toBe(0);
+    expect(naoConformesDaLigacao({ ...pronta, chegouTudo: false }, false)).toBe(0);
+    expect(naoConformesDaLigacao(pronta, true)).toBe(1);
+    expect(naoConformesDaLigacao({ ...pronta, prazoConforme: false, ocEcrConforme: false }, true)).toBe(3);
+  });
+
+  it('o que falta, na ordem da tela', () => {
+    expect(problemaDaLigacao(LIGACAO_VAZIA, comNota)).toBe('Escolha a OC.');
+    expect(problemaDaLigacao({ ...pronta, prazoConforme: null }, comNota)).toBe('Responda: Prazo de entrega.');
+    expect(problemaDaLigacao({ ...pronta, ocEcrConforme: null }, comNota)).toBe('Responda: Confere com a OC e com a ECR.');
+    expect(problemaDaLigacao({ ...pronta, chegouTudo: null }, comNota)).toBe('Responda: Chegou tudo?');
+    expect(problemaDaLigacao(pronta, comNota)).toBe('');
+  });
+
+  it('o mestre mandou só a foto: o número da nota é do escritório; em branco não serve', () => {
+    const soFoto = { notaFiscal: '', chegouComEstrago: false };
+    const falta = 'Escreva o número da nota: o mestre mandou só a foto.';
+    expect(problemaDaLigacao(pronta, soFoto)).toBe(falta);
+    expect(problemaDaLigacao({ ...pronta, notaFiscal: '  ' }, soFoto)).toBe(falta);
+    expect(problemaDaLigacao({ ...pronta, notaFiscal: '4321' }, soFoto)).toBe('');
+  });
+
+  it('dois "Não Conforme" (contando o estrago) pedem a tratativa; um só, não', () => {
+    const comEstrago = { notaFiscal: '1', chegouComEstrago: true };
+    expect(problemaDaLigacao(pronta, comEstrago)).toBe('');
+    expect(problemaDaLigacao({ ...pronta, prazoConforme: false }, comEstrago)).toMatch(/escreva a tratativa/);
+    expect(problemaDaLigacao({ ...pronta, prazoConforme: false, tratativa: ' ' }, comEstrago)).toMatch(/tratativa/);
+    expect(problemaDaLigacao({ ...pronta, prazoConforme: false, tratativa: 'devolvido' }, comEstrago)).toBe('');
+  });
+
+  it('as OCs para ligar: a mesma obra, emitida ou entregue; a informada primeiro, depois as mais novas', () => {
+    const oc = (id: string, numero: string, status: string, obra_id = 'obra-1') => ({ id, numero, status, obra_id });
+    const ocs = [
+      oc('a', '2026/001', 'emitida'), oc('b', '2026/003', 'entregue'), oc('c', '2026/002', 'emitida'),
+      oc('d', '2026/009', 'rascunho'), oc('e', '2026/008', 'cancelada'), oc('f', '2026/007', 'emitida', 'obra-2'),
+    ];
+    expect(ocsParaLigar(ocs, 'obra-1').map((o) => o.id)).toEqual(['b', 'c', 'a']);
+    expect(ocsParaLigar(ocs, 'obra-1', 'a').map((o) => o.id)).toEqual(['a', 'b', 'c']);
+    expect(ocsParaLigar(ocs, 'obra-1', 'e').map((o) => o.id)).toEqual(['b', 'c', 'a']);
+    expect(ocsParaLigar(ocs, 'obra-3')).toEqual([]);
+  });
+
+  it('a última entrega de cada OC: o dia mais novo; no mesmo dia, a que entrou depois', () => {
+    const m = ultimaEntregaPorOc([
+      { id: 1, ocId: 'x', recebidoEm: '2026-10-02' },
+      { id: 4, ocId: 'x', recebidoEm: '2026-10-01' },
+      { id: 2, ocId: 'y', recebidoEm: '2026-10-03' },
+      { id: 3, ocId: 'y', recebidoEm: '2026-10-03' },
+    ]);
+    expect(m.get('x')!.id).toBe(1);
+    expect(m.get('y')!.id).toBe(3);
+    expect(m.size).toBe(2);
   });
 });

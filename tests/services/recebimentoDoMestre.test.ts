@@ -40,7 +40,7 @@ vi.mock('../../src/services/supabase/client', () => ({
 }));
 
 import {
-  arquivarFotoDoRecebimento, cartaoDaLinha, lerLinksDasFotos, lerMaterialAChegar, lerNumeroDaNotaNaFoto,
+  arquivarFotoDoRecebimento, cartaoDaLinha, descartarSemPedido, lerLinksDasFotos, ligarSemPedido, lerMaterialAChegar, lerNumeroDaNotaNaFoto,
   registrarEntregaDoMestre, registrarSemPedidoDoMestre, semPedidoDaLinha,
 } from '../../src/services/supabase/recebimento';
 
@@ -305,5 +305,44 @@ describe('o escritório: a fila do sem pedido', () => {
     ];
     const m = await lerLinksDasFotos(['doc-1', 'doc-2', 'doc-1', '']);
     expect([...m]).toEqual([['doc-1', 'https://pasta-de-teste.invalid/1.jpg']]);
+  });
+});
+
+describe('o escritório: ligar e descartar, com as chaves do contrato (Banco D697 §2)', () => {
+  const ligacao = {
+    ocId: 'oc-1', versao: 7, notaFiscal: '', prazoConforme: true, ocEcrConforme: false, chegouTudo: false,
+    tratativa: ' ', observacao: '  conferido  ',
+  };
+
+  it('ligar: o id, a OC, a VERSÃO (obrigatória no escritório) e as respostas; vazios não vão', async () => {
+    banco.respostas = [{ data: { desfecho: 'ligado' }, error: null, status: 200 }];
+    await ligarSemPedido(5, ligacao);
+    expect(banco.rpc.at(-1)).toEqual({
+      esquema: 'compras', nome: 'ligar_sem_pedido',
+      args: {
+        p_id: 5, p_oc_id: 'oc-1', p_versao: 7,
+        p: { prazo_conforme: true, oc_ecr_conforme: false, chegou_tudo: false, observacao: 'conferido' },
+      },
+    });
+  });
+
+  it('ligar: a nota que o escritório escreveu vai (o mestre mandou só a foto); e a tratativa', async () => {
+    banco.respostas = [{ data: { desfecho: 'ligado' }, error: null, status: 200 }];
+    await ligarSemPedido(5, { ...ligacao, notaFiscal: ' 4321 ', tratativa: 'devolvido' });
+    expect(banco.rpc.at(-1)!.args['p']).toMatchObject({ nota_fiscal: '4321', tratativa: 'devolvido' });
+  });
+
+  it('a recusa do banco sobe com a frase dele', async () => {
+    banco.respostas = [{ data: null, error: { code: '22023', message: 'A OC é de outra obra.' }, status: 400 }];
+    await expect(ligarSemPedido(5, ligacao)).rejects.toThrow('A OC é de outra obra.');
+    await expect(descartarSemPedido(5, 'x')).rejects.toThrow('A OC é de outra obra.');
+  });
+
+  it('descartar: o id e o motivo, sem espaço nas pontas', async () => {
+    banco.respostas = [{ data: null, error: null, status: 204 }];
+    await descartarSemPedido(5, '  registrado em dobro ');
+    expect(banco.rpc.at(-1)).toEqual({
+      esquema: 'compras', nome: 'descartar_sem_pedido', args: { p_id: 5, p_motivo: 'registrado em dobro' },
+    });
   });
 });

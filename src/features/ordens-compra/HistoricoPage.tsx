@@ -42,6 +42,9 @@ import {
 } from '../../domain/fornecedores';
 import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 import { entregarPdfDaOc, lerPdfsNaPasta } from '../../services/supabase/pastaDaObra';
+import type { AvaliacaoGravada } from '../../services/supabase/qualificacao';
+import { lerLinksDasFotos } from '../../services/supabase/recebimento';
+import { ultimaEntregaPorOc } from '../../domain/recebimento';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
 
 export function HistoricoPage() {
@@ -72,6 +75,31 @@ export function HistoricoPage() {
     void lerPdfsNaPasta().then((m) => {
       if (vivo) setNaPasta(m);
     });
+    return () => {
+      vivo = false;
+    };
+  }, [data]);
+
+  /**
+   * A última entrega de cada OC, e a foto da nota que o mestre tirou (CTO-D696
+   * §5.2): debaixo do status, quem recebeu, quando, e se foi só uma parte.
+   * Sem leitura, nada aparece — o Histórico não depende dela.
+   */
+  const [entregas, setEntregas] = useState<Map<string, AvaliacaoGravada>>(new Map());
+  const [fotosDasEntregas, setFotosDasEntregas] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    let vivo = true;
+    void (async () => {
+      try {
+        const ultimas = ultimaEntregaPorOc(await lerAvaliacoesDeEntrega());
+        if (!vivo) return;
+        setEntregas(ultimas);
+        const fotos = await lerLinksDasFotos([...ultimas.values()].map((a) => a.fotoDocumentoId));
+        if (vivo) setFotosDasEntregas(fotos);
+      } catch {
+        /* sem a linha do recebimento: o resto do Histórico segue */
+      }
+    })();
     return () => {
       vivo = false;
     };
@@ -296,6 +324,29 @@ export function HistoricoPage() {
     );
   }
 
+  /** A última entrega: o dia, quem recebeu, "só uma parte" e a foto da nota. */
+  function recebimentoDaOc(o: OrdemCompra) {
+    const a = entregas.get(o.id);
+    if (!a) return null;
+    const foto = linkSeguro(fotosDasEntregas.get(a.fotoDocumentoId) ?? '');
+    return (
+      <div data-recebimento-da-oc style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+        <span>
+          Recebido {formatDate(a.recebidoEm)}
+          {a.avaliadoPorNome ? ` · ${a.avaliadoPorNome}` : ''}
+        </span>
+        {!a.chegouTudo && (
+          <span style={{ color: 'var(--aviso)', fontWeight: 600 }}>Só uma parte: espera o resto</span>
+        )}
+        {foto && (
+          <a href={foto} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+            Foto da nota
+          </a>
+        )}
+      </div>
+    );
+  }
+
   /**
    * Debaixo do status, nas OCs emitidas (D685): o ✓ com o link e o botão de
    * mandar. Fica na coluna Status e não numa coluna própria: com mais uma
@@ -374,6 +425,7 @@ export function HistoricoPage() {
       render: (o) => (
         <>
           <Pill status={o.status} />
+          {recebimentoDaOc(o)}
           {pastaDaOc(o)}
         </>
       ),

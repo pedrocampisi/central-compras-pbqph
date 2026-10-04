@@ -40,7 +40,8 @@ export type IconName =
   | 'lapis'
   | 'selo'
   | 'check'
-  | 'camera';
+  | 'camera'
+  | 'caixa';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -193,6 +194,14 @@ const PATHS: Record<IconName, React.ReactNode> = {
     <>
       <path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
       <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
+  // O material que chegou na obra: a aba Recebimentos do escritório (CTO-D696).
+  caixa: (
+    <>
+      <path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z" />
+      <path d="M3 7.5l9 4.5 9-4.5" />
+      <path d="M12 12v9" />
     </>
   ),
 };

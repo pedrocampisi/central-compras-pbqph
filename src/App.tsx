@@ -48,6 +48,7 @@ import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
 import { TelaDoMestre } from './features/recebimento/TelaDoMestre';
+import { RecebimentosPage } from './features/recebimento/RecebimentosPage';
 
 // ── Navegação da sidebar ──────────────────────────────────────────────────────
 
@@ -61,6 +62,8 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
   { id: 'nova-oc', label: 'Nova OC', icon: 'plus' },
   { id: 'historico', label: 'Histórico', icon: 'history' },
+  // O que chegou na obra sem pedido, para ligar à OC ou descartar (CTO-D696 §5.2).
+  { id: 'recebimentos', label: 'Recebimentos', icon: 'caixa' },
   { id: 'fornecedores', label: 'Fornecedores', icon: 'users' },
   // A FO 8.4.1.1 no menu (CTO-D661): a qualificação achada sem passar pela ficha.
   { id: 'qualificacao', label: 'Qualificação', icon: 'selo' },
@@ -419,6 +422,7 @@ export default function App() {
               {activeTab === 'dashboard'     && <DashboardPage />}
               {activeTab === 'nova-oc'       && <NovaOcPage />}
               {activeTab === 'historico'     && <HistoricoPage />}
+              {activeTab === 'recebimentos'  && <RecebimentosPage />}
               {activeTab === 'fornecedores'  && <FornecedoresPage />}
               {activeTab === 'qualificacao'  && <QualificacaoPage />}
               {activeTab === 'obras'         && <ObrasPage />}

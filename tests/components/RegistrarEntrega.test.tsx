@@ -160,11 +160,24 @@ describe('D604 §3.2 — o "Entregue" abre a avaliação', () => {
         notaFiscal: '1234', recebidoEm: hojeEmSaoPaulo(), prazoConforme: true, integridadeConforme: true,
         ocEcrConforme: true, observacao: 'chegou de manhã', tratativa: '',
       },
+      true,
     ]);
     expect(banco.status).not.toHaveBeenCalled();
     expect(banco.recarregar).toHaveBeenCalledTimes(1);
     expect(caixa()).toBeNull();
     expect(avisos()).toContain('OC 2026/001: entrega registrada.');
+  });
+
+  it('"Chegou só uma parte": vai como entrega parcial, e a OC continua na lista do mestre (D696 §3.2)', async () => {
+    banco.registrar = vi.fn(async () => ({
+      avaliacaoId: 2, status: 'entregue', versao: 5, entregueEm: hojeEmSaoPaulo(), naoConformes: 0, tratativaAberta: false,
+    }));
+    await abrir();
+    fireEvent.change(campo(/Nota fiscal/), { target: { value: '1234' } });
+    responder([true, true, true]);
+    fireEvent.click(screen.getByRole('checkbox', { name: /Chegou só uma parte/ }));
+    await registrar();
+    expect(banco.registrar.mock.calls[0]![3]).toBe(false);
   });
 
   it('duas "Não Conforme": a tratativa aparece e é obrigatória; com ela, grava e avisa que ficou aberta', async () => {

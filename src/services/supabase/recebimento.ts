@@ -352,6 +352,8 @@ export async function lerLinksDasFotos(ids: readonly string[]): Promise<Map<stri
 export interface Ligacao {
   ocId: string;
   versao: number;
+  /** Só quando o mestre mandou a foto sem o número: o banco exige o número da nota na avaliação. */
+  notaFiscal: string;
   prazoConforme: boolean;
   ocEcrConforme: boolean;
   chegouTudo: boolean;
@@ -362,6 +364,7 @@ export interface Ligacao {
 /** Liga o recebimento a uma OC da mesma obra: vira a avaliação dela (a integridade é o que o mestre disse). */
 export async function ligarSemPedido(id: number, l: Ligacao): Promise<void> {
   const p = {
+    ...(l.notaFiscal.trim() ? { nota_fiscal: l.notaFiscal.trim() } : {}),
     prazo_conforme: l.prazoConforme,
     oc_ecr_conforme: l.ocEcrConforme,
     chegou_tudo: l.chegouTudo,
