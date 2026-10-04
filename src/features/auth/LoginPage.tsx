@@ -24,6 +24,15 @@ import styles from './LoginPage.module.css';
 const MARCA = `${import.meta.env.BASE_URL}marca/`;
 
 /**
+ * Para onde o link do e-mail volta (CTO-D700). Sem isto, o login manda ao
+ * endereço padrão dele, que é a Central: a pessoa gravava a senha lá e tinha
+ * de achar a OC sozinha, e a tela "Definir nova senha" daqui nunca abria. O
+ * endereço já está na lista do login desde 04/09; se sair dela, o link volta
+ * ao padrão — o desvio de antes, nada pior.
+ */
+export const VOLTA_DO_LINK = 'https://compras.campisi.com.br/';
+
+/**
  * Erro vindo do link do e-mail (ex.: token expirado), lido uma única vez no
  * carregamento do módulo. O hash é limpo em seguida para o erro não
  * reaparecer em recarregamentos futuros.
@@ -81,7 +90,7 @@ export function LoginPage() {
     }
     setEnviando(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: VOLTA_DO_LINK });
       if (error) throw new Error(traduzErroAuth(error.message));
       setAviso(enviado);
     } catch (err) {
