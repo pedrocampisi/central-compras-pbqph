@@ -6,6 +6,15 @@
 
 ---
 
+### 26. A busca, o PDF com o apelido e os dois defeitos (D680) no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `ca08eeee` (CTO-D683, decisão 77); o desfazer é `aeec3fcc`**
+
+*Aberta em 04/10/2026, na decisão 76.* A régua da busca nas sete buscas, o nome do PDF pelo apelido, a trava da
+quantidade 0 e a entidade da leitura estão no ramo `d680-busca-apelido-defeitos` (`c6c28a6`), com o CI verde e NÃO
+publicados. **Espera:** a conferência do CTO. Depois vem a emenda 3: juntar, rodar a bateria, publicar pelo
+PowerShell e medir por fora.
+
+---
+
 ### 25. A tela Qualificação (D661) no ramo, esperando o CTO — **FECHADA EM 01/10/2026: NO AR em `aeec3fcc` (CTO-D662, decisão 75); o desfazer é `8d25ed4b`**
 
 *Aberta em 01/10/2026, na decisão 74.* A tela no menu, igual à planilha FO 8.4.1.1, está no ramo

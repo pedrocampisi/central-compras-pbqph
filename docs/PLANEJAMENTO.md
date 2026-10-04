@@ -2827,3 +2827,27 @@ A pausa da casa não vale para esta lista.
   Banco_de_Dados.
 
 **DAQUI EM DIANTE:** a conferência do CTO, e depois a publicação pela emenda 3.
+
+## Decisão 77 — no ar: a busca pelo que bate melhor, o PDF com o apelido e os dois defeitos · 04/10/2026
+
+**POR QUÊ (CTO-D683):** o CTO rodou a bateria numa cópia do ramo, fora desta pasta (689 verdes, tipos limpos), leu o
+diff e viu as fotos 01, 02, 06 e 11. Aceitou os dois desvios do §2.2 (no Histórico contam a razão social e o número;
+o documento colado conta) e mandou publicar. O §4.1 também foi aceito: a trava da quantidade 0 vai ao banco por carta
+dele ao Banco_de_Dados, e a tela não espera por ela.
+
+**O QUE MUDOU:**
+- **A junção:** o ramo `d680-busca-apelido-defeitos` (`c6c28a6`) entrou no `main` em `c7afab3`, sem conflito, e nada
+  fora de `docs/` difere do ramo.
+- **A bateria:** 689 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI está verde (37205033220).
+- **Publicado** às 10h19 de 04/10: `ca08eeee-7e62-480b-8092-818fa2035abd`, versão `20261004131812-c7afab3`, com 100%
+  do tráfego.
+- **O desfazer é `aeec3fcc`.**
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA**, no que o site serve:
+- o `versao.txt` é o novo, e a página, o código e o `sw.js` respondem 200;
+- o aviso da linha zerada está lá nas duas portas ("está com quantidade 0" e "Abra a OC em Editar");
+- a régua (`[^a-z0-9]+`), o apelido e a leitura que desfaz a entidade também.
+- **Logado:** não medido (pendência 13). O CTO confere "co" na Nova OC pelo Chrome do Pedro, sem salvar nada.
+
+**DAQUI EM DIANTE:** o CTO confere no ar e avisa o Pedro. A D685 (o PDF vai sozinho para a pasta da obra) vem a seguir.
