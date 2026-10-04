@@ -2798,3 +2798,32 @@ mesma publicação porque era só estilo.
 
 **DAQUI EM DIANTE:** o CTO avisa o Pedro, e ele vê a tela no ar com os dados de verdade. A cópia `OC_empresas` e o ramo
 podem sair, só por `git worktree remove`, com o sim do Pedro.
+
+## Decisão 76 — a busca pelo que bate melhor, o PDF com o apelido e os dois defeitos da 2026/010, no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D680, palavra do Pedro de hoje, com as fotos da 2026/010):**
+- "queria a comarco e apareceu ABr gesso?";
+- "O nome da OC precisa vir com o apelido e não esse nome gigantesco."
+
+A pausa da casa não vale para esta lista.
+
+**O QUE MUDOU**, no ramo `d680-busca-apelido-defeitos` (`c6c28a6`), **fora do `main` e NÃO publicado**:
+- **A régua da Central nas sete buscas da OC** (`notaDaBusca` e `pelaNota`, em `domain/pesquisa.ts`):
+  - o nome que a lista mostra conta de 0 a 3, e o resto leva 4;
+  - na mesma nota, o inativo, o bloqueado, a obra encerrada e a OC cancelada descem;
+  - sem busca, nada muda.
+- **Na produção, só lendo, com "co" na lista da Nova OC:** a Comarco foi de 14º para 1º, e a ABR Gesso, de 1º para
+  18º, entre 51.
+- **O nome do PDF** vem pelo apelido (`apelidoDoFornecedor`) nas duas portas.
+- **A linha de quantidade 0 não emite**, nem pela Nova OC nem pelo Histórico. Na Nova OC, a linha em branco some.
+- **A leitura desfaz a entidade de HTML** (`&#x3D;`).
+- **A prova:**
+  - 689 testes (eram 657);
+  - 16 sabotagens vermelhas;
+  - CI verde (37204479177);
+  - 58 fotos com dados inventados em `docs/Capturas/2026-10-04_D680/`, no ramo.
+- **O tamanho:** +248 linhas de código, sem perícia.
+- **O banco não mudou.** Recomendei ao CTO a mesma trava da quantidade no banco; a carta seria para o
+  Banco_de_Dados.
+
+**DAQUI EM DIANTE:** a conferência do CTO, e depois a publicação pela emenda 3.

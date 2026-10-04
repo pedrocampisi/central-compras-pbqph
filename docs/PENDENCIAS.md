@@ -208,6 +208,15 @@ segurou).
 
 ---
 
+### 26. A busca, o PDF com o apelido e os dois defeitos (D680) no ramo, esperando o CTO
+
+*Aberta em 04/10/2026, na decisão 76.* A régua da busca nas sete buscas, o nome do PDF pelo apelido, a trava da
+quantidade 0 e a entidade da leitura estão no ramo `d680-busca-apelido-defeitos` (`c6c28a6`), com o CI verde e NÃO
+publicados. **Espera:** a conferência do CTO. Depois vem a emenda 3: juntar, rodar a bateria, publicar pelo
+PowerShell e medir por fora.
+
+---
+
 ## Onde estão as fechadas
 
 Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.
