@@ -38,7 +38,8 @@ export type IconName =
   | 'alerta'
   | 'chevron'
   | 'lapis'
-  | 'selo';
+  | 'selo'
+  | 'check';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -184,6 +185,8 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M8.8 12.2l2.2 2.2 4.2-4.4" />
     </>
   ),
+  // O PDF da OC está na pasta da obra (CTO-D685): o ✓ do Histórico.
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
 };
 
 export function Icon({ name, size = 16, className }: IconProps) {

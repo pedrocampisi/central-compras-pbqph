@@ -18,7 +18,7 @@ import { computeItemTotal, computeOcTotals } from '../../domain/compute';
 import { formatBrl, todayIso, nowIso } from '../../domain/format';
 import { uid } from '../../domain/id';
 import { UN_PADRAO } from '../../domain/constants';
-import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
+import { generateOcPdfBlob } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
 import { ErroDaImportacao, lerLista, lerPedido, statusDoErro } from '../../services/ai/lerPedido';
 import { avisoDaLeitura, avisoDaTroca } from '../../domain/importacao';
@@ -36,8 +36,8 @@ import {
   type Leitor,
 } from '../../domain/leitor';
 import { CampoDeImportacao } from './CampoDeImportacao';
-import { getObraDirHandle } from '../../services/storage/handles';
-import { verifyHandlePermission } from '../../services/storage/permissions';
+import { entregarPdfDaOc } from '../../services/supabase/pastaDaObra';
+import { avisoDoPdf } from '../../domain/pastaDaObra';
 import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
 import type { QualificacaoGravada } from '../../services/supabase/qualificacao';
 import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
@@ -537,23 +537,10 @@ export function NovaOcPage() {
       const fornNome = apelidoDoFornecedor(data.fornecedores.find((f) => f.id === emitida.fornecedor_id));
       const filename = buildPdfFilename(emitida, fornNome);
 
-      // Tenta resolver o handle persistido para a pasta desta obra.
-      // Se não houver, ou se o navegador revogou a permissão, cai em download.
-      let obraHandle: FileSystemDirectoryHandle | undefined;
-      const stored = await getObraDirHandle(emitida.obra_id);
-      if (stored) {
-        const ok = await verifyHandlePermission(stored, true);
-        if (ok) {
-          obraHandle = stored;
-        } else {
-          showToast(
-            'Permissão da pasta da obra foi revogada. PDF será baixado pelo navegador. Reconecte em Obras.',
-            'warning',
-          );
-        }
-      }
-
-      const result = await savePdfToFile(blob, filename, obraHandle);
+      // A OC já está emitida no banco. O PDF vai para a pasta da obra pelo
+      // servidor; só se ele falhar entra o caminho de hoje (a pasta ligada
+      // neste navegador, ou o download). Com 200 não salva de novo (D685).
+      const { resposta, caminho } = await entregarPdfDaOc(emitida, blob, filename);
 
       // Carimbo DEPOIS de o arquivo existir. Antes ele era gravado junto com a
       // OC, e o banco podia afirmar "PDF gerado" de um arquivo que nunca saiu.
@@ -565,16 +552,8 @@ export function NovaOcPage() {
 
       await recarregarDados();
       stopEditing();
-      if (result === 'saved') {
-        showToast(`OC ${emitida.numero} emitida. PDF salvo na pasta da obra.`, 'success');
-      } else {
-        showToast(
-          obraHandle
-            ? `OC ${emitida.numero} emitida. Falha ao salvar na pasta — PDF baixado pelo navegador.`
-            : `OC ${emitida.numero} emitida. PDF baixado (configure pasta da obra para salvar automaticamente).`,
-          obraHandle ? 'warning' : 'info',
-        );
-      }
+      const aviso = avisoDoPdf(emitida.numero, resposta, caminho, 'emissao');
+      showToast(aviso.texto, aviso.tom);
       setTab('historico');
     } catch (err) {
       avisarErro('emitir', err);
