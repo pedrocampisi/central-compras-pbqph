@@ -45,19 +45,23 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 28. A tela "Material a chegar", do mestre de obra (D693): as fotos no ramo, esperando o CTO e o Pedro
+### 28. O app do mestre de obra (D693, D696): a tela aprovada, o passo 1 no ramo, esperando a volta do Banco
 
-*Aberta em 04/10/2026, na decisão 80.* A tela e a lógica estão no ramo `d693-material-a-chegar` (`8ec0027`), com 12
-fotos a 375, o CI verde, NÃO publicadas e NÃO ligadas ao banco. **Espera:**
-1. a conferência do CTO e a palavra do Pedro sobre as fotos;
-2. a volta do Banco aprovada, para a ligação.
+*Aberta em 04/10/2026, na decisão 80; atualizada na decisão 81.* A tela foi aprovada pelo CTO e pelo Pedro (D696). No
+ramo `d693-material-a-chegar` (`a77bfe1`), com o CI verde, NÃO publicados e NÃO ligados ao banco:
+- os dois retoques;
+- a "Entrega prevista";
+- o rascunho no celular, que vai sozinho quando o sinal volta.
 
-**Falta, na ligação:**
-- o contrato do Banco;
-- o rascunho no aparelho (o sinal fraco);
-- o dia combinado;
+**Espera:** a volta do Banco à carta D697 desta casa (a coluna `entrega_prevista`, a chave de cada envio, a versão) e
+o ramo dele.
+
+**Falta:**
+- a ligação ao contrato;
 - o lado do escritório (o Histórico e a fila do sem pedido);
-- a perícia da §9.5, porque vai passar de mil linhas.
+- a tela "Mestres" com o QR, e o login dentro do ícone no iPhone, medido;
+- as fotos ao CTO;
+- o aviso de ramo completo, com o commit, para a perícia do perito (D698).
 
 ---
 

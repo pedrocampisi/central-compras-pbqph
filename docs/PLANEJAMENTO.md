@@ -2938,3 +2938,47 @@ publicado e NÃO ligado ao banco**:
   - o rascunho no aparelho, para o sinal fraco;
   - o dia combinado, se vier a coluna;
   - o Histórico e a fila do sem pedido.
+
+## Decisão 81 — a tela do mestre aprovada; o passo 1 da D696 no ramo · 04/10/2026
+
+**POR QUÊ (CTO-D696, D697 e D698):** o CTO viu as 12 fotos, e o Pedro disse "ok" às seis telas. O CTO pediu dois
+retoques. O Pedro decidiu pela "Entrega prevista" na OC e pelo acesso por QR, que o engenheiro também gera na obra. A
+ordem: primeiro o que não depende do Banco, depois a ligação, o escritório e a tela "Mestres". A perícia é do perito
+(o Codex), uma só, sobre os dois ramos completos (D698).
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`a77bfe1`), **NÃO publicado e NÃO ligado ao banco**:
+- **Os retoques:**
+  - "Chegou material sem pedido" fica no alto da lista;
+  - o "Sair" pergunta antes, porque sem senha voltar é pedir um QR novo.
+- **A "Entrega prevista":**
+  - um campo de data opcional na Nova OC;
+  - "ENTREGA PREVISTA" no PDF;
+  - a chave `entrega_prevista` no cabeçalho da `salvar_oc` e na leitura.
+  - **Espera a coluna do Banco.** Sem ela, a data se perderia sem aviso.
+- **O rascunho no celular** (`fila.ts`, `guardaDoAparelho.ts`):
+  - cada toque fica no IndexedDB do aparelho, com a foto;
+  - o "Pronto" guarda antes de mandar;
+  - sem sinal, manda sozinho ao abrir, quando a rede volta e a cada 30 s, com a mesma chave;
+  - a recusa do banco (`RecusaDefinitiva`) para a fila e mostra o motivo;
+  - o cartão guardado não abre, para não receber duas vezes.
+- **A prova:**
+  - 751 testes;
+  - 19 sabotagens vermelhas;
+  - CI verde (37210704505);
+  - o IndexedDB provado num navegador de verdade, a 375, com recarga, foto e volta do sinal;
+  - 6 fotos em `docs/Capturas/2026-10-04_D696/`, no ramo.
+- **A carta ao Banco (D697):**
+  - **O endereço do QR é `https://compras.campisi.com.br/`**, que já está na lista do Auth.
+    - O "Esqueci minha senha" da OC não diz para onde voltar, e por isso cai no `site_url`, que é o da Central.
+    - O "mesmo endereço do Esqueci" não serviria.
+  - **Os três pedidos:** a coluna `entrega_prevista`; a `chave` de cada envio, que devolve "já estava"; e a entrega do
+    mestre sem exigir a versão da OC.
+- **O tamanho:** cerca de 1.450 linhas novas fora dos testes, entre a D693 e a D696. A perícia do perito vem antes da
+  produção.
+
+**DAQUI EM DIANTE:**
+- a volta do Banco;
+- a ligação: a lista, a entrega, a foto, o sem pedido, a fila do escritório e o Histórico;
+- a tela "Mestres" com o QR, e o iPhone medido (o login dentro do ícone instalado);
+- as fotos ao CTO;
+- o aviso de ramo completo para a perícia.
