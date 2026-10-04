@@ -104,9 +104,9 @@ export interface CartaoAChegar {
 
 const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 
-/** "hoje", "amanhã", "ontem", ou "terça, 06/10" — como se fala no canteiro. */
+/** "hoje", "amanhã", "ontem", ou "terça, 06/10" — como se fala no canteiro; vazio quando o pedido não tem data. */
 export function diaCombinado(dia: string, hoje: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return 'sem dia combinado';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return '';
   const d = new Date(`${dia}T12:00:00Z`);
   const h = new Date(`${hoje}T12:00:00Z`);
   const dif = Math.round((d.getTime() - h.getTime()) / 86_400_000);

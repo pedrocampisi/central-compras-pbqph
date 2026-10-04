@@ -133,7 +133,13 @@ function ResumoDoPedido({ cartao: c, hoje }: { cartao: CartaoAChegar; hoje: stri
     <span className={styles.resumo}>
       <span className={styles.fornecedor}>{c.fornecedor}</span>
       <span className={styles.combinado}>
-        Combinado para <strong>{dia}</strong>
+        {dia ? (
+          <>
+            Combinado para <strong>{dia}</strong>
+          </>
+        ) : (
+          'Sem dia combinado'
+        )}
       </span>
       <span className={styles.itens}>
         {c.itens.map((i, n) => (

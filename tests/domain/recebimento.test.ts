@@ -108,9 +108,9 @@ describe('o dia combinado, como se fala no canteiro', () => {
     expect(diaCombinado('2026-10-02', hoje)).toBe('sexta, 02/10');
     expect(diaCombinado('2026-10-13', hoje)).toBe('terça, 13/10');
   });
-  it('sem data, diz que não tem', () => {
-    expect(diaCombinado('', hoje)).toBe('sem dia combinado');
-    expect(diaCombinado('05/10', hoje)).toBe('sem dia combinado');
+  it('sem data, ou com data fora do formato, vazio: a tela diz "Sem dia combinado"', () => {
+    expect(diaCombinado('', hoje)).toBe('');
+    expect(diaCombinado('05/10', hoje)).toBe('');
   });
 });
 

@@ -56,6 +56,12 @@ describe('Material a chegar', () => {
     expect(screen.getByText(/1\.540,00/)).toBeTruthy();
   });
 
+  it('o pedido sem data diz "Sem dia combinado", e não "Combinado para sem dia combinado"', () => {
+    montar({ cartoes: [{ ...CARTAO, combinadoPara: '' }, { ...CARTAO, ocId: 'oc-2', combinadoPara: '05/10' }] });
+    expect(screen.getAllByText('Sem dia combinado')).toHaveLength(2);
+    expect(document.body.textContent).not.toMatch(/Combinado para/);
+  });
+
   it('com tudo "Sim" e o número escrito, o "Pronto" grava e diz "Recebido."', async () => {
     const p = montar();
     abrirEResponder(tudoSim);
