@@ -385,3 +385,58 @@
   font-size: 22px;
   color: var(--texto-suave);
 }
+
+/* Guardado no celular, esperando sinal: não abre, para não receber duas vezes. */
+.cartaoGuardado {
+  composes: cartaoAberto;
+  opacity: 0.85;
+}
+
+.cartaoNota,
+.guardado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.guardado {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  font-size: 16px;
+}
+
+.cartaoNota svg,
+.guardado svg {
+  flex: 0 0 auto;
+}
+
+.cartaoRecusado {
+  color: var(--erro);
+  font-weight: 700;
+}
+
+/* O "Sair" pergunta antes (D696 §2.2): sem senha, voltar é pedir QR novo. */
+.confirmar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 2px solid var(--borda-forte);
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+}
+
+.confirmar .perguntaTexto,
+.confirmar .dica {
+  margin: 0;
+}
+
+.prontoSeloGuardado {
+  composes: prontoSelo;
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}

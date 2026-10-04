@@ -100,6 +100,8 @@ export function cabecalhoDaOc(oc: OrdemCompra): Record<string, unknown> {
     // `emitente_id` não vai mais (CTO-D390): chave ausente não mexe, e as duas
     // OCs antigas ficam com o que têm até o banco aposentar a coluna.
     condicao_pagamento: oc.condicao_pagamento || null,
+    // A data combinada (CTO-D696): esvaziada vai como null, e o apagar pega.
+    entrega_prevista: oc.entrega_prevista || null,
     frete: oc.frete ?? 0,
     outras_despesas: oc.outras_despesas ?? 0,
     desconto_material: oc.desconto_material ?? 0,

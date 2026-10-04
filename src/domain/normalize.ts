@@ -97,6 +97,7 @@ export function normalizeOC(oc: unknown): OrdemCompra {
     fornecedor_id: String(o['fornecedor_id'] ?? ''),
     obra_id: String(o['obra_id'] ?? ''),
     condicao_pagamento: String(o['condicao_pagamento'] ?? ''),
+    entrega_prevista: String(o['entrega_prevista'] ?? ''),
     emitente_id: String(o['emitente_id'] ?? ''),
     itens: asArr(o['itens']).map(normalizeItem),
     frete: toNum(o['frete']),

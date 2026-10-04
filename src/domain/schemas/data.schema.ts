@@ -152,6 +152,7 @@ export const OrdemCompraSchema = z.object({
   fornecedor_id: z.string().default(''),
   obra_id: z.string().default(''),
   condicao_pagamento: z.string().default(''),
+  entrega_prevista: z.string().default(''),
   emitente_id: z.string().default(''),
   itens: z.array(ItemSchema).default([]),
   frete: z.number().default(0),

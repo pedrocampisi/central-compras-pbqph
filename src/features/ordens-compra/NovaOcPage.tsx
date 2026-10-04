@@ -90,6 +90,7 @@ function buildNewOc(
     fornecedor_id: defaultFornecedorId,
     obra_id: defaultObraId,
     condicao_pagamento: defaultCondicao,
+    entrega_prevista: '',
     itens: [],
     frete: 0,
     outras_despesas: 0,
@@ -927,6 +928,15 @@ export function NovaOcPage() {
           required
           value={ocEditing.data}
           onChange={(e) => updateField('data', e.target.value)}
+        />
+
+        <Field
+          label="Entrega prevista"
+          aria-label="Entrega prevista"
+          type="date"
+          hint="O dia combinado com o fornecedor. É o que o mestre vê na obra."
+          value={ocEditing.entrega_prevista ?? ''}
+          onChange={(e) => updateField('entrega_prevista', e.target.value)}
         />
 
         <Field

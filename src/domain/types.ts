@@ -178,6 +178,12 @@ export interface OrdemCompra {
   obra_id: string;
   condicao_pagamento: string;
   /**
+   * O dia em que o material deve chegar, `AAAA-MM-DD`; vazio quando ninguém
+   * combinou (CTO-D696, decisão do Pedro). É o "Combinado para" que o mestre
+   * de obra vê no cartão, e o que ele responde em "Chegou no dia combinado?".
+   */
+  entrega_prevista?: string;
+  /**
    * Da lista antiga `compras.emitentes`, que a OC não lê mais desde 15/09/2026
    * (CTO-D390). Fica só para as OCs emitidas antes, até o banco aposentar a
    * coluna. Novas OCs nascem com ela vazia.

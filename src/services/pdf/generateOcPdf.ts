@@ -301,7 +301,12 @@ export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string 
   // ── Condição de Pagamento ──────────────────────────────────────────────────
   doc.setFont('helvetica', 'bold');
   drawBox(doc, margin, y, pw - 2 * margin, 7);
-  doc.text(`CONDIÇÃO DE PAGAMENTO: ${oc.condicao_pagamento || '—'}`, margin + 2, y + 5);
+  const condicao = `CONDIÇÃO DE PAGAMENTO: ${oc.condicao_pagamento || '—'}`;
+  doc.text(condicao, margin + 2, y + 5);
+  // O dia combinado (CTO-D696): o fornecedor lê no papel o mesmo que o mestre vê na
+  // obra. Começa na coluna da Data, ou depois da condição, se ela for comprida.
+  const xDaEntrega = Math.max(margin + 120, margin + 2 + doc.getTextWidth(condicao) + 6);
+  doc.text(`ENTREGA PREVISTA: ${oc.entrega_prevista ? formatDate(oc.entrega_prevista) : '—'}`, xDaEntrega, y + 5);
   y += 9;
 
   // ── Fornecedor ─────────────────────────────────────────────────────────────

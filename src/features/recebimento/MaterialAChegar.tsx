@@ -1,5 +1,5 @@
 /**
- * "Material a chegar" — a tela do mestre de obra, no celular (CTO-D693).
+ * "Material a chegar" — a tela do mestre de obra, no celular (CTO-D693, D696).
  *
  * Para quem não tem intimidade com tecnologia, no canteiro, no sol, com a mão
  * suja e sinal fraco: uma coisa por vez, botões grandes, as palavras dele. Sem
@@ -9,27 +9,25 @@
  *     └──"Chegou material sem pedido"──▶ sem pedido ──Pronto──▶ pronto
  *
  * A tela não fala com o banco: quem a monta passa os pedidos e as funções de
- * gravar. Se a gravação falha, nada do que ele preencheu se perde — a tela
- * fica onde estava e diz o que houve.
+ * gravar. O que ele preenche fica guardado no celular a cada toque, e o
+ * "Pronto" guarda antes de mandar: sem sinal, vai sozinho depois (`fila.ts`).
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
-import type { Avaliacao } from '../../domain/qualificacao';
 import {
   PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, oQueAconteceuObrigatorio, oQueFalta,
   perguntaOQueAconteceu, quantidadeFalada, type CartaoAChegar, type RespostasDoMestre,
 } from '../../domain/recebimento';
+import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
+import {
+  CHAVES, novaChave, useFilaDoMestre, type Desfecho, type Envio, type EnvioDeRecebimento, type EnvioSemPedido,
+  type Guardado, type RascunhoDoReceber, type RascunhoSemPedido,
+} from './fila';
 import styles from './MaterialAChegar.module.css';
 
-export interface SemPedido {
-  foto: File | null;
-  numeroDaNota: string;
-  deQuem: string;
-  oQueChegou: string;
-  comEstrago: boolean;
-}
+export type { EnvioDeRecebimento, EnvioSemPedido, SemPedido } from './fila';
 
 export interface MaterialAChegarProps {
   obra: string;
@@ -37,30 +35,85 @@ export interface MaterialAChegarProps {
   cartoes: CartaoAChegar[];
   /** Lê o número da nota na foto; '' quando não conseguiu. */
   lerNumeroDaNota: (foto: File) => Promise<string>;
-  aoReceber: (cartao: CartaoAChegar, avaliacao: Avaliacao, soUmaParte: boolean, foto: File | null) => Promise<void>;
-  aoRegistrarSemPedido: (registro: SemPedido) => Promise<void>;
+  /** Grava a entrega. Lança `RecusaDefinitiva` quando o banco diz não e repetir não muda. */
+  aoReceber: (envio: EnvioDeRecebimento) => Promise<void>;
+  aoRegistrarSemPedido: (envio: EnvioSemPedido) => Promise<void>;
   aoSair?: () => void;
+  /** Onde guardar no celular; o IndexedDB do aparelho, se não vier. */
+  guarda?: GuardaDoAparelho;
 }
 
 type Tela =
   | { tipo: 'lista' }
-  | { tipo: 'receber'; cartao: CartaoAChegar }
-  | { tipo: 'sem-pedido' }
-  | { tipo: 'pronto'; titulo: string };
+  | { tipo: 'receber'; cartao: CartaoAChegar; rascunho?: RascunhoDoReceber; foto?: File; recusado?: string }
+  | { tipo: 'sem-pedido'; rascunho?: RascunhoSemPedido; foto?: File }
+  | { tipo: 'pronto'; titulo: string; texto: string; guardou: boolean };
 
-const FALHOU = 'Não consegui mandar agora. O que você preencheu continua aqui. Toque em "Pronto" de novo quando tiver sinal.';
+const NAO_GUARDOU =
+  'Não consegui guardar nem mandar. O que você preencheu continua aqui. Toque em "Pronto" de novo.';
+const GUARDADO = { titulo: 'Guardado no celular.', texto: 'Vai sozinho para o escritório quando o sinal voltar.' };
+
+/** O que o "Pronto" faz depois de mandar: termina, ou fica e diz o motivo. */
+type AoMandar = (envio: Envio, foi: Desfecho) => Promise<void> | void;
 
 export function MaterialAChegar(props: MaterialAChegarProps) {
+  const guarda = useMemo(() => props.guarda ?? guardaDoAparelho(), [props.guarda]);
+  const fila = useFilaDoMestre(guarda, props.aoReceber, props.aoRegistrarSemPedido);
   const [tela, setTela] = useState<Tela>({ tipo: 'lista' });
+  const [confirmarSaida, setConfirmarSaida] = useState(false);
   const voltar = () => setTela({ tipo: 'lista' });
+
+  const doCartao = new Map<string, Guardado>();
+  for (const g of fila.guardados) if (g.envio.tipo === 'receber') doCartao.set(g.envio.cartao.ocId, g);
+  const esperando = fila.guardados.filter((g) => g.estado === 'esperando').length;
+  const semPedidoRecusados = fila.guardados.filter((g) => g.envio.tipo === 'sem-pedido' && g.estado === 'recusado');
+
+  async function abrirCartao(c: CartaoAChegar) {
+    const [rascunho, foto] = await Promise.all([
+      guarda.ler<RascunhoDoReceber>(CHAVES.receber(c.ocId)),
+      guarda.ler<File>(CHAVES.fotoDoReceber(c.ocId)),
+    ]);
+    setTela({ tipo: 'receber', cartao: c, rascunho, foto, recusado: doCartao.get(c.ocId)?.envio.chave });
+  }
+
+  async function abrirSemPedido() {
+    const [rascunho, foto] = await Promise.all([
+      guarda.ler<RascunhoSemPedido>(CHAVES.semPedido),
+      guarda.ler<File>(CHAVES.fotoDoSemPedido),
+    ]);
+    setTela({ tipo: 'sem-pedido', rascunho, foto });
+  }
+
+  /** O sem pedido que o banco recusou volta para o formulário, como ele deixou. */
+  async function reabrirSemPedido(g: Guardado) {
+    if (g.envio.tipo !== 'sem-pedido') return;
+    const s = g.envio.registro;
+    await fila.esquecer(g.envio.chave);
+    setTela({
+      tipo: 'sem-pedido',
+      rascunho: { numero: s.numeroDaNota, deQuem: s.deQuem, oQueChegou: s.oQueChegou, semEstrago: !s.comEstrago },
+      foto: s.foto ?? undefined,
+    });
+  }
+
+  const terminar = (titulo: string) => (_: Envio, d: Desfecho) =>
+    setTela(
+      d.foi
+        ? { tipo: 'pronto', titulo, texto: 'O escritório já vê.', guardou: false }
+        : { tipo: 'pronto', ...GUARDADO, guardou: true },
+    );
 
   if (tela.tipo === 'receber') {
     return (
       <Receber
+        key={tela.cartao.ocId}
         {...props}
-        cartao={tela.cartao}
+        {...tela}
+        guarda={guarda}
+        mandar={fila.mandar}
+        esquecer={fila.esquecer}
         aoVoltar={voltar}
-        aoTerminar={() => setTela({ tipo: 'pronto', titulo: 'Recebido.' })}
+        aoTerminar={terminar('Recebido.')}
       />
     );
   }
@@ -68,8 +121,12 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
     return (
       <ChegouSemPedido
         {...props}
+        {...tela}
+        guarda={guarda}
+        mandar={fila.mandar}
+        esquecer={fila.esquecer}
         aoVoltar={voltar}
-        aoTerminar={() => setTela({ tipo: 'pronto', titulo: 'Registrado.' })}
+        aoTerminar={terminar('Registrado.')}
       />
     );
   }
@@ -77,11 +134,11 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
     return (
       <div className={styles.tela} data-tela-do-mestre="pronto">
         <div className={styles.pronto} role="status">
-          <span className={styles.prontoSelo}>
-            <Icon name="check" size={56} />
+          <span className={tela.guardou ? styles.prontoSeloGuardado : styles.prontoSelo}>
+            <Icon name={tela.guardou ? 'history' : 'check'} size={56} />
           </span>
           <h1 className={styles.prontoTitulo}>{tela.titulo}</h1>
-          <p className={styles.prontoTexto}>O escritório já vê.</p>
+          <p className={styles.prontoTexto}>{tela.texto}</p>
         </div>
         <button type="button" className={styles.primario} onClick={voltar}>
           Voltar para a lista
@@ -98,31 +155,87 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
         <h1 className={styles.titulo}>Material a chegar</h1>
       </header>
 
+      {/* No alto, à vista: com dez pedidos na lista, no pé ele não acharia (D696 §2.1). */}
+      <button type="button" className={styles.secundario} onClick={() => void abrirSemPedido()}>
+        Chegou material sem pedido
+      </button>
+
+      {esperando > 0 && (
+        <p className={styles.guardado} role="status" data-fila-do-mestre>
+          <Icon name="history" size={20} />
+          {esperando === 1 ? '1 recebimento guardado no celular.' : `${esperando} recebimentos guardados no celular.`}{' '}
+          Vai sozinho quando o sinal voltar.
+        </p>
+      )}
+      {semPedidoRecusados.map((g) => (
+        <div key={g.envio.chave} className={styles.aviso} role="alert">
+          <span>Um material sem pedido não foi: {g.motivo}</span>
+          <button type="button" className={styles.link} onClick={() => void reabrirSemPedido(g)}>
+            Abrir de novo
+          </button>
+        </div>
+      ))}
+
       {cartoes.length === 0 ? (
         <p className={styles.vazio}>Nenhum material a chegar nesta obra.</p>
       ) : (
         <ul className={styles.lista}>
-          {cartoes.map((c) => (
-            <li key={c.ocId}>
-              <button type="button" className={styles.cartao} onClick={() => setTela({ tipo: 'receber', cartao: c })}>
-                <ResumoDoPedido cartao={c} hoje={hoje} />
-                <span className={styles.cartaoAcao}>
-                  Toque para receber <Icon name="chevron" size={18} className={styles.seta} />
-                </span>
-              </button>
-            </li>
-          ))}
+          {cartoes.map((c) => {
+            const g = doCartao.get(c.ocId);
+            // Guardado esperando sinal não abre: receber de novo faria duas entregas.
+            if (g?.estado === 'esperando') {
+              return (
+                <li key={c.ocId}>
+                  <div className={styles.cartaoGuardado}>
+                    <ResumoDoPedido cartao={c} hoje={hoje} />
+                    <span className={styles.cartaoNota}>
+                      <Icon name="history" size={18} /> Guardado no celular. Vai quando tiver sinal.
+                    </span>
+                  </div>
+                </li>
+              );
+            }
+            return (
+              <li key={c.ocId}>
+                <button type="button" className={styles.cartao} onClick={() => void abrirCartao(c)}>
+                  <ResumoDoPedido cartao={c} hoje={hoje} />
+                  {g?.estado === 'recusado' ? (
+                    <span className={styles.cartaoRecusado}>Não foi: {g.motivo} Toque para ver.</span>
+                  ) : (
+                    <span className={styles.cartaoAcao}>
+                      Toque para receber <Icon name="chevron" size={18} className={styles.seta} />
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
-      <button type="button" className={styles.secundario} onClick={() => setTela({ tipo: 'sem-pedido' })}>
-        Chegou material sem pedido
-      </button>
-      {aoSair && (
-        <button type="button" className={styles.sair} onClick={aoSair}>
-          Sair
-        </button>
-      )}
+      {aoSair &&
+        (confirmarSaida ? (
+          // Ele não tem senha: sair é precisar de um QR novo para voltar (D696 §2.2).
+          <div className={styles.confirmar} role="alertdialog" aria-labelledby="sair-titulo">
+            <p id="sair-titulo" className={styles.perguntaTexto}>
+              Sair mesmo?
+            </p>
+            <p className={styles.dica}>
+              Para entrar de novo, você vai precisar de um QR novo do escritório.
+              {esperando > 0 && ' O que está guardado no celular só vai quando você entrar de novo neste celular.'}
+            </p>
+            <button type="button" className={styles.primario} onClick={() => setConfirmarSaida(false)}>
+              Não, ficar
+            </button>
+            <button type="button" className={styles.secundario} onClick={aoSair}>
+              Sim, sair
+            </button>
+          </div>
+        ) : (
+          <button type="button" className={styles.sair} onClick={() => setConfirmarSaida(true)}>
+            Sair
+          </button>
+        ))}
     </div>
   );
 }
@@ -159,16 +272,34 @@ function ResumoDoPedido({ cartao: c, hoje }: { cartao: CartaoAChegar; hoje: stri
   );
 }
 
+interface PassoProps {
+  guarda: GuardaDoAparelho;
+  lerNumeroDaNota: (foto: File) => Promise<string>;
+  mandar: (envio: Envio) => Promise<Desfecho>;
+  esquecer: (chave: string) => Promise<void>;
+  aoVoltar: () => void;
+  aoTerminar: AoMandar;
+}
+
 /** As perguntas, a foto da nota, o "O que aconteceu?" e o "Pronto". */
 function Receber({
-  cartao, hoje, lerNumeroDaNota, aoReceber, aoVoltar, aoTerminar,
-}: MaterialAChegarProps & { cartao: CartaoAChegar; aoVoltar: () => void; aoTerminar: () => void }) {
-  const [r, setR] = useState<RespostasDoMestre>(SEM_RESPOSTA);
-  const [foto, setFoto] = useState<File | null>(null);
-  const [numero, setNumero] = useState('');
-  const [texto, setTexto] = useState('');
+  cartao, hoje, rascunho, foto: fotoGuardada, recusado, guarda, lerNumeroDaNota, mandar, esquecer, aoVoltar, aoTerminar,
+}: PassoProps & { cartao: CartaoAChegar; hoje: string; rascunho?: RascunhoDoReceber; foto?: File; recusado?: string }) {
+  const [r, setR] = useState<RespostasDoMestre>(rascunho?.r ?? SEM_RESPOSTA);
+  const [foto, setFoto] = useState<File | null>(fotoGuardada ?? null);
+  const [numero, setNumero] = useState(rascunho?.numero ?? '');
+  const [texto, setTexto] = useState(rascunho?.texto ?? '');
   const [aviso, setAviso] = useState('');
   const [mandando, setMandando] = useState(false);
+
+  // Cada toque fica no celular: fechar o app não apaga nada (D696 §5.1).
+  useEffect(() => {
+    void guarda.gravar(CHAVES.receber(cartao.ocId), { r, numero, texto } satisfies RascunhoDoReceber).catch(() => undefined);
+  }, [guarda, cartao.ocId, r, numero, texto]);
+  useEffect(() => {
+    const k = CHAVES.fotoDoReceber(cartao.ocId);
+    void (foto ? guarda.gravar(k, foto) : guarda.apagar(k)).catch(() => undefined);
+  }, [guarda, cartao.ocId, foto]);
 
   const obrigatorio = oQueAconteceuObrigatorio(r);
 
@@ -181,10 +312,24 @@ function Receber({
     setAviso('');
     setMandando(true);
     try {
-      await aoReceber(cartao, avaliacaoDoMestre(r, numero, texto, hoje), r.tudo === false, foto);
-      aoTerminar();
+      if (recusado) await esquecer(recusado);
+      const envio: EnvioDeRecebimento = {
+        tipo: 'receber',
+        chave: novaChave(),
+        cartao,
+        avaliacao: avaliacaoDoMestre(r, numero, texto, hoje),
+        soUmaParte: r.tudo === false,
+        foto,
+      };
+      const d = await mandar(envio);
+      if (!d.foi && d.motivo) {
+        await esquecer(envio.chave);
+        setAviso(`Não foi: ${d.motivo}`);
+        return;
+      }
+      await aoTerminar(envio, d);
     } catch {
-      setAviso(FALHOU);
+      setAviso(NAO_GUARDOU);
     } finally {
       setMandando(false);
     }
@@ -327,15 +472,26 @@ function FotoDaNota({
 
 /** O material que chegou sem pedido: a foto, de quem, o que chegou e se veio sem estrago. */
 function ChegouSemPedido({
-  lerNumeroDaNota, aoRegistrarSemPedido, aoVoltar, aoTerminar,
-}: MaterialAChegarProps & { aoVoltar: () => void; aoTerminar: () => void }) {
-  const [foto, setFoto] = useState<File | null>(null);
-  const [numero, setNumero] = useState('');
-  const [deQuem, setDeQuem] = useState('');
-  const [oQueChegou, setOQueChegou] = useState('');
-  const [semEstrago, setSemEstrago] = useState<boolean | null>(null);
+  rascunho, foto: fotoGuardada, guarda, lerNumeroDaNota, mandar, esquecer, aoVoltar, aoTerminar,
+}: PassoProps & { rascunho?: RascunhoSemPedido; foto?: File }) {
+  const [foto, setFoto] = useState<File | null>(fotoGuardada ?? null);
+  const [numero, setNumero] = useState(rascunho?.numero ?? '');
+  const [deQuem, setDeQuem] = useState(rascunho?.deQuem ?? '');
+  const [oQueChegou, setOQueChegou] = useState(rascunho?.oQueChegou ?? '');
+  const [semEstrago, setSemEstrago] = useState<boolean | null>(rascunho?.semEstrago ?? null);
   const [aviso, setAviso] = useState('');
   const [mandando, setMandando] = useState(false);
+
+  useEffect(() => {
+    void guarda
+      .gravar(CHAVES.semPedido, { numero, deQuem, oQueChegou, semEstrago } satisfies RascunhoSemPedido)
+      .catch(() => undefined);
+  }, [guarda, numero, deQuem, oQueChegou, semEstrago]);
+  useEffect(() => {
+    void (foto ? guarda.gravar(CHAVES.fotoDoSemPedido, foto) : guarda.apagar(CHAVES.fotoDoSemPedido)).catch(
+      () => undefined,
+    );
+  }, [guarda, foto]);
 
   async function pronto() {
     if (!foto && !numero.trim()) return setAviso('Tire a foto da nota, ou escreva o número dela.');
@@ -344,10 +500,23 @@ function ChegouSemPedido({
     setAviso('');
     setMandando(true);
     try {
-      await aoRegistrarSemPedido({ foto, numeroDaNota: numero.trim(), deQuem: deQuem.trim(), oQueChegou: oQueChegou.trim(), comEstrago: !semEstrago });
-      aoTerminar();
+      const envio: EnvioSemPedido = {
+        tipo: 'sem-pedido',
+        chave: novaChave(),
+        registro: { foto, numeroDaNota: numero.trim(), deQuem: deQuem.trim(), oQueChegou: oQueChegou.trim(), comEstrago: !semEstrago },
+      };
+      const d = await mandar(envio);
+      if (!d.foi && d.motivo) {
+        await esquecer(envio.chave);
+        setAviso(`Não foi: ${d.motivo}`);
+        return;
+      }
+      // Já está na fila: o formulário fica limpo para o próximo sem pedido.
+      await guarda.apagar(CHAVES.semPedido);
+      await guarda.apagar(CHAVES.fotoDoSemPedido);
+      await aoTerminar(envio, d);
     } catch {
-      setAviso(FALHOU);
+      setAviso(NAO_GUARDOU);
     } finally {
       setMandando(false);
     }
