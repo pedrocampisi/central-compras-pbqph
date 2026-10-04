@@ -13,7 +13,7 @@
  * "Pronto" guarda antes de mandar: sem sinal, vai sozinho depois (`fila.ts`).
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
 import {
@@ -45,6 +45,8 @@ export interface MaterialAChegarProps {
   aoSair?: () => void;
   /** Um recado sobre a lista, debaixo do título (por exemplo: sem sinal, é a lista de antes). */
   aviso?: string;
+  /** No pé da lista, antes do "Sair": o pedido de pôr o ícone na tela (D696 §4). */
+  rodape?: ReactNode;
   /** Onde guardar no celular; o IndexedDB do aparelho, se não vier. */
   guarda?: GuardaDoAparelho;
 }
@@ -241,6 +243,8 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
         </ul>
       )}
 
+      {props.rodape}
+
       {aoSair &&
         (confirmarSaida ? (
           // Ele não tem senha: sair é precisar de um QR novo para voltar (D696 §2.2).
@@ -249,7 +253,7 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
               Sair mesmo?
             </p>
             <p className={styles.dica}>
-              Para entrar de novo, você vai precisar de um QR novo do escritório.
+              Para entrar de novo, você vai precisar de um QR novo do engenheiro.
               {esperando > 0 && ' O que está guardado no celular só vai quando você entrar de novo neste celular.'}
             </p>
             <button type="button" className={styles.primario} onClick={() => setConfirmarSaida(false)}>

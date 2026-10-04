@@ -18,6 +18,7 @@ import {
 } from '../../services/supabase/recebimento';
 import type { EnvioDeRecebimento, EnvioSemPedido } from './fila';
 import { MaterialAChegar } from './MaterialAChegar';
+import { PedirOIcone } from '../mestres/EntradaDoMestre';
 import styles from './MaterialAChegar.module.css';
 
 export const CHAVE_DA_LISTA = 'lista:ultima';
@@ -130,6 +131,7 @@ export function TelaDoMestre({ aoSair, guarda: guardaDeFora }: { aoSair: () => v
       aoSair={aoSair}
       aviso={semSinal ? `Sem sinal. Esta é a lista das ${horaDe(lista.lidaEm)}.` : undefined}
       guarda={guarda}
+      rodape={<PedirOIcone />}
     />
   );
 }

@@ -9,7 +9,7 @@ import type { StatusOc } from '../domain/constants';
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
 export const ABAS = [
-  'dashboard', 'nova-oc', 'historico', 'recebimentos', 'fornecedores', 'qualificacao', 'obras', 'catalogo', 'config',
+  'dashboard', 'nova-oc', 'historico', 'recebimentos', 'fornecedores', 'qualificacao', 'obras', 'mestres', 'catalogo', 'config',
 ] as const;
 export type TabId = (typeof ABAS)[number];
 

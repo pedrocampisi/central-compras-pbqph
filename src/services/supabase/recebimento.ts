@@ -119,7 +119,7 @@ export async function prepararFoto(foto: Blob): Promise<{ base64: string; mime: 
 }
 
 /** Chama uma função de borda com o crachá da sessão. Sem rede ou sem tempo, lança erro comum (espera). */
-async function chamarFuncao(
+export async function chamarFuncao(
   nome: string,
   corpo: unknown,
   tempoMs: number,

@@ -41,7 +41,9 @@ export type IconName =
   | 'selo'
   | 'check'
   | 'camera'
-  | 'caixa';
+  | 'caixa'
+  | 'capacete'
+  | 'qr';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -202,6 +204,21 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z" />
       <path d="M3 7.5l9 4.5 9-4.5" />
       <path d="M12 12v9" />
+    </>
+  ),
+  // O mestre de obra: o menu Mestres (CTO-D696).
+  capacete: (
+    <>
+      <path d="M4 17a8 8 0 0 1 16 0" />
+      <path d="M3 17h18v2H3z" />
+      <path d="M10 9V6h4v3" />
+    </>
+  ),
+  // Ler o QR, no ícone do iPhone (CTO-D696).
+  qr: (
+    <>
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+      <path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2" />
     </>
   ),
 };
