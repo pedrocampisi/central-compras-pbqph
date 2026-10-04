@@ -52,9 +52,10 @@ import { podeEditar, podeEmitirOc } from '../../services/supabase/auth';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
+import { semLinhasEmBranco, travaDaQuantidade } from '../../domain/itensDaEmissao';
 import styles from './NovaOcPage.module.css';
 import {
-  agruparPorEmpresa, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
+  agruparPorEmpresa, apelidoDoFornecedor, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
   motivoForaDaOc, opcoesDeEmpresa, opcoesDeObra, travaDaFilial,
 } from '../../domain/fornecedores';
 import {
@@ -495,7 +496,11 @@ export function NovaOcPage() {
       }
     }
     if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
-    if (ocEditing.itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
+    // A linha em branco some; a linha com quantidade 0 não emite, e a mensagem diz qual (D680).
+    const itens = semLinhasEmBranco(ocEditing.itens);
+    if (itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
+    const quantidade = travaDaQuantidade(ocEditing.itens, 'nova-oc');
+    if (quantidade) { showToast(quantidade, 'warning'); return; }
 
     // Obra sem destinatário da nota não emite: não há para quem faturar, e a
     // OC não inventa — o cadastro é do Central (CTO-D390).
@@ -508,7 +513,7 @@ export function NovaOcPage() {
       // fotografia do destinatário (quem ERA no dia da emissão). Se qualquer
       // parte falhar, nada fica gravado pela metade.
       const gravada = await salvarOrdemCompra(
-        { ...ocEditing, status: 'emitida', destinatario, atualizado_em: nowIso() },
+        { ...ocEditing, itens, status: 'emitida', destinatario, atualizado_em: nowIso() },
         idDaTentativa(),
       );
       tentativaRef.current = null;
@@ -517,6 +522,7 @@ export function NovaOcPage() {
       // O número e a versão vêm do banco — é lá que eles nascem.
       const emitida: OrdemCompra = {
         ...ocEditing,
+        itens,
         destinatario,
         id: gravada.id,
         status: gravada.status,
@@ -528,7 +534,7 @@ export function NovaOcPage() {
       };
 
       const blob = await generateOcPdfBlob(emitida, data);
-      const fornNome = data.fornecedores.find((f) => f.id === emitida.fornecedor_id)?.razao_social ?? '';
+      const fornNome = apelidoDoFornecedor(data.fornecedores.find((f) => f.id === emitida.fornecedor_id));
       const filename = buildPdfFilename(emitida, fornNome);
 
       // Tenta resolver o handle persistido para a pasta desta obra.

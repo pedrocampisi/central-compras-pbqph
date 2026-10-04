@@ -9,6 +9,7 @@
 import type { Fornecedor, OrdemCompra } from '../../domain/types';
 import type { StatusOc } from '../../domain/constants';
 import { travaDaFilial } from '../../domain/fornecedores';
+import { travaDaQuantidade } from '../../domain/itensDaEmissao';
 import { definirStatusOc, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
 import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
 import { recarregarDados } from '../../services/supabase/sync';
@@ -34,6 +35,9 @@ export async function mudarStatusDaOc(
     // Material controlado só com empresa qualificada para as ECRs dele (CTO-D605).
     const q = qualificacaoParaEmitir(oc, fornecedores);
     if (q.trava) { avisar(q.trava, 'warning'); return; }
+    // Nem com quantidade 0: o status muda sozinho, e a linha iria junto (D680).
+    const quantidade = travaDaQuantidade(oc.itens, 'historico');
+    if (quantidade) { avisar(quantidade, 'warning'); return; }
   }
   try {
     // Comando estreito: muda o status e nada mais. Vai com a versão que esta
