@@ -20,6 +20,7 @@ import { guardaDoAparelho, guardaDoDono, type GuardaDoAparelho } from '../../ser
 import {
   lerMaterialAChegar, lerNumeroDaNotaNaFoto, registrarEntregaDoMestre, registrarSemPedidoDoMestre,
 } from '../../services/supabase/recebimento';
+import { ListaPelaMetade } from '../../services/supabase/dados';
 import type { EnvioDeRecebimento, EnvioSemPedido } from './fila';
 import { MaterialAChegar } from './MaterialAChegar';
 import { PedirOIcone } from '../mestres/EntradaDoMestre';
@@ -58,17 +59,18 @@ export function TelaDoMestre(props: TelaDoMestreProps) {
 function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) {
   const guarda = useMemo(() => guardaDoDono(guardaDeFora ?? guardaDoAparelho(), dono), [guardaDeFora, dono]);
   const [lista, setLista] = useState<ListaGuardada | null>(null);
-  const [semSinal, setSemSinal] = useState(false);
+  // Por que a lista do banco não veio: sem sinal, ou chegou pela metade (CTO-D719).
+  const [falha, setFalha] = useState<'sem-sinal' | 'pela-metade' | null>(null);
 
   const ler = useCallback(async () => {
     try {
       const l = await lerMaterialAChegar();
       const nova: ListaGuardada = { ...l, lidaEm: new Date().toISOString() };
       setLista(nova);
-      setSemSinal(false);
+      setFalha(null);
       await guarda.gravar(CHAVE_DA_LISTA, nova).catch(() => undefined);
-    } catch {
-      setSemSinal(true);
+    } catch (e) {
+      setFalha(e instanceof ListaPelaMetade ? 'pela-metade' : 'sem-sinal');
     }
   }, [guarda]);
 
@@ -122,13 +124,15 @@ function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) 
   }, []);
 
   if (!lista) {
-    if (!semSinal) return <Loader texto="Buscando os pedidos…" />;
+    if (!falha) return <Loader texto="Buscando os pedidos…" />;
     return (
       <div className={styles.tela} data-tela-do-mestre="sem-lista">
         <header className={styles.topo}>
           <h1 className={styles.titulo}>Material a chegar</h1>
         </header>
-        <p className={styles.vazio}>Sem sinal para buscar os pedidos.</p>
+        <p className={styles.vazio}>
+          {falha === 'pela-metade' ? 'A lista de pedidos não chegou inteira.' : 'Sem sinal para buscar os pedidos.'}
+        </p>
         <button type="button" className={styles.primario} onClick={() => void ler()}>
           Tentar de novo
         </button>
@@ -145,7 +149,13 @@ function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) 
       aoReceber={aoReceber}
       aoRegistrarSemPedido={aoRegistrarSemPedido}
       aoSair={aoSair}
-      aviso={semSinal ? `Sem sinal. Esta é a lista das ${horaDe(lista.lidaEm)}.` : undefined}
+      aviso={
+        falha === 'pela-metade'
+          ? `A lista nova não chegou inteira. Esta é a das ${horaDe(lista.lidaEm)}.`
+          : falha === 'sem-sinal'
+            ? `Sem sinal. Esta é a lista das ${horaDe(lista.lidaEm)}.`
+            : undefined
+      }
       guarda={guarda}
       rodape={<PedirOIcone />}
     />

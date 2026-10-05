@@ -68,6 +68,12 @@ export interface Resposta<T> {
  * metade. A consulta precisa de ordem com desempate (o id), senão as páginas
  * se sobrepõem.
  */
+/**
+ * A lista não chegou inteira: mudou entre uma página e outra, ou veio sem a
+ * contagem. Não é falta de sinal, e quem mostra a lista diz isso (CTO-D719).
+ */
+export class ListaPelaMetade extends Error {}
+
 export async function todasAsLinhas<T>(
   nome: string,
   pagina: (de: number, ate: number) => PromiseLike<Resposta<T>>,
@@ -77,13 +83,13 @@ export async function todasAsLinhas<T>(
     const r = await pagina(linhas.length, linhas.length + PAGINA - 1);
     if (r.error) return r;
     if (typeof r.count !== 'number') {
-      throw new Error(`Falha ao carregar dados: a lista de ${nome} veio sem a contagem, e não há como saber se veio inteira.`);
+      throw new ListaPelaMetade(`Falha ao carregar dados: a lista de ${nome} veio sem a contagem, e não há como saber se veio inteira.`);
     }
     const veio = r.data ?? [];
     linhas.push(...veio);
     if (linhas.length >= r.count) return { data: linhas, error: null };
     if (veio.length === 0) {
-      throw new Error(`Falha ao carregar dados: a lista de ${nome} veio incompleta (${linhas.length} de ${r.count}).`);
+      throw new ListaPelaMetade(`Falha ao carregar dados: a lista de ${nome} veio incompleta (${linhas.length} de ${r.count}).`);
     }
   }
 }

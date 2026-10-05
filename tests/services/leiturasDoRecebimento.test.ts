@@ -20,6 +20,8 @@ const banco = vi.hoisted(() => ({
   /** Cada pedido que chegou: a tabela ou função, os filtros e a faixa. */
   pedidos: [] as { alvo: string; filtros: [string, unknown][]; faixa: [number, number] | null; contagem: boolean }[],
   semContagem: false,
+  /** A contagem diz uma linha a mais do que chega: a lista mudou entre as páginas. */
+  contagemAMais: false,
 }));
 
 function consulta(alvo: string, linhas: () => Record<string, unknown>[], contagem: boolean) {
@@ -33,7 +35,7 @@ function consulta(alvo: string, linhas: () => Record<string, unknown>[], contage
       const todas = linhas().filter((l) => p.filtros.every(([k, v]) => l[k] === v));
       const [de, ate] = p.faixa ?? [0, Number.POSITIVE_INFINITY];
       const data = todas.slice(de, Math.min(ate + 1, de + TETO));
-      ok({ data, error: null, count: p.contagem && !banco.semContagem ? todas.length : null });
+      ok({ data, error: null, count: p.contagem && !banco.semContagem ? todas.length + (banco.contagemAMais ? 1 : 0) : null });
     },
   };
   return c;
@@ -55,6 +57,7 @@ vi.mock('../../src/services/supabase/client', () => ({
 }));
 
 import { lerFilaSemPedido, lerMaterialAChegar } from '../../src/services/supabase/recebimento';
+import { ListaPelaMetade } from '../../src/services/supabase/dados';
 
 const pedido = (n: number) => ({
   oc_id: `oc-${n}`, numero: `2026/${n}`, intervencao_id: 'obra-1', obra: 'Obra Um', fornecedor: 'Fornecedor (teste)', itens: [],
@@ -65,6 +68,7 @@ beforeEach(() => {
   banco.funcoes = {};
   banco.pedidos = [];
   banco.semContagem = false;
+  banco.contagemAMais = false;
 });
 
 describe('a fila do escritório com a máscara de uma obra (perícia 05/10, achado 5)', () => {
@@ -119,5 +123,20 @@ describe('a lista do mestre, página por página (perícia 05/10, achado 9)', ()
     banco.funcoes['compras.material_a_chegar'] = Array.from({ length: 1001 }, (_, i) => pedido(i));
     banco.semContagem = true;
     await expect(lerMaterialAChegar()).rejects.toThrow(/sem a contagem/);
+  });
+
+  it('a lista que não chegou inteira acusa com o tipo próprio, para a tela não dizer "sem sinal" (CTO-D719)', async () => {
+    banco.funcoes['compras.material_a_chegar'] = Array.from({ length: 1001 }, (_, i) => pedido(i));
+    banco.semContagem = true;
+    const e = await lerMaterialAChegar().catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(ListaPelaMetade);
+  });
+
+  it('a contagem promete mais do que chega (mudou entre as páginas): acusa com o mesmo tipo', async () => {
+    banco.funcoes['compras.material_a_chegar'] = Array.from({ length: 1000 }, (_, i) => pedido(i));
+    banco.contagemAMais = true;
+    const e = await lerMaterialAChegar().catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(ListaPelaMetade);
+    expect((e as Error).message).toMatch(/veio incompleta/);
   });
 });

@@ -46,6 +46,7 @@ vi.mock('../../src/services/guardaDoAparelho', async (original) => {
 });
 
 import App from '../../src/App';
+import { ListaPelaMetade } from '../../src/services/supabase/dados';
 import { TelaDoMestre, CHAVE_DA_LISTA } from '../../src/features/recebimento/TelaDoMestre';
 
 window.matchMedia ??= ((q: string) => ({
@@ -98,6 +99,26 @@ describe('a tela do mestre, ligada ao banco', () => {
     render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
     expect(await screen.findByText('Fornecedor de Teste')).toBeTruthy();
     expect(await screen.findByText('Sem sinal. Esta é a lista das 14h05.')).toBeTruthy();
+  });
+
+  it('a lista nova chegou pela metade: mostra a de antes, e diz isso, não "sem sinal" (CTO-D719)', async () => {
+    await guardaDoDono(celular.guarda!, 'conta-a').gravar(CHAVE_DA_LISTA, {
+      cartoes: [CARTAO], obras: [], lidaEm: '2026-10-04T17:05:00.000Z',
+    });
+    servico.lerMaterialAChegar.mockRejectedValue(new ListaPelaMetade('a lista de material a chegar veio incompleta (1000 de 1001)'));
+    render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
+    expect(await screen.findByText('A lista nova não chegou inteira. Esta é a das 14h05.')).toBeTruthy();
+    expect(screen.getByText('Fornecedor de Teste')).toBeTruthy();
+    expect(screen.queryByText(/[Ss]em sinal/)).toBeNull();
+  });
+
+  it('pela metade e sem lista guardada: diz que não chegou inteira, e "Tentar de novo" busca outra vez', async () => {
+    servico.lerMaterialAChegar.mockRejectedValueOnce(new ListaPelaMetade('veio sem a contagem'));
+    render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
+    expect(await screen.findByText('A lista de pedidos não chegou inteira.')).toBeTruthy();
+    expect(screen.queryByText(/[Ss]em sinal/)).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+    expect(await screen.findByText('Fornecedor de Teste')).toBeTruthy();
   });
 
   it('sem sinal e sem lista guardada: diz, e "Tentar de novo" busca outra vez', async () => {
