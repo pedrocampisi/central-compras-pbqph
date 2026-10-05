@@ -52,7 +52,7 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 "Mestres" com o QR e o caminho do iPhone. O desfazer da tela é `4da03d09`.
 
 **Falta:**
-- a conferência do CTO da versão no ar (carta `D721-no-ar-73d2b3db-o-app-do-mestre`);
+- ~~a conferência do CTO da versão no ar~~ — **conferida** (CTO, 05/10, commit `3503160` dele);
 - **o primeiro uso** (D716): o primeiro mestre é cadastrado pelo engenheiro que o Pedro escolher, nunca por esta casa.
   No dia, esta casa fica de prontidão até o primeiro recebimento sair (pendência 31).
 
