@@ -3133,3 +3133,34 @@ fica de prontidão para consertar no mesmo dia.
 - **O banco não mudou** por esta casa.
 
 **DAQUI EM DIANTE:** a triagem do CTO, quando o Banco medir os achados dele. Depois, a carta da produção.
+
+## Decisão 88 — no ar: o app do mestre e o lado do escritório · 05/10/2026
+
+**POR QUÊ (CTO-D720/D721):** a triagem aceitou os achados da OC (3, 5, 6 e 9), consertados no ramo. O CTO mandou
+fundir e publicar só depois da campainha do Banco. Ela tocou às 10h4x de 05/10: o contrato do mestre está na produção
+(migrations `20261004120000` e `20261004120100`, bordas do commit `353e431`).
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes da junção:** `4da03d09` (a D701), `versao.txt` `20261004151414-c1bfbf5`. Se for
+  preciso desfazer tela e banco, a tela volta primeiro.
+- **O contrato foi lido no mapa da produção** (`compartilhado/tipos-banco.ts`, 05/10 10h45). As sete coisas que o
+  ramo chama estão lá, com os argumentos certos. Nenhum código desta casa importa o mapa.
+- **A junção:** o ramo `d693-material-a-chegar` (`af84116`) entrou no `main` em `a335f66`, sem conflito, e nada fora
+  de `docs/` difere do ramo.
+- **Um tropeço:** a pasta do `main` não tinha as duas bibliotecas da D710 instaladas. Foram instaladas pelo arquivo de
+  versões travadas, sem mudar versão nenhuma.
+- **A bateria:** 924 testes, tipos e lint limpos, o `conferir` deu 7 de 7, o CI ficou verde (37319983083), e a
+  conferência do pacote deu 5 de 5.
+- **Publicado** pelo PowerShell às 10h53 de 05/10: `73d2b3db-0c22-44bd-b7cf-e2641e4f8614`, versão
+  `20261005135251-a335f66`, com 100% do tráfego.
+- **O banco não mudou** por esta casa. Nenhum mestre de teste, nenhum e-mail, nenhuma senha.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo; a página, o código, o `sw.js` e o pedaço do QR respondem 200;
+- o código servido tem a "Entrega prevista", "Recebimentos", "Mestres", as funções do mestre e os recados da perícia;
+- o "Esqueci" continua mandando para `https://compras.campisi.com.br/`;
+- a página de entrada abriu no navegador sem erro no console;
+- **não provado por fora:** as telas com dados de verdade, porque é preciso entrar com conta. A prova é o primeiro uso.
+
+**DAQUI EM DIANTE:** o CTO confere a versão no ar. No dia do primeiro mestre de verdade (D716), esta casa fica de
+prontidão até o primeiro recebimento sair.

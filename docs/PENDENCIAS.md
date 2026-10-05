@@ -45,23 +45,16 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 28. O app do mestre de obra (D693, D696): o ramo completo, esperando a perícia
+### 28. O app do mestre de obra (D693, D696): no ar, esperando o primeiro uso
 
-*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81, 84, 85, 86 e 87.* No ramo `d693-material-a-chegar` (`af84116`),
-com o CI verde, **NÃO publicado**: a tela do mestre ligada ao contrato do Banco, o lado do escritório, a tela "Mestres"
-com o QR e o caminho do iPhone.
+*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81, 84, 85, 86, 87 e 88.* **No ar desde 05/10, 10h53,
+em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o lado do escritório (Recebimentos), a tela
+"Mestres" com o QR e o caminho do iPhone. O desfazer da tela é `4da03d09`.
 
-**Espera:**
-- ~~o CTO: as fotos e as duas bibliotecas~~ — **conferido e aprovado na D710** (04/10);
-- ~~o Banco: a prova da `verifyOtp` e o nome das obras~~ — **feitos** (Banco-D710); a troca está no ramo em
-  `99c0588` (decisão 85);
-- ~~a perícia~~ — **chegou** (D718); os achados da OC (3, 5, 6 e 9) reproduziram e estão consertados em `a6a7242`
-  (decisão 86); o 7 é do Banco;
-- a medida do CTO conferida (D719), e o recado próprio da lista pela metade feito (decisão 87);
-- a triagem do CTO, quando o Banco medir os achados dele;
-- ~~o ensaio num iPhone de verdade~~ — **saiu** (D716): o aparelho se prova no primeiro uso (pendência 31).
-
-**Falta:** publicar, só com carta do CTO, e com o ramo do Banco no ar antes.
+**Falta:**
+- a conferência do CTO da versão no ar (carta `D721-no-ar-73d2b3db-o-app-do-mestre`);
+- **o primeiro uso** (D716): o primeiro mestre é cadastrado pelo engenheiro que o Pedro escolher, nunca por esta casa.
+  No dia, esta casa fica de prontidão até o primeiro recebimento sair (pendência 31).
 
 ---
 
