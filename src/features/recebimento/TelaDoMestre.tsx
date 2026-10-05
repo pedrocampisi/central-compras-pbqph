@@ -6,13 +6,17 @@
  * sinal, ele abre o app e vê os pedidos da última vez que leu, e recebe do mesmo
  * jeito — a fila manda quando o sinal voltar. A lista é lida de novo ao abrir,
  * quando a rede volta, quando o app volta à frente e depois de cada envio.
+ *
+ * Tudo o que fica no celular é da conta que entrou (`dono`): outra conta no
+ * mesmo celular não vê a lista, os rascunhos nem as fotos, e a fila de uma
+ * nunca vai com a sessão da outra (perícia 05/10, achado 3).
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader } from '../../components/Loader/Loader';
 import { todayIso } from '../../domain/format';
 import { obrasDoMestre, type CartaoAChegar, type ObraDoMestre } from '../../domain/recebimento';
-import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
+import { guardaDoAparelho, guardaDoDono, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
   lerMaterialAChegar, lerNumeroDaNotaNaFoto, registrarEntregaDoMestre, registrarSemPedidoDoMestre,
 } from '../../services/supabase/recebimento';
@@ -39,8 +43,20 @@ function horaDe(iso: string): string {
   return `${h}h${m}`;
 }
 
-export function TelaDoMestre({ aoSair, guarda: guardaDeFora }: { aoSair: () => void; guarda?: GuardaDoAparelho }) {
-  const guarda = useMemo(() => guardaDeFora ?? guardaDoAparelho(), [guardaDeFora]);
+interface TelaDoMestreProps {
+  aoSair: () => void;
+  /** A conta que entrou: o dono de tudo o que esta tela guarda no celular. */
+  dono: string;
+  guarda?: GuardaDoAparelho;
+}
+
+/** Trocou a conta, troca a tela inteira: nada do que a anterior viu fica à vista. */
+export function TelaDoMestre(props: TelaDoMestreProps) {
+  return <TelaDaConta key={props.dono} {...props} />;
+}
+
+function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) {
+  const guarda = useMemo(() => guardaDoDono(guardaDeFora ?? guardaDoAparelho(), dono), [guardaDeFora, dono]);
   const [lista, setLista] = useState<ListaGuardada | null>(null);
   const [semSinal, setSemSinal] = useState(false);
 

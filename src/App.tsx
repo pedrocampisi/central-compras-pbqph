@@ -344,7 +344,7 @@ export default function App() {
   if (perfil?.papel === 'mestre') {
     return (
       <>
-        <TelaDoMestre aoSair={() => void handleSair()} />
+        <TelaDoMestre dono={userId} aoSair={() => void handleSair()} />
         <ToastContainer />
       </>
     );

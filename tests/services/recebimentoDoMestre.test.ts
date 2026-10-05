@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RecusaDefinitiva } from '../../src/domain/recebimento';
+import { RecusaDefinitiva, avaliacaoDoMestre } from '../../src/domain/recebimento';
 import type { Avaliacao } from '../../src/domain/qualificacao';
 
 /**
@@ -16,10 +16,23 @@ const banco = vi.hoisted(() => ({
   tabelas: {} as Record<string, Record<string, unknown>[]>,
 }));
 
+/**
+ * A chamada de função do Supabase: aceita `order` e `range` (a lista vai por
+ * página) e responde ao ser esperada. Lista vem com a contagem, como a API
+ * manda quando se pede.
+ */
 function rpcFalso(esquema: string) {
-  return async (nome: string, args: Record<string, unknown> = {}) => {
+  return (nome: string, args: Record<string, unknown> = {}) => {
     banco.rpc.push({ esquema, nome, args });
-    return banco.respostas.length > 1 ? banco.respostas.shift()! : banco.respostas[0]!;
+    const c = {
+      order: () => c,
+      range: () => c,
+      then: (ok: (r: unknown) => unknown, falhou?: (e: unknown) => unknown) => {
+        const r = banco.respostas.length > 1 ? banco.respostas.shift()! : banco.respostas[0]!;
+        return Promise.resolve(Array.isArray(r.data) ? { ...r, count: r.data.length } : r).then(ok, falhou);
+      },
+    };
+    return c;
   };
 }
 
@@ -148,6 +161,15 @@ describe('a entrega do mestre (compras.registrar_entrega)', () => {
       },
     }]);
     expect(fetchFalso).not.toHaveBeenCalled();
+  });
+
+  it('dois "Não": o que o mestre contou vai em `tratativa`, inteiro, e a observação fica de fora (perícia 05/10, achado 7: é este campo que o banco leva ao sem pedido)', async () => {
+    const r = { noDia: false, semEstrago: false, oQueFoiPedido: true, tudo: true };
+    const avaliacao = avaliacaoDoMestre(r, '4567', '  Quatro sacos rasgados e chegou dois dias depois  ', '2026-10-05');
+    await registrarEntregaDoMestre(entrega({ avaliacao }));
+    const p = banco.rpc[0]!.args['p'] as Record<string, unknown>;
+    expect(p['tratativa']).toBe('Quatro sacos rasgados e chegou dois dias depois');
+    expect(p).not.toHaveProperty('observacao');
   });
 
   it('com foto: a foto vai primeiro, para a pasta da obra, e o id dela vai na entrega', async () => {

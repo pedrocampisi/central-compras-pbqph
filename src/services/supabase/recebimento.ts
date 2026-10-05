@@ -53,10 +53,24 @@ export interface ListaDoMestre {
   obras: ObraDoMestre[];
 }
 
+/**
+ * As duas leituras vão página por página até a contagem (perícia 05/10,
+ * achado 9): a API corta em mil linhas sem erro, e lista pela metade acusa em
+ * vez de seguir calada. A ordem é a das funções, com o id de desempate, para
+ * as páginas não se sobreporem.
+ */
 export async function lerMaterialAChegar(): Promise<ListaDoMestre> {
   const [lista, obras] = await Promise.all([
-    compras().rpc('material_a_chegar'),
-    core().rpc('obras_do_mestre_com_nome'),
+    todasAsLinhas('material a chegar', (de, ate) =>
+      compras()
+        .rpc('material_a_chegar', {}, { count: 'exact' })
+        .order('entrega_prevista', { nullsFirst: false })
+        .order('data')
+        .order('numero')
+        .order('oc_id')
+        .range(de, ate)),
+    todasAsLinhas('obras do mestre', (de, ate) =>
+      core().rpc('obras_do_mestre_com_nome', {}, { count: 'exact' }).order('obra').order('intervencao_id').range(de, ate)),
   ]);
   if (lista.error) throw new Error(lista.error.message);
   if (obras.error) throw new Error(obras.error.message);
@@ -331,9 +345,16 @@ export function semPedidoDaLinha(l: Record<string, unknown>): SemPedidoNaFila {
   };
 }
 
-export async function lerFilaSemPedido(): Promise<SemPedidoNaFila[]> {
-  const r = await todasAsLinhas('recebimentos sem pedido', (de, ate) =>
-    compras().from('sem_pedido_na_fila').select('*', { count: 'exact' }).order('criado_em').order('id').range(de, ate));
+/**
+ * A fila do escritório. Com a máscara de uma obra (`obra`), o filtro vai NA
+ * consulta: as linhas das outras obras nem chegam ao navegador (perícia 05/10,
+ * achado 5; a família da D620).
+ */
+export async function lerFilaSemPedido(obra: string | null): Promise<SemPedidoNaFila[]> {
+  const r = await todasAsLinhas('recebimentos sem pedido', (de, ate) => {
+    const q = compras().from('sem_pedido_na_fila').select('*', { count: 'exact' });
+    return (obra ? q.eq('intervencao_id', obra) : q).order('criado_em').order('id').range(de, ate);
+  });
   if (r.error) throw new Error(`Falha ao ler os recebimentos sem pedido: ${r.error.message}`);
   return ((r.data ?? []) as Record<string, unknown>[]).map(semPedidoDaLinha);
 }

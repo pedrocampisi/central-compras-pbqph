@@ -47,8 +47,9 @@ export function RecebimentosPage() {
 
   const ler = useCallback(async () => {
     try {
+      // A obra da máscara vai na busca; o filtro daqui é só a segunda trava.
       const mascara = obraDaMascara();
-      const todos = await lerFilaSemPedido();
+      const todos = await lerFilaSemPedido(mascara);
       const f = mascara ? todos.filter((x) => x.intervencaoId === mascara) : todos;
       setFila(f);
       setErro('');

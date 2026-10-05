@@ -20,7 +20,7 @@ const banco = vi.hoisted(
 );
 vi.mock('../../src/services/supabase/recebimento', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/recebimento')>()),
-  lerFilaSemPedido: () => banco.fila(),
+  lerFilaSemPedido: (...a: unknown[]) => banco.fila(...a),
   lerLinksDasFotos: (ids: string[]) => banco.links(ids),
   ligarSemPedido: (...a: unknown[]) => banco.ligar(...a),
   descartarSemPedido: (...a: unknown[]) => banco.descartar(...a),
@@ -130,10 +130,16 @@ describe('Recebimentos: a fila do sem pedido', () => {
     expect(screen.getByText('Só a foto')).toBeTruthy();
   });
 
-  it('com a máscara de uma obra, só os desta obra', async () => {
+  it('com a máscara de uma obra, a obra vai NA busca (perícia 05/10, achado 5), e só os desta obra aparecem', async () => {
     banco.mascara = OUTRA.id;
     render(<RecebimentosPage />);
     expect(await screen.findByText('Nenhum recebimento sem pedido esperando o escritório.')).toBeTruthy();
+    expect(banco.fila).toHaveBeenCalledWith(OUTRA.id);
+  });
+
+  it('sem a máscara, a busca vai sem obra', async () => {
+    await montar();
+    expect(banco.fila).toHaveBeenCalledWith(null);
   });
 
   it('quem só lê não vê os botões', async () => {

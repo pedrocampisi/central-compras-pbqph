@@ -60,6 +60,12 @@ type Tela =
 const NAO_GUARDOU =
   'Não consegui guardar nem mandar. O que você preencheu continua aqui. Toque em "Pronto" de novo.';
 const GUARDADO = { titulo: 'Guardado no celular.', texto: 'Vai sozinho para o escritório quando o sinal voltar.' };
+// O celular que não guarda (sem IndexedDB): não se promete o que fechar o app
+// apaga (perícia 05/10, achado 6).
+const SO_COM_O_APP_ABERTO = {
+  titulo: 'Ainda não foi.',
+  texto: 'Sem sinal, e este celular não está guardando. Não feche o app: ele manda sozinho quando o sinal voltar.',
+};
 
 /** O que o "Pronto" faz depois de mandar: termina, ou fica e diz o motivo. */
 type AoMandar = (envio: Envio, foi: Desfecho) => Promise<void> | void;
@@ -69,6 +75,18 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   const fila = useFilaDoMestre(guarda, props.aoReceber, props.aoRegistrarSemPedido);
   const [tela, setTela] = useState<Tela>({ tipo: 'lista' });
   const [confirmarSaida, setConfirmarSaida] = useState(false);
+  // Só se diz "guardado no celular" quando o celular guarda de verdade.
+  const [duravel, setDuravel] = useState(false);
+  useEffect(() => {
+    let viva = true;
+    guarda
+      .duravel()
+      .then((d) => viva && setDuravel(d))
+      .catch(() => undefined);
+    return () => {
+      viva = false;
+    };
+  }, [guarda]);
   const voltar = () => setTela({ tipo: 'lista' });
 
   const doCartao = new Map<string, Guardado>();
@@ -110,12 +128,11 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
     });
   }
 
-  const terminar = (titulo: string) => (_: Envio, d: Desfecho) =>
-    setTela(
-      d.foi
-        ? { tipo: 'pronto', titulo, texto: d.aviso || 'O escritório já vê.', guardou: false }
-        : { tipo: 'pronto', ...GUARDADO, guardou: true },
-    );
+  const terminar = (titulo: string) => async (_: Envio, d: Desfecho) => {
+    if (d.foi) return setTela({ tipo: 'pronto', titulo, texto: d.aviso || 'O escritório já vê.', guardou: false });
+    const guardou = await guarda.duravel().catch(() => false);
+    setTela({ tipo: 'pronto', ...(guardou ? GUARDADO : SO_COM_O_APP_ABERTO), guardou: true });
+  };
 
   if (tela.tipo === 'receber') {
     return (
@@ -185,8 +202,17 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
       {esperando > 0 && (
         <p className={styles.guardado} role="status" data-fila-do-mestre>
           <Icon name="history" size={20} />
-          {esperando === 1 ? '1 recebimento guardado no celular.' : `${esperando} recebimentos guardados no celular.`}{' '}
-          Vai sozinho quando o sinal voltar.
+          {duravel ? (
+            <>
+              {esperando === 1 ? '1 recebimento guardado no celular.' : `${esperando} recebimentos guardados no celular.`}{' '}
+              Vai sozinho quando o sinal voltar.
+            </>
+          ) : (
+            <>
+              {esperando === 1 ? '1 recebimento esperando sinal.' : `${esperando} recebimentos esperando sinal.`} Não feche
+              o app: este celular não está guardando.
+            </>
+          )}
         </p>
       )}
       {semPedidoRecusados.map((g) => (
@@ -219,7 +245,8 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
                   <div className={styles.cartaoGuardado}>
                     <ResumoDoPedido cartao={c} hoje={hoje} comObra={variasObras} />
                     <span className={styles.cartaoNota}>
-                      <Icon name="history" size={18} /> Guardado no celular. Vai quando tiver sinal.
+                      <Icon name="history" size={18} />{' '}
+                      {duravel ? 'Guardado no celular. Vai quando tiver sinal.' : 'Esperando sinal. Não feche o app.'}
                     </span>
                   </div>
                 </li>
@@ -254,7 +281,10 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
             </p>
             <p className={styles.dica}>
               Para entrar de novo, você vai precisar de um QR novo do engenheiro.
-              {esperando > 0 && ' O que está guardado no celular só vai quando você entrar de novo neste celular.'}
+              {esperando > 0 &&
+                (duravel
+                  ? ' O que está guardado no celular só vai quando você entrar de novo neste celular.'
+                  : ' O que está esperando sinal se perde: este celular não está guardando.')}
             </p>
             <button type="button" className={styles.primario} onClick={() => setConfirmarSaida(false)}>
               Não, ficar

@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { MaterialAChegar, type MaterialAChegarProps } from '../../src/features/recebimento/MaterialAChegar';
 import { RecusaDefinitiva, TENTAR_DE_NOVO_MS } from '../../src/features/recebimento/fila';
 import type { CartaoAChegar } from '../../src/domain/recebimento';
-import { guardaNaMemoria, type GuardaDoAparelho } from '../../src/services/guardaDoAparelho';
+import { guardaDoAparelho, guardaNaMemoria, type GuardaDoAparelho } from '../../src/services/guardaDoAparelho';
 
 /**
  * CTO-D693 e D696: a tela do mestre de obra, por COMPORTAMENTO. A tela não
@@ -37,7 +37,8 @@ function montar(extra: Partial<MaterialAChegarProps> = {}) {
     lerNumeroDaNota: vi.fn(async () => '000123'),
     aoReceber: vi.fn(async () => undefined),
     aoRegistrarSemPedido: vi.fn(async () => undefined),
-    guarda: guardaNaMemoria(),
+    // Finge o aparelho que guarda (o IndexedDB): durável.
+    guarda: guardaNaMemoria(true),
     ...extra,
   };
   render(<MaterialAChegar {...props} />);
@@ -250,6 +251,21 @@ describe('Material a chegar: guardado no celular (D696 §5.1)', () => {
     const [primeira, segunda] = aoReceber.mock.calls as unknown as [[{ chave: string }], [{ chave: string }]];
     expect(segunda[0].chave).toBe(primeira[0].chave);
     expect(await p.guarda!.chaves('')).toEqual([]);
+  });
+
+  it('o celular que não guarda (sem IndexedDB): sem sinal, NÃO diz "Guardado no celular", diz para não fechar (perícia 05/10, achado 6)', async () => {
+    const aoReceber = vi.fn(async () => Promise.reject(new Error('Failed to fetch')));
+    montar({ aoReceber, guarda: guardaDoAparelho() });
+    await abrirEResponder(tudoSim);
+    escreverNumero('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(await screen.findByText('Ainda não foi.')).toBeTruthy();
+    expect(screen.getByText(/Não feche o app/)).toBeTruthy();
+    expect(screen.queryByText(/[Gg]uardado no celular/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar para a lista' }));
+    expect(await screen.findByText(/1 recebimento esperando sinal/)).toBeTruthy();
+    expect(screen.getByText(/Não feche o app: este celular não está guardando/)).toBeTruthy();
+    expect(screen.queryByText(/[Gg]uardado no celular/)).toBeNull();
   });
 
   it('o guardado vai sozinho também ao abrir o app de novo', async () => {
