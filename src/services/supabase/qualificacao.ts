@@ -240,9 +240,21 @@ export interface EntregaGravada {
   tratativaAberta: boolean;
 }
 
-/** A avaliação e o "entregue" numa escrita só (contrato §2). */
-export async function registrarEntrega(ocId: string, versao: number, a: Avaliacao): Promise<EntregaGravada> {
+/**
+ * A avaliação e o "entregue" numa escrita só (contrato §2).
+ *
+ * `chegouTudo` falso: foi só uma parte, e a OC continua na lista do mestre
+ * esperando o resto (CTO-D696 §3.2). Só vai quando é falso: sem a chave, o
+ * banco entende "tudo", como sempre entendeu.
+ */
+export async function registrarEntrega(
+  ocId: string,
+  versao: number,
+  a: Avaliacao,
+  chegouTudo = true,
+): Promise<EntregaGravada> {
   const p = {
+    ...(chegouTudo ? {} : { chegou_tudo: false }),
     nota_fiscal: a.notaFiscal.trim(),
     recebido_em: a.recebidoEm,
     prazo_conforme: a.prazoConforme,
@@ -289,6 +301,10 @@ export interface AvaliacaoGravada {
   cienciaPorNome: string;
   cienciaEm: string;
   cienciaNota: string;
+  /** Falso quando foi só uma parte (CTO-D693); sem a coluna, verdadeiro. */
+  chegouTudo: boolean;
+  /** A foto da nota que o mestre tirou na obra; '' sem foto. */
+  fotoDocumentoId: string;
 }
 
 /** Todas as avaliações, pelo dia do recebimento; com a máscara, só as da obra dela. */
@@ -313,5 +329,7 @@ export async function lerAvaliacoesDeEntrega(obra: string | null = obraDaMascara
     cienciaPorNome: txt(l['ciencia_por_nome']),
     cienciaEm: txt(l['ciencia_em']),
     cienciaNota: txt(l['ciencia_nota']),
+    chegouTudo: l['chegou_tudo'] !== false,
+    fotoDocumentoId: txt(l['foto_documento_id']),
   }));
 }

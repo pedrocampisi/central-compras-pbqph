@@ -1,0 +1,35 @@
+/* A entrada do mestre pelo QR e o pedido do ícone (CTO-D696 §4). O resto vem da tela do mestre. */
+
+.passos {
+  margin: 0;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.camera {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--raio-grande);
+  background: var(--qr-escuro);
+}
+
+.pedido {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+
+.pedidoTitulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--marca);
+}

@@ -1,0 +1,83 @@
+/* Recebimentos: a fila do "chegou sem pedido", do lado do escritório (CTO-D696). */
+
+.lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel);
+  box-shadow: var(--sombra-suave);
+}
+
+.cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+.cabeca strong {
+  font-size: 15px;
+  color: var(--texto);
+}
+
+.estrago {
+  padding: 2px 8px;
+  border-radius: var(--raio-pill);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 13px;
+}
+.dados dt {
+  color: var(--texto-suave);
+}
+.dados dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.link {
+  margin-right: auto;
+  color: var(--marca);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .dados {
+    grid-template-columns: 1fr;
+  }
+  .dados dd {
+    margin-bottom: 4px;
+  }
+}

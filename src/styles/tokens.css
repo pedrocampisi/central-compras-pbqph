@@ -42,6 +42,10 @@
   --fonte-display: 'Source Serif 4', Georgia, serif;
   --fonte-sans: 'Albert Sans', system-ui, -apple-system, sans-serif;
   --fonte-mono: ui-monospace, 'SF Mono', Consolas, monospace; /* CNPJ, códigos */
+  /* O QR do mestre (CTO-D696): escuro sobre claro nos DOIS temas — a câmera lê
+   * assim, e QR invertido muita câmera não lê. Por isso não mudam no escuro. */
+  --qr-claro: #ffffff;
+  --qr-escuro: #0b1a23;
 }
 
 [data-tema='escuro'] {

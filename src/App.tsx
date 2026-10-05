@@ -22,7 +22,7 @@ import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
 import { useQualificacaoStore } from './stores/useQualificacaoStore';
 
 // Services
-import { sessaoAtual, perfilAtual, sair, type Papel } from './services/supabase/auth';
+import { sessaoAtual, perfilAtual, sair, podeGerirMestre, type Papel } from './services/supabase/auth';
 import { supabase } from './services/supabase/client';
 import { assinarMudancas } from './services/supabase/dados';
 import { recarregarDados } from './services/supabase/sync';
@@ -47,6 +47,13 @@ import { QualificacaoPage } from './features/qualificacao/QualificacaoPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
+import { TelaDoMestre } from './features/recebimento/TelaDoMestre';
+import { RecebimentosPage } from './features/recebimento/RecebimentosPage';
+import { MestresPage } from './features/mestres/MestresPage';
+import { EntrarNoIcone, PorOIconeNoIphone, QrNaoEntrou } from './features/mestres/EntradaDoMestre';
+import { acessoQueChegouNoEndereco, ehDaApple, estaNoIcone } from './services/aparelho';
+import { entrarComOQr } from './services/supabase/mestres';
+import { oQueFazerComOAcesso } from './domain/acessoPorQr';
 
 // ── Navegação da sidebar ──────────────────────────────────────────────────────
 
@@ -60,10 +67,14 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
   { id: 'nova-oc', label: 'Nova OC', icon: 'plus' },
   { id: 'historico', label: 'Histórico', icon: 'history' },
+  // O que chegou na obra sem pedido, para ligar à OC ou descartar (CTO-D696 §5.2).
+  { id: 'recebimentos', label: 'Recebimentos', icon: 'caixa' },
   { id: 'fornecedores', label: 'Fornecedores', icon: 'users' },
   // A FO 8.4.1.1 no menu (CTO-D661): a qualificação achada sem passar pela ficha.
   { id: 'qualificacao', label: 'Qualificação', icon: 'selo' },
   { id: 'obras', label: 'Obras', icon: 'building' },
+  // O acesso do mestre de obra: só admin e engenharia (CTO-D696 §4).
+  { id: 'mestres', label: 'Mestres', icon: 'capacete' },
   { id: 'catalogo', label: 'Catálogo ECR', icon: 'clipboard' },
 ];
 
@@ -76,7 +87,19 @@ const PAPEL_LABEL: Record<Papel, string> = {
   engenharia: 'Engenharia',
   financeiro: 'Financeiro',
   leitura: 'Somente leitura',
+  mestre: 'Mestre de obra',
 };
+
+/**
+ * O QR do mestre que chegou no endereço (CTO-D696 §4): entra já, ou — no
+ * iPhone fora do ícone — guarda o QR sem gastar e ensina a pôr o ícone.
+ */
+type EntradaPeloQr = { tipo: 'nada' } | { tipo: 'entrando' } | { tipo: 'por-o-icone' } | { tipo: 'falhou'; erro: string };
+
+function entradaQueChegou(): EntradaPeloQr {
+  if (!acessoQueChegouNoEndereco()) return { tipo: 'nada' };
+  return oQueFazerComOAcesso(ehDaApple(), estaNoIcone()) === 'entrar' ? { tipo: 'entrando' } : { tipo: 'por-o-icone' };
+}
 
 /** Iniciais para o avatar do rodapé (padrão: círculo com 2 letras). */
 function iniciais(nome: string, email: string): string {
@@ -107,6 +130,9 @@ export default function App() {
   const [carregandoDados, setCarregandoDados] = useState(false);
   const [erroDados, setErroDados] = useState('');
   const [definindoSenha, setDefinindoSenha] = useState(false);
+  const [entradaPeloQr, setEntradaPeloQr] = useState<EntradaPeloQr>(entradaQueChegou);
+  /** Dentro do ícone, a tela de entrada é a do QR; quem tem senha pede o formulário. */
+  const [usarSenha, setUsarSenha] = useState(false);
 
   const { escuro, alternar } = useTema();
 
@@ -163,6 +189,20 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── O QR do mestre: entra com o código que veio no endereço ───────────────
+  useEffect(() => {
+    const acesso = acessoQueChegouNoEndereco();
+    if (entradaPeloQr.tipo !== 'entrando' || !acesso) return;
+    let viva = true;
+    entrarComOQr(acesso).then(
+      () => viva && setEntradaPeloQr({ tipo: 'nada' }),
+      (e: unknown) => viva && setEntradaPeloQr({ tipo: 'falhou', erro: e instanceof Error ? e.message : 'Não deu para entrar.' }),
+    );
+    return () => {
+      viva = false;
+    };
+  }, [entradaPeloQr.tipo]);
+
   // ── Dados: perfil + carga inicial + realtime, amarrados ao usuário logado ──
   // Chaveado no user.id (não no objeto sessão) para não recarregar tudo a cada
   // renovação de token, que troca o objeto mas não o usuário. E na obra da
@@ -198,7 +238,8 @@ export default function App() {
         const p = await perfilAtual();
         if (!ativo) return;
         setPerfil(p);
-        if (p) await recarregarDados();
+        // O mestre não lê o cadastro nem as OCs (CTO-D693): a tela dele busca a própria lista.
+        if (p && p.papel !== 'mestre') await recarregarDados();
       } catch (err) {
         if (ativo) {
           setErroDados(err instanceof Error ? err.message : 'Falha ao carregar dados.');
@@ -212,6 +253,7 @@ export default function App() {
     // vários eventos seguidos (cabeçalho + itens) e uma recarga basta.
     let timer: ReturnType<typeof setTimeout> | null = null;
     const cancelarRealtime = assinarMudancas(() => {
+      if (useAuthStore.getState().perfil?.papel === 'mestre') return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         void recarregarDados().catch(() => {
@@ -253,8 +295,22 @@ export default function App() {
 
   // ── Portões de entrada ─────────────────────────────────────────────────────
 
+  if (entradaPeloQr.tipo === 'entrando') {
+    return <Loader texto="Entrando pelo QR…" />;
+  }
+  if (entradaPeloQr.tipo === 'por-o-icone') {
+    return <PorOIconeNoIphone aoUsarAqui={() => setEntradaPeloQr({ tipo: 'entrando' })} />;
+  }
+  if (entradaPeloQr.tipo === 'falhou') {
+    return <QrNaoEntrou erro={entradaPeloQr.erro} aoVoltar={() => setEntradaPeloQr({ tipo: 'nada' })} />;
+  }
+
   if (verificando) {
     return <Loader texto="Verificando sessão…" />;
+  }
+
+  if (!sessao && estaNoIcone() && !usarSenha) {
+    return <EntrarNoIcone aoUsarSenha={() => setUsarSenha(true)} />;
   }
 
   if (!sessao) {
@@ -279,6 +335,16 @@ export default function App() {
     return (
       <>
         <SemAcessoPage email={sessao.user.email ?? ''} onSair={() => void handleSair()} />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  // O mestre de obra: a tela dele, sem menu, e só ela (CTO-D693, D696).
+  if (perfil?.papel === 'mestre') {
+    return (
+      <>
+        <TelaDoMestre dono={userId} aoSair={() => void handleSair()} />
         <ToastContainer />
       </>
     );
@@ -313,7 +379,7 @@ export default function App() {
 
         <nav id="tabsNav">
           <div className={styles.navLabel}>Compras</div>
-          {NAV_COMPRAS.map((item) => (
+          {NAV_COMPRAS.filter((item) => item.id !== 'mestres' || podeGerirMestre(perfil?.papel)).map((item) => (
             <button
               key={item.id}
               className={[styles.tabBtn, activeTab === item.id ? styles.active : ''].join(' ')}
@@ -405,9 +471,11 @@ export default function App() {
               {activeTab === 'dashboard'     && <DashboardPage />}
               {activeTab === 'nova-oc'       && <NovaOcPage />}
               {activeTab === 'historico'     && <HistoricoPage />}
+              {activeTab === 'recebimentos'  && <RecebimentosPage />}
               {activeTab === 'fornecedores'  && <FornecedoresPage />}
               {activeTab === 'qualificacao'  && <QualificacaoPage />}
               {activeTab === 'obras'         && <ObrasPage />}
+              {activeTab === 'mestres'       && podeGerirMestre(perfil?.papel) && <MestresPage />}
               {activeTab === 'catalogo'      && <CatalogoPage />}
               {activeTab === 'config'        && <ConfigPage />}
             </>

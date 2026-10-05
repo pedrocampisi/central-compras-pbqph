@@ -30,7 +30,8 @@
 .linhaDeCampos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 13px; font-weight: 600; color: var(--texto); }
 .campo input,
-.campo textarea {
+.campo textarea,
+.campo select {
   width: 100%;
   min-width: 0;
   padding: 7px 9px;
@@ -43,8 +44,10 @@
   font-weight: 400;
 }
 .campo textarea { resize: vertical; field-sizing: content; min-height: 38px; }
+.campo select { min-height: 36px; }
 .campo input:focus-visible,
-.campo textarea:focus-visible {
+.campo textarea:focus-visible,
+.campo select:focus-visible {
   outline: 2px solid var(--marca);
   outline-offset: 0;
   border-color: var(--marca);
@@ -66,6 +69,16 @@
 }
 .pergunta legend { padding: 0 4px; font-weight: 700; }
 .pergunta label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+.marcar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--texto);
+  cursor: pointer;
+}
+.marcar input { margin-top: 2px; }
 
 .aviso {
   margin: 0;

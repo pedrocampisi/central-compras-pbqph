@@ -1,0 +1,184 @@
+/* Mestres: o acesso do mestre de obra, no celular do engenheiro (CTO-D696 §4). Tem de caber a 375. */
+
+.lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel);
+  box-shadow: var(--sombra-suave);
+}
+.cartao[data-desligado] {
+  background: var(--fundo);
+}
+
+.cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+.cabeca strong {
+  font-size: 16px;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+
+.desligado {
+  padding: 2px 8px;
+  border-radius: var(--raio-pill);
+  background: var(--erro-bg);
+  color: var(--erro);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.miudo {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.obras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.obra {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 6px 6px 6px 12px;
+  border-radius: var(--raio-pill);
+  background: var(--marca-fraca);
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 600;
+}
+.obra > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.obra small {
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+.tirar {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pill);
+  background: var(--painel);
+  color: var(--marca);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tirar:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 1px;
+}
+
+.porNaObra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.campoSelect {
+  flex: 1;
+  min-width: 0;
+}
+.campoSelect select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+.campoSelect select:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 0;
+  border-color: var(--marca);
+}
+
+.somenteLeitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── O QR ─────────────────────────────────────────────────────────────── */
+
+.caixaDoQr {
+  align-items: center;
+  text-align: center;
+}
+.instrucao {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.qr {
+  display: block;
+  width: min(100%, 340px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--raio-pequeno);
+}
+.qrFundo {
+  fill: var(--qr-claro);
+}
+.qrModulos {
+  fill: var(--qr-escuro);
+}
+.relogio {
+  margin: 0;
+  font-size: 15px;
+  color: var(--texto);
+}
+.relogio strong {
+  font-family: var(--fonte-mono);
+  font-size: 22px;
+}
+.notas {
+  margin: 0;
+  padding-left: 18px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.notas li + li {
+  margin-top: 4px;
+}

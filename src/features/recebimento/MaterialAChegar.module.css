@@ -1,0 +1,457 @@
+/* A tela do mestre de obra (CTO-D693): letra e botões maiores que os do
+ * escritório, para o canteiro — sol, mão suja, dedo grosso. Cor, raio e
+ * fonte só dos tokens. Uma ação laranja por tela; o resto é de contorno.
+ * Sem animação: movimento só em espera e no login. */
+
+.tela {
+  min-height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-sans);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.obra {
+  margin: 0;
+  color: var(--terra);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--marca);
+}
+
+.vazio {
+  margin: 24px 0;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cartao,
+.cartaoAberto {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-suave);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.cartao {
+  cursor: pointer;
+}
+
+.cartao:focus-visible,
+.resposta:focus-visible,
+.primario:focus-visible,
+.secundario:focus-within,
+.voltar:focus-visible {
+  outline: 3px solid var(--marca);
+  outline-offset: 2px;
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Só com mais de uma obra: de qual é o pedido. */
+.obraDoCartao {
+  color: var(--terra);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fornecedor {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--marca);
+}
+
+.combinado {
+  color: var(--texto-suave);
+}
+
+.combinado strong {
+  color: var(--texto);
+}
+
+.itens {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda);
+}
+
+.item {
+  display: flex;
+  gap: 10px;
+}
+
+.qtd {
+  flex: 0 0 auto;
+  min-width: 72px;
+  font-weight: 700;
+}
+
+.valor {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--texto-suave);
+  font-size: 16px;
+}
+
+.valor strong {
+  color: var(--texto);
+  font-size: 18px;
+}
+
+.cartaoAcao {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  color: var(--marca);
+  font-weight: 700;
+}
+
+.seta {
+  transform: rotate(-90deg);
+}
+
+.setaVoltar {
+  transform: rotate(90deg);
+}
+
+.voltar {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--marca);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pergunta {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perguntaTexto {
+  padding: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.botoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* "Em qual obra?": uma obra por linha, o nome inteiro, sem cortar. */
+.botoesEmPe {
+  display: grid;
+  gap: 12px;
+}
+
+.resposta {
+  min-height: 64px;
+  padding: 8px 12px;
+  border: 2px solid var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sim {
+  border-color: var(--sucesso);
+  background: var(--sucesso-bg);
+  color: var(--sucesso);
+}
+
+.nao {
+  border-color: var(--erro);
+  background: var(--erro-bg);
+  color: var(--erro);
+}
+
+.foto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.miniatura {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.escondido {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dica {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 16px;
+}
+
+.numero,
+.linha,
+.caixa {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 20px;
+}
+
+.numero {
+  font-family: var(--fonte-mono);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+}
+
+.caixa {
+  resize: vertical;
+}
+
+.numero:focus,
+.linha:focus,
+.caixa:focus {
+  outline: 3px solid var(--marca);
+  outline-offset: 1px;
+}
+
+.link {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--marca);
+  font: inherit;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.aviso {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--raio);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+  font-weight: 600;
+}
+
+.primario,
+.secundario {
+  position: relative;
+  width: 100%;
+  min-height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: var(--raio-pill);
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primario {
+  margin-top: 4px;
+  border: 0;
+  background: var(--acento);
+  color: var(--acento-texto);
+  box-shadow: 0 4px 0 var(--acento-sombra);
+}
+
+.primario:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.secundario {
+  border: 2px solid var(--marca);
+  background: var(--painel);
+  color: var(--marca);
+}
+
+.sair {
+  align-self: center;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--texto-suave);
+  font: inherit;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pronto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.prontoSelo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: var(--sucesso-bg);
+  color: var(--sucesso);
+}
+
+.prontoTitulo {
+  margin: 8px 0 0;
+  font-family: var(--fonte-display);
+  font-size: 34px;
+  color: var(--marca);
+}
+
+.prontoTexto {
+  margin: 0;
+  font-size: 22px;
+  color: var(--texto-suave);
+}
+
+/* Guardado no celular, esperando sinal: não abre, para não receber duas vezes. */
+.cartaoGuardado {
+  composes: cartaoAberto;
+  opacity: 0.85;
+}
+
+.cartaoNota,
+.guardado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.guardado {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  font-size: 16px;
+}
+
+.cartaoNota svg,
+.guardado svg {
+  flex: 0 0 auto;
+}
+
+.cartaoRecusado {
+  color: var(--erro);
+  font-weight: 700;
+}
+
+/* O "Sair" pergunta antes (D696 §2.2): sem senha, voltar é pedir QR novo. */
+.confirmar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 2px solid var(--borda-forte);
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+}
+
+.confirmar .perguntaTexto,
+.confirmar .dica {
+  margin: 0;
+}
+
+.prontoSeloGuardado {
+  composes: prontoSelo;
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}
