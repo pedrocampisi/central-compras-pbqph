@@ -47,7 +47,7 @@ mais barato que carta apontando para o item errado.
 
 ### 28. O app do mestre de obra (D693, D696): o ramo completo, esperando a perícia
 
-*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81, 84, 85 e 86.* No ramo `d693-material-a-chegar` (`a6a7242`),
+*Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81, 84, 85, 86 e 87.* No ramo `d693-material-a-chegar` (`af84116`),
 com o CI verde, **NÃO publicado**: a tela do mestre ligada ao contrato do Banco, o lado do escritório, a tela "Mestres"
 com o QR e o caminho do iPhone.
 
@@ -57,8 +57,9 @@ com o QR e o caminho do iPhone.
   `99c0588` (decisão 85);
 - ~~a perícia~~ — **chegou** (D718); os achados da OC (3, 5, 6 e 9) reproduziram e estão consertados em `a6a7242`
   (decisão 86); o 7 é do Banco;
-- a triagem do CTO;
-- o ensaio num iPhone de verdade (pendência 31).
+- a medida do CTO conferida (D719), e o recado próprio da lista pela metade feito (decisão 87);
+- a triagem do CTO, quando o Banco medir os achados dele;
+- ~~o ensaio num iPhone de verdade~~ — **saiu** (D716): o aparelho se prova no primeiro uso (pendência 31).
 
 **Falta:** publicar, só com carta do CTO, e com o ramo do Banco no ar antes.
 
@@ -66,19 +67,19 @@ com o QR e o caminho do iPhone.
 
 ### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
 
-*Aberta em 04/10/2026, na decisão 84.* Falhou uma vez na `main` (decisão 83) e uma vez no ramo do mestre, sempre no
-meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
+*Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
+no ramo do mestre (a última em 05/10), sempre no meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
 regra. **Falta:** achar a espera que está curta (`tests/components/TituloUmaVez.test.tsx`) e prová-la com a bateria
 rodando várias vezes seguidas.
 
 ---
 
-### 31. O QR do mestre num iPhone de verdade
+### 31. O QR do mestre e o celular que guarda, num aparelho de verdade
 
-*Aberta em 04/10/2026, na decisão 84.* O caminho do iPhone (o QR no Safari pede o ícone; o ícone lê o mesmo QR e
-entra) está provado em teste e nas fotos, sobre um banco falso. **Falta:** um ensaio de cinco minutos num iPhone, com
-um mestre de teste, depois da perícia e com o ramo do Banco no ar. **É de mão:** o Pedro, ou quem ele mandar, segura o
-aparelho.
+*Aberta em 04/10/2026, na decisão 84; mudada na decisão 87.* O caminho do iPhone (o QR no Safari pede o ícone; o ícone
+lê o mesmo QR e entra) e o celular que guarda (o IndexedDB) estão provados em teste e nas fotos, sobre um banco falso.
+**O ensaio de cinco minutos saiu** (CTO-D716). **Falta:** o primeiro uso na produção, com o engenheiro ao lado até o
+primeiro recebimento sair. Esta casa fica de prontidão para consertar no mesmo dia. Vai na carta da produção.
 ---
 
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio

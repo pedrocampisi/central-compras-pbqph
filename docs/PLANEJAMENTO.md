@@ -3112,3 +3112,24 @@ carta dele.
 
 **DAQUI EM DIANTE:** a triagem do CTO. Conserto de perícia não chama perícia nova (lei 3 §9.5). Depois, o ensaio no
 iPhone e a publicação pela carta dele.
+
+## Decisão 87 — o recado próprio da lista que não chegou inteira · 05/10/2026
+
+**POR QUÊ (CTO-D719):** o CTO conferiu a medida da perícia (`a6a7242`). Ele pediu o recado que a carta deixou em
+aberto: quando a lista do mestre não chega inteira, a tela dizia "Sem sinal", e esse recado era falso. O teste do
+iPhone saiu (D716): o aparelho de verdade se prova no primeiro uso, na produção, com o engenheiro ao lado, e esta casa
+fica de prontidão para consertar no mesmo dia.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`af84116`), **NÃO publicado**:
+- **`ListaPelaMetade`:** o `todasAsLinhas` acusa com um tipo próprio quando a lista vem sem a contagem ou incompleta.
+  Para quem já lia a mensagem, nada muda.
+- **A tela do mestre diz o que é:**
+  - com a lista guardada: "A lista nova não chegou inteira. Esta é a das 9h20.";
+  - sem lista guardada: "A lista de pedidos não chegou inteira.", com "Tentar de novo";
+  - sem sinal, como antes.
+- **A prova:** 924 testes; tipos e lint limpos; 5 sabotagens, todas vermelhas; CI verde (37311197239); a foto
+  `22_a_lista_nao_chegou_inteira_375` (claro e escuro), em `docs/Capturas/2026-10-04_D696/`, no ramo.
+- **O teste da D643 oscilou de novo** numa rodada, e passou sozinho e na bateria seguinte (pendência 30).
+- **O banco não mudou** por esta casa.
+
+**DAQUI EM DIANTE:** a triagem do CTO, quando o Banco medir os achados dele. Depois, a carta da produção.
