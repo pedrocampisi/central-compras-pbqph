@@ -34,7 +34,9 @@ import {
   type QualificacaoGravada,
 } from '../../services/supabase/qualificacao';
 import type { Ecr } from '../../domain/types';
+import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
+import { ajudaDoCriterio } from '../../domain/ajudaDosCriterios';
 import styles from './QualificarDialogo.module.css';
 
 interface Props {
@@ -133,41 +135,46 @@ export function QualificarDialogo({
           </p>
         )}
 
-        {categoria.criterios.map((texto, i) => (
-          <fieldset key={i} className={styles.criterio} data-criterio={i + 1}>
-            <legend>
-              {i + 1}. {texto}
-            </legend>
-            <div className={styles.escolha}>
-              <label>
-                <input
-                  type="radio"
-                  name={`criterio-${i}`}
-                  checked={marcas[i]!.atende === true}
-                  onChange={() => marcar(i, { atende: true })}
-                />
-                Atende
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name={`criterio-${i}`}
-                  checked={marcas[i]!.atende === false}
-                  onChange={() => marcar(i, { atende: false })}
-                />
-                Não atende
-              </label>
-            </div>
-            <textarea
-              className={styles.motivo}
-              rows={2}
-              aria-label={`Motivo do critério ${i + 1}`}
-              placeholder="Por que atende, ou por que não atende."
-              value={marcas[i]!.motivo}
-              onChange={(e) => marcar(i, { motivo: e.target.value })}
-            />
-          </fieldset>
-        ))}
+        {categoria.criterios.map((texto, i) => {
+          // O que o PS.02 diz além da pergunta (CTO-D728 §3); sem nada além, sem "?".
+          const ajuda = ajudaDoCriterio(categoria.categoria, i + 1);
+          return (
+            <fieldset key={i} className={styles.criterio} data-criterio={i + 1}>
+              <legend>
+                {i + 1}. {texto}
+              </legend>
+              <div className={styles.escolha}>
+                <label>
+                  <input
+                    type="radio"
+                    name={`criterio-${i}`}
+                    checked={marcas[i]!.atende === true}
+                    onChange={() => marcar(i, { atende: true })}
+                  />
+                  Atende
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name={`criterio-${i}`}
+                    checked={marcas[i]!.atende === false}
+                    onChange={() => marcar(i, { atende: false })}
+                  />
+                  Não atende
+                </label>
+                {ajuda && <Ajuda sobre={`O que é atender o critério ${i + 1}`}>{ajuda}</Ajuda>}
+              </div>
+              <textarea
+                className={styles.motivo}
+                rows={2}
+                aria-label={`Motivo do critério ${i + 1}`}
+                placeholder="Por que atende, ou por que não atende."
+                value={marcas[i]!.motivo}
+                onChange={(e) => marcar(i, { motivo: e.target.value })}
+              />
+            </fieldset>
+          );
+        })}
 
         {material && ecrs.length > 0 && (
           <fieldset className={styles.criterio}>
