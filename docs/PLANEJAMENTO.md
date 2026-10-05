@@ -3164,3 +3164,32 @@ fundir e publicar só depois da campainha do Banco. Ela tocou às 10h4x de 05/10
 
 **DAQUI EM DIANTE:** o CTO confere a versão no ar. No dia do primeiro mestre de verdade (D716), esta casa fica de
 prontidão até o primeiro recebimento sair.
+
+## Decisão 89 — os três pedidos do Pedro (D728): a sigla ECR, a entrega no dia seguinte e o "?" da qualidade · 05/10/2026
+
+**POR QUÊ (CTO-D728):** o Pedro mandou ao CTO três fotos da OC (o catálogo, a Nova OC e o "Qualificar agora"), com
+três pedidos: dizer o que a sigla ECR significa; deixar a entrega prevista já no dia seguinte; e explicar o que faz um
+fornecedor atender o critério de qualidade. A pausa de 04/09 abriu só para esta lista.
+
+**O QUE MUDOU**, no ramo `d728-tres-pedidos` (`b226682`), **NÃO publicado**:
+- **A sigla:**
+  - o catálogo virou "Catálogo de ECRs", com a sigla por extenso sob o título;
+  - nas outras telas, um "?" na primeira vez que a sigla aparece, um só por tela, com o mesmo texto em todas
+    (`O_QUE_E_ECR`, em `src/domain/ecr.ts`). O `FieldGroup` passou a aceitar um "?" ao lado do título.
+- **A entrega prevista:**
+  - a OC nova e a duplicada nascem com o dia seguinte ao da Data (`src/domain/entregaPrevista.ts`);
+  - a entrega acompanha a Data até o engenheiro mexer nela. Quem guarda isso é o estado da OC em edição
+    (`entregaAcompanha`, `startNova`, `mudarData`);
+  - o rascunho salvo e a OC que já existe ficam com o que têm.
+- **O "?" dos critérios:**
+  - a fonte é o PS.02 vigente: o item 2 e o parágrafo do PSQ, e o item 5, dos laboratórios. Ele foi lido no Dropbox
+    do SGQ e nada foi copiado;
+  - o "?" vai só onde o PS.02 diz algo além da pergunta: Materiais 1 e os três do controle tecnológico
+    (`src/domain/ajudaDosCriterios.ts`);
+  - as perguntas do banco não mudaram. As cinco diferenças entre a pergunta e o PS.02 e a referência ao item 6
+    (que no PS.02 de hoje é o item 5) foram contadas ao CTO, sem troca.
+- **A prova:** 945 testes; tipos e lint limpos; 7 sabotagens, todas vermelhas; CI verde (37375832445); 14 fotos em
+  `docs/Capturas/2026-10-05_D728/`, no ramo, sobre um banco falso.
+- **O banco não mudou.**
+
+**DAQUI EM DIANTE:** a avaliação do CTO. Aprovado, publica-se, fora do dia do primeiro uso do mestre.

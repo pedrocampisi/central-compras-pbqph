@@ -58,6 +58,16 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 
 ---
 
+### 32. Os três pedidos do Pedro (D728): no ramo, esperando a avaliação do CTO
+
+*Aberta em 05/10/2026, na decisão 89.* No ramo `d728-tres-pedidos` (`b226682`), com o CI verde, **NÃO publicado**:
+a sigla ECR por extenso, a entrega prevista no dia seguinte e o "?" dos critérios pelo PS.02.
+
+**Falta:** a avaliação do CTO (carta `D728-os-tres-pedidos-no-ramo`); aprovado, publicar pela emenda 3, fora do dia
+do primeiro uso do mestre.
+
+---
+
 ### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
 
 *Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
