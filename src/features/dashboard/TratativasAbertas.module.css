@@ -16,6 +16,9 @@
   text-transform: uppercase;
   color: var(--text-muted);
 }
+/* O título com o "?" da sigla: a linha quebra, e a resposta ocupa a largura toda. */
+.cabeca { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 10px; }
+.cabeca h3 { margin: 0; }
 .vazio { margin: 0; font-size: 13px; color: var(--texto-suave); }
 
 .lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }

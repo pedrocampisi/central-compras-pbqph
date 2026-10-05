@@ -18,6 +18,7 @@ import { uid } from '../../domain/id';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
 import { ecrsDaGaveta, seloDaFilial } from '../../domain/qualificacao';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import { useQualificacoesDoDia } from '../../stores/useQualificacaoStore';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { FichaDaEmpresa } from './FichaDaEmpresa';
@@ -147,7 +148,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose, aoCriar }: Props) 
         (CTO-D614 §2.1). Aqui só se lê.
       */}
       {!isNew && fornecedor && (
-        <FieldGroup title="Qualificação">
+        <FieldGroup title="Qualificação" ajuda={<AjudaDaEcr />}>
           <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
             <SeloDaQualificacao selo={seloDeMaterial} rotulo="Material" />
             <Button variant="outline" size="sm" onClick={() => setFichaAberta(true)}>

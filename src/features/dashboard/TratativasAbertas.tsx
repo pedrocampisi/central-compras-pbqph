@@ -20,6 +20,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { useDataStore } from '../../stores/useDataStore';
 import { useQualificacaoStore } from '../../stores/useQualificacaoStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './TratativasAbertas.module.css';
 
 /** As perguntas que deram "Não Conforme", na ordem da avaliação. */
@@ -59,7 +60,11 @@ export function TratativasAbertas() {
 
   return (
     <section className={styles.bloco} data-tratativas-abertas="">
-      <h3>Tratativas abertas{dados ? ` (${tratativas.length})` : ''}</h3>
+      <div className={styles.cabeca}>
+        <h3>Tratativas abertas{dados ? ` (${tratativas.length})` : ''}</h3>
+        {/* A sigla aparece nas linhas de "OC e ECR" (CTO-D728 §1). */}
+        {tratativas.some((t) => !t.ocEcrConforme) && <AjudaDaEcr />}
+      </div>
       {!dados ? (
         <p className={styles.vazio} role="alert">
           As tratativas não carregaram. Recarregue a página.

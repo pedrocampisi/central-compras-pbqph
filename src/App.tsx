@@ -75,7 +75,7 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'obras', label: 'Obras', icon: 'building' },
   // O acesso do mestre de obra: só admin e engenharia (CTO-D696 §4).
   { id: 'mestres', label: 'Mestres', icon: 'capacete' },
-  { id: 'catalogo', label: 'Catálogo ECR', icon: 'clipboard' },
+  { id: 'catalogo', label: 'Catálogo de ECRs', icon: 'clipboard' },
 ];
 
 const NAV_SISTEMA: NavItem[] = [

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import type jsPDF from 'jspdf';
 
@@ -33,6 +33,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUiStore } from '../../src/stores/useUiStore';
+import { entregaAoMudarAData, entregaDaOcNova } from '../../src/domain/entregaPrevista';
 import type { Data, OrdemCompra } from '../../src/domain/types';
 
 const OBRA = normalizeObra({ id: 'obra-teste', nome: 'Obra de teste' });
@@ -80,6 +81,82 @@ describe('a Nova OC', () => {
     });
     expect(salvar).toHaveBeenCalledTimes(1);
     expect(salvar.mock.calls[0]![0]).toMatchObject({ entrega_prevista: '2026-10-08' });
+  });
+});
+
+describe('a OC que nasce agora vem com a entrega no dia seguinte (CTO-D728 §2)', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** 22h de 05/10 em Brasília: no UTC já é 01h de 06/10. */
+  const AS_22H_DE_BRASILIA = new Date('2026-10-06T01:00:00Z');
+
+  function abrirOcNova() {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(AS_22H_DE_BRASILIA);
+    render(<NovaOcPage />);
+    return {
+      data: screen.getByLabelText('Data') as HTMLInputElement,
+      entrega: screen.getByLabelText('Entrega prevista') as HTMLInputElement,
+    };
+  }
+
+  it('às 22h de Brasília, a Data é hoje e a entrega é amanhã, de Brasília (e não depois de amanhã)', () => {
+    const { data, entrega } = abrirOcNova();
+    expect(data.value).toBe('2026-10-05');
+    expect(entrega.value).toBe('2026-10-06');
+  });
+
+  it('a Data muda antes de mexerem na entrega: a entrega acompanha', () => {
+    const { data, entrega } = abrirOcNova();
+    fireEvent.change(data, { target: { value: '2026-10-09' } });
+    expect(entrega.value).toBe('2026-10-10');
+  });
+
+  it('depois que mexeram na entrega, ela é deles: a Data muda e a entrega fica', () => {
+    const { data, entrega } = abrirOcNova();
+    fireEvent.change(entrega, { target: { value: '2026-10-20' } });
+    fireEvent.change(data, { target: { value: '2026-10-09' } });
+    expect(entrega.value).toBe('2026-10-20');
+  });
+
+  it('esvaziada pelo engenheiro, fica vazia: a Data muda e a entrega não volta', () => {
+    const { data, entrega } = abrirOcNova();
+    fireEvent.change(entrega, { target: { value: '' } });
+    fireEvent.change(data, { target: { value: '2026-10-09' } });
+    expect(entrega.value).toBe('');
+  });
+
+  it('o rascunho salvo fica com o que tem, e a Data mudada não mexe nele', () => {
+    useOcEditingStore.getState().startEditing(oc({ entrega_prevista: '' }));
+    render(<NovaOcPage />);
+    fireEvent.change(screen.getByLabelText('Data'), { target: { value: '2026-10-09' } });
+    expect((screen.getByLabelText('Entrega prevista') as HTMLInputElement).value).toBe('');
+  });
+
+  it('a OC que já existe fica com a entrega dela', () => {
+    useOcEditingStore.getState().startEditing(oc({ status: 'emitida', entrega_prevista: '2026-10-30' }));
+    render(<NovaOcPage />);
+    fireEvent.change(screen.getByLabelText('Data'), { target: { value: '2026-10-09' } });
+    expect(useOcEditingStore.getState().ocEditing?.entrega_prevista).toBe('2026-10-30');
+  });
+
+  it('a duplicada nasce agora: a entrega é o dia seguinte da Data nova, e não a da OC copiada', () => {
+    useOcEditingStore.getState().startNova(oc({ data: '2026-10-05', entrega_prevista: '2026-08-01' }));
+    expect(useOcEditingStore.getState().ocEditing?.entrega_prevista).toBe('2026-10-06');
+    useOcEditingStore.getState().mudarData('2026-10-07');
+    expect(useOcEditingStore.getState().ocEditing?.entrega_prevista).toBe('2026-10-08');
+  });
+
+  it('a conta do dia seguinte vira o mês, o ano e o 29 de fevereiro; o que não é dia não vira nada', () => {
+    expect(entregaDaOcNova('2026-10-31')).toBe('2026-11-01');
+    expect(entregaDaOcNova('2026-12-31')).toBe('2027-01-01');
+    expect(entregaDaOcNova('2028-02-28')).toBe('2028-02-29');
+    expect(entregaDaOcNova('2027-02-28')).toBe('2027-03-01');
+    expect(entregaDaOcNova('')).toBe('');
+    expect(entregaDaOcNova('2026-13-40')).toBe('');
+    expect(entregaAoMudarAData('2026-10-06', '', true)).toBe('2026-10-06');
   });
 });
 

@@ -34,6 +34,7 @@ import {
   type QualificacaoGravada,
 } from '../../services/supabase/qualificacao';
 import type { Ecr } from '../../domain/types';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './QualificarDialogo.module.css';
 
 interface Props {
@@ -67,6 +68,9 @@ export function QualificarDialogo({
   const [gravando, setGravando] = useState(false);
 
   const material = categoria.categoria === 'material';
+  // O "?" da sigla vai na primeira vez que ela aparece (CTO-D728 §1): na frase
+  // da trava, quando ela fala de ECR; senão, nas ECRs para marcar.
+  const ecrNoPorque = !!porque && /\bECRs?\b/.test(porque);
   const nota = notaAoVivo(marcas.map((m) => ({ atende: m.atende === true, motivo: m.motivo })));
   const passa = nota >= categoria.minimo;
 
@@ -120,6 +124,7 @@ export function QualificarDialogo({
         {porque && (
           <p className={styles.porque} data-porque="">
             {porque}
+            {ecrNoPorque && <> <AjudaDaEcr /></>}
           </p>
         )}
         {desempenho && (
@@ -166,7 +171,9 @@ export function QualificarDialogo({
 
         {material && ecrs.length > 0 && (
           <fieldset className={styles.criterio}>
-            <legend>Qualificada para as ECRs</legend>
+            <legend>
+              Qualificada para as ECRs {!ecrNoPorque && <AjudaDaEcr />}
+            </legend>
             <div className={styles.ecrs}>
               {ecrs.map((e) => (
                 <label key={e.id} className={styles.ecr} data-marcada={marcadas.includes(e.id) || undefined}>

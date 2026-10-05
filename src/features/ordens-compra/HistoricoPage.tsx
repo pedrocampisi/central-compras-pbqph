@@ -51,6 +51,7 @@ export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
 
   const startEditing = useOcEditingStore((s) => s.startEditing);
+  const startNova = useOcEditingStore((s) => s.startNova);
 
   // Espelho da permissão do banco: quem não pode gravar OC não deve ver botão
   // que só vai tomar erro do RLS depois do clique. A trava real é do banco.
@@ -199,7 +200,8 @@ export function HistoricoPage() {
       pdf_gerado_em: '',
       versao: 0,
     };
-    startEditing(duplicated);
+    // A cópia é OC que nasce agora: a entrega prevista no dia seguinte (CTO-D728 §2).
+    startNova(duplicated);
     setTab('nova-oc');
   }
 
