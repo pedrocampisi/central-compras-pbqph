@@ -3086,3 +3086,29 @@ como "Obra 2" no "Em qual obra?". O CTO pediu a troca antes de chamar o perito.
 
 **DAQUI EM DIANTE:** o CTO chama o perito com este commit. Depois, a triagem, o ensaio no iPhone e a publicação pela
 carta dele.
+
+## Decisão 86 — a perícia do app do mestre: os achados da OC medidos e consertados no ramo · 05/10/2026
+
+**POR QUÊ (CTO-D718):** o perito (o Codex) leu os ramos do mestre e trouxe nove suspeitas. São da OC as 3, 5, 6 e
+9, e o lado da tela da 7. O CTO mandou medir cada uma pelo "como conferir" e consertar no ramo o que reproduzisse.
+
+**O QUE MUDOU**, no ramo `d693-material-a-chegar` (`a6a7242`, sobre o `99c0588` periciado), **NÃO publicado**:
+- **Primeiro a medida:** cada teste foi escrito pelo caminho do perito e ficou vermelho no código periciado; só
+  depois veio o conserto. As quatro reproduziram.
+- **Achado 3:** a guarda do celular ganhou dono. Cada conta lê, lista e apaga só o que é dela, e a fila de uma nunca
+  vai com a sessão da outra. Trocar a conta troca a tela inteira.
+- **Achado 5:** a obra da máscara vai na consulta da fila do escritório, em cada página.
+- **Achado 6:** a tela só diz "guardado no celular" quando o celular guarda; sem IndexedDB, pede para não fechar o
+  app. Gravar e apagar só terminam quando a transação fecha. A prova usa um IndexedDB falso com o "disco" fora da
+  guarda.
+- **Achado 9:** a lista do mestre e as obras vão página por página até a contagem, com desempate; a lista pela metade
+  acusa.
+- **Achado 7, o lado da tela:** não muda. O texto dos dois "Não" vai inteiro em `tratativa`; a perda é na conversão
+  do banco, e o conserto é do Banco. Um teste prende o contrato.
+- **A prova:** 920 testes; tipos e lint limpos; 15 sabotagens, todas vermelhas; CI verde (37309753859).
+- **A carta:** `2026-10-05_de_Ordem_de_Compra_para_CTO_D718-os-achados-da-oc-medidos-e-consertados.md`, com as
+  digitais.
+- **O banco não mudou** por esta casa.
+
+**DAQUI EM DIANTE:** a triagem do CTO. Conserto de perícia não chama perícia nova (lei 3 §9.5). Depois, o ensaio no
+iPhone e a publicação pela carta dele.
