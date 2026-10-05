@@ -58,16 +58,6 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 
 ---
 
-### 32. Os três pedidos do Pedro (D728): no ramo, esperando a avaliação do CTO
-
-*Aberta em 05/10/2026, na decisão 89.* No ramo `d728-tres-pedidos` (`b226682`), com o CI verde, **NÃO publicado**:
-a sigla ECR por extenso, a entrega prevista no dia seguinte e o "?" dos critérios pelo PS.02.
-
-**Falta:** a avaliação do CTO (carta `D728-os-tres-pedidos-no-ramo`); aprovado, publicar pela emenda 3, fora do dia
-do primeiro uso do mestre.
-
----
-
 ### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
 
 *Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
@@ -83,6 +73,21 @@ rodando várias vezes seguidas.
 lê o mesmo QR e entra) e o celular que guarda (o IndexedDB) estão provados em teste e nas fotos, sobre um banco falso.
 **O ensaio de cinco minutos saiu** (CTO-D716). **Falta:** o primeiro uso na produção, com o engenheiro ao lado até o
 primeiro recebimento sair. Esta casa fica de prontidão para consertar no mesmo dia. Vai na carta da produção.
+---
+
+### 33. A coluna ECR da tabela de itens, a 375, corta o código
+
+*Aberta em 05/10/2026, na decisão 90 (CTO-D729 §2).* No celular, a coluna ECR da Nova OC é estreita e não mostra qual
+ECR o item tem. Já era assim antes do ramo da D728. **Para depois:** não se mexe agora.
+
+---
+
+### 34. A pergunta longa do critério passa por cima da borda da caixa
+
+*Aberta em 05/10/2026, na decisão 90 (CTO-D729 §2).* No "Qualificar", a legenda longa (o "3. O fornecedor consegue
+atender conforme o prazo estipulado pela construtora?") quebra em duas linhas e cruza a borda do quadro, a 375 e na
+foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não se mexe agora.
+
 ---
 
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio

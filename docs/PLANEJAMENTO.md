@@ -3193,3 +3193,29 @@ fornecedor atender o critério de qualidade. A pausa de 04/09 abriu só para est
 - **O banco não mudou.**
 
 **DAQUI EM DIANTE:** a avaliação do CTO. Aprovado, publica-se, fora do dia do primeiro uso do mestre.
+
+## Decisão 90 — no ar: os três pedidos do Pedro · 05/10/2026
+
+**POR QUÊ (CTO-D729):** o CTO aprovou o ramo inteiro. Ele conferiu o CI, leu o código da entrega, olhou as 14 fotos e
+conferiu os textos do "?" contra o PS.02. Aceitou também a duplicada com o dia seguinte, e mandou publicar fora do dia
+do primeiro uso do mestre, que ainda não foi marcado.
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes da junção:** `73d2b3db` (o app do mestre, D721).
+- **A junção:** o ramo `d728-tres-pedidos` (`b226682`) entrou no `main` em `6a98fa9`, sem conflito, e nada fora de
+  `docs/` difere do ramo.
+- **A bateria:** 945 testes, tipos e lint limpos, o `conferir` deu 7 de 7, e o CI ficou verde (37376937795).
+- **Publicado** pelo PowerShell às 18h38 de 05/10: `2ab2ba5b-e64c-4b5c-9029-0e3d4635fc65`, versão
+  `20261005213744-6a98fa9`, com 100% do tráfego.
+- **O banco não mudou.**
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e tudo responde 200;
+- o código servido tem "Catálogo de ECRs" (e o nome antigo, nenhuma vez), a sigla por extenso, os "?" com as duas
+  fontes do PS.02 e a entrega que acompanha a Data;
+- o "Esqueci" continua mandando para `https://compras.campisi.com.br/`.
+
+**DAQUI EM DIANTE:**
+- o CTO confere por fora;
+- duas pendências da casa ficam para depois, sem mexer agora (pendências 33 e 34);
+- o "item 6" do PS.02 e as cinco diferenças entre as perguntas e o PS.02 foram ao Pedro pelo CTO.

@@ -6,6 +6,16 @@
 
 ---
 
+### 32. Os três pedidos do Pedro (D728): no ramo, esperando a avaliação do CTO — **FECHADA EM 05/10/2026: NO AR em `2ab2ba5b` (CTO-D729, decisão 90); o desfazer é `73d2b3db`**
+
+*Aberta em 05/10/2026, na decisão 89.* No ramo `d728-tres-pedidos` (`b226682`), com o CI verde, **NÃO publicado**:
+a sigla ECR por extenso, a entrega prevista no dia seguinte e o "?" dos critérios pelo PS.02.
+
+**Falta:** a avaliação do CTO (carta `D728-os-tres-pedidos-no-ramo`); aprovado, publicar pela emenda 3, fora do dia
+do primeiro uso do mestre.
+
+---
+
 ### 29. O "Esqueci minha senha" volta para a OC (D700), no ramo, esperando o CTO — **FECHADA EM 04/10/2026: NO AR em `4da03d09` (CTO-D701, decisão 83); o desfazer é `003c223c`**
 
 *Aberta em 04/10/2026, na decisão 82.* A linha do `redirectTo` e a prova da tela "Definir nova senha" estão no ramo
