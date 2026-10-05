@@ -31,6 +31,7 @@ import { obraDaMascara } from '../../services/storage/umaObra';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import styles from './RecebimentosPage.module.css';
 
@@ -283,6 +284,8 @@ function LigarDialogo({
               <input type="radio" name={p.chave} checked={r[p.chave] === false} onChange={() => mudar({ [p.chave]: false })} />
               {p.nao}
             </label>
+            {/* A primeira vez que a sigla aparece nesta caixa (CTO-D728 §1). */}
+            {p.chave === 'ocEcrConforme' && <AjudaDaEcr />}
           </fieldset>
         ))}
 

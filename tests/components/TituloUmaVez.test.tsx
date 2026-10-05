@@ -51,7 +51,7 @@ const TELAS: [TabId, string][] = [
   ['historico', 'Histórico de OCs'],
   ['fornecedores', 'Fornecedores'],
   ['obras', 'Obras'],
-  ['catalogo', 'Catálogo ECR'],
+  ['catalogo', 'Catálogo de ECRs'],
   ['config', 'Configurações'],
 ];
 

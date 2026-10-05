@@ -33,6 +33,7 @@ import type { Fornecedor } from '../../domain/types';
 import { QualificarDialogo } from './QualificarDialogo';
 import { depoisDeQualificar as avisarDepoisDeQualificar } from './depoisDeQualificar';
 import { SeloDaQualificacao } from './SeloDaQualificacao';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './FichaDaEmpresa.module.css';
 
 export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFechar: () => void }) {
@@ -102,7 +103,11 @@ export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFec
                       Qualificada em {dataBr(vale.qualificadaEm)}
                       {vale.qualificadoPorNome && <> por {vale.qualificadoPorNome}</>} · nota {vale.nota} de{' '}
                       {vale.criterios.length} (mínimo {vale.minimo})
-                      {c.categoria === 'material' && vale.ecrs.length > 0 && <> · {nomeDasEcrs(vale.ecrs)}</>}
+                      {c.categoria === 'material' && vale.ecrs.length > 0 && (
+                        <>
+                          {' '}· {nomeDasEcrs(vale.ecrs)} <AjudaDaEcr />
+                        </>
+                      )}
                     </p>
                   )}
                   {historico.length > 0 && (

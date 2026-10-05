@@ -36,6 +36,7 @@ import {
   type Leitor,
 } from '../../domain/leitor';
 import { CampoDeImportacao } from './CampoDeImportacao';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import { entregarPdfDaOc } from '../../services/supabase/pastaDaObra';
 import { avisoDoPdf } from '../../domain/pastaDaObra';
 import { salvarOrdemCompra, marcarPdfGerado, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
@@ -343,9 +344,10 @@ export function NovaOcPage() {
   const qualificacoes = useQualificacoesDoDia();
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
-  const startEditing = useOcEditingStore((s) => s.startEditing);
+  const startNova = useOcEditingStore((s) => s.startNova);
   const stopEditing = useOcEditingStore((s) => s.stopEditing);
   const updateField = useOcEditingStore((s) => s.updateField);
+  const mudarData = useOcEditingStore((s) => s.mudarData);
   const addItem = useOcEditingStore((s) => s.addItem);
   const updateItem = useOcEditingStore((s) => s.updateItem);
   const removeItem = useOcEditingStore((s) => s.removeItem);
@@ -407,7 +409,7 @@ export function NovaOcPage() {
     // errada. Escolher é ato da pessoa; a validação já recusa emitir sem os dois.
     const defaultCondicao = data.config.condicoes_pagamento[0] ?? '';
 
-    startEditing(buildNewOc(currentYear, '', '', defaultCondicao));
+    startNova(buildNewOc(currentYear, '', '', defaultCondicao));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -796,6 +798,7 @@ export function NovaOcPage() {
 
   // O selo de material da empresa escolhida (D604 §3.4): o que a emissão vai conferir.
   const seloDoEscolhido = fornecedorEscolhido && qualificacoes ? seloDaFilial(fornecedorEscolhido, qualificacoes.linhas) : null;
+  const ecrsNoSelo = !!seloDoEscolhido && seloDoEscolhido.ecrs.length > 0;
 
   function escolherEmpresaNaOc(chave: string) {
     if (!ocEditing) return;
@@ -895,8 +898,11 @@ export function NovaOcPage() {
           {fornecedorEscolhido && (
             <span className={styles.seloDoFornecedor} data-selo-do-fornecedor="">
               <SeloDaQualificacao selo={seloDoEscolhido} rotulo="Material" />
-              {seloDoEscolhido && seloDoEscolhido.ecrs.length > 0 && (
-                <span className={styles.ecrsDoSelo}>{nomeDasEcrs(seloDoEscolhido.ecrs)}</span>
+              {ecrsNoSelo && (
+                <>
+                  <span className={styles.ecrsDoSelo}>{nomeDasEcrs(seloDoEscolhido.ecrs)}</span>
+                  <AjudaDaEcr />
+                </>
               )}
             </span>
           )}
@@ -924,10 +930,11 @@ export function NovaOcPage() {
 
         <Field
           label="Data"
+          aria-label="Data"
           type="date"
           required
           value={ocEditing.data}
-          onChange={(e) => updateField('data', e.target.value)}
+          onChange={(e) => mudarData(e.target.value)}
         />
 
         <Field
@@ -962,7 +969,9 @@ export function NovaOcPage() {
       </FieldGroup>
 
       {/* ── Itens ────────────────────────────────────────────────────────── */}
-      <FieldGroup title="Itens">
+      {/* A sigla ECR tem o "?" na primeira vez que aparece (CTO-D728 §1): no selo
+          do fornecedor, se ele mostra ECRs; senão, aqui, antes da coluna ECR. */}
+      <FieldGroup title="Itens" ajuda={ecrsNoSelo ? undefined : <AjudaDaEcr />}>
         <div style={{ gridColumn: '1 / -1' }}>
           <ItemsTable
             items={ocEditing.itens}

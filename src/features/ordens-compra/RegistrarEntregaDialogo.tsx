@@ -22,6 +22,7 @@ import { registrarEntrega } from '../../services/supabase/qualificacao';
 import { recarregarDados } from '../../services/supabase/sync';
 import { useUiStore } from '../../stores/useUiStore';
 import type { OrdemCompra } from '../../domain/types';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './RegistrarEntregaDialogo.module.css';
 
 const PERGUNTAS = [
@@ -127,6 +128,8 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
               <input type="radio" name={p.chave} checked={a[p.chave] === false} onChange={() => mudar({ [p.chave]: false })} />
               Não Conforme
             </label>
+            {/* A primeira vez que a sigla aparece nesta caixa (CTO-D728 §1). */}
+            {p.chave === 'ocEcrConforme' && <AjudaDaEcr />}
           </fieldset>
         ))}
 

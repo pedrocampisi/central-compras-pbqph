@@ -15,3 +15,14 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
 }
+/* O título com o "?": a linha quebra, e a resposta ocupa a largura toda. */
+.cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0 0 12px;
+}
+.cabeca .title {
+  margin: 0;
+}

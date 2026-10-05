@@ -48,6 +48,7 @@ import { FichaDaEmpresa } from '../fornecedores/FichaDaEmpresa';
 import { FornecedorDrawer } from '../fornecedores/FornecedorDrawer';
 import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
 import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
+import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './QualificacaoPage.module.css';
 
 /** O nome da aba quando o banco não mandou a categoria (não deve acontecer; a aba não some por isso). */
@@ -122,6 +123,8 @@ export function QualificacaoPage() {
           <h2>Qualificação</h2>
           <p className="section-sub">
             As qualificações da FO 8.4.1.1, por categoria: uma linha por empresa, com a que vale.
+            {/* Em Materiais, as linhas mostram as ECRs (CTO-D728 §1). */}
+            {material && <> <AjudaDaEcr /></>}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => void pdfDosQualificados(dados, data.fornecedores, showToast)}>

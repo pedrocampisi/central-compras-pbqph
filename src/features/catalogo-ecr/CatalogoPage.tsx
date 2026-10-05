@@ -1,5 +1,5 @@
 /**
- * Aba Catálogo ECR — as 20 ECRs em vigor (CTO-D586, com a D588: a ECR do
+ * Aba Catálogo de ECRs — as 20 ECRs em vigor (CTO-D586, com a D588: a ECR do
  * sistema é a que vale). Cada ECR aberta mostra a revisão, as cinco seções na
  * ordem do documento, os materiais e, no fim, o histórico de revisões. Cada
  * ECR tem o botão do PDF (D589 §4.1), para quem vê o catálogo, e o de editar
@@ -16,6 +16,7 @@ import {
   HISTORICO,
   MATERIAIS,
   NENHUMA_REVISAO,
+  ECR_POR_EXTENSO,
   O_QUE_E_O_CATALOGO,
   SEM_HISTORICO,
   SEM_TEXTO,
@@ -240,9 +241,10 @@ export function CatalogoPage() {
     <div className="section">
       <div className="section-header">
         <div>
-          <h2>Catálogo ECR</h2>
+          <h2>Catálogo de ECRs</h2>
           <p className="section-sub">
-            Especificações de Compra e Recebimento — {data.ecrs.length} ECRs. {O_QUE_E_O_CATALOGO}
+            {/* A sigla por extenso logo abaixo do título (CTO-D728 §1). */}
+            ECR é a {ECR_POR_EXTENSO} de cada material — {data.ecrs.length} ECRs. {O_QUE_E_O_CATALOGO}
           </p>
         </div>
       </div>

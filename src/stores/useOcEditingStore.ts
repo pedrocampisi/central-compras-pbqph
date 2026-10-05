@@ -8,16 +8,26 @@ import { create } from 'zustand';
 import type { Item, OrdemCompra } from '../domain/types';
 import { uid } from '../domain/id';
 import { normalizeItem } from '../domain/normalize';
+import { entregaAoMudarAData, entregaDaOcNova } from '../domain/entregaPrevista';
 
 interface OcEditingState {
   ocEditing: OrdemCompra | null;
+  /**
+   * A entrega prevista ainda é a que nasceu com a OC (CTO-D728 §2): enquanto
+   * for, ela acompanha a Data. Mexer na entrega desliga.
+   */
+  entregaAcompanha: boolean;
 
   // Lifecycle
   startEditing: (oc: OrdemCompra) => void;
+  /** A OC que nasce agora (a nova e a duplicada): a entrega prevista no dia seguinte ao da Data. */
+  startNova: (oc: OrdemCompra) => void;
   stopEditing: () => void;
 
   // Field mutations
   updateField: <K extends keyof OrdemCompra>(field: K, value: OrdemCompra[K]) => void;
+  /** A Data, e a entrega junto enquanto ela acompanha. */
+  mudarData: (data: string) => void;
 
   // Item mutations
   addItem: () => void;
@@ -29,19 +39,34 @@ interface OcEditingState {
 
 export const useOcEditingStore = create<OcEditingState>((set, get) => ({
   ocEditing: null,
+  entregaAcompanha: false,
 
   startEditing(oc) {
-    set({ ocEditing: structuredClone(oc) });
+    set({ ocEditing: structuredClone(oc), entregaAcompanha: false });
+  },
+
+  startNova(oc) {
+    set({ ocEditing: { ...structuredClone(oc), entrega_prevista: entregaDaOcNova(oc.data) }, entregaAcompanha: true });
   },
 
   stopEditing() {
-    set({ ocEditing: null });
+    set({ ocEditing: null, entregaAcompanha: false });
   },
 
   updateField(field, value) {
-    const { ocEditing } = get();
+    const { ocEditing, entregaAcompanha } = get();
     if (!ocEditing) return;
-    set({ ocEditing: { ...ocEditing, [field]: value } });
+    set({
+      ocEditing: { ...ocEditing, [field]: value },
+      entregaAcompanha: field === 'entrega_prevista' ? false : entregaAcompanha,
+    });
+  },
+
+  mudarData(data) {
+    const { ocEditing, entregaAcompanha } = get();
+    if (!ocEditing) return;
+    const entrega = entregaAoMudarAData(ocEditing.entrega_prevista ?? '', data, entregaAcompanha);
+    set({ ocEditing: { ...ocEditing, data, entrega_prevista: entrega } });
   },
 
   addItem() {

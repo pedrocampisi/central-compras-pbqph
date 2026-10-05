@@ -35,6 +35,16 @@ export const TITULOS_DA_ECR = [
 export const O_QUE_E_O_CATALOGO =
   'O texto em vigor de cada ECR, com o histórico de revisões no fim.';
 
+/**
+ * A sigla por extenso (CTO-D728 §1, pedido do Pedro): em cada tela, na
+ * primeira vez que "ECR" aparece, ela vem por extenso ou com o "?" que diz
+ * isto. Uma frase só, para todas as telas dizerem a mesma coisa.
+ */
+export const ECR_POR_EXTENSO = 'Especificação de Compra e Recebimento';
+export const O_QUE_E_ECR =
+  `ECR é a ${ECR_POR_EXTENSO}: o que a Campisi exige na compra e no recebimento de cada material controlado. ` +
+  'O texto de cada uma está no Catálogo de ECRs.';
+
 /** Para a ECR que ainda não tem texto: a tela diz, numa linha, e não quebra. */
 export const SEM_TEXTO = 'O texto desta ECR ainda não foi carregado.';
 

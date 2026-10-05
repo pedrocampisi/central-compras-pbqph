@@ -73,6 +73,14 @@ describe('D586/D588 — a lista e o que a página diz', () => {
     expect(sub).not.toMatch(/SGQ|cópia/i);
   });
 
+  it('a sigla por extenso logo abaixo do título "Catálogo de ECRs" (CTO-D728 §1)', () => {
+    montar([ecr(0), ecr(1)]);
+    expect(document.querySelector('h2')!.textContent).toBe('Catálogo de ECRs');
+    expect(document.querySelector('.section-sub')!.textContent).toMatch(
+      /^ECR é a Especificação de Compra e Recebimento de cada material — 2 ECRs\./,
+    );
+  });
+
   it('fechada, cada ECR mostra código, nome e "Rev. 00 · emitida em 15/04/2026"', () => {
     montar([ecr(0)]);
     const botao = screen.getByText('ECR 03').closest('button')!;
