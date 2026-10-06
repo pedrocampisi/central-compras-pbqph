@@ -94,7 +94,8 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 *Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02`. O CTO aprovou a
 tela e o PDF (D732, decisão 92), e a leitura segue o contrato do Banco (`130e7a5`, decisão 93). **Falta:**
-- a conferência do CTO da diferença `cf9413e..130e7a5`;
+- ~~a conferência do CTO da diferença `cf9413e..130e7a5`~~ — **conferida** (D735; as fotos do sumário novo em
+  `docs/Capturas/2026-10-06_D735/`). O texto do perito está com o Pedro;
 - **a perícia, uma só para os dois ramos** (o `6e8a0a8` do Banco e o `130e7a5`, 2.427 linhas): o CTO dá o texto ao
   Pedro, ele dispara, e o laudo vem por carta. **Até a triagem, nada no `main` e nada publicado**, e os ramos ficam
   parados. A meta de 13/10 pode escorregar; o limite é o ensaio de 09/11;
