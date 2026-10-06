@@ -3256,3 +3256,31 @@ mostra. A pausa de 04/09 abriu só para esta lista.
 - a avaliação do CTO, a perícia, e as tabelas do Banco na produção com o contrato ajustado aqui;
 - então, a ordem de publicar, fora do dia do primeiro uso do mestre;
 - a Rev. 01 (o rascunho do manual) só começa com a Rev. 00 e a página no ar.
+
+## Decisão 92 — o ramo do PS.02 aprovado (D732); os dois retoques já no ramo · 06/10/2026
+
+**POR QUÊ (CTO-D732):** o CTO conferiu o CI, as 18 fotos e as 3 páginas do PDF do `cf9413e` e aprovou a tela e o PDF.
+Pediu dois retoques e disse que eles podem chegar junto com o ajuste ao contrato do Banco. Adiantei os dois agora,
+para a carta do ajuste levar só a diferença do contrato.
+
+**O QUE MUDOU**, no ramo `d730-ps02` (`5b85d02`), **NÃO publicado**:
+- **O menu diz "Procedimento de Compras"**, sem "(PS.02)", e cabe numa linha a 1366. O título da página continua
+  "Procedimento de Compras (PS.02)" (`NOME_NO_MENU`, em `domain/procedimento.ts`).
+- **O contorno da linha marcada fica dentro da tabela** (`outline-offset: -3px` só na `tr`), com o mesmo desenho.
+- **As fotos:** a 41 e a 43 refeitas, a 1366 e a 375, e a 49 com o contorno antes e depois. As fotos 40, 42 e 44 a 47
+  ainda mostram o nome antigo no menu; não refiz, porque nada mais mudou nelas.
+- **A prova:** 984 testes, tipos e lint limpos.
+- **O banco não mudou.**
+
+**APROVADO COMO ESTÁ (D732 §2):** o subtítulo, a URL sem âncora, a lista do item 5 numerada, a pergunta "Sair da
+qualificação?", o rodapé sem a parte do rascunho local e o link do Dropbox como texto.
+
+**PARA A REV. 01 (D732 §4), não retoque:** o "item 6" que é o item 5, o "autosave do navegador" do "?" do item 7 e o
+quadro "Conteúdo preparado para a próxima revisão formal".
+
+**DAQUI EM DIANTE:**
+- a carta de fecho do Banco com o contrato do jsonb; então o ajuste em `procedimentoDoBanco.ts` e no `select`, e a
+  carta ao CTO com a diferença e uma foto da página lendo o ensaio, com os nomes do histórico cobertos;
+- **a foto do ensaio precisa de uma sessão aberta no app, e eu não digito senha.** O Pedro entra com a dele no
+  navegador embutido, e eu fotografo; ou o CTO aponta outro caminho. Vai escrito na carta do ajuste;
+- uma perícia só para os dois ramos, disparada pelo Pedro; até a triagem, nada no `main` e nada publicado.

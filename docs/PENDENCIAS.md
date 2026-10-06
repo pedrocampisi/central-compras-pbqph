@@ -90,12 +90,14 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 35. O PS.02 no sistema (D730): no ramo, esperando o Banco, a perícia e a ordem
+### 35. O PS.02 no sistema (D730): aprovado no ramo, esperando o Banco, a perícia e a ordem
 
-*Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02` (`cf9413e`), com
-984 testes, CI verde e as fotos. **Falta:**
-- a avaliação do CTO;
-- o contrato do jsonb na carta de fecho do Banco (só `procedimentoDoBanco.ts` muda);
+*Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02`, com 984
+testes, CI verde e as fotos. **O CTO aprovou a tela e o PDF (D732, decisão 92)**, e os dois retoques dele já estão no
+ramo (`5b85d02`). **Falta:**
+- o contrato do jsonb na carta de fecho do Banco; então o ajuste em `procedimentoDoBanco.ts` e no `select`, e a
+  carta ao CTO com a diferença e a foto da página lendo o ensaio, com os nomes cobertos. **A foto precisa de sessão
+  aberta, e eu não digito senha:** o Pedro entra com a dele, ou o CTO aponta outro caminho;
 - a perícia, porque passou de mil linhas. O caminho, pelo CTO em 06/10: ele avalia o ramo da OC e o Banco no ensaio;
   com os dois aprovados, o Pedro dispara o perito, e o laudo vai para `CTO\docs\Pericias`; cada casa mede os achados
   dela, e o CTO faz a triagem. **Até a triagem, nada no `main` e nada publicado.** A meta de 13/10 pode escorregar; o
