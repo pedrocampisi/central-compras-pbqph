@@ -3339,3 +3339,32 @@ ensaio saiu da volta, pela D734: a sessão no ensaio venceu, e só o Pedro entra
 **DAQUI EM DIANTE:**
 - a triagem do CTO;
 - depois, a ordem da produção (D733 §4).
+
+## Decisão 95 — no ar: o PS.02 no sistema · 06/10/2026
+
+**POR QUÊ (CTO-D737 e a campainha dele):** a perícia foi triada (4 de 4 aceitos, placar 1,00). O Banco subiu as
+tabelas na produção, e o CTO as conferiu por SELECT: 1 procedimento, Rev. 00, 7 seções, 59 âncoras, 1 linha no
+histórico, só leitura para `authenticated`, e o md5 do documento igual ao do dado de teste (`1c82ab10…`).
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes da junção:** `2ab2ba5b` (os três pedidos, D729), com 100% do tráfego.
+- **A junção:** o `d730-ps02` (`062ed73`) entrou no `main` em `3315b8c`, sem conflito. Fora de `docs/`, nada difere
+  do ramo.
+- **A bateria:**
+  - 989 testes;
+  - tipos e lint limpos;
+  - o `conferir` 7 de 7 e o do pacote 5 de 5.
+- **Publicado pelo PowerShell às 16h24 de 06/10:** `c1816ff8-830b-4719-a486-4da2e2c29b05`, versão
+  `20261006192357-3315b8c`.
+- **O banco não mudou por esta casa.**
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e o `index.html`, o código e o `sw.js` respondem 200;
+- o código servido tem a página, o menu, o `select` do contrato, o sumário e o "ver no PS.02, item N".
+- A página lendo a produção pede sessão aberta, e esta casa não entra com senha: fica com o CTO ou com a primeira
+  pessoa que abrir.
+
+**DAQUI EM DIANTE:**
+- o CTO confere por fora;
+- a Rev. 01 (o rascunho do manual) pode começar, agora que a Rev. 00 e a página estão no ar, quando vier a carta
+  dela.
