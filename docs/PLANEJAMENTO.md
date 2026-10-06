@@ -3284,3 +3284,34 @@ quadro "Conteúdo preparado para a próxima revisão formal".
 - **a foto do ensaio precisa de uma sessão aberta no app, e eu não digito senha.** O Pedro entra com a dele no
   navegador embutido, e eu fotografo; ou o CTO aponta outro caminho. Vai escrito na carta do ajuste;
 - uma perícia só para os dois ramos, disparada pelo Pedro; até a triagem, nada no `main` e nada publicado.
+
+## Decisão 93 — o PS.02 no contrato do Banco (D733), no ramo; a foto do ensaio sai (D734) · 06/10/2026
+
+**POR QUÊ (CTO-D733 e D734):** o Banco fechou o contrato do jsonb (a carta dele de 06/10, §3, ramo `6e8a0a8`), e o
+CTO o conferiu. A OC ajusta a leitura agora, para a perícia ser uma só, nos dois ramos. A foto da página lendo o
+ensaio saiu da volta, pela D734: a sessão no ensaio venceu, e só o Pedro entrando resolveria (D536).
+
+**O QUE MUDOU**, no ramo `d730-ps02` (`130e7a5`, CI 37492084724 verde), **NÃO publicado**:
+- **A leitura do banco segue o contrato:**
+  - a coluna é `documento`, e Código, Revisão e Data vêm das colunas;
+  - o `aviso` guarda o tom (`warn` = aviso, `info` = informação), e o `miudo` é a letra miúda;
+  - o `endereco` do quadro FO 8.4.1.1 não vira link;
+  - o `select` nomeia as colunas.
+- **O sumário diz o que o documento diz** ("1. Objetivo"). Antes a página escrevia o título da seção. Ninguém tinha
+  visto nas fotos.
+- **O dado de teste do Banco** é o jsonb da carga, com a mesma digital do ensaio (`1c82ab10…`, por SQL só leitura,
+  emenda 3, sem nomes: os do histórico saíram cobertos na própria consulta). A leitura dele dá o procedimento do dado
+  de teste antigo, palavra por palavra.
+- **A prova:**
+  - 988 testes, tipos e lint limpos;
+  - 29 sabotagens, todas vermelhas (8 novas do contrato).
+- **O tamanho:** 1.526 linhas novas em `src/`, sem os testes. Com o Banco, 2.427.
+- **O controle de permissão desta máquina recusou** subir a prova com a linha lida do ensaio. Não insisti, e o CTO
+  tirou a foto da volta.
+- **O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+- a conferência do CTO e o texto do perito para o Pedro: uma perícia, os dois ramos;
+- os ramos ficam parados até o laudo, e só entra conserto de achado aceito;
+- a ordem da produção (D733 §4): primeiro o Banco; depois o CTO confere; então a OC publica, fora do dia do
+  primeiro uso do mestre.

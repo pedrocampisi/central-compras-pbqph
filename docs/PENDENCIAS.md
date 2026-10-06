@@ -90,19 +90,16 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 35. O PS.02 no sistema (D730): aprovado no ramo, esperando o Banco, a perícia e a ordem
+### 35. O PS.02 no sistema (D730): o ramo no contrato do Banco, esperando a perícia e a ordem
 
-*Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02`, com 984
-testes, CI verde e as fotos. **O CTO aprovou a tela e o PDF (D732, decisão 92)**, e os dois retoques dele já estão no
-ramo (`5b85d02`). **Falta:**
-- o contrato do jsonb na carta de fecho do Banco; então o ajuste em `procedimentoDoBanco.ts` e no `select`, e a
-  carta ao CTO com a diferença e a foto da página lendo o ensaio, com os nomes cobertos. **A foto precisa de sessão
-  aberta, e eu não digito senha:** o Pedro entra com a dele, ou o CTO aponta outro caminho;
-- a perícia, porque passou de mil linhas. O caminho, pelo CTO em 06/10: ele avalia o ramo da OC e o Banco no ensaio;
-  com os dois aprovados, o Pedro dispara o perito, e o laudo vai para `CTO\docs\Pericias`; cada casa mede os achados
-  dela, e o CTO faz a triagem. **Até a triagem, nada no `main` e nada publicado.** A meta de 13/10 pode escorregar; o
-  limite é o ensaio de 09/11;
-- a ordem de publicar: o Banco primeiro, a OC depois (D433).
+*Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02`. O CTO aprovou a
+tela e o PDF (D732, decisão 92), e a leitura segue o contrato do Banco (`130e7a5`, decisão 93). **Falta:**
+- a conferência do CTO da diferença `cf9413e..130e7a5`;
+- **a perícia, uma só para os dois ramos** (o `6e8a0a8` do Banco e o `130e7a5`, 2.427 linhas): o CTO dá o texto ao
+  Pedro, ele dispara, e o laudo vem por carta. **Até a triagem, nada no `main` e nada publicado**, e os ramos ficam
+  parados. A meta de 13/10 pode escorregar; o limite é o ensaio de 09/11;
+- a ordem de publicar (D733 §4): o Banco primeiro, o CTO confere, a OC publica. A ligação com o banco de verdade se
+  vê na produção, antes de publicar (D734). Nada no dia do primeiro uso do mestre.
 
 Depois, a Rev. 01, o rascunho do manual.
 
