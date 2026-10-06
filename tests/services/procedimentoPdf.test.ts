@@ -2,7 +2,8 @@
  * CTO-D730 §3.2 — o PDF do procedimento, pela impressão do próprio HTML do SGQ
  * (resposta (c) do CTO): o cabeçalho, os seis campos, o "Como usar", as seções
  * 1 a 7 com o histórico; sem o fluxo didático, sem o sumário e sem os "?". O
- * teste lê o texto de dentro do PDF, página por página, sem baixar nada.
+ * teste lê o texto de dentro do PDF, página por página, sem baixar nada; o que
+ * foi desenhado na Symbol volta a ser o sinal (perícia de 06/10, achado 4).
  */
 import { describe, expect, it } from 'vitest';
 import type jsPDF from 'jspdf';
@@ -12,10 +13,33 @@ import { desenhaPdfDoProcedimento, palavrasDe } from '../../src/services/pdf/gen
 import { textoSimples, type Procedimento } from '../../src/domain/procedimento';
 import { ps02Rev00 } from '../fixtures/ps02Rev00';
 
-/** Os textos desenhados numa página, na ordem, juntos por espaço. */
+/**
+ * O gabarito da leitura, escrito à mão da codificação da fonte Symbol da
+ * Adobe, e não tirado da tabela `SINAIS` que está sob teste: se alguém trocar
+ * um código lá, a leitura daqui acusa.
+ */
+const NA_SYMBOL_DA_ADOBE: Record<number, string> = { 0xb3: '≥', 0xa3: '≤' };
+
+/**
+ * Os textos desenhados numa página, na ordem, juntos por espaço. O que foi
+ * desenhado na Symbol é lido pelo código dela ("\xb3" → "≥"); o sinal que
+ * não foi desenhado não aparece (perícia de 06/10, achado 4).
+ */
 function textoDaPagina(doc: jsPDF, pagina: number): string {
   const conteudo = (doc.internal as unknown as { pages: string[][] }).pages[pagina]!.join('\n');
-  return [...conteudo.matchAll(/\(((?:\\.|[^\\)])*)\) Tj/g)].map((m) => m[1]!.replace(/\\(.)/g, '$1')).join(' ');
+  doc.setFont('symbol', 'normal');
+  const symbol = String(doc.getFont().id);
+  let fonte = '';
+  const partes: string[] = [];
+  for (const m of conteudo.matchAll(/\/(F\d+) [\d.]+ Tf|\(((?:\\.|[^\\)])*)\) Tj/g)) {
+    if (m[1]) {
+      fonte = m[1];
+      continue;
+    }
+    const t = m[2]!.replace(/\\(.)/g, '$1');
+    partes.push(fonte === symbol ? Array.from(t, (c) => NA_SYMBOL_DA_ADOBE[c.charCodeAt(0)] ?? c).join('') : t);
+  }
+  return partes.join(' ');
 }
 
 function textoTodo(doc: jsPDF): string {
@@ -50,11 +74,17 @@ function textosDoCorpo(x: Procedimento): string[] {
 }
 
 describe('D730 — o PDF do PS.02', () => {
-  it('cada texto do corpo está no PDF, palavra por palavra (o "≥" sai pela Symbol)', () => {
-    const faltam = textosDoCorpo(p)
-      .map((t) => t.replace(/≥/g, ''))
-      .filter((t) => !todo.includes(noPdf(t)));
+  it('cada texto do corpo está no PDF, palavra por palavra, com o "≥" lido da Symbol', () => {
+    const faltam = textosDoCorpo(p).filter((t) => !todo.includes(noPdf(t)));
     expect(faltam).toEqual([]);
+  });
+
+  it('perícia de 06/10, achado 4: os 4 "≥" do item 2 saem desenhados, na Symbol', () => {
+    const noDocumento = textosDoCorpo(p).join(' ').match(/≥/g) ?? [];
+    expect(noDocumento).toHaveLength(4);
+    expect(todo.match(/≥/g) ?? []).toHaveLength(4);
+    // Nenhum "≥" na Helvetica: lá ele sairia como "?" ou sumiria.
+    expect(todo).not.toContain('?2');
   });
 
   it('no alto de toda página: o título, o subtítulo, o código e a revisão; no pé, o rodapé e o número', () => {
