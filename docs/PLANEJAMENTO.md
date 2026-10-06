@@ -3315,3 +3315,27 @@ ensaio saiu da volta, pela D734: a sessão no ensaio venceu, e só o Pedro entra
 - os ramos ficam parados até o laudo, e só entra conserto de achado aceito;
 - a ordem da produção (D733 §4): primeiro o Banco; depois o CTO confere; então a OC publica, fora do dia do
   primeiro uso do mestre.
+
+## Decisão 94 — a perícia do PS.02: o achado 4 é da OC, aceito e consertado no ramo · 06/10/2026
+
+**POR QUÊ (CTO-D736):** o laudo do Codex (`CTO\docs\Pericias\2026-10-06_pericia_codex_ps02-no-sistema.md`) trouxe
+4 achados: os 1, 2 e 3 são do Banco, e o 4 é desta casa. Cada casa mede os seus antes da triagem (lei 3, cap. 9).
+
+**O ACHADO 4 (baixa), ACEITO:** o teste "palavra por palavra" do PDF tirava o "≥" do esperado.
+- **A prova do perito reproduziu:** omitindo o sinal só no desenho, o teste ficou verde, 9 de 9.
+
+**O CONSERTO**, no ramo `d730-ps02` (`062ed73`, CI 37514896120 verde), **NÃO publicado**:
+- **só o teste muda;** o `src/` não, e o tamanho segue 1.526;
+- a leitura do PDF lê a Symbol pelo gabarito da Adobe, como nos outros PDFs da casa;
+- o texto do corpo é conferido com o sinal, e um teste conta os 4 "≥";
+- **a prova:**
+  - a sabotagem do perito fica vermelha, e a variante (">=" na Helvetica) também;
+  - as 7 sabotagens antigas do PDF continuam vermelhas;
+  - 989 testes.
+- **O banco não mudou.**
+
+**O ACHADO 2** cita o leitor da OC, mas o conserto é na porta do Banco: o código desta casa não muda por ele.
+
+**DAQUI EM DIANTE:**
+- a triagem do CTO;
+- depois, a ordem da produção (D733 §4).
