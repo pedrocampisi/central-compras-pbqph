@@ -111,6 +111,9 @@ export interface Procedimento {
 /** O nome da página no menu e no título (D730 §3.1). */
 export const NOME_DA_PAGINA = 'Procedimento de Compras (PS.02)';
 
+/** O nome no menu, sem o código: cabe numa linha a 1366, como os outros (CTO-D732 §3.1). */
+export const NOME_NO_MENU = 'Procedimento de Compras';
+
 /** O que a página é (régua da D475): o subtítulo, logo abaixo do título. */
 export const O_QUE_E_A_PAGINA =
   'O procedimento do SGQ que diz como a Campisi compra e contrata: da necessidade ao fornecedor avaliado. ' +

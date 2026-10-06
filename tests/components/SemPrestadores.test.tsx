@@ -59,7 +59,7 @@ describe('D585 — a aba Prestadores saiu', () => {
   it('o menu não tem "Prestadores", e as outras abas ficam (a Qualificação entrou depois de Fornecedores, D661; o PS.02 depois do Catálogo, D730)', async () => {
     const menu = await abrirOc();
     const abas = within(menu).getAllByRole('button').map((b) => b.textContent?.trim());
-    expect(abas).toEqual(['Dashboard', 'Nova OC', 'Histórico', 'Recebimentos', 'Fornecedores', 'Qualificação', 'Obras', 'Mestres', 'Catálogo de ECRs', 'Procedimento de Compras (PS.02)', 'Configurações']);
+    expect(abas).toEqual(['Dashboard', 'Nova OC', 'Histórico', 'Recebimentos', 'Fornecedores', 'Qualificação', 'Obras', 'Mestres', 'Catálogo de ECRs', 'Procedimento de Compras', 'Configurações']);
     expect(screen.queryByText(/Prestadores/)).toBeNull();
   });
 

@@ -13,6 +13,8 @@
   outline-offset: 3px;
   border-radius: var(--raio-pequeno);
 }
+/* Na tabela, o contorno fica dentro da linha, sem cobrir a borda (CTO-D732 §3.2). */
+.documento tr[data-alvo] { outline-offset: -3px; }
 .documento tr[data-alvo] td { background: var(--marca-fraca); }
 
 /* ── O cabeçalho ───────────────────────────────────────────────────────── */

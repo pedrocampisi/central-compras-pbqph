@@ -47,7 +47,7 @@ import { QualificacaoPage } from './features/qualificacao/QualificacaoPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
 import { ProcedimentoPage } from './features/procedimento/ProcedimentoPage';
-import { NOME_DA_PAGINA } from './domain/procedimento';
+import { NOME_NO_MENU } from './domain/procedimento';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
 import { TelaDoMestre } from './features/recebimento/TelaDoMestre';
 import { RecebimentosPage } from './features/recebimento/RecebimentosPage';
@@ -79,7 +79,7 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'mestres', label: 'Mestres', icon: 'capacete' },
   { id: 'catalogo', label: 'Catálogo de ECRs', icon: 'clipboard' },
   // O PS.02 no sistema, o manual de compras (CTO-D730 §3.1).
-  { id: 'procedimento', label: NOME_DA_PAGINA, icon: 'livro' },
+  { id: 'procedimento', label: NOME_NO_MENU, icon: 'livro' },
 ];
 
 const NAV_SISTEMA: NavItem[] = [
