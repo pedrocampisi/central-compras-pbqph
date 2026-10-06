@@ -1,0 +1,210 @@
+{
+  "revisao_de": "00",
+  "descricao": "O procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do mestre e a tratativa no Dashboard entram no texto.",
+  "mudancas": [
+    {
+      "id": "M01",
+      "item": "Cabeçalho",
+      "ancora": "cabecalho.revisao",
+      "motivo": "A Rev. 01 passa a descrever cada passo na tela do sistema em que ele é feito (D730 §4.1)."
+    },
+    {
+      "id": "M02",
+      "item": "Como usar",
+      "ancora": "como_usar",
+      "motivo": "Uma frase no fim: o procedimento passa a ser também o manual das telas."
+    },
+    {
+      "id": "M03",
+      "item": "Fluxo, cartão \"Material controlado\"",
+      "ancora": "fluxo.c1",
+      "motivo": "O mesmo caminho, com a tela de cada passo."
+    },
+    {
+      "id": "M04",
+      "item": "Fluxo, cartão \"Serviço de obra\"",
+      "ancora": "fluxo.c2",
+      "motivo": "Só a qualificação de serviço está no sistema; contrato, PES e avaliação de serviço continuam fora dele."
+    },
+    {
+      "id": "M05",
+      "item": "Fluxo, cartão \"Laboratório\"",
+      "ancora": "fluxo.c3",
+      "motivo": "Só a qualificação do laboratório está no sistema."
+    },
+    {
+      "id": "M06",
+      "item": "Fluxo, cartão \"Projeto / engenharia\"",
+      "ancora": "fluxo.c4",
+      "motivo": "Só a qualificação está no sistema."
+    },
+    {
+      "id": "M07",
+      "item": "Fluxo, cartão \"Locação de equipamento\"",
+      "ancora": "fluxo.c5",
+      "motivo": "Só a qualificação está no sistema."
+    },
+    {
+      "id": "M08",
+      "item": "Fluxo, passo \"3 · Qualificação\"",
+      "ancora": "fluxo.s3",
+      "motivo": "A FO 8.4.1.1 virou a tela Qualificação (D730 §4.2)."
+    },
+    {
+      "id": "M09",
+      "item": "Fluxo, passo \"4 · Contratação\"",
+      "ancora": "fluxo.s4",
+      "motivo": "A tela de cada passo, para material."
+    },
+    {
+      "id": "M10",
+      "item": "Fluxo, passo \"5 · Recebimento\"",
+      "ancora": "fluxo.s5",
+      "motivo": "O recebimento de material virou o app do mestre (D730 §4.2)."
+    },
+    {
+      "id": "M11",
+      "item": "Fluxo, passo \"6 · Avaliação\"",
+      "ancora": "fluxo.s6",
+      "motivo": "A avaliação e a tratativa no sistema."
+    },
+    {
+      "id": "M12",
+      "item": "1, quadro \"Diretoria\"",
+      "ancora": "objetivo.q1.i1",
+      "motivo": "No sistema, revisar ECR, revisar o procedimento e dar ciência na tratativa são de uma pessoa só, a mesma (a regra da D589)."
+    },
+    {
+      "id": "M13",
+      "item": "1, quadro \"Administrativo / Compras\"",
+      "ancora": "objetivo.q1.i2",
+      "motivo": "As telas de quem compra."
+    },
+    {
+      "id": "M14",
+      "item": "1, quadro \"Obra / Engenharia\"",
+      "ancora": "objetivo.q1.i3",
+      "motivo": "A tela Mestres é da engenharia (e do administrador)."
+    },
+    {
+      "id": "M15",
+      "item": "1, quadro novo \"Mestre de obra\"",
+      "ancora": "objetivo.q1.i4",
+      "motivo": "O mestre passou a receber pelo sistema (o app do mestre, D693 e D696). O papel não estava no PS.02."
+    },
+    {
+      "id": "M16",
+      "item": "2, primeiro parágrafo",
+      "ancora": "qualificacao.p1",
+      "motivo": "A FO 8.4.1.1 virou a tela Qualificação (D730 §4.2). No sistema, a qualificação é da empresa, não da filial."
+    },
+    {
+      "id": "M17",
+      "item": "2, tabela, linha \"Materiais controlados\"",
+      "ancora": "materiais",
+      "motivo": "Uma das 5 diferenças da D729: a pergunta da tela diz \"menor preço de mercado\"."
+    },
+    {
+      "id": "M18",
+      "item": "2, tabela, linha \"Serviços\"",
+      "ancora": "servicos",
+      "motivo": "Uma das 5 diferenças da D729: a pergunta da tela diz \"menor preço do mercado\"."
+    },
+    {
+      "id": "M19",
+      "item": "2, tabela, linha \"Projetos / engenharia\"",
+      "ancora": "qualificacao.t1.l3",
+      "motivo": "Duas das 5 diferenças da D729: a tela pergunta \"conhecimento da ABNT NBR 15575\" e \"menor preço do mercado\"."
+    },
+    {
+      "id": "M20",
+      "item": "2, tabela, linha \"Locação\"",
+      "ancora": "locacao",
+      "motivo": "Uma das 5 diferenças da D729: a pergunta da tela diz \"menor preço do mercado\"."
+    },
+    {
+      "id": "M21",
+      "item": "2, tabela, linha \"Controle tecnológico\"",
+      "ancora": "qualificacao.t1.l5",
+      "motivo": "O \"item 6\" era um engano: os laboratórios são o item 5 (D729, D732 §4). E o sistema qualifica o laboratório com uma das três respostas favorável (o mínimo do banco é 1); a Rev. 00 não dizia a regra de decisão desta linha."
+    },
+    {
+      "id": "M22",
+      "item": "2, parágrafo novo: a trava da emissão",
+      "ancora": "qualificacao.p3",
+      "motivo": "A trava da emissão existe no sistema (D605) e não estava escrita no PS.02 (D730 §4.2)."
+    },
+    {
+      "id": "M23",
+      "item": "2, a regra interna (letra miúda)",
+      "ancora": "qualificacao.p2",
+      "motivo": "No sistema, toda qualificação vence em 12 meses, em todas as categorias. Os 12 meses que o SiAC exige ficam cobertos, porque valem para todas."
+    },
+    {
+      "id": "M24",
+      "item": "3, tabela, linha \"Material controlado\", como formaliza",
+      "ancora": "contratacao.t1.l1",
+      "motivo": "A OC é emitida no sistema. O número vem do banco na emissão; o PDF vai à pasta da obra pelo servidor e, se ele falhar, pelo navegador."
+    },
+    {
+      "id": "M25",
+      "item": "3, tabela, linha \"Material controlado\", conteúdo mínimo",
+      "ancora": "contratacao.t1.l1",
+      "motivo": "No sistema, a ECR é marcada por item da OC."
+    },
+    {
+      "id": "M26",
+      "item": "4, quadro \"Materiais e locação\"",
+      "ancora": "avaliacao.q1.i1",
+      "motivo": "O recebimento virou o app do mestre e o \"Entregue\" com a avaliação (D730 §4.2). O texto de antes fica inteiro, para o que é recebido fora do sistema."
+    },
+    {
+      "id": "M27",
+      "item": "4, a regra operacional (informação)",
+      "ancora": "avaliacao.a1",
+      "motivo": "O \"comunicar o responsável\" virou a tratativa aberta no Dashboard, com a ciência dele."
+    },
+    {
+      "id": "M28",
+      "item": "6, quadro \"FO 8.4.1.1\"",
+      "ancora": "registros.q1.i1",
+      "motivo": "A FO 8.4.1.1 virou a tela Qualificação, e a folha do auditor sai pelo botão dela."
+    },
+    {
+      "id": "M29",
+      "item": "6, quadro \"FO 8.4.1.1\", o link da planilha",
+      "ancora": "registros.q1.i1",
+      "motivo": "O link levava à planilha, que deixa de ser o registro. Na página do sistema ele já aparecia sem link (D732)."
+    },
+    {
+      "id": "M30",
+      "item": "6, quadro \"ECRs\"",
+      "ancora": "registros.q1.i2",
+      "motivo": "As ECRs viraram o Catálogo de ECRs (D588, D730 §4.2)."
+    },
+    {
+      "id": "M31",
+      "item": "6, quadro \"Ordens / documentos de compra\"",
+      "ancora": "registros.q1.i3",
+      "motivo": "Onde a OC fica no sistema."
+    },
+    {
+      "id": "M32",
+      "item": "6, quadro \"Avaliações\"",
+      "ancora": "registros.q1.i5",
+      "motivo": "Onde a avaliação fica no sistema. O texto de antes fica, para o que é avaliado fora dele."
+    },
+    {
+      "id": "M33",
+      "item": "7, o \"?\" do item",
+      "ancora": "revisoes",
+      "motivo": "O \"autosave do navegador\" era do HTML, e no sistema não existe (D732 §4)."
+    },
+    {
+      "id": "M34",
+      "item": "7, o quadro \"Conteúdo preparado para a próxima revisão formal\"",
+      "ancora": "revisoes.a1",
+      "motivo": "O quadro descrevia a migração para o HTML, que a página já é (D732 §4)."
+    }
+  ]
+}

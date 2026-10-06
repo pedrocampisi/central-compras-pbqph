@@ -157,14 +157,19 @@ export function procedimentoDoBanco(linha: unknown, revisoes: unknown): Procedim
     fluxo: {
       titulo: texto(fluxo['titulo']),
       introducao: simples(fluxo['texto']),
-      cartoes: lista(fluxo['cartoes']).map((c): CartaoDoFluxo => {
+      cartoes: lista(fluxo['cartoes']).map((c, i): CartaoDoFluxo => {
         const o = obj(c);
-        return { titulo: texto(o['titulo']), texto: simples(o['texto']), destino: texto(o['destino']) || null };
+        return {
+          ancora: texto(o['ancora']) || `fluxo.c${i + 1}`,
+          titulo: texto(o['titulo']),
+          texto: simples(o['texto']),
+          destino: texto(o['destino']) || null,
+        };
       }),
       tituloDaSequencia: texto(sequencia['titulo']),
-      sequencia: lista(sequencia['passos']).map((p): PassoDaSequencia => {
+      sequencia: lista(sequencia['passos']).map((p, i): PassoDaSequencia => {
         const o = obj(p);
-        return { titulo: texto(o['rotulo']), texto: simples(o['texto']) };
+        return { ancora: texto(o['ancora']) || `fluxo.s${i + 1}`, titulo: texto(o['rotulo']), texto: simples(o['texto']) };
       }),
     },
     secoes: lista(doc['secoes']).map(secao),
