@@ -3433,3 +3433,31 @@ requisito do SiAC sai. Ficaram três ordens:
 2. junto e publico (emenda 3), com o desfazer anotado;
 3. o CTO confere por fora;
 4. o Pedro senta e grava com a mão dele.
+
+## Decisão 98 — no ar: a Rev. 01 pela mão do Pedro, esperando a sentada dele · 06/10/2026
+
+**POR QUÊ (CTO-D740):** o CTO aprovou o ramo. Ele mediu de novo a forma na peça do Banco (null, 61 âncoras),
+conferiu o CI, o código e as fotos, e aceitou as três escolhas da casa.
+
+**O QUE MUDOU:**
+- **O desfazer foi anotado antes da junção:** `c1816ff8`, com 100% do tráfego.
+- **A junção:** o `d739-rev01` (`81f6bef`) entrou no `main` em `e5944b6`, sem conflito.
+- **A bateria:**
+  - 1013 testes;
+  - tipos e lint limpos;
+  - o `conferir` 7 de 7 e o do pacote 5 de 5.
+- **Publicado pelo PowerShell às 17h23 de 06/10:** `36e26eab-ddbe-49b5-a6b1-b41ac0e4de99`, versão
+  `20261006202414-e5944b6`. O primeiro uso do mestre ainda não tem data.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- o código, o `sw.js` e os dois pedaços do rascunho respondem 200;
+- o código tem o quadro, o "?" do motivo, a pergunta e a chamada da porta;
+- o rascunho servido tem a frase da nota consertada.
+
+**O banco não mudou. Ninguém apertou o "Gravar"** (D740: só o Pedro, nem para prova).
+
+**DAQUI EM DIANTE:**
+1. o CTO confere por fora;
+2. o Pedro senta e grava a Rev. 01 com a mão dele;
+3. na publicação seguinte, o rascunho sai do código.
