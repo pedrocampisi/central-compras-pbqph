@@ -2,7 +2,7 @@
 
 > **Data:** 06/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)
 > **Estado:** PROPOSTA — aguardando o Pedro
-> **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738). **NÃO** é o procedimento: o texto inteiro está em `documento_rev01_rascunho.json`, na forma que o banco guarda.
+> **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738, D739). **NÃO** é o procedimento: o texto inteiro está em `src/features/procedimento/rev01/documento.json`, na forma que o banco guarda, e é o que a página mostra a quem revisa e o que o botão "Gravar a Rev. 01" grava.
 
 ---
 
@@ -10,27 +10,20 @@
 
 - **34 mudanças.** Quase todas acrescentam a tela do sistema ao que o PS.02 já dizia.
 - **Requisitos do SiAC que saem: 0.** Nenhum requisito da Rev. 00 sai nem se estreita. Cada mudança foi conferida uma a uma (coluna "SiAC").
-- **Escolhas do Pedro: 7.** Estão juntas na seção seguinte, cada uma com as opções.
+- **Pontos já decididos: 7.** Foram decididos antes do rascunho, e a decisão de cada um está na seção seguinte (CTO-D739 §3). Na sentada, o Pedro lê o texto inteiro e pode recusar qualquer frase.
 - **Nada inventado:** cada frase sobre o sistema foi medida no código ou no banco. O que o sistema não faz (contratos, PES, avaliação de serviço, projeto e laboratório, o PSQ), o texto não diz que ele faz.
 - **O que não muda:** o item 5 (laboratórios) inteiro, o aviso do PSQ/SiMaC, o escopo, a referência, o sumário e o rodapé.
 - **A forma:** a do contrato do Banco. As 11 âncoras do documento continuam; são 61 âncoras, nenhuma repetida, e todo cartão e item do sumário apontam para uma que existe.
 
-## As escolhas do Pedro
+## Os pontos já decididos
 
-- **M12 — 1, quadro "Diretoria".** Quem revisa as ECRs e o procedimento e dá ciência nas tratativas é a Diretoria? (a) Sim, como está. (b) Outro papel: diga qual.
-  - No rascunho está a opção (a).
-- **M17 — 2, tabela, linha "Materiais controlados".** Materiais, critério 2: (a) o PS.02 passa a dizer o que a tela pergunta, "menor preço de mercado"; (b) o PS.02 fica "preço/condições", e a pergunta da tela muda (carta ao Banco).
-  - No rascunho está a opção (a).
-- **M18 — 2, tabela, linha "Serviços".** Serviços, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "condição comercial/técnica", e a pergunta muda.
-  - No rascunho está a opção (a).
-- **M19 — 2, tabela, linha "Projetos / engenharia".** Projetos, critérios 2 e 3: (a) como a tela, "conhecimento da ABNT NBR 15575" e "menor preço do mercado"; (b) ficam "conhecimento/requisitos técnicos aplicáveis" e "prazo/preço", e as perguntas mudam. Pode ser (a) num e (b) no outro.
-  - No rascunho está a opção (a).
-- **M20 — 2, tabela, linha "Locação".** Locação, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "disponibilidade/preço", e a pergunta muda.
-  - No rascunho está a opção (a).
-- **M21 — 2, tabela, linha "Controle tecnológico".** Controle tecnológico: (a) a regra é "≥ 1 favorável", como o sistema já faz; (b) outra regra (diga qual), e o mínimo do banco muda.
-  - No rascunho está a opção (a).
-- **M29 — 6, quadro "FO 8.4.1.1", o link da planilha.** A planilha FO 8.4.1.1 deixa de ser o registro? (a) Sim: o link sai, e o registro é a tela. (b) Não: o link fica, e a planilha continua valendo junto.
-  - No rascunho está a opção (a).
+- **M12 — 1, quadro "Diretoria".** D589: só o Pedro revisa as ECRs, e a D730 estendeu a regra ao procedimento. Gravar a Rev. 01 pela mão dele, na página (D739 §4), torna a frase verdade.
+- **M17 — 2, tabela, linha "Materiais controlados".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
+- **M18 — 2, tabela, linha "Serviços".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
+- **M19 — 2, tabela, linha "Projetos / engenharia".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
+- **M20 — 2, tabela, linha "Locação".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
+- **M21 — 2, tabela, linha "Controle tecnológico".** D606 §2: o laboratório segue o PS.02, basta um enquadramento (o mínimo do banco é 1).
+- **M29 — 6, quadro "FO 8.4.1.1", o link da planilha.** D604: a planilha FO 8.4.1.1 foi aposentada; o registro é a tela Qualificação.
 
 ## Todas as mudanças
 
@@ -129,7 +122,7 @@
 - **Depois:** Assegura recursos e diretrizes do processo de aquisição. No sistema, revisa as ECRs e este procedimento, e dá ciência nas tratativas.
 - **Por quê:** No sistema, revisar ECR, revisar o procedimento e dar ciência na tratativa são de uma pessoa só, a mesma (a regra da D589).
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Quem revisa as ECRs e o procedimento e dá ciência nas tratativas é a Diretoria? (a) Sim, como está. (b) Outro papel: diga qual.
+- **Já decidido:** D589: só o Pedro revisa as ECRs, e a D730 estendeu a regra ao procedimento. Gravar a Rev. 01 pela mão dele, na página (D739 §4), torna a frase verdade.
 
 ### M13 — 1, quadro "Administrativo / Compras"
 
@@ -151,7 +144,7 @@
 
 - **Âncora:** `objetivo.q1`
 - **Antes:** não existia.
-- **Depois (novo):** **Mestre de obra**: Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, com a foto ou o número da nota.
+- **Depois (novo):** **Mestre de obra**: Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, e registra o número da nota (o app pode ler o número na foto da nota, e o mestre confere).
 - **Por quê:** O mestre passou a receber pelo sistema (o app do mestre, D693 e D696). O papel não estava no PS.02.
 - **SiAC:** Nenhum requisito sai.
 
@@ -170,7 +163,7 @@
 - **Depois:** Qualidade/PSQ-ECR · menor preço de mercado · prazo
 - **Por quê:** Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço de mercado".
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Materiais, critério 2: (a) o PS.02 passa a dizer o que a tela pergunta, "menor preço de mercado"; (b) o PS.02 fica "preço/condições", e a pergunta da tela muda (carta ao Banco).
+- **Já decidido:** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 
 ### M18 — 2, tabela, linha "Serviços"
 
@@ -179,7 +172,7 @@
 - **Depois:** Documentação e requisitos de SST · EPI aplicável · menor preço do mercado
 - **Por quê:** Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço do mercado".
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Serviços, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "condição comercial/técnica", e a pergunta muda.
+- **Já decidido:** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 
 ### M19 — 2, tabela, linha "Projetos / engenharia"
 
@@ -188,7 +181,7 @@
 - **Depois:** Responsabilidade técnica · conhecimento da ABNT NBR 15575 · menor preço do mercado
 - **Por quê:** Duas das 5 diferenças da D729: a tela pergunta "conhecimento da ABNT NBR 15575" e "menor preço do mercado".
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Projetos, critérios 2 e 3: (a) como a tela, "conhecimento da ABNT NBR 15575" e "menor preço do mercado"; (b) ficam "conhecimento/requisitos técnicos aplicáveis" e "prazo/preço", e as perguntas mudam. Pode ser (a) num e (b) no outro.
+- **Já decidido:** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 
 ### M20 — 2, tabela, linha "Locação"
 
@@ -197,7 +190,7 @@
 - **Depois:** Contrato/documentação · condição/checklist do equipamento · menor preço do mercado
 - **Por quê:** Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço do mercado".
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Locação, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "disponibilidade/preço", e a pergunta muda.
+- **Já decidido:** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 
 ### M21 — 2, tabela, linha "Controle tecnológico"
 
@@ -206,7 +199,7 @@
 - **Depois:** ≥ 1 favorável: qualificado; nenhuma: desqualificado. Aplicar os critérios específicos do item 5 deste procedimento.
 - **Por quê:** O "item 6" era um engano: os laboratórios são o item 5 (D729, D732 §4). E o sistema qualifica o laboratório com uma das três respostas favorável (o mínimo do banco é 1); a Rev. 00 não dizia a regra de decisão desta linha.
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** Controle tecnológico: (a) a regra é "≥ 1 favorável", como o sistema já faz; (b) outra regra (diga qual), e o mínimo do banco muda.
+- **Já decidido:** D606 §2: o laboratório segue o PS.02, basta um enquadramento (o mínimo do banco é 1).
 
 ### M22 — 2, parágrafo novo: a trava da emissão
 
@@ -244,7 +237,7 @@
 
 - **Âncora:** `avaliacao.q1.i1`
 - **Antes:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável.
-- **Depois:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e a foto ou o número da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.
+- **Depois:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.
 - **Por quê:** O recebimento virou o app do mestre e o "Entregue" com a avaliação (D730 §4.2). O texto de antes fica inteiro, para o que é recebido fora do sistema.
 - **SiAC:** Nenhum requisito sai.
 
@@ -271,7 +264,7 @@
 - **Depois:** sai.
 - **Por quê:** O link levava à planilha, que deixa de ser o registro. Na página do sistema ele já aparecia sem link (D732).
 - **SiAC:** Nenhum requisito sai.
-- **Escolha do Pedro:** A planilha FO 8.4.1.1 deixa de ser o registro? (a) Sim: o link sai, e o registro é a tela. (b) Não: o link fica, e a planilha continua valendo junto.
+- **Já decidido:** D604: a planilha FO 8.4.1.1 foi aposentada; o registro é a tela Qualificação.
 
 ### M30 — 6, quadro "ECRs"
 

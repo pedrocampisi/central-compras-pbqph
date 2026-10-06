@@ -294,6 +294,122 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
 }
 .rodape strong { color: var(--texto); }
 
+/* ── A revisão pela mão do Pedro (CTO-D739 §4) ─────────────────────────── */
+/* O quadro de quem revisa, no alto da página. */
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--borda-forte);
+  border-left: 4px solid var(--sucesso);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+.painel strong { font-size: 14px; color: var(--texto); }
+.painel p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--texto-suave); }
+.painel .saiu { color: var(--erro); }
+.acoesDoPainel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* O cartão do fluxo mora num lugar com a âncora: a marca fica fora do botão. */
+.lugarDoCartao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lugarDoCartao > .cartao { flex: 1; }
+
+/* O trecho que mudou: a faixa verde à esquerda, sem mexer no resto do desenho. */
+.documento [data-mudou]:not(tr) { box-shadow: inset 4px 0 0 var(--sucesso); }
+.documento p[data-mudou],
+.documento li[data-mudou],
+.documento .quadro[data-mudou] { padding-left: 14px; }
+.documento tr[data-mudou] td:first-child { box-shadow: inset 4px 0 0 var(--sucesso); }
+.documento .lugarDoCartao[data-mudou] { padding-left: 8px; }
+/* A etiqueta "Mudou" e o "?" do motivo; a linha quebra para a resposta abrir embaixo. */
+.mudou {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.etiquetaMudou {
+  padding: 2px 8px;
+  border-radius: var(--raio-pill);
+  background: var(--sucesso-bg);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sucesso);
+}
+.cabecaDaSecao .mudou { margin-top: 0; }
+.legendaDaMudanca { caption-side: top; text-align: left; }
+
+/* A pergunta antes de gravar: o desenho do "Gravar revisão" das ECRs. */
+.caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+  padding: 22px;
+  border-radius: var(--raio-grande);
+  background: var(--painel);
+  box-shadow: var(--sombra-elevada);
+}
+.tituloDoDialogo {
+  margin: 0 0 4px;
+  font-family: var(--fonte-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.resumo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--texto);
+}
+.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--texto); }
+.obrigatorio { margin-left: 2px; color: var(--erro); }
+.descricao {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 9px;
+  border: 1.5px solid var(--borda-forte);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  resize: vertical;
+}
+.dica { font-size: 12px; color: var(--texto-muted); }
+.erro {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  color: var(--erro);
+}
+.acoesDoDialogo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 @media (max-width: 700px) {
   .cabecalho,
   .secao,

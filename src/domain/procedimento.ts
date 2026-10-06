@@ -56,6 +56,8 @@ export interface Secao {
 }
 
 export interface CartaoDoFluxo {
+  /** A âncora do cartão no documento (`fluxo.c1`…): é por ela que a revisão marca o que mudou. */
+  ancora: string;
   /** O título como o documento o tem, com o emoji; a tela mostra sem (D730, resposta (a)). */
   titulo: string;
   texto: string;
@@ -64,6 +66,8 @@ export interface CartaoDoFluxo {
 }
 
 export interface PassoDaSequencia {
+  /** A âncora do passo no documento (`fluxo.s1`…). */
+  ancora: string;
   titulo: string;
   texto: string;
 }

@@ -3,11 +3,14 @@
 Parte do `documento` da Rev. 00 como o Banco o guarda (o dado de teste com a digital do banco,
 `tests/fixtures/ps02Rev00DoBanco.json`) e aplica as mudanças declaradas abaixo, uma a uma. Cada mudança
 confere o texto de antes (se o de antes não bate, o programa para), e diz o depois, o motivo, o que
-acontece com o SiAC e se é escolha do Pedro.
+acontece com o SiAC e, quando o ponto já tinha sido decidido antes, qual decisão o decidiu (CTO-D739 §3).
 
-Escreve dois arquivos em `docs/Rev01_PS02/`:
-  - `documento_rev01_rascunho.json`: o `documento` na forma do contrato, para a porta de revisar;
-  - `MUDANCAS_REV01.md`: o arquivo de leitura, para o CTO e para o Pedro.
+Escreve três arquivos:
+  - `src/features/procedimento/rev01/documento.json`: o `documento` na forma do contrato, que a página mostra
+    a quem revisa e manda à porta de revisar quando o Pedro grava (CTO-D739 §4);
+  - `src/features/procedimento/rev01/mudancas.json`: a revisão de partida, a descrição para o histórico e, de
+    cada mudança, a âncora que a página marca e o motivo (o "?" do trecho);
+  - `docs/Rev01_PS02/MUDANCAS_REV01.md`: o arquivo de leitura, para o CTO e para o Pedro.
 
 Nada aqui fala com o banco. O HTML do Dropbox não é lido nem tocado.
 Rodar: python scripts/rascunho-rev01-ps02.py
@@ -21,6 +24,9 @@ import re
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REV00 = os.path.join(RAIZ, 'tests', 'fixtures', 'ps02Rev00DoBanco.json')
 SAIDA = os.path.join(RAIZ, 'docs', 'Rev01_PS02')
+SAIDA_DA_PAGINA = os.path.join(RAIZ, 'src', 'features', 'procedimento', 'rev01')
+# A revisão de onde o rascunho parte: a porta recusa se a vigente for outra (D607).
+REVISAO_DE = '00'
 
 # As 11 âncoras que o próprio documento tem: a porta recusa revisão que tire uma delas.
 DO_DOCUMENTO = ['objetivo', 'qualificacao', 'contratacao', 'avaliacao', 'laboratorios', 'registros', 'revisoes',
@@ -68,10 +74,13 @@ MANTIDO = 'mantido'          # nenhum requisito do SiAC sai
 VERMELHO = 'VERMELHO'        # um requisito do SiAC sai ou se estreita: vai ao Pedro
 SIAC = {MANTIDO: 'Nenhum requisito sai.', VERMELHO: '🟥 **Um requisito do SiAC sai ou se estreita.**'}
 
-# Cada mudança: (id, item, âncora, campo, antes, depois, motivo, siac, escolha)
+# As perguntas da tela são as da própria planilha FO 8.4.1.1 (D604); o Pedro as pôs na Rev. 01 (D729, D730).
+DA_D729 = 'D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").'
+
+# Cada mudança: (id, item, âncora, campo, antes, depois, motivo, siac, decidido)
 #   campo: 'texto' (texto rico), 'texto_simples', 'titulo', 'etiqueta', 'ajuda', ('celula', n), 'endereco',
 #          'novo_bloco_depois' / 'novo_item' (o depois é o bloco ou item inteiro)
-#   escolha: None, ou a pergunta ao Pedro (com as opções)
+#   decidido: None, ou a decisão de antes que já decidiu o ponto (CTO-D739 §3)
 MUDANCAS = [
     # ── O cabeçalho e o "Como usar" ──
     ('M01', 'Cabeçalho', 'cabecalho.revisao', 'etiqueta',
@@ -126,7 +135,7 @@ MUDANCAS = [
      'Assegura recursos e diretrizes do processo de aquisição. No sistema, revisa as ECRs e este procedimento, e dá ciência nas tratativas.',
      'No sistema, revisar ECR, revisar o procedimento e dar ciência na tratativa são de uma pessoa só, a mesma (a regra da D589).',
      MANTIDO,
-     'Quem revisa as ECRs e o procedimento e dá ciência nas tratativas é a Diretoria? (a) Sim, como está. (b) Outro papel: diga qual.'),
+     'D589: só o Pedro revisa as ECRs, e a D730 estendeu a regra ao procedimento. Gravar a Rev. 01 pela mão dele, na página (D739 §4), torna a frase verdade.'),
     ('M13', '1, quadro "Administrativo / Compras"', 'objetivo.q1.i2', 'texto',
      'Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais.',
      'Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e resolve o que chegou sem pedido, na tela Recebimentos.',
@@ -138,7 +147,7 @@ MUDANCAS = [
     ('M15', '1, quadro novo "Mestre de obra"', 'objetivo.q1', 'novo_item',
      None,
      {'ancora': 'objetivo.q1.i4', 'titulo': 'Mestre de obra',
-      'texto': rico('Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, com a foto ou o número da nota.')},
+      'texto': rico('Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, e registra o número da nota (o app pode ler o número na foto da nota, e o mestre confere).')},
      'O mestre passou a receber pelo sistema (o app do mestre, D693 e D696). O papel não estava no PS.02.', MANTIDO, None),
 
     # ── 2. Qualificação ──
@@ -150,28 +159,28 @@ MUDANCAS = [
      'Qualidade/PSQ-ECR · preço/condições · prazo',
      'Qualidade/PSQ-ECR · menor preço de mercado · prazo',
      'Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço de mercado".', MANTIDO,
-     'Materiais, critério 2: (a) o PS.02 passa a dizer o que a tela pergunta, "menor preço de mercado"; (b) o PS.02 fica "preço/condições", e a pergunta da tela muda (carta ao Banco).'),
+     DA_D729),
     ('M18', '2, tabela, linha "Serviços"', 'servicos', ('celula', 1),
      'Documentação e requisitos de SST · EPI aplicável · condição comercial/técnica',
      'Documentação e requisitos de SST · EPI aplicável · menor preço do mercado',
      'Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço do mercado".', MANTIDO,
-     'Serviços, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "condição comercial/técnica", e a pergunta muda.'),
+     DA_D729),
     ('M19', '2, tabela, linha "Projetos / engenharia"', 'qualificacao.t1.l3', ('celula', 1),
      'Responsabilidade técnica · conhecimento/requisitos técnicos aplicáveis · prazo/preço',
      'Responsabilidade técnica · conhecimento da ABNT NBR 15575 · menor preço do mercado',
      'Duas das 5 diferenças da D729: a tela pergunta "conhecimento da ABNT NBR 15575" e "menor preço do mercado".', MANTIDO,
-     'Projetos, critérios 2 e 3: (a) como a tela, "conhecimento da ABNT NBR 15575" e "menor preço do mercado"; (b) ficam "conhecimento/requisitos técnicos aplicáveis" e "prazo/preço", e as perguntas mudam. Pode ser (a) num e (b) no outro.'),
+     DA_D729),
     ('M20', '2, tabela, linha "Locação"', 'locacao', ('celula', 1),
      'Contrato/documentação · condição/checklist do equipamento · disponibilidade/preço',
      'Contrato/documentação · condição/checklist do equipamento · menor preço do mercado',
      'Uma das 5 diferenças da D729: a pergunta da tela diz "menor preço do mercado".', MANTIDO,
-     'Locação, critério 3: (a) "menor preço do mercado", como a tela; (b) fica "disponibilidade/preço", e a pergunta muda.'),
+     DA_D729),
     ('M21', '2, tabela, linha "Controle tecnológico"', 'qualificacao.t1.l5', ('celula', 2),
      'Aplicar os critérios específicos do item 6 deste procedimento.',
      '≥ 1 favorável: qualificado; nenhuma: desqualificado. Aplicar os critérios específicos do item 5 deste procedimento.',
      'O "item 6" era um engano: os laboratórios são o item 5 (D729, D732 §4). E o sistema qualifica o laboratório com uma das três respostas favorável (o mínimo do banco é 1); a Rev. 00 não dizia a regra de decisão desta linha.',
      MANTIDO,
-     'Controle tecnológico: (a) a regra é "≥ 1 favorável", como o sistema já faz; (b) outra regra (diga qual), e o mínimo do banco muda.'),
+     'D606 §2: o laboratório segue o PS.02, basta um enquadramento (o mínimo do banco é 1).'),
     ('M22', '2, parágrafo novo: a trava da emissão', 'qualificacao.t1', 'novo_bloco_depois',
      None,
      {'tipo': 'paragrafo', 'ancora': 'qualificacao.p3', 'miudo': False,
@@ -197,7 +206,7 @@ MUDANCAS = [
     # ── 4. Recebimento e avaliação ──
     ('M26', '4, quadro "Materiais e locação"', 'avaliacao.q1.i1', 'texto',
      'Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável.',
-     'Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e a foto ou o número da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.',
+     'Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.',
      'O recebimento virou o app do mestre e o "Entregue" com a avaliação (D730 §4.2). O texto de antes fica inteiro, para o que é recebido fora do sistema.',
      MANTIDO, None),
     ('M27', '4, a regra operacional (informação)', 'avaliacao.a1', 'texto',
@@ -215,7 +224,7 @@ MUDANCAS = [
      None,
      'O link levava à planilha, que deixa de ser o registro. Na página do sistema ele já aparecia sem link (D732).',
      MANTIDO,
-     'A planilha FO 8.4.1.1 deixa de ser o registro? (a) Sim: o link sai, e o registro é a tela. (b) Não: o link fica, e a planilha continua valendo junto.'),
+     'D604: a planilha FO 8.4.1.1 foi aposentada; o registro é a tela Qualificação.'),
     ('M30', '6, quadro "ECRs"', 'registros.q1.i2', 'texto',
      'Especificações de Compra e Recebimento',
      'Especificações de Compra e Recebimento: o Catálogo de ECRs, com o histórico de revisões e o PDF de cada uma.',
@@ -243,7 +252,7 @@ MUDANCAS = [
 
 def aplica(doc):
     novo = copy.deepcopy(doc)
-    for (mid, item, ancora, campo, antes, depois, motivo, siac, escolha) in MUDANCAS:
+    for (mid, item, ancora, campo, antes, depois, motivo, siac, decidido) in MUDANCAS:
         if ancora == 'cabecalho.revisao':
             alvo = next(c for c in novo['cabecalho'] if c.get('campo') == 'revisao')
         elif ancora == 'como_usar':
@@ -307,33 +316,60 @@ def confere(doc):
     return len(a)
 
 
+def marca(ancora, campo, depois):
+    """A âncora que a página marca: a do que nasceu, ou a do lugar que mudou."""
+    return depois['ancora'] if campo in ('novo_item', 'novo_bloco_depois') else ancora
+
+
+def descricao(rev01):
+    """A descrição do histórico: o quadro "Conteúdo desta revisão", sem o rótulo (D739 §4: até 500 caracteres)."""
+    texto = simples(acha({k: v for k, v in rev01.items() if k != 'sumario'}, 'revisoes.a1')['texto'])
+    rotulo = 'Conteúdo desta revisão (Rev. 01): '
+    assert texto.startswith(rotulo)
+    d = texto[len(rotulo):]
+    d = d[0].upper() + d[1:]
+    assert 0 < len(d) <= 500, len(d)
+    return d
+
+
+def para_a_pagina(rev01):
+    return {
+        'revisao_de': REVISAO_DE,
+        'descricao': descricao(rev01),
+        'mudancas': [{'id': mid, 'item': item, 'ancora': marca(ancora, campo, depois), 'motivo': motivo}
+                     for (mid, item, ancora, campo, antes, depois, motivo, siac, decidido) in MUDANCAS],
+    }
+
+
 def leitura(rev00, rev01, n_ancoras):
-    escolhas = [m for m in MUDANCAS if m[8]]
+    decididos = [m for m in MUDANCAS if m[8]]
     vermelhos = [m for m in MUDANCAS if m[7] == VERMELHO]
     L = []
     L += ['# PS.02 Rev. 01 — o rascunho, mudança por mudança', '',
           '> **Data:** 06/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)',
           '> **Estado:** PROPOSTA — aguardando o Pedro',
-          '> **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738). '
-          '**NÃO** é o procedimento: o texto inteiro está em `documento_rev01_rascunho.json`, na forma que o banco guarda.',
+          '> **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738, '
+          'D739). **NÃO** é o procedimento: o texto inteiro está em `src/features/procedimento/rev01/documento.json`, na '
+          'forma que o banco guarda, e é o que a página mostra a quem revisa e o que o botão "Gravar a Rev. 01" grava.',
           '', '---', '',
           '## Em uma olhada', '',
           f'- **{len(MUDANCAS)} mudanças.** Quase todas acrescentam a tela do sistema ao que o PS.02 já dizia.',
           f'- **Requisitos do SiAC que saem: {len(vermelhos)}.** '
           + ('Nenhum requisito da Rev. 00 sai nem se estreita. Cada mudança foi conferida uma a uma (coluna "SiAC").'
              if not vermelhos else 'Estão marcados em vermelho abaixo.'),
-          f'- **Escolhas do Pedro: {len(escolhas)}.** Estão juntas na seção seguinte, cada uma com as opções.',
+          f'- **Pontos já decididos: {len(decididos)}.** Foram decididos antes do rascunho, e a decisão de cada um está na '
+          'seção seguinte (CTO-D739 §3). Na sentada, o Pedro lê o texto inteiro e pode recusar qualquer frase.',
           '- **Nada inventado:** cada frase sobre o sistema foi medida no código ou no banco. O que o sistema não faz '
           '(contratos, PES, avaliação de serviço, projeto e laboratório, o PSQ), o texto não diz que ele faz.',
           '- **O que não muda:** o item 5 (laboratórios) inteiro, o aviso do PSQ/SiMaC, o escopo, a referência, o '
           'sumário e o rodapé.',
           f'- **A forma:** a do contrato do Banco. As 11 âncoras do documento continuam; são {n_ancoras} âncoras, '
           'nenhuma repetida, e todo cartão e item do sumário apontam para uma que existe.',
-          '', '## As escolhas do Pedro', '']
-    for m in escolhas:
-        L += [f'- **{m[0]} — {m[1]}.** {m[8]}', f'  - No rascunho está a opção (a).']
+          '', '## Os pontos já decididos', '']
+    for m in decididos:
+        L += [f'- **{m[0]} — {m[1]}.** {m[8]}']
     L += ['', '## Todas as mudanças', '']
-    for (mid, item, ancora, campo, antes, depois, motivo, siac, escolha) in MUDANCAS:
+    for (mid, item, ancora, campo, antes, depois, motivo, siac, decidido) in MUDANCAS:
         L += [f'### {mid} — {item}', '', f'- **Âncora:** `{ancora}`']
         if antes is None:
             L += ['- **Antes:** não existia.']
@@ -348,8 +384,8 @@ def leitura(rev00, rev01, n_ancoras):
         else:
             L += [f'- **Depois:** {depois}']
         L += [f'- **Por quê:** {motivo}', f'- **SiAC:** {SIAC[siac]}']
-        if escolha:
-            L += [f'- **Escolha do Pedro:** {escolha}']
+        if decidido:
+            L += [f'- **Já decidido:** {decidido}']
         L += ['']
     return '\n'.join(L).replace('\n', '\r\n')
 
@@ -360,11 +396,14 @@ def main():
     n = confere(rev01)
     assert rev01 != rev00
     os.makedirs(SAIDA, exist_ok=True)
-    io.open(os.path.join(SAIDA, 'documento_rev01_rascunho.json'), 'w', encoding='utf-8', newline='\n').write(
+    os.makedirs(SAIDA_DA_PAGINA, exist_ok=True)
+    io.open(os.path.join(SAIDA_DA_PAGINA, 'documento.json'), 'w', encoding='utf-8', newline='\n').write(
         json.dumps(rev01, ensure_ascii=False, indent=2) + '\n')
+    io.open(os.path.join(SAIDA_DA_PAGINA, 'mudancas.json'), 'w', encoding='utf-8', newline='\n').write(
+        json.dumps(para_a_pagina(rev01), ensure_ascii=False, indent=2) + '\n')
     io.open(os.path.join(SAIDA, 'MUDANCAS_REV01.md'), 'w', encoding='utf-8', newline='').write(
         leitura(rev00, rev01, n) + '\r\n')
-    print(f'{len(MUDANCAS)} mudanças; {n} âncoras; escolhas {sum(1 for m in MUDANCAS if m[8])}; '
+    print(f'{len(MUDANCAS)} mudanças; {n} âncoras; já decididos {sum(1 for m in MUDANCAS if m[8])}; '
           f'vermelhos {sum(1 for m in MUDANCAS if m[7] == VERMELHO)}')
 
 

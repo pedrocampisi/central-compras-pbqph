@@ -285,7 +285,7 @@
               "titulo": "Mestre de obra",
               "texto": [
                 {
-                  "texto": "Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, com a foto ou o número da nota.",
+                  "texto": "Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, e registra o número da nota (o app pode ler o número na foto da nota, e o mestre confere).",
                   "negrito": false
                 }
               ]
@@ -664,7 +664,7 @@
               "titulo": "Materiais e locação",
               "texto": [
                 {
-                  "texto": "Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e a foto ou o número da nota), ou o escritório registra pelo \"Entregue\" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.",
+                  "texto": "Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo \"Entregue\" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.",
                   "negrito": false
                 }
               ]
