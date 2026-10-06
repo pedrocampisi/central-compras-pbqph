@@ -90,20 +90,23 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 36. A Rev. 01 do PS.02 (D738): o rascunho entregue, esperando o CTO e a sentada do Pedro
+### 36. A Rev. 01 do PS.02 (D738, D739): no ramo, esperando o CTO conferir as fotos
 
-*Aberta em 06/10/2026, na decisão 96.* O rascunho está em `docs/Rev01_PS02/`:
-- 34 mudanças;
-- 0 requisito do SiAC fora;
-- 7 escolhas do Pedro.
+*Aberta em 06/10/2026, na decisão 96.* O CTO conferiu o rascunho (D739): a forma passa na peça do Banco, e nenhum
+requisito do SiAC sai.
 
-Ele está na forma do contrato do Banco. **Nada foi ao ar.**
+No ramo `d739-rev01` (`81f6bef`, CI verde), **NÃO publicado** (decisão 97):
+- a frase da nota consertada;
+- as 7 escolhas como pontos já decididos;
+- na página, para quem revisa ECR, o rascunho com o que mudou marcado e o "Gravar a Rev. 01", que chama a porta do
+  Banco.
 
 **Falta, nesta ordem:**
-1. a conferência do CTO;
-2. a sentada do Pedro com as 7 escolhas (uma escolha (b) vira carta ao Banco);
-3. refazer o rascunho com as escolhas, pelo script;
-4. o jeito de a Rev. 01 entrar no banco (D730 §4.4).
+1. a conferência das fotos pelo CTO;
+2. juntar e publicar (emenda 3), com o desfazer anotado;
+3. a conferência do CTO por fora;
+4. a sentada do Pedro, que grava com a mão dele;
+5. na publicação seguinte, o rascunho sai do código.
 
 Meta: 23/10.
 

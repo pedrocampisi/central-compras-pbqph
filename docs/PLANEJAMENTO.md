@@ -3397,3 +3397,39 @@ e o motivo dela. Meta: 23/10.
 - o Pedro senta e faz as 7 escolhas;
 - como a Rev. 01 entra no banco decide-se aí (D730 §4.4), e só depois o "?" das telas passa a ler das âncoras (D730
   §4.5).
+
+## Decisão 97 — a Rev. 01 pela mão do Pedro: o rascunho na página, com o "Gravar a Rev. 01" · 06/10/2026
+
+**POR QUÊ (CTO-D739):** o CTO conferiu o rascunho. A forma passa na peça real do Banco (null, 61 âncoras), e nenhum
+requisito do SiAC sai. Ficaram três ordens:
+- **a nota:** na entrega da OC, o número é exigido, e a foto só ajuda a ler;
+- **as 7 escolhas** já estavam decididas (D589, D604, D606, D729/D730);
+- **a Rev. 01 entra pela mão do Pedro (D730 §4.4):** na página, só para quem revisa ECR, o rascunho com o que mudou
+  marcado e o botão que chama `core.revisar_procedimento`.
+
+**O QUE FOI FEITO** (ramo `d739-rev01`, `81f6bef`, CI 37524865910 verde, **NÃO publicado**):
+- **o script:** conserta a frase da nota, que foi conferida no app do mestre antes de escrever, e troca as escolhas
+  por "pontos já decididos". O documento sai em `src/features/procedimento/rev01/`, com os motivos;
+- **a página:**
+  - o quadro "Rev. 01 em rascunho";
+  - o rascunho com 32 trechos marcados pela comparação por âncora, o motivo no "?" de cada um, e a "Próxima
+    mudança";
+  - o "Gravar a Rev. 01", com a pergunta antes e a descrição do histórico;
+  - o PDF só da vigente;
+  - o rascunho só desce para quem revisa;
+- **a porta:** `core.revisar_procedimento('PS.02', '00', documento, descrição)`; a recusa aparece em frase;
+- **os cartões e os passos do fluxo** guardam a âncora do documento;
+- **a bateria:**
+  - 1013 testes;
+  - a forma do Banco traduzida para TypeScript;
+  - 6 sabotagens no código ficaram vermelhas;
+- **o tamanho:** 734 linhas novas de código, sem os testes;
+- **as fotos:** 28, a 1366 e a 375, claras e escuras, locais, sem login (`docs/Capturas/2026-10-06_D739/`).
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere as fotos;
+2. junto e publico (emenda 3), com o desfazer anotado;
+3. o CTO confere por fora;
+4. o Pedro senta e grava com a mão dele.
