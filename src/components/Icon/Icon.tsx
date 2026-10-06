@@ -43,7 +43,8 @@ export type IconName =
   | 'camera'
   | 'caixa'
   | 'capacete'
-  | 'qr';
+  | 'qr'
+  | 'livro';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -85,6 +86,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
   ),
   wrench: (
     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+  ),
+  // O manual (o procedimento de compras, CTO-D730): um livro aberto.
+  livro: (
+    <>
+      <path d="M12 6.5C10.3 5.2 7.8 4.6 4 4.6v13.6c3.8 0 6.3.6 8 1.9" />
+      <path d="M12 6.5c1.7-1.3 4.2-1.9 8-1.9v13.6c-3.8 0-6.3.6-8 1.9z" />
+    </>
   ),
   clipboard: (
     <>

@@ -1,0 +1,327 @@
+/* O procedimento como manual (CTO-D730 §3.1): a estrutura do documento, a cara
+   da OC. Cores, raios e fontes só dos tokens. */
+
+.documento {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* O lugar aonde se pulou: marcado, sem animação (regra 8). */
+.documento [data-alvo] {
+  outline: 2px solid var(--marca);
+  outline-offset: 3px;
+  border-radius: var(--raio-pequeno);
+}
+/* Na tabela, o contorno fica dentro da linha, sem cobrir a borda (CTO-D732 §3.2). */
+.documento tr[data-alvo] { outline-offset: -3px; }
+.documento tr[data-alvo] td { background: var(--marca-fraca); }
+
+/* ── O cabeçalho ───────────────────────────────────────────────────────── */
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+.sobretitulo {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--terra);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 22px;
+  color: var(--marca);
+}
+.subtitulo { font-size: 13px; color: var(--texto-suave); }
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+}
+.campos div {
+  padding: 10px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+}
+.campos dt { font-size: 11px; color: var(--texto-suave); }
+.campos dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.situacao {
+  padding: 1px 8px;
+  border-radius: var(--raio-pill);
+  background: var(--sucesso-bg);
+  color: var(--sucesso);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ── O sumário ─────────────────────────────────────────────────────────── */
+.sumario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 13px;
+}
+.sumario strong { color: var(--texto); }
+.sumario button {
+  padding: 4px 10px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pill);
+  background: var(--painel);
+  color: var(--marca);
+  font: inherit;
+  cursor: pointer;
+}
+.sumario button:hover { border-color: var(--marca); }
+.sumario button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-fraca); }
+
+/* ── O "Como usar" ─────────────────────────────────────────────────────── */
+.comoUsar {
+  margin: 0;
+  padding: 14px 16px;
+  border-left: 4px solid var(--acento);
+  border-radius: 0 var(--raio-pequeno) var(--raio-pequeno) 0;
+  background: var(--painel);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--texto);
+}
+.comoUsar strong { color: var(--marca); }
+
+/* ── O fluxo didático ──────────────────────────────────────────────────── */
+.fluxo {
+  padding: 16px 18px;
+  border: 2px solid var(--marca);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+.fluxo h3,
+.fluxo h4 {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--marca);
+}
+.fluxo h4 { margin-top: 16px; }
+.fluxoIntro { margin: 0 0 12px; font-size: 13px; color: var(--texto-suave); }
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+  color: var(--texto-suave);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.45;
+  text-align: left;
+}
+button.cartao { cursor: pointer; }
+button.cartao:hover { border-color: var(--marca); }
+button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-fraca); }
+.cartao strong { font-size: 13px; color: var(--marca); }
+.sequencia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sequencia li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.sequencia strong { color: var(--texto); }
+
+/* ── As seções ─────────────────────────────────────────────────────────── */
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+/* A linha do título quebra: o "?" abre a resposta logo abaixo dela. */
+.cabecaDaSecao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.cabecaDaSecao h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--texto);
+}
+.numero {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--raio-pill);
+  background: var(--marca);
+  color: var(--painel);
+  font-size: 13px;
+  font-weight: 700;
+}
+.selo {
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-pill);
+  background: var(--fundo);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.paragrafo,
+.aviso,
+.informacao,
+.miudo {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--texto);
+}
+.aviso,
+.informacao {
+  padding: 12px 14px;
+  border-left: 4px solid var(--aviso);
+  border-radius: 0 var(--raio-pequeno) var(--raio-pequeno) 0;
+  background: var(--aviso-bg);
+}
+.informacao {
+  border-left-color: var(--marca);
+  background: var(--marca-fraca);
+}
+.miudo { font-size: 12px; color: var(--texto-suave); }
+
+.quadros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.quadro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+.quadro strong { color: var(--marca); }
+
+.lista {
+  margin: 0;
+  padding-left: 24px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--texto);
+}
+.lista li { margin: 4px 0; padding-left: 2px; }
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tabela th,
+.tabela td {
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  text-align: left;
+  vertical-align: top;
+}
+.tabela th { background: var(--fundo); font-weight: 700; color: var(--texto); }
+.tabela td { color: var(--texto-suave); }
+.tabela td strong { color: var(--texto); }
+
+.semTexto { margin: 0; font-size: 13px; color: var(--texto-muted); }
+
+.rodape {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 4px 0;
+  border-top: 1px solid var(--borda);
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+.rodape strong { color: var(--texto); }
+
+@media (max-width: 700px) {
+  .cabecalho,
+  .secao,
+  .fluxo { padding: 14px 12px; }
+  .selo { margin-left: 0; }
+
+  /* A 375 as tabelas não cabem: cada linha vira um bloco, com o nome da coluna em cima do valor. */
+  .empilha thead { display: none; }
+  .empilha,
+  .empilha tbody,
+  .empilha tr,
+  .empilha td { display: block; width: 100%; }
+  .empilha tr {
+    margin-bottom: 8px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-pequeno);
+  }
+  .empilha td {
+    border: 0;
+    border-bottom: 1px solid var(--borda);
+  }
+  .empilha td:last-child { border-bottom: 0; }
+  .empilha td::before {
+    content: attr(data-coluna);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--texto);
+  }
+}

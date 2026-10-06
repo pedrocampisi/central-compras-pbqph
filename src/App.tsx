@@ -46,6 +46,8 @@ import { FornecedoresPage } from './features/fornecedores/FornecedoresPage';
 import { QualificacaoPage } from './features/qualificacao/QualificacaoPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { CatalogoPage } from './features/catalogo-ecr/CatalogoPage';
+import { ProcedimentoPage } from './features/procedimento/ProcedimentoPage';
+import { NOME_NO_MENU } from './domain/procedimento';
 import { ConfigPage } from './features/configuracoes/ConfigPage';
 import { TelaDoMestre } from './features/recebimento/TelaDoMestre';
 import { RecebimentosPage } from './features/recebimento/RecebimentosPage';
@@ -76,6 +78,8 @@ const NAV_COMPRAS: NavItem[] = [
   // O acesso do mestre de obra: só admin e engenharia (CTO-D696 §4).
   { id: 'mestres', label: 'Mestres', icon: 'capacete' },
   { id: 'catalogo', label: 'Catálogo de ECRs', icon: 'clipboard' },
+  // O PS.02 no sistema, o manual de compras (CTO-D730 §3.1).
+  { id: 'procedimento', label: NOME_NO_MENU, icon: 'livro' },
 ];
 
 const NAV_SISTEMA: NavItem[] = [
@@ -477,6 +481,7 @@ export default function App() {
               {activeTab === 'obras'         && <ObrasPage />}
               {activeTab === 'mestres'       && podeGerirMestre(perfil?.papel) && <MestresPage />}
               {activeTab === 'catalogo'      && <CatalogoPage />}
+              {activeTab === 'procedimento'  && <ProcedimentoPage />}
               {activeTab === 'config'        && <ConfigPage />}
             </>
           )}
