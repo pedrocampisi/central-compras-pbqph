@@ -90,6 +90,19 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
+### 35. O PS.02 no sistema (D730): no ramo, esperando o Banco, a perícia e a ordem
+
+*Aberta em 06/10/2026, na decisão 91.* A página, o PDF e o caminho do "?" estão no ramo `d730-ps02` (`cf9413e`), com
+984 testes, CI verde e as fotos. **Falta:**
+- a avaliação do CTO;
+- o contrato do jsonb na carta de fecho do Banco (só `procedimentoDoBanco.ts` muda);
+- a perícia, porque passou de mil linhas;
+- a ordem de publicar.
+
+Depois, a Rev. 01, o rascunho do manual.
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*

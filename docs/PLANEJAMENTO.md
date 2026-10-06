@@ -3219,3 +3219,40 @@ do primeiro uso do mestre, que ainda não foi marcado.
 - o CTO confere por fora;
 - duas pendências da casa ficam para depois, sem mexer agora (pendências 33 e 34);
 - o "item 6" do PS.02 e as cinco diferenças entre as perguntas e o PS.02 foram ao Pedro pelo CTO.
+
+## Decisão 91 — o PS.02 no sistema (D730): a página, o PDF e o caminho do "?", no ramo · 06/10/2026
+
+**POR QUÊ (CTO-D730, palavra do Pedro: "trazer a PS.02 para o sistema... Para ela servir como um Manual", e "pode
+mandar"):** o procedimento de compras do SGQ vira o manual da equipe, pelo caminho das ECRs (D586, D588 e D589). O
+Banco guarda o texto e o histórico em `core.procedimentos` e `core.procedimento_revisoes`, e só o Pedro revisa. A OC
+mostra. A pausa de 04/09 abriu só para esta lista.
+
+**O QUE MUDOU**, no ramo `d730-ps02` (`cf9413e`), **NÃO publicado**:
+- **A página "Procedimento de Compras (PS.02)"**, no menu depois do Catálogo de ECRs:
+  - mostra o cabeçalho, o sumário, o "Como usar", o fluxo e as seções 1 a 7, com o selo, o "?" e os blocos na ordem
+    do documento;
+  - o histórico de revisões é a seção 7, e o rodapé vem só na primeira parte;
+  - os cartões do fluxo vão sem emoji e levam às linhas do documento (`materiais`, `servicos`, `locacao`,
+    `projetos`);
+  - o pulo é direto, sem animação, e marca o lugar.
+- **O PDF segue a impressão do próprio HTML:** sem o fluxo, o sumário e os "?"; 3 páginas, 147 KB
+  (`generateProcedimentoPdf.ts`).
+- **O "?" dos critérios** ganha "ver no PS.02, item 2" ou "item 5". Com algo marcado na caixa de qualificar, ela
+  pergunta antes de sair. O texto do "?" fica até a Rev. 01.
+- **A leitura do banco** segue o plano do Banco. A forma do jsonb é uma suposição desta casa, a confirmar na carta de
+  fecho dele. Quando o contrato chegar, só `src/domain/procedimentoDoBanco.ts` e o `select` mudam.
+- **O texto de teste** é a Rev. 00, palavra por palavra, conferida contra o arquivo. Os nomes do histórico são
+  inventados: no repositório, nunca os de verdade.
+- **A prova:**
+  - 984 testes, tipos e lint limpos;
+  - 21 sabotagens, todas vermelhas;
+  - CI verde (37479730541);
+  - 18 fotos de tela e o PDF em `docs/Capturas/2026-10-06_D730/`, no ramo, sobre um banco falso.
+- **O tamanho:** 1.494 linhas novas em `src/`, sem os testes. Passou de mil, e por isso há perícia antes da produção
+  (lei 3, cap. 9). O CTO foi avisado antes da carta.
+- **O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+- a avaliação do CTO, a perícia, e as tabelas do Banco na produção com o contrato ajustado aqui;
+- então, a ordem de publicar, fora do dia do primeiro uso do mestre;
+- a Rev. 01 (o rascunho do manual) só começa com a Rev. 00 e a página no ar.
