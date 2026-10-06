@@ -6,6 +6,19 @@
 
 ---
 
+### 35. O PS.02 no sistema (D730): no ar, esperando a conferência do CTO — **FECHADA EM 06/10/2026: conferida pelo CTO por fora (CTO-D738 §1); a Rev. 01 segue na pendência 36**
+
+*Aberta em 06/10/2026, na decisão 91.* A página "Procedimento de Compras (PS.02)", o PDF e o "ver no PS.02, item N"
+estão **no ar** desde 16h24 de 06/10:
+- em `c1816ff8`, versão `20261006192357-3315b8c`, pelo `main` `3315b8c` (decisão 95);
+- o desfazer é `2ab2ba5b`;
+- a perícia foi triada, 4 de 4 aceitos (D737);
+- as tabelas estão na produção, conferidas pelo CTO.
+
+**Falta:** a conferência do CTO por fora. Com ela, esta pendência fecha.
+
+Depois, a Rev. 01, o rascunho do manual, quando vier a carta dela.
+
 ### 32. Os três pedidos do Pedro (D728): no ramo, esperando a avaliação do CTO — **FECHADA EM 05/10/2026: NO AR em `2ab2ba5b` (CTO-D729, decisão 90); o desfazer é `73d2b3db`**
 
 *Aberta em 05/10/2026, na decisão 89.* No ramo `d728-tres-pedidos` (`b226682`), com o CI verde, **NÃO publicado**:

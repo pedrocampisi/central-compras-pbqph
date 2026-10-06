@@ -90,18 +90,22 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 35. O PS.02 no sistema (D730): no ar, esperando a conferência do CTO
+### 36. A Rev. 01 do PS.02 (D738): o rascunho entregue, esperando o CTO e a sentada do Pedro
 
-*Aberta em 06/10/2026, na decisão 91.* A página "Procedimento de Compras (PS.02)", o PDF e o "ver no PS.02, item N"
-estão **no ar** desde 16h24 de 06/10:
-- em `c1816ff8`, versão `20261006192357-3315b8c`, pelo `main` `3315b8c` (decisão 95);
-- o desfazer é `2ab2ba5b`;
-- a perícia foi triada, 4 de 4 aceitos (D737);
-- as tabelas estão na produção, conferidas pelo CTO.
+*Aberta em 06/10/2026, na decisão 96.* O rascunho está em `docs/Rev01_PS02/`:
+- 34 mudanças;
+- 0 requisito do SiAC fora;
+- 7 escolhas do Pedro.
 
-**Falta:** a conferência do CTO por fora. Com ela, esta pendência fecha.
+Ele está na forma do contrato do Banco. **Nada foi ao ar.**
 
-Depois, a Rev. 01, o rascunho do manual, quando vier a carta dela.
+**Falta, nesta ordem:**
+1. a conferência do CTO;
+2. a sentada do Pedro com as 7 escolhas (uma escolha (b) vira carta ao Banco);
+3. refazer o rascunho com as escolhas, pelo script;
+4. o jeito de a Rev. 01 entrar no banco (D730 §4.4).
+
+Meta: 23/10.
 
 ---
 

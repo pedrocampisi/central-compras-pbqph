@@ -30,6 +30,7 @@
 | [roteiros/guia-do-desenvolvedor.md](roteiros/guia-do-desenvolvedor.md) | dev humano que nunca viu o projeto | Como rodar, mapa de arquivos, como adicionar coisas comuns. **Descreve a branch `main`** (arquivo JSON) |
 | [melhorias-futuras/README.md](melhorias-futuras/README.md) | Pedro e IA | O índice das ideias ainda não implementadas — ele responde pelos arquivos da pasta dele. É **proposta**, não plano de execução |
 | [Fluxo.md](Fluxo.md) | dono/operador | O que acontece na tela, sem abrir código |
+| [Rev01_PS02/MUDANCAS_REV01.md](Rev01_PS02/MUDANCAS_REV01.md) | CTO e Pedro | **PROPOSTA:** o rascunho da Rev. 01 do PS.02 (CTO-D730 §4, D738), mudança por mudança, com o motivo e as escolhas do Pedro. O texto inteiro, na forma do banco, está em `documento_rev01_rascunho.json`, ao lado; os dois saem de `scripts/rascunho-rev01-ps02.py` |
 
 ## Vivos — conversa em andamento
 

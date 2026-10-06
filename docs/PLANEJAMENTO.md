@@ -3368,3 +3368,32 @@ histórico, só leitura para `authenticated`, e o md5 do documento igual ao do d
 - o CTO confere por fora;
 - a Rev. 01 (o rascunho do manual) pode começar, agora que a Rev. 00 e a página estão no ar, quando vier a carta
   dela.
+
+## Decisão 96 — o rascunho da Rev. 01 do PS.02: o manual do sistema, mudança por mudança · 06/10/2026
+
+**POR QUÊ (CTO-D738, a D730 §4):** com a Rev. 00 e a página no ar, conferidas pelo CTO por fora (D738 §1), começa a
+Rev. 01: o PS.02 como manual do que o sistema faz hoje, no `documento` do contrato do Banco, com cada mudança marcada
+e o motivo dela. Meta: 23/10.
+
+**O QUE FOI FEITO** (em `docs/Rev01_PS02/`, gerado por `scripts/rascunho-rev01-ps02.py` a partir da Rev. 00 do Banco):
+- `documento_rev01_rascunho.json`, o texto inteiro, e `MUDANCAS_REV01.md`, o arquivo de leitura;
+- **34 mudanças.** Quase todas acrescentam a tela ao que a Rev. 00 já dizia, e cada "antes" é conferido pelo script;
+- **requisitos do SiAC que saem: 0.** Onde a Rev. 00 descreve um registro fora do sistema, o texto fica, para o que é
+  feito fora;
+- **7 escolhas do Pedro:** M12 (a Diretoria como quem revisa), M17 a M20 (as 5 diferenças da D729), M21 (a regra do
+  laboratório) e M29 (o link da planilha FO 8.4.1.1). No rascunho está a opção (a), a do sistema de hoje;
+- **nada inventado:** cada frase sobre o sistema foi lida no código ou nas migrações do Banco, só lendo. Na releitura,
+  a frase da trava (M22) foi corrigida: a emissão segue só com a nota no mínimo.
+
+**A FORMA:**
+- a regra `core.procedimento_fora_da_forma` foi traduzida para um verificador local; a Rev. 00 e o rascunho passam
+  (61 âncoras), e 7 sabotagens ficam vermelhas;
+- a página desta casa lê o rascunho sem erro (teste temporário, apagado).
+
+**O banco não mudou. Nada foi ao ar. O HTML do Dropbox não foi tocado.**
+
+**DAQUI EM DIANTE:**
+- o CTO confere o rascunho contra a Rev. 00 e contra o sistema;
+- o Pedro senta e faz as 7 escolhas;
+- como a Rev. 01 entra no banco decide-se aí (D730 §4.4), e só depois o "?" das telas passa a ler das âncoras (D730
+  §4.5).

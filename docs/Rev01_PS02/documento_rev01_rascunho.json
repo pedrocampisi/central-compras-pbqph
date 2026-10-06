@@ -1,0 +1,900 @@
+{
+  "linha_de_cima": "CAMPISI ENGENHARIA LTDA · SGQ PBQP-H SIAC NÍVEL A",
+  "subtitulo": "Procedimento Sistêmico Corporativo de Qualidade",
+  "cabecalho": [
+    {
+      "rotulo": "Código",
+      "campo": "codigo"
+    },
+    {
+      "rotulo": "Revisão vigente",
+      "campo": "revisao",
+      "etiqueta": "Manual do sistema de compras"
+    },
+    {
+      "rotulo": "Data da revisão",
+      "campo": "emitida_em"
+    },
+    {
+      "rotulo": "Responsável pela próxima revisão",
+      "valor": "SGQ Campisi Engenharia"
+    },
+    {
+      "rotulo": "Referência principal",
+      "valor": "SiAC PBQP-H 2021 · requisito 8.4"
+    },
+    {
+      "rotulo": "Escopo",
+      "valor": "Materiais, serviços, laboratórios, projetos/engenharia e locação de equipamentos críticos"
+    }
+  ],
+  "sumario": {
+    "rotulo": "Sumário:",
+    "itens": [
+      {
+        "texto": "1. Objetivo",
+        "ancora": "objetivo"
+      },
+      {
+        "texto": "2. Qualificação",
+        "ancora": "qualificacao"
+      },
+      {
+        "texto": "3. Contratação",
+        "ancora": "contratacao"
+      },
+      {
+        "texto": "4. Avaliação",
+        "ancora": "avaliacao"
+      },
+      {
+        "texto": "5. Laboratórios",
+        "ancora": "laboratorios"
+      },
+      {
+        "texto": "6. Registros",
+        "ancora": "registros"
+      },
+      {
+        "texto": "7. Revisões",
+        "ancora": "revisoes"
+      }
+    ]
+  },
+  "como_usar": [
+    {
+      "texto": "Como usar este procedimento:",
+      "negrito": true
+    },
+    {
+      "texto": " identifique primeiro ",
+      "negrito": false
+    },
+    {
+      "texto": "o que está sendo adquirido",
+      "negrito": true
+    },
+    {
+      "texto": ". A categoria define como qualificar o fornecedor, qual documento de aquisição/contratação deve existir e como será feita a avaliação posterior. Cada passo diz também ",
+      "negrito": false
+    },
+    {
+      "texto": "em que tela do sistema de compras",
+      "negrito": true
+    },
+    {
+      "texto": " ele é feito.",
+      "negrito": false
+    }
+  ],
+  "fluxo": {
+    "titulo": "Fluxo didático — da necessidade ao fornecedor avaliado",
+    "texto": [
+      {
+        "texto": "O fluxo é o mesmo em essência, mas os documentos e critérios mudam conforme a categoria.",
+        "negrito": false
+      }
+    ],
+    "cartoes": [
+      {
+        "ancora": "fluxo.c1",
+        "destino": "materiais",
+        "tom": "campisi",
+        "titulo": "🧱 Material controlado",
+        "texto": [
+          {
+            "texto": "Qualificar na tela Qualificação → especificar pela ECR do Catálogo de ECRs → emitir a OC na Nova OC → receber pelo app do mestre e avaliar.",
+            "negrito": false
+          }
+        ]
+      },
+      {
+        "ancora": "fluxo.c2",
+        "destino": "servicos",
+        "tom": "campisi",
+        "titulo": "👷 Serviço de obra",
+        "texto": [
+          {
+            "texto": "Qualificar na tela Qualificação → contratar com escopo técnico → acompanhar execução/PES → avaliar.",
+            "negrito": false
+          }
+        ]
+      },
+      {
+        "ancora": "fluxo.c3",
+        "destino": "laboratorios",
+        "tom": "campisi",
+        "titulo": "🧪 Laboratório",
+        "texto": [
+          {
+            "texto": "Verificar enquadramento/acreditação na tela Qualificação (Controle tecnológico) → contratar ensaio → conferir laudo e rastreabilidade.",
+            "negrito": false
+          }
+        ]
+      },
+      {
+        "ancora": "fluxo.c4",
+        "destino": "projetos",
+        "tom": "campisi",
+        "titulo": "📐 Projeto / engenharia",
+        "texto": [
+          {
+            "texto": "Qualificar na tela Qualificação → contrato com objeto, escopo e responsabilidades → avaliar entrega técnica.",
+            "negrito": false
+          }
+        ]
+      },
+      {
+        "ancora": "fluxo.c5",
+        "destino": "locacao",
+        "tom": "client",
+        "titulo": "🏗️ Locação de equipamento",
+        "texto": [
+          {
+            "texto": "Qualificar na tela Qualificação → contrato/documento de locação claro → conferir equipamento e avaliar.",
+            "negrito": false
+          }
+        ]
+      }
+    ],
+    "sequencia": {
+      "titulo": "Sequência mínima",
+      "passos": [
+        {
+          "ancora": "fluxo.s1",
+          "rotulo": "1 · Necessidade",
+          "texto": [
+            {
+              "texto": "Obra/Engenharia define o que precisa.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "ancora": "fluxo.s2",
+          "rotulo": "2 · Categoria",
+          "texto": [
+            {
+              "texto": "Classificar material, serviço, laboratório, projeto ou locação.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "ancora": "fluxo.s3",
+          "rotulo": "3 · Qualificação",
+          "texto": [
+            {
+              "texto": "Registrar na tela Qualificação (a FO 8.4.1.1 no sistema).",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "ancora": "fluxo.s4",
+          "rotulo": "4 · Contratação",
+          "texto": [
+            {
+              "texto": "Comunicar requisitos suficientes ao fornecedor. Material: a OC da Nova OC, com a ECR de cada item.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "ancora": "fluxo.s5",
+          "rotulo": "5 · Recebimento",
+          "texto": [
+            {
+              "texto": "Conferir o que foi entregue/executado. Material: o mestre registra no app do mestre.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "ancora": "fluxo.s6",
+          "rotulo": "6 · Avaliação",
+          "texto": [
+            {
+              "texto": "Registrar desempenho e tratar desvios. Material: a avaliação da OC; a tratativa fica no Dashboard até a ciência.",
+              "negrito": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "secoes": [
+    {
+      "ancora": "objetivo",
+      "numero": "1",
+      "titulo": "Objetivo e responsabilidades",
+      "selo": "SiAC 8.4",
+      "ajuda": "O processo de aquisição deve assegurar que materiais, serviços e processos externos atendam aos requisitos especificados. Dica de auditoria: mostre a ligação entre necessidade, qualificação, documento de contratação, recebimento e avaliação.",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "ancora": "objetivo.p1",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "Objetivo:",
+              "negrito": true
+            },
+            {
+              "texto": " assegurar que a compra de produtos e a contratação de serviços e processos estejam conformes com os requisitos aplicáveis.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "quadros",
+          "ancora": "objetivo.q1",
+          "itens": [
+            {
+              "ancora": "objetivo.q1.i1",
+              "titulo": "Diretoria",
+              "texto": [
+                {
+                  "texto": "Assegura recursos e diretrizes do processo de aquisição. No sistema, revisa as ECRs e este procedimento, e dá ciência nas tratativas.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "objetivo.q1.i2",
+              "titulo": "Administrativo / Compras",
+              "texto": [
+                {
+                  "texto": "Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e resolve o que chegou sem pedido, na tela Recebimentos.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "objetivo.q1.i3",
+              "titulo": "Obra / Engenharia",
+              "texto": [
+                {
+                  "texto": "Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o mestre de obra, põe na obra e gera o QR de entrada dele, na tela Mestres.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "objetivo.q1.i4",
+              "titulo": "Mestre de obra",
+              "texto": [
+                {
+                  "texto": "Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, com a foto ou o número da nota.",
+                  "negrito": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "qualificacao",
+      "numero": "2",
+      "titulo": "Qualificação de fornecedores",
+      "selo": "SiAC 8.4.1.1",
+      "ajuda": "A qualificação ocorre antes da compra/contratação, com critérios adequados ao tipo de fornecimento. Os registros devem demonstrar por que o fornecedor foi aceito.",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "ancora": "qualificacao.p1",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "A Campisi pré-avalia e seleciona fornecedores com base na capacidade de atender aos requisitos especificados. O registro corporativo é a ",
+              "negrito": false
+            },
+            {
+              "texto": "tela Qualificação",
+              "negrito": true
+            },
+            {
+              "texto": " do sistema de compras — a ",
+              "negrito": false
+            },
+            {
+              "texto": "FO 8.4.1.1 — Qualificação de Fornecedores",
+              "negrito": true
+            },
+            {
+              "texto": " —, separada por categoria, uma aba para cada. A qualificação é da empresa e vale para todas as filiais dela.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "ancora": "qualificacao.a1",
+          "tom": "warn",
+          "texto": [
+            {
+              "texto": "PSQ / SiMaC:",
+              "negrito": true
+            },
+            {
+              "texto": " quando existir PSQ para o produto-alvo, é vedada a aquisição de produtos de fornecedores considerados ",
+              "negrito": false
+            },
+            {
+              "texto": "não conformes",
+              "negrito": true
+            },
+            {
+              "texto": " no PSQ. A apresentação de um certificado isolado não deve ser usada para contornar essa vedação. Quando cabível, fornecedores conformes no PSQ podem ser dispensados da qualificação convencional prevista pelo SiAC.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "tabela",
+          "ancora": "qualificacao.t1",
+          "colunas": [
+            "Categoria",
+            "Critérios internos Campisi",
+            "Regra de decisão"
+          ],
+          "linhas": [
+            {
+              "ancora": "materiais",
+              "celulas": [
+                [
+                  {
+                    "texto": "Materiais controlados",
+                    "negrito": true
+                  }
+                ],
+                [
+                  {
+                    "texto": "Qualidade/PSQ-ECR · menor preço de mercado · prazo",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "≥ 2 respostas favoráveis: qualificado; < 2: desqualificado para compra de material controlado.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "servicos",
+              "celulas": [
+                [
+                  {
+                    "texto": "Serviços",
+                    "negrito": true
+                  }
+                ],
+                [
+                  {
+                    "texto": "Documentação e requisitos de SST · EPI aplicável · menor preço do mercado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "≥ 2 favoráveis: qualificado; < 2: desqualificado.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "qualificacao.t1.l3",
+              "celulas": [
+                [
+                  {
+                    "texto": "Projetos / engenharia",
+                    "negrito": true
+                  }
+                ],
+                [
+                  {
+                    "texto": "Responsabilidade técnica · conhecimento da ABNT NBR 15575 · menor preço do mercado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "≥ 2 favoráveis: qualificado; < 2: desqualificado.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "locacao",
+              "celulas": [
+                [
+                  {
+                    "texto": "Locação",
+                    "negrito": true
+                  }
+                ],
+                [
+                  {
+                    "texto": "Contrato/documentação · condição/checklist do equipamento · menor preço do mercado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "≥ 2 favoráveis: qualificado; < 2: desqualificado.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "qualificacao.t1.l5",
+              "celulas": [
+                [
+                  {
+                    "texto": "Controle tecnológico",
+                    "negrito": true
+                  }
+                ],
+                [
+                  {
+                    "texto": "Enquadramento conforme critérios de laboratório do SiAC / ABNT NBR ISO/IEC 17025.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "≥ 1 favorável: qualificado; nenhuma: desqualificado. Aplicar os critérios específicos do item 5 deste procedimento.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "paragrafo",
+          "ancora": "qualificacao.p3",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "A trava da emissão:",
+              "negrito": true
+            },
+            {
+              "texto": " a OC com material controlado (item com ECR) só é emitida se a empresa estiver qualificada em Materiais para aquelas ECRs, ou com a qualificação vencendo nos próximos 30 dias. Se não estiver, a Nova OC abre o \"Qualificar agora\", e a emissão segue se a qualificação for gravada com a nota no mínimo; abaixo dele, a empresa fica desqualificada e a OC não emite para ela.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "paragrafo",
+          "ancora": "qualificacao.p2",
+          "miudo": true,
+          "texto": [
+            {
+              "texto": "Regra interna Campisi: toda qualificação vale 12 meses. A tela Qualificação mostra o vencimento e avisa 30 dias antes; a requalificação é feita na mesma tela, e a caixa de qualificar mostra as entregas avaliadas da empresa nos últimos 12 meses.",
+              "negrito": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "contratacao",
+      "numero": "3",
+      "titulo": "Documento de compra ou contratação",
+      "selo": "SiAC 8.4.3",
+      "ajuda": "O SiAC exige que os requisitos sejam suficientes antes de serem comunicados ao fornecedor. O formato do documento pode variar; o importante é deixar claro o que está sendo comprado ou contratado.",
+      "blocos": [
+        {
+          "tipo": "tabela",
+          "ancora": "contratacao.t1",
+          "colunas": [
+            "Categoria",
+            "Como a Campisi formaliza",
+            "Conteúdo mínimo"
+          ],
+          "linhas": [
+            {
+              "ancora": "contratacao.t1.l1",
+              "celulas": [
+                [
+                  {
+                    "texto": "Material controlado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Ordem de Compra",
+                    "negrito": true
+                  },
+                  {
+                    "texto": " emitida na tela Nova OC. O número nasce na emissão, e o PDF é guardado na pasta da obra.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Descrição clara + especificações técnicas + requisitos da ECR aplicável. Na OC, cada item leva a ECR dele.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "contratacao.t1.l2",
+              "celulas": [
+                [
+                  {
+                    "texto": "Serviço de obra controlado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Contrato / pedido / instrumento equivalente.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Escopo e especificações técnicas do serviço.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "contratacao.t1.l3",
+              "celulas": [
+                [
+                  {
+                    "texto": "Laboratório",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Contrato / solicitação de ensaio.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Ensaio, norma, prazo, requisitos de acreditação quando aplicáveis, competências e equipamentos/calibração quando requeridos.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "projetos",
+              "celulas": [
+                [
+                  {
+                    "texto": "Projeto / serviço especializado",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Contrato ou documento formal de contratação.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Objeto, escopo, responsabilidades, especificações técnicas e, em habitação, atendimento às exigências aplicáveis da NBR 15575.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            },
+            {
+              "ancora": "contratacao.t1.l5",
+              "celulas": [
+                [
+                  {
+                    "texto": "Locação de equipamento crítico",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Contrato/documento de locação.",
+                    "negrito": true
+                  },
+                  {
+                    "texto": " Não é necessário criar uma OC apenas por ser locação, se o documento de contratação já cumprir o requisito.",
+                    "negrito": false
+                  }
+                ],
+                [
+                  {
+                    "texto": "Equipamento, especificações, características operacionais, manutenção e responsabilidades técnicas aplicáveis.",
+                    "negrito": false
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "avaliacao",
+      "numero": "4",
+      "titulo": "Recebimento e avaliação do fornecedor",
+      "selo": "SiAC 8.4.1.2",
+      "ajuda": "A avaliação acontece depois do fornecimento. O registro pode ser digital, em NF, formulário, bot ou planilha, desde que seja rastreável e contenha os critérios definidos.",
+      "blocos": [
+        {
+          "tipo": "quadros",
+          "ancora": "avaliacao.q1",
+          "itens": [
+            {
+              "ancora": "avaliacao.q1.i1",
+              "titulo": "Materiais e locação",
+              "texto": [
+                {
+                  "texto": "Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e a foto ou o número da nota), ou o escritório registra pelo \"Entregue\" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "avaliacao.q1.i2",
+              "titulo": "Serviços, projetos e laboratórios",
+              "texto": [
+                {
+                  "texto": "Avaliar prazo, conformidade com escopo e normas aplicáveis, documentação técnica/responsabilidade e evidência de aceite ou tratativa.",
+                  "negrito": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "ancora": "avaliacao.a1",
+          "tom": "info",
+          "texto": [
+            {
+              "texto": "Regra operacional do controle digital:",
+              "negrito": true
+            },
+            {
+              "texto": " quando houver duas ou mais respostas “Não Conforme”, o sistema exige a tratativa por escrito e a mantém em \"Tratativas abertas\", no Dashboard, até o responsável pelas ECRs dar ciência. A abertura de RNC/FO 10.2 ocorre quando o desvio se enquadrar no processo de não conformidade da empresa; não deve ser gerada automaticamente apenas pelo número de respostas.",
+              "negrito": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "laboratorios",
+      "numero": "5",
+      "titulo": "Laboratórios de controle tecnológico",
+      "selo": "SiAC 8.4.1.1 · Anexo 7",
+      "ajuda": "Laboratórios exigem verificação específica. A acreditação deve cobrir os ensaios contratados. Laboratórios fora das alíneas de acreditação/processo de acreditação exigem avaliação complementar conforme Anexo 7.",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "ancora": "laboratorios.p1",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "Os critérios podem incluir:",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "lista",
+          "ancora": "laboratorios.n1",
+          "ordenada": true,
+          "itens": [
+            {
+              "ancora": "laboratorios.n1.i1",
+              "texto": [
+                {
+                  "texto": "laboratório acreditado pela CGCRE/INMETRO para os ensaios contratados;",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "laboratorios.n1.i2",
+              "texto": [
+                {
+                  "texto": "laboratório em processo de acreditação pela CGCRE/INMETRO;",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "laboratorios.n1.i3",
+              "texto": [
+                {
+                  "texto": "laboratório avaliado satisfatoriamente pela Campisi conforme requisitos do Anexo 7;",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "laboratorios.n1.i4",
+              "texto": [
+                {
+                  "texto": "instituição de pesquisa/ensino que comprove atendimento à ABNT NBR ISO/IEC 17025;",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "laboratorios.n1.i5",
+              "texto": [
+                {
+                  "texto": "empresa de controle tecnológico com SGQ ISO 9001 cujo escopo inclua os ensaios;",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "laboratorios.n1.i6",
+              "texto": [
+                {
+                  "texto": "outros laboratórios que comprovem atendimento à ABNT NBR ISO/IEC 17025.",
+                  "negrito": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "ancora": "laboratorios.a1",
+          "tom": "warn",
+          "texto": [
+            {
+              "texto": "Nos casos não enquadrados como acreditados ou em processo de acreditação, a Campisi deve avaliar instalações, competência/experiência da equipe e calibração dos equipamentos conforme o Anexo 7. Esses laboratórios devem ser requalificados a cada 12 meses. O avaliador deve possuir os registros de capacitação/experiência exigidos pelo SiAC.",
+              "negrito": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "registros",
+      "numero": "6",
+      "titulo": "Registros e evidências",
+      "selo": "Informação documentada",
+      "ajuda": "O auditor deve conseguir seguir a trilha: fornecedor qualificado → requisito comunicado → fornecimento recebido → desempenho avaliado.",
+      "blocos": [
+        {
+          "tipo": "quadros",
+          "ancora": "registros.q1",
+          "itens": [
+            {
+              "ancora": "registros.q1.i1",
+              "titulo": "FO 8.4.1.1",
+              "texto": [
+                {
+                  "texto": "Qualificação de fornecedores: a tela Qualificação; para o auditor, o \"PDF dos qualificados\".",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "registros.q1.i2",
+              "titulo": "ECRs",
+              "texto": [
+                {
+                  "texto": "Especificações de Compra e Recebimento: o Catálogo de ECRs, com o histórico de revisões e o PDF de cada uma.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "registros.q1.i3",
+              "titulo": "Ordens / documentos de compra",
+              "texto": [
+                {
+                  "texto": "Materiais controlados e demais compras conforme processo: a tela Histórico, com o PDF de cada OC na pasta da obra.",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "registros.q1.i4",
+              "titulo": "Contratos",
+              "texto": [
+                {
+                  "texto": "Serviços, projetos, laboratórios e locações quando aplicável",
+                  "negrito": false
+                }
+              ]
+            },
+            {
+              "ancora": "registros.q1.i5",
+              "titulo": "Avaliações",
+              "texto": [
+                {
+                  "texto": "As avaliações de cada OC, no sistema; para o auditor, o \"PDF das avaliações\" do Histórico. Fora do sistema: NF, formulário digital, bot ou planilha rastreável.",
+                  "negrito": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ancora": "revisoes",
+      "numero": "7",
+      "titulo": "Histórico e controle de revisão",
+      "selo": "Controle documental",
+      "ajuda": "Somente revisões gravadas no sistema entram neste quadro: no sistema, gravar a revisão é aprová-la. O rascunho não entra.",
+      "blocos": [
+        {
+          "tipo": "historico",
+          "ancora": "revisoes.h1",
+          "colunas": [
+            "Revisão",
+            "Data",
+            "Descrição",
+            "Resp. revisão",
+            "Análise crítica / aprovação"
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "ancora": "revisoes.a1",
+          "tom": "info",
+          "texto": [
+            {
+              "texto": "Conteúdo desta revisão (Rev. 01):",
+              "negrito": true
+            },
+            {
+              "texto": " o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do mestre e a tratativa no Dashboard entram no texto.",
+              "negrito": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rodape": [
+    {
+      "titulo": "Campisi Engenharia Ltda.",
+      "texto": "Sistema de Gestão da Qualidade · PBQP-H SiAC Nível A"
+    }
+  ]
+}
