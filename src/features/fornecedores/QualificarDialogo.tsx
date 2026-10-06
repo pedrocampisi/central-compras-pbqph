@@ -36,7 +36,9 @@ import {
 import type { Ecr } from '../../domain/types';
 import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
-import { ajudaDoCriterio } from '../../domain/ajudaDosCriterios';
+import { ajudaDoCriterio, itemDoPs02 } from '../../domain/ajudaDosCriterios';
+import { CaminhoParaOItem } from '../../components/Ajuda/CaminhoParaOItem';
+import { confirmAsync } from '../../stores/useConfirmStore';
 import styles from './QualificarDialogo.module.css';
 
 interface Props {
@@ -73,6 +75,23 @@ export function QualificarDialogo({
   // O "?" da sigla vai na primeira vez que ela aparece (CTO-D728 §1): na frase
   // da trava, quando ela fala de ECR; senão, nas ECRs para marcar.
   const ecrNoPorque = !!porque && /\bECRs?\b/.test(porque);
+  // O "?" dos critérios leva ao item do PS.02 (CTO-D730 §3.3). Ir para lá fecha
+  // esta caixa: com algo marcado, pergunta antes de perder.
+  const itemDoProcedimento = itemDoPs02(categoria.categoria);
+  const marcouAlgo =
+    marcas.some((m) => m.atende !== null || m.motivo.trim() !== '') ||
+    tipo.trim() !== '' ||
+    qualificadaEm !== hoje ||
+    marcadas.join() !== [...ecrsMarcadas].join();
+  const podeSair = () =>
+    !marcouAlgo ||
+    confirmAsync({
+      title: 'Sair da qualificação?',
+      message: 'O que você marcou nesta caixa se perde, e nada é gravado. A página do procedimento abre no lugar do item.',
+      confirmLabel: 'Ir ao procedimento',
+      cancelLabel: 'Continuar aqui',
+      tone: 'danger',
+    });
   const nota = notaAoVivo(marcas.map((m) => ({ atende: m.atende === true, motivo: m.motivo })));
   const passa = nota >= categoria.minimo;
 
@@ -162,7 +181,12 @@ export function QualificarDialogo({
                   />
                   Não atende
                 </label>
-                {ajuda && <Ajuda sobre={`O que é atender o critério ${i + 1}`}>{ajuda}</Ajuda>}
+                {ajuda && (
+                  <Ajuda sobre={`O que é atender o critério ${i + 1}`}>
+                    {ajuda}
+                    {itemDoProcedimento && <CaminhoParaOItem item={itemDoProcedimento} antesDeIr={podeSair} />}
+                  </Ajuda>
+                )}
               </div>
               <textarea
                 className={styles.motivo}

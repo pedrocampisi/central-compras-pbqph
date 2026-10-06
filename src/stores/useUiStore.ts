@@ -9,7 +9,7 @@ import type { StatusOc } from '../domain/constants';
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
 export const ABAS = [
-  'dashboard', 'nova-oc', 'historico', 'recebimentos', 'fornecedores', 'qualificacao', 'obras', 'mestres', 'catalogo', 'config',
+  'dashboard', 'nova-oc', 'historico', 'recebimentos', 'fornecedores', 'qualificacao', 'obras', 'mestres', 'catalogo', 'procedimento', 'config',
 ] as const;
 export type TabId = (typeof ABAS)[number];
 
@@ -68,6 +68,8 @@ interface UiState {
   fornFilter: FornFilter;
   obraFilter: ObraFilter;
   catalogoFilter: CatalogoFilter;
+  /** O lugar do procedimento que a página abre (o "ver no PS.02, item 2" das telas, CTO-D730 §3.3). */
+  ancoraDoProcedimento: string | null;
   toasts: Toast[];
 
   // Actions
@@ -76,6 +78,10 @@ interface UiState {
   setFornFilter: (partial: Partial<FornFilter>) => void;
   setObraFilter: (partial: Partial<ObraFilter>) => void;
   setCatalogoFilter: (partial: Partial<CatalogoFilter>) => void;
+  /** Abre a página do procedimento no lugar da âncora. */
+  abrirProcedimento: (ancora: string) => void;
+  /** A página chegou ao lugar: a âncora se gasta. */
+  chegouNoProcedimento: () => void;
   showToast: (message: string, tone?: ToastTone, chave?: string) => void;
   dismissToast: (id: string) => void;
 }
@@ -88,6 +94,7 @@ export const useUiStore = create<UiState>((set) => ({
   fornFilter: { search: '', status: 'todos' },
   obraFilter: { search: '', status: 'todas' },
   catalogoFilter: { search: '' },
+  ancoraDoProcedimento: null,
   toasts: [],
 
   setActiveTab(tab) {
@@ -108,6 +115,14 @@ export const useUiStore = create<UiState>((set) => ({
 
   setCatalogoFilter(partial) {
     set((s) => ({ catalogoFilter: { ...s.catalogoFilter, ...partial } }));
+  },
+
+  abrirProcedimento(ancora) {
+    set({ activeTab: 'procedimento', ancoraDoProcedimento: ancora });
+  },
+
+  chegouNoProcedimento() {
+    set({ ancoraDoProcedimento: null });
   },
 
   showToast(message, tone = 'info', chave) {

@@ -69,3 +69,18 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* O caminho para o item do procedimento (CTO-D730 §3.3), na linha de baixo do texto. */
+.caminho {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--marca);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

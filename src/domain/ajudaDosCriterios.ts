@@ -18,6 +18,7 @@
  */
 
 import type { Categoria } from './qualificacao';
+import { ITEM_DA_QUALIFICACAO, ITEM_DOS_LABORATORIOS } from './procedimento';
 
 type AjudaDosCriterios = Partial<Record<Categoria, Partial<Record<1 | 2 | 3, string>>>>;
 
@@ -46,4 +47,19 @@ const AJUDA: AjudaDosCriterios = {
 /** O "?" do critério `ordem` (1 a 3) da categoria; `null` quando o PS.02 não diz nada além da pergunta. */
 export function ajudaDoCriterio(categoria: Categoria, ordem: number): string | null {
   return AJUDA[categoria]?.[ordem as 1 | 2 | 3] ?? null;
+}
+
+/**
+ * O item do PS.02 de onde vem o "?" da categoria (CTO-D730 §3.3): o caminho
+ * "ver no PS.02, item N" abre a página do procedimento ali. O texto do "?"
+ * fica como está até a Rev. 01.
+ */
+const ITEM_DO_PS02: Partial<Record<Categoria, { numero: number; ancora: string }>> = {
+  material: ITEM_DA_QUALIFICACAO,
+  controle_tecnologico: ITEM_DOS_LABORATORIOS,
+};
+
+/** O item do PS.02 que o "?" dos critérios da categoria aponta; `null` se a categoria não tem "?". */
+export function itemDoPs02(categoria: Categoria): { numero: number; ancora: string } | null {
+  return ITEM_DO_PS02[categoria] ?? null;
 }
