@@ -90,20 +90,21 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 36. A Rev. 01 do PS.02 (D738 a D740): no ar, esperando a sentada do Pedro
+### 36. A Rev. 01 do PS.02 (D738 a D741): no ar e conferida, esperando a sentada do Pedro
 
 *Aberta em 06/10/2026, na decisão 96.* A página com o rascunho e o "Gravar a Rev. 01", só para quem revisa ECR, está
 **no ar** desde 17h23 de 06/10:
 - em `36e26eab`, versão `20261006202414-e5944b6`, pelo `main` `e5944b6` (decisão 98);
-- o desfazer é `c1816ff8`.
+- o desfazer é `c1816ff8`;
+- **conferida por fora pelo CTO** (D741, só registro, CTO `b17f501`).
 
 A Rev. 01 **não foi gravada**: a vigente no banco é a Rev. 00.
 
 **Falta, nesta ordem:**
-1. a conferência do CTO por fora;
-2. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí ela muda pelo script e
-   volta ao CTO);
-3. na publicação seguinte, o rascunho sai do código.
+1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
+   pelo script e volta a ele);
+2. o CTO confere a gravação por SELECT e avisa;
+3. na publicação seguinte, o rascunho sai do código (D739 §4.3).
 
 Meta: 23/10.
 
