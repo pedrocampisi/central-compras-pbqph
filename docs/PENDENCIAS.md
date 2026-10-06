@@ -96,8 +96,11 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 984 testes, CI verde e as fotos. **Falta:**
 - a avaliação do CTO;
 - o contrato do jsonb na carta de fecho do Banco (só `procedimentoDoBanco.ts` muda);
-- a perícia, porque passou de mil linhas;
-- a ordem de publicar.
+- a perícia, porque passou de mil linhas. O caminho, pelo CTO em 06/10: ele avalia o ramo da OC e o Banco no ensaio;
+  com os dois aprovados, o Pedro dispara o perito, e o laudo vai para `CTO\docs\Pericias`; cada casa mede os achados
+  dela, e o CTO faz a triagem. **Até a triagem, nada no `main` e nada publicado.** A meta de 13/10 pode escorregar; o
+  limite é o ensaio de 09/11;
+- a ordem de publicar: o Banco primeiro, a OC depois (D433).
 
 Depois, a Rev. 01, o rascunho do manual.
 
