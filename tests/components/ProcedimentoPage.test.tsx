@@ -142,9 +142,19 @@ describe('os pulos: o sumário, os cartões e o caminho das outras telas', () =>
     expect(document.getElementById('laboratorios')!.hasAttribute('data-alvo')).toBe(true);
   });
 
-  it('o sumário leva à seção', async () => {
+  it('o sumário diz o que o documento diz e leva à seção', async () => {
     await abre();
-    fireEvent.click(screen.getByRole('button', { name: '4. Recebimento e avaliação do fornecedor' }));
+    const nav = screen.getByRole('navigation', { name: 'Sumário do procedimento' });
+    expect(within(nav).getAllByRole('button').map((b) => b.textContent)).toEqual([
+      '1. Objetivo',
+      '2. Qualificação',
+      '3. Contratação',
+      '4. Avaliação',
+      '5. Laboratórios',
+      '6. Registros',
+      '7. Revisões',
+    ]);
+    fireEvent.click(within(nav).getByRole('button', { name: '4. Avaliação' }));
     expect(rolou.mock.contexts.at(-1)).toBe(document.getElementById('avaliacao'));
   });
 

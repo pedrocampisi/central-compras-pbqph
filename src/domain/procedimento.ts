@@ -91,6 +91,8 @@ export interface Procedimento {
   responsavel: string;
   referencia: string;
   escopo: string;
+  /** O sumário como o documento o escreve ("1. Objetivo"), cada item com a âncora da seção. */
+  sumario: { texto: string; ancora: string }[];
   comoUsar: TextoRico;
   fluxo: {
     titulo: string;

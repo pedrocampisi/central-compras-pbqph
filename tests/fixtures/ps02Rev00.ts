@@ -26,6 +26,15 @@ export function ps02Rev00(): Procedimento {
     responsavel: 'SGQ Campisi Engenharia',
     referencia: 'SiAC PBQP-H 2021 · requisito 8.4',
     escopo: 'Materiais, serviços, laboratórios, projetos/engenharia e locação de equipamentos críticos',
+    sumario: [
+      { texto: '1. Objetivo', ancora: 'objetivo' },
+      { texto: '2. Qualificação', ancora: 'qualificacao' },
+      { texto: '3. Contratação', ancora: 'contratacao' },
+      { texto: '4. Avaliação', ancora: 'avaliacao' },
+      { texto: '5. Laboratórios', ancora: 'laboratorios' },
+      { texto: '6. Registros', ancora: 'registros' },
+      { texto: '7. Revisões', ancora: 'revisoes' },
+    ],
     comoUsar: [
       n('Como usar este procedimento:'),
       t(' identifique primeiro '),

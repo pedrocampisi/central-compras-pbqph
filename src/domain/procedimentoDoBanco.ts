@@ -1,15 +1,18 @@
 /**
- * O procedimento como vem do banco (CTO-D730 §2: `core.procedimentos` e
- * `core.procedimento_revisoes`, plano do Banco de 06/10).
+ * O procedimento como vem do banco (CTO-D730 §2; o contrato é o §3 da carta do
+ * Banco de 06/10, conferido pelo CTO na D733).
  *
- * ⚠️ A FORMA AINDA É A DO RAMO: a linha traz `codigo`, `titulo`, `revisao`,
- * `emitida_em` e o documento inteiro no jsonb `secoes`, na forma de
- * `domain/procedimento`. Quando a carta de fecho do Banco trouxer o contrato,
- * só este arquivo muda: a tela e o PDF leem `Procedimento`.
+ * - `core.procedimentos`: Código, Revisão e Data são colunas (`codigo`,
+ *   `revisao`, `emitida_em`), e o resto do documento mora no jsonb `documento`.
+ * - `core.procedimento_revisoes`: o histórico, uma linha por revisão.
  *
- * Aceita só a forma esperada; o que não for texto vira texto vazio, e nada é
+ * Aceita só a forma do contrato; o que não for texto vira texto vazio, e nada é
  * reescrito. Um bloco de tipo desconhecido não some calado: vira parágrafo com
  * o que houver de texto nele.
+ *
+ * O que a tela ainda mostra sem negrito: o texto dos quadros, dos itens de
+ * lista, dos cartões e dos passos do fluxo, e o "?" das seções. Na Rev. 00
+ * nenhum deles tem negrito.
  */
 
 import type {
@@ -22,6 +25,7 @@ import type {
   Secao,
   TextoRico,
 } from './procedimento';
+import { CAMPOS_DO_CABECALHO, textoSimples } from './procedimento';
 
 type Obj = Record<string, unknown>;
 
@@ -38,7 +42,11 @@ function rico(v: unknown): TextoRico {
   });
 }
 
-const DESTAQUES: readonly Destaque[] = ['aviso', 'informacao', 'miudo'];
+/** A frase sem o negrito, para o que a tela mostra como texto simples. */
+const simples = (v: unknown): string => textoSimples(rico(v));
+
+/** O tom do aviso vira o destaque que desenha a faixa: `warn` é o aviso, `info` a informação. */
+const TOM_DO_AVISO: Record<string, Destaque> = { warn: 'aviso', info: 'informacao' };
 
 function bloco(v: unknown, i: number, secao: string): Bloco {
   const o = obj(v);
@@ -48,9 +56,10 @@ function bloco(v: unknown, i: number, secao: string): Bloco {
       return {
         tipo: 'quadros',
         ancora,
-        quadros: lista(o['quadros']).map((q, k) => {
+        // O `endereco` (o link da planilha, na seção 6) não vira link: o quadro fica como texto (D732 §2).
+        quadros: lista(o['itens']).map((q, k) => {
           const qo = obj(q);
-          return { ancora: texto(qo['ancora']) || `${ancora}.${k + 1}`, titulo: texto(qo['titulo']), texto: texto(qo['texto']) };
+          return { ancora: texto(qo['ancora']) || `${ancora}.${k + 1}`, titulo: texto(qo['titulo']), texto: simples(qo['texto']) };
         }),
       };
     case 'lista':
@@ -59,7 +68,7 @@ function bloco(v: unknown, i: number, secao: string): Bloco {
         ancora,
         itens: lista(o['itens']).map((it, k) => {
           const io = obj(it);
-          return { ancora: texto(io['ancora']) || `${ancora}.${k + 1}`, texto: texto(io['texto']) };
+          return { ancora: texto(io['ancora']) || `${ancora}.${k + 1}`, texto: simples(io['texto']) };
         }),
       };
     case 'tabela':
@@ -74,29 +83,30 @@ function bloco(v: unknown, i: number, secao: string): Bloco {
       };
     case 'historico':
       return { tipo: 'historico', ancora };
-    default: {
-      const d = o['destaque'];
-      return {
-        tipo: 'paragrafo',
-        ancora,
-        texto: rico(o['texto']),
-        destaque: DESTAQUES.includes(d as Destaque) ? (d as Destaque) : null,
-      };
-    }
+    case 'aviso':
+      return { tipo: 'paragrafo', ancora, texto: rico(o['texto']), destaque: TOM_DO_AVISO[texto(o['tom'])] ?? 'aviso' };
+    default:
+      return { tipo: 'paragrafo', ancora, texto: rico(o['texto']), destaque: o['miudo'] === true ? 'miudo' : null };
   }
 }
 
 function secao(v: unknown, i: number): Secao {
   const o = obj(v);
   const ancora = texto(o['ancora']) || `secao-${i + 1}`;
+  const numero = Number(o['numero']);
   return {
-    numero: typeof o['numero'] === 'number' ? o['numero'] : i + 1,
+    numero: Number.isInteger(numero) && numero > 0 ? numero : i + 1,
     ancora,
     titulo: texto(o['titulo']),
     selo: texto(o['selo']),
-    ajuda: texto(o['ajuda']),
+    ajuda: simples(o['ajuda']),
     blocos: lista(o['blocos']).map((b, k) => bloco(b, k, ancora)),
   };
+}
+
+/** Os três campos do cabeçalho que têm `valor` no documento, pelo rótulo dele. */
+function valorDoCabecalho(cabecalho: Obj[], rotulo: string): string {
+  return texto(cabecalho.find((c) => texto(c['rotulo']) === rotulo)?.['valor']);
 }
 
 /**
@@ -121,37 +131,49 @@ export function revisoesDoProcedimentoDoBanco(v: unknown): RevisaoDoProcedimento
 /** A linha de `core.procedimentos` com o histórico; `null` se não há documento nela. */
 export function procedimentoDoBanco(linha: unknown, revisoes: unknown): Procedimento | null {
   const l = obj(linha);
-  const doc = obj(l['secoes']);
+  const doc = obj(l['documento']);
   if (!Array.isArray(doc['secoes'])) return null;
+  const cabecalho = lista(doc['cabecalho']).map(obj);
   const fluxo = obj(doc['fluxo']);
-  const rodape = obj(doc['rodape']);
+  const sequencia = obj(fluxo['sequencia']);
+  // O documento tem uma parte só no rodapé; se um dia vier mais de uma, vão todas, uma depois da outra.
+  const rodape = lista(doc['rodape']).map(obj);
   return {
     codigo: texto(l['codigo']),
     titulo: texto(l['titulo']),
     subtitulo: texto(doc['subtitulo']),
-    sobretitulo: texto(doc['sobretitulo']),
+    sobretitulo: texto(doc['linha_de_cima']),
     revisao: texto(l['revisao']),
-    situacao: texto(doc['situacao']),
+    situacao: texto(cabecalho.find((c) => c['campo'] === 'revisao')?.['etiqueta']),
     data: texto(l['emitida_em']),
-    responsavel: texto(doc['responsavel']),
-    referencia: texto(doc['referencia']),
-    escopo: texto(doc['escopo']),
-    comoUsar: rico(doc['comoUsar']),
+    responsavel: valorDoCabecalho(cabecalho, CAMPOS_DO_CABECALHO.responsavel),
+    referencia: valorDoCabecalho(cabecalho, CAMPOS_DO_CABECALHO.referencia),
+    escopo: valorDoCabecalho(cabecalho, CAMPOS_DO_CABECALHO.escopo),
+    sumario: lista(obj(doc['sumario'])['itens']).map((it) => {
+      const o = obj(it);
+      return { texto: texto(o['texto']), ancora: texto(o['ancora']) };
+    }),
+    comoUsar: rico(doc['como_usar']),
     fluxo: {
       titulo: texto(fluxo['titulo']),
-      introducao: texto(fluxo['introducao']),
+      introducao: simples(fluxo['texto']),
       cartoes: lista(fluxo['cartoes']).map((c): CartaoDoFluxo => {
         const o = obj(c);
-        return { titulo: texto(o['titulo']), texto: texto(o['texto']), destino: texto(o['destino']) || null };
+        return { titulo: texto(o['titulo']), texto: simples(o['texto']), destino: texto(o['destino']) || null };
       }),
-      tituloDaSequencia: texto(fluxo['tituloDaSequencia']),
-      sequencia: lista(fluxo['sequencia']).map((p): PassoDaSequencia => {
+      tituloDaSequencia: texto(sequencia['titulo']),
+      sequencia: lista(sequencia['passos']).map((p): PassoDaSequencia => {
         const o = obj(p);
-        return { titulo: texto(o['titulo']), texto: texto(o['texto']) };
+        return { titulo: texto(o['rotulo']), texto: simples(o['texto']) };
       }),
     },
     secoes: lista(doc['secoes']).map(secao),
-    rodape: rodape['titulo'] || rodape['texto'] ? { titulo: texto(rodape['titulo']), texto: texto(rodape['texto']) } : null,
+    rodape: rodape.length
+      ? {
+          titulo: rodape.map((r) => texto(r['titulo'])).filter(Boolean).join(' · '),
+          texto: rodape.map((r) => texto(r['texto'])).filter(Boolean).join(' · '),
+        }
+      : null,
     revisoes: revisoesDoProcedimentoDoBanco(revisoes),
   };
 }

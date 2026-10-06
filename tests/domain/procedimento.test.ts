@@ -3,6 +3,8 @@
  * o título do cartão sem emoji, o nome do PDF, o caminho das telas para o item
  * e a leitura do que vem do banco (que não reescreve nada).
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   ITEM_DA_QUALIFICACAO,
@@ -20,11 +22,17 @@ import { procedimentoDoBanco, revisoesDoProcedimentoDoBanco } from '../../src/do
 import { itemDoPs02 } from '../../src/domain/ajudaDosCriterios';
 import { ps02Rev00 } from '../fixtures/ps02Rev00';
 
-/** O procedimento como a linha do banco o traz (a forma do ramo). */
+/**
+ * O procedimento como a linha do banco o traz (o contrato do Banco, D733): o
+ * `documento` é o jsonb da carga da Rev. 00, tirado da migration do ramo
+ * `6e8a0a8` do Banco, sem mudar uma letra. Os nomes do histórico são os
+ * inventados do dado de teste.
+ */
 function comoNoBanco() {
-  const { codigo, titulo, revisao, data, revisoes, ...resto } = ps02Rev00();
+  const { codigo, titulo, revisao, data, revisoes } = ps02Rev00();
+  const documento: unknown = JSON.parse(readFileSync(join(__dirname, '../fixtures/ps02Rev00DoBanco.json'), 'utf-8'));
   return {
-    linha: { codigo, titulo, revisao, emitida_em: data, secoes: resto },
+    linha: { codigo, titulo, revisao, emitida_em: data, documento },
     revisoes: (revisoes ?? []).map((r, i) => ({
       id: i + 1,
       revisao: r.revisao,
@@ -35,6 +43,12 @@ function comoNoBanco() {
     })),
   };
 }
+
+/** As 11 âncoras que o próprio documento tem: as 7 seções e as 4 linhas de tabela. */
+const ancorasDoDocumento = [
+  ...['objetivo', 'qualificacao', 'contratacao', 'avaliacao', 'laboratorios', 'registros', 'revisoes'],
+  ...['materiais', 'servicos', 'locacao', 'projetos'],
+];
 
 describe('as âncoras do documento ficam paradas', () => {
   const p = ps02Rev00();
@@ -106,10 +120,64 @@ describe('o caminho das telas para o item (D730 §3.3)', () => {
   });
 });
 
-describe('a leitura do banco', () => {
-  it('o que vem do banco volta igual, sem reescrever nada', () => {
+/** O procedimento sem as âncoras que não são do documento (as do Banco são pela posição; as do dado de teste, outras). */
+function semAncorasDePosicao(v: unknown): unknown {
+  const DO_DOCUMENTO = new Set(ancorasDoDocumento);
+  if (Array.isArray(v)) return v.map(semAncorasDePosicao);
+  if (v && typeof v === 'object') {
+    return Object.fromEntries(
+      Object.entries(v)
+        .filter(([k, x]) => k !== 'ancora' || DO_DOCUMENTO.has(x as string))
+        .map(([k, x]) => [k, k === 'sumario' ? x : semAncorasDePosicao(x)]),
+    );
+  }
+  return v;
+}
+
+describe('a leitura do banco (o contrato da D733)', () => {
+  it('a carga do Banco dá o mesmo procedimento do dado de teste, palavra por palavra', () => {
     const { linha, revisoes } = comoNoBanco();
-    expect(procedimentoDoBanco(linha, revisoes)).toEqual(ps02Rev00());
+    const p = procedimentoDoBanco(linha, revisoes)!;
+    expect(semAncorasDePosicao(p)).toEqual(semAncorasDePosicao(ps02Rev00()));
+  });
+
+  it('as âncoras do documento estão lá, e nenhuma se repete', () => {
+    const { linha, revisoes } = comoNoBanco();
+    const todas = ancorasDe(procedimentoDoBanco(linha, revisoes)!);
+    for (const a of ancorasDoDocumento) expect(todas).toContain(a);
+    expect(new Set(todas).size).toBe(todas.length);
+  });
+
+  it('Código, Revisão e Data vêm das colunas, não do documento', () => {
+    const { linha, revisoes } = comoNoBanco();
+    const p = procedimentoDoBanco({ ...linha, codigo: 'PS.99', revisao: '07', emitida_em: '2027-01-02' }, revisoes)!;
+    expect([p.codigo, p.revisao, p.data]).toEqual(['PS.99', '07', '2027-01-02']);
+    expect(p.situacao).toBe('Emissão inicial formal');
+  });
+
+  it('o aviso guarda o tom: "warn" é a faixa de aviso, "info" a de informação', () => {
+    const { linha, revisoes } = comoNoBanco();
+    const blocos = procedimentoDoBanco(linha, revisoes)!.secoes.flatMap((s) => s.blocos);
+    const destaque = (ancora: string) => {
+      const b = blocos.find((x) => x.ancora === ancora);
+      return b?.tipo === 'paragrafo' ? b.destaque : undefined;
+    };
+    expect(destaque('qualificacao.a1')).toBe('aviso');
+    expect(destaque('laboratorios.a1')).toBe('aviso');
+    expect(destaque('avaliacao.a1')).toBe('informacao');
+    expect(destaque('revisoes.a1')).toBe('informacao');
+    expect(destaque('qualificacao.p2')).toBe('miudo');
+    expect(destaque('objetivo.p1')).toBeNull();
+  });
+
+  it('o endereço da planilha não vira link: o quadro fica como texto', () => {
+    const { linha, revisoes } = comoNoBanco();
+    const registros = procedimentoDoBanco(linha, revisoes)!.secoes.find((s) => s.ancora === 'registros')!;
+    expect(registros.blocos[0]).toEqual({
+      tipo: 'quadros',
+      ancora: 'registros.q1',
+      quadros: expect.arrayContaining([{ ancora: 'registros.q1.i1', titulo: 'FO 8.4.1.1', texto: 'Qualificação de fornecedores' }]),
+    });
   });
 
   it('sem documento na linha, não há procedimento', () => {
@@ -129,7 +197,7 @@ describe('a leitura do banco', () => {
 
   it('um bloco de tipo desconhecido não some: vira parágrafo com o texto dele', () => {
     const { linha, revisoes } = comoNoBanco();
-    const doc = linha.secoes as { secoes: { blocos: unknown[] }[] };
+    const doc = linha.documento as { secoes: { blocos: unknown[] }[] };
     doc.secoes[0]!.blocos.push({ tipo: 'novo', ancora: 'x', texto: 'Texto de um bloco novo.' });
     const p = procedimentoDoBanco(linha, revisoes)!;
     const ultimo = p.secoes[0]!.blocos.at(-1)!;

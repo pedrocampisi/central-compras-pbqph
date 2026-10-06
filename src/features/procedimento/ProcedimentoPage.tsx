@@ -185,9 +185,9 @@ function Documento({ p, irPara }: { p: Procedimento; irPara: (ancora: string) =>
 
       <nav className={styles.sumario} aria-label="Sumário do procedimento">
         <strong>{SUMARIO}</strong>
-        {p.secoes.map((s) => (
+        {p.sumario.map((s) => (
           <button key={s.ancora} type="button" onClick={() => irPara(s.ancora)}>
-            {s.numero}. {s.titulo}
+            {s.texto}
           </button>
         ))}
       </nav>
