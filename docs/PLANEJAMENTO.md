@@ -3525,3 +3525,31 @@ Ele dispensou o percurso no banco de ensaio e aceitou a oferta guardada por nave
 1. o CTO confere;
 2. junto e publico, com o desfazer anotado, e a D757 sai junto;
 3. o Pedro testa com uma pessoa de verdade.
+
+## Decisão 101 — no ar: o tutorial da Nova OC e a frase do 502 · 10/10/2026
+
+**POR QUÊ (CTO-D765):** o CTO conferiu os retoques nas fotos 71, 76, 79 e 79b, nas quatro versões, e aceitou as duas
+notas. Pela régua dele, sem comentários, deu 419 linhas; pela minha, 548. As duas ficam abaixo de mil: sem perícia.
+
+**O QUE MUDOU:**
+- **o desfazer**, anotado antes da junção: `36e26eab`, com 100% do tráfego;
+- **a junção:** o `d763-tutorial` (`35d79ea`) entrou no `main` em `0e7717e`, sem conflito. Fora de `docs/`, nada
+  difere do ramo;
+- **a bateria:**
+  - 1035 testes;
+  - tipos e lint limpos;
+  - o `conferir` 7 de 7;
+  - o CI do ramo verde;
+- **publicado pelo PowerShell às 09h35 de 10/10:** `656d33e5-b679-4538-b6eb-0ba09cbfe441`, versão
+  `20261010123530-0e7717e`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- o código servido tem a oferta, o balão e os "?" novos;
+- o pedaço da importação tem a frase nova do 502, sem "OpenRouter".
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere por fora;
+2. o Pedro testa com uma pessoa de verdade, e o CTO conta as OCs antes e depois.

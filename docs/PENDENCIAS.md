@@ -110,16 +110,17 @@ Meta: 23/10.
 
 ---
 
-### 37. O tutorial da Nova OC e a frase do 502 (D763, D764, D757): no ramo, esperando o CTO
+### 37. O tutorial da Nova OC e a frase do 502 (D763 a D765, D757): no ar, esperando o teste do Pedro
 
-*Aberta em 10/10/2026, na decisão 99.* O ramo `d763-tutorial` (`35d79ea`) tem o tutorial "Fazer uma OC", os dois
-retoques da D764 (o contorno e os "?" novos, decisão 100) e a frase nova do 502. **NÃO publicado.** O ensaio foi
-dispensado pelo CTO.
+*Aberta em 10/10/2026, na decisão 99.* O tutorial "Fazer uma OC", com os "?" novos, e a frase nova do 502 estão
+**no ar** desde 09h35 de 10/10:
+- em `656d33e5`, versão `20261010123530-0e7717e`, pelo `main` `0e7717e` (decisão 101);
+- o desfazer é `36e26eab`.
 
 **Falta, nesta ordem:**
-1. a conferência do CTO das fotos novas;
-2. juntar e publicar, com o desfazer anotado;
-3. o teste do Pedro com uma pessoa de verdade.
+1. a conferência do CTO por fora;
+2. o teste do Pedro com uma pessoa de verdade, com a contagem de OCs antes e depois, feita pelo CTO;
+3. se der certo, o mesmo jeito nas outras telas, quando o CTO mandar.
 
 ---
 
