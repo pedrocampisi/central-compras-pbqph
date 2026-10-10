@@ -13,7 +13,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '../../components/Button/Button';
 import type { OrdemCompra } from '../../domain/types';
 import {
-  PASSOS_DA_NOVA_OC, passoSeguiu, rotuloDoAvancar, type PassoDoTutorial,
+  PASSOS_DA_NOVA_OC, passoSeguiu, rotuloDoAvancar, type AlvoDoTutorial, type PassoDoTutorial,
 } from '../../domain/tutorialDaNovaOc';
 import styles from './TutorialDaNovaOc.module.css';
 
@@ -37,11 +37,17 @@ function alvoNaTela(passo: PassoDoTutorial): HTMLElement | null {
 }
 
 /**
+ * Os totais ficam na coluna da direita, e em cima deles está a tabela de
+ * itens: o balão vai para o vão da esquerda (CTO-D764 §2.1).
+ */
+const VAI_PARA_A_ESQUERDA: ReadonlySet<AlvoDoTutorial> = new Set(['totais']);
+
+/**
  * Nunca embaixo do alvo, se der: a lista do campo abre para baixo, e o balão
  * a cobriria. Acima; sem espaço, ao lado (direita, depois esquerda); só então
  * embaixo. Na tela pequena, a faixa fica no pé — e sobe quando o alvo está lá.
  */
-function lugarDoBalao(alvo: HTMLElement | null, balao: HTMLElement | null): Lugar {
+function lugarDoBalao(alvo: HTMLElement | null, balao: HTMLElement | null, esquerdaPrimeiro = false): Lugar {
   if (!alvo || !balao) return { faixa: 'embaixo' };
   const r = alvo.getBoundingClientRect();
   const h = balao.offsetHeight;
@@ -51,6 +57,9 @@ function lugarDoBalao(alvo: HTMLElement | null, balao: HTMLElement | null): Luga
   if (largura < LARGURA_DA_FAIXA) return { faixa: r.bottom > altura - h - 2 * DISTANCIA ? 'em-cima' : 'embaixo' };
   const naAltura = (top: number) => Math.max(MARGEM, Math.min(top, altura - h - MARGEM));
   const naLargura = (left: number) => Math.max(MARGEM, Math.min(left, largura - w - MARGEM));
+  if (esquerdaPrimeiro && r.left - DISTANCIA - w >= MARGEM) {
+    return { faixa: false, top: naAltura(r.top), left: r.left - DISTANCIA - w };
+  }
   if (r.top - DISTANCIA - h >= MARGEM) return { faixa: false, top: r.top - DISTANCIA - h, left: naLargura(r.left) };
   if (r.right + DISTANCIA + w <= largura - MARGEM) return { faixa: false, top: naAltura(r.top), left: r.right + DISTANCIA };
   if (r.left - DISTANCIA - w >= MARGEM) return { faixa: false, top: naAltura(r.top), left: r.left - DISTANCIA - w };
@@ -88,7 +97,7 @@ export function TutorialDaNovaOc({ oc, indice, onIr, onSair, passos = PASSOS_DA_
     let quadro = 0;
     let antes = '';
     const medir = () => {
-      const novo = lugarDoBalao(alvoNaTela(passo), balaoRef.current);
+      const novo = lugarDoBalao(alvoNaTela(passo), balaoRef.current, VAI_PARA_A_ESQUERDA.has(passo.alvo));
       const chave = JSON.stringify(novo);
       if (chave !== antes) {
         antes = chave;

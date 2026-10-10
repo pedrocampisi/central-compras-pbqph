@@ -3,7 +3,11 @@
    Sem transição — o balão aparece no lugar (lei da casa: movimento só em
    espera e no login). Abaixo de 700px, o balão vira faixa no pé da tela. */
 
+/* O contorno abraça o conteúdo, e não a caixa (CTO-D764 §2.1): na grade, o
+   campo esticava até a altura do vizinho com dica, e o contorno descia até
+   um vão vazio. Encostado no topo, ele fica do tamanho do campo e da dica. */
 :global([data-tutorial-aceso]) {
+  align-self: start;
   outline: 3px solid var(--acento);
   outline-offset: 4px;
   border-radius: var(--raio-pequeno);

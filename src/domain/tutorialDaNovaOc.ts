@@ -22,6 +22,37 @@ export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar Item" ou importe um pedid
 /** A dica do "Importar Pedido (IA)". */
 export const DICA_DA_IMPORTACAO = 'Importar os itens de um pedido (PDF, foto ou print) pela IA';
 
+/**
+ * O "?" dos campos que não tinham um (CTO-D764 §2.2): é o texto do passo, e o
+ * passo o usa. `sobre` é o nome do "?" para quem lê a tela em voz.
+ */
+export const AJUDA_DO_FORNECEDOR = {
+  sobre: 'Como escolher o fornecedor',
+  texto:
+    'Digite parte do nome e escolha a empresa na lista. Embaixo do campo aparece o nome que vai na OC, ' +
+    'e ao lado o selo diz se a empresa está qualificada para material.',
+} as const;
+export const AJUDA_DA_OBRA = {
+  sobre: 'O que a obra decide',
+  texto:
+    'A obra diz para quem a nota fiscal é faturada (aparece embaixo do campo) e em que pasta o PDF da OC ' +
+    'fica guardado.',
+} as const;
+export const AJUDA_DOS_ITENS = {
+  sobre: 'Como pôr os itens',
+  texto: `${VAZIO_DOS_ITENS} A IA lê o pedido do fornecedor em PDF, foto ou print, e os itens entram na tabela.`,
+} as const;
+export const AJUDA_DOS_TOTAIS = {
+  sobre: 'O que entra nos totais',
+  texto: 'Frete, outras despesas e desconto do material entram aqui, e o total geral se refaz sozinho.',
+} as const;
+export const AJUDA_DO_EMITIR = {
+  sobre: 'O que o Emitir faz',
+  texto:
+    'Quando estiver tudo certo, é este botão que emite: a OC ganha o número, o PDF é gerado e vai para a ' +
+    'pasta da obra. Ainda não terminou? "Salvar Rascunho" guarda a OC sem número.',
+} as const;
+
 // ── Os passos ─────────────────────────────────────────────────────────────────
 
 /** Onde o balão acende: o `data-tutorial` do elemento na tela. */
@@ -49,9 +80,7 @@ export const PASSOS_DA_NOVA_OC: readonly PassoDoTutorial[] = [
   {
     alvo: 'fornecedor',
     titulo: 'Escolha o fornecedor',
-    texto:
-      'Digite parte do nome e escolha a empresa na lista. Embaixo do campo aparece o nome que vai na OC, ' +
-      'e ao lado o selo diz se a empresa está qualificada para material.',
+    texto: AJUDA_DO_FORNECEDOR.texto,
     fazer: 'Escolha um fornecedor para seguir.',
     retrato: (oc) => oc.fornecedor_id,
     cumprido: (oc) => oc.fornecedor_id !== '',
@@ -59,9 +88,7 @@ export const PASSOS_DA_NOVA_OC: readonly PassoDoTutorial[] = [
   {
     alvo: 'obra',
     titulo: 'Escolha a obra',
-    texto:
-      'A obra diz para quem a nota fiscal é faturada (aparece embaixo do campo) e em que pasta o PDF da OC ' +
-      'fica guardado.',
+    texto: AJUDA_DA_OBRA.texto,
     fazer: 'Escolha a obra para seguir.',
     retrato: (oc) => oc.obra_id,
     cumprido: (oc) => oc.obra_id !== '',
@@ -74,7 +101,7 @@ export const PASSOS_DA_NOVA_OC: readonly PassoDoTutorial[] = [
   {
     alvo: 'itens',
     titulo: 'Ponha os itens',
-    texto: `${VAZIO_DOS_ITENS} A IA lê o pedido do fornecedor em PDF, foto ou print, e os itens entram na tabela.`,
+    texto: AJUDA_DOS_ITENS.texto,
     fazer: 'Ponha o primeiro item para seguir.',
     retrato: (oc) => String(oc.itens.length),
     cumprido: (oc) => oc.itens.length > 0,
@@ -89,15 +116,13 @@ export const PASSOS_DA_NOVA_OC: readonly PassoDoTutorial[] = [
   {
     alvo: 'totais',
     titulo: 'Frete e descontos',
-    texto: 'Frete, outras despesas e desconto do material entram aqui, e o total geral se refaz sozinho.',
+    texto: AJUDA_DOS_TOTAIS.texto,
   },
   {
     alvo: 'emitir',
     titulo: 'Emitir a OC',
-    texto:
-      'Quando estiver tudo certo, é este botão que emite: a OC ganha o número, o PDF é gerado e vai para a ' +
-      'pasta da obra. Quem aperta é você — o tutorial não aperta, e sair dele não grava nada. Ainda não ' +
-      'terminou? "Salvar Rascunho" guarda a OC sem número.',
+    // O "?" do Emitir, mais o que é só do tutorial.
+    texto: `${AJUDA_DO_EMITIR.texto} Quem aperta é você — o tutorial não aperta, e sair dele não grava nada.`,
   },
 ];
 

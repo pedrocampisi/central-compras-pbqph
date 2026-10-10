@@ -20,6 +20,13 @@
   font-weight: 500;
   color: var(--texto-suave);
 }
+/* O rótulo com o "?" (CTO-D764): a linha quebra, e a resposta ocupa a largura toda. */
+.rotuloComAjuda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
 .required {
   color: var(--erro);
   margin-left: 2px;

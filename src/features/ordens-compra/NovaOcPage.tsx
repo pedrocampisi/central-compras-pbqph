@@ -58,8 +58,10 @@ import styles from './NovaOcPage.module.css';
 import tutorialStyles from './TutorialDaNovaOc.module.css';
 import { TutorialDaNovaOc } from './TutorialDaNovaOc';
 import {
+  AJUDA_DA_OBRA, AJUDA_DO_EMITIR, AJUDA_DO_FORNECEDOR, AJUDA_DOS_ITENS, AJUDA_DOS_TOTAIS,
   DICA_DA_ENTREGA, DICA_DA_IMPORTACAO, OFERTA_DO_TUTORIAL, VAZIO_DOS_ITENS,
 } from '../../domain/tutorialDaNovaOc';
+import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { deveOferecerTutorial, marcarTutorialOferecido } from '../../services/storage/tutorial';
 import {
   agruparPorEmpresa, apelidoDoFornecedor, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
@@ -107,6 +109,11 @@ function buildNewOc(
     atualizado_em: nowIso(),
     pdf_gerado_em: '',
   };
+}
+
+/** O `?` de um campo, com o texto que o tutorial também usa (CTO-D764). */
+function AjudaDoCampo({ ajuda }: { ajuda: { sobre: string; texto: string } }) {
+  return <Ajuda sobre={ajuda.sobre}>{ajuda.texto}</Ajuda>;
 }
 
 // ── Items table ───────────────────────────────────────────────────────────────
@@ -287,7 +294,7 @@ function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
   const t = computeOcTotals(oc);
   return (
     <div className={styles.totalsPanel}>
-      <div className={styles.totalsGrid}>
+      <div className={styles.totalsGrid} data-tutorial="totais">
         <span>Subtotal bruto:</span>
         <span>{formatBrl(t.sub_total)}</span>
         <span>( − ) Desconto itens:</span>
@@ -923,7 +930,8 @@ export function NovaOcPage() {
         {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas.
             O Fornecedor é a EMPRESA (D542); a filial não se escolhe — quem decide
             a loja é o vendedor, e a OC grava a principal (D549). */}
-        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={pistaDoFornecedor} marca="fornecedor">
+        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={pistaDoFornecedor} marca="fornecedor"
+          ajuda={<AjudaDoCampo ajuda={AJUDA_DO_FORNECEDOR} />}>
           <CampoPesquisavel
             id="oc-fornecedor"
             required
@@ -950,6 +958,7 @@ export function NovaOcPage() {
           required
           htmlFor="oc-obra"
           marca="obra"
+          ajuda={<AjudaDoCampo ajuda={AJUDA_DA_OBRA} />}
           hint={
             obraEscolhida
               ? rotuloFaturarPara(destinatarioDaObraEscolhida) || MENSAGEM_OBRA_SEM_DESTINATARIO
@@ -1062,13 +1071,14 @@ export function NovaOcPage() {
             >
               <Icon name="sparkles" size={13} /> Importar Pedido (IA)
             </Button>
+            <AjudaDoCampo ajuda={AJUDA_DOS_ITENS} />
           </div>
         </div>
       </FieldGroup>
 
       {/* ── Totais ───────────────────────────────────────────────────────── */}
-      <FieldGroup title="Totais">
-        <div style={{ gridColumn: '1 / -1' }} data-tutorial="totais">
+      <FieldGroup title="Totais" ajuda={<AjudaDoCampo ajuda={AJUDA_DOS_TOTAIS} />}>
+        <div style={{ gridColumn: '1 / -1' }}>
           <TotalsPanel
             oc={ocEditing}
             onChangeField={(field, value) => updateField(field, value)}
@@ -1101,6 +1111,7 @@ export function NovaOcPage() {
         >
           <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
         </Button>
+        <AjudaDoCampo ajuda={AJUDA_DO_EMITIR} />
       </div>
 
       {passoDoTutorial !== null && (

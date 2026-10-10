@@ -34,7 +34,10 @@ vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: vi.fn(asyn
 import { NovaOcPage } from '../../src/features/ordens-compra/NovaOcPage';
 import { normalizeFornecedor, normalizeObra } from '../../src/domain/normalize';
 import { O_QUE_E_ECR } from '../../src/domain/ecr';
-import { DICA_DA_ENTREGA, PASSOS_DA_NOVA_OC } from '../../src/domain/tutorialDaNovaOc';
+import {
+  AJUDA_DA_OBRA, AJUDA_DO_EMITIR, AJUDA_DO_FORNECEDOR, AJUDA_DOS_ITENS, AJUDA_DOS_TOTAIS, DICA_DA_ENTREGA,
+  PASSOS_DA_NOVA_OC,
+} from '../../src/domain/tutorialDaNovaOc';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
@@ -242,6 +245,23 @@ describe('D763 §1.6 — uma fonte só para o texto', () => {
     render(<NovaOcPage />);
     expect(screen.getByText(DICA_DA_ENTREGA)).toBeInTheDocument();
     expect(PASSOS_DA_NOVA_OC.find((p) => p.alvo === 'entrega')!.texto).toContain(DICA_DA_ENTREGA);
+  });
+
+  it('D764: fornecedor, obra, itens, totais e emitir ganharam o "?", e ele abre o texto do passo', () => {
+    render(<NovaOcPage />);
+    const pares = [
+      ['fornecedor', AJUDA_DO_FORNECEDOR],
+      ['obra', AJUDA_DA_OBRA],
+      ['itens', AJUDA_DOS_ITENS],
+      ['totais', AJUDA_DOS_TOTAIS],
+      ['emitir', AJUDA_DO_EMITIR],
+    ] as const;
+    for (const [alvo, ajuda] of pares) {
+      fireEvent.click(screen.getByRole('button', { name: `Ajuda: ${ajuda.sobre}` }));
+      expect(screen.getByRole('note')).toHaveTextContent(ajuda.texto);
+      expect(PASSOS_DA_NOVA_OC.find((p) => p.alvo === alvo)!.texto).toContain(ajuda.texto);
+      fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    }
   });
 
   it('o passo dos itens explica a ECR com a frase do "?" da ECR', () => {
