@@ -44,7 +44,8 @@ export type IconName =
   | 'caixa'
   | 'capacete'
   | 'qr'
-  | 'livro';
+  | 'livro'
+  | 'guia';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -227,6 +228,13 @@ const PATHS: Record<IconName, React.ReactNode> = {
     <>
       <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
       <path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2" />
+    </>
+  ),
+  // O tutorial da tela, passo a passo (CTO-D763).
+  guia: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M10 8.5v7l5.5-3.5z" />
     </>
   ),
 };

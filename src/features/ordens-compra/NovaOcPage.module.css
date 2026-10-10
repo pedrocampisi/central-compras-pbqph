@@ -112,6 +112,7 @@
 .itemsActions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center; /* o "?" no meio da fila (CTO-D764) */
   gap: 8px;
   margin-top: 10px;
 }
@@ -230,6 +231,7 @@
 .footerActions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center; /* o "?" no meio da fila (CTO-D764) */
   justify-content: flex-end;
   gap: 8px;
   padding-top: 8px;

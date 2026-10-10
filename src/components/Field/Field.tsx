@@ -7,6 +7,8 @@ interface FieldBaseProps {
   wide?: boolean;
   span2?: boolean;
   required?: boolean;
+  /** Onde o balão do tutorial acende (`data-tutorial`, CTO-D763). */
+  marca?: string;
 }
 
 // ── Input Field ────────────────────────────────────────────────────────────────
@@ -32,30 +34,40 @@ export type FieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps
  * `htmlFor` liga o rótulo ao controle, para o leitor de tela e para o clique.
  */
 export function FieldShell({
-  label, hint, wide, span2, required, htmlFor, children,
-}: FieldBaseProps & { htmlFor: string; children: ReactNode }) {
+  label, hint, wide, span2, required, marca, ajuda, htmlFor, children,
+}: FieldBaseProps & { htmlFor: string; children: ReactNode; /** Um "?" ao lado do rótulo (CTO-D764). */ ajuda?: ReactNode }) {
   const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
     .join(' ');
+  const rotulo = (
+    <label htmlFor={htmlFor}>
+      {label}
+      {required && <span className={styles.required}>*</span>}
+    </label>
+  );
   return (
-    <div className={cls}>
-      <label htmlFor={htmlFor}>
-        {label}
-        {required && <span className={styles.required}>*</span>}
-      </label>
+    <div className={cls} data-tutorial={marca}>
+      {ajuda ? (
+        <div className={styles.rotuloComAjuda}>
+          {rotulo}
+          {ajuda}
+        </div>
+      ) : (
+        rotulo
+      )}
       {children}
       {hint && <span className={styles.hint}>{hint}</span>}
     </div>
   );
 }
 
-export function Field({ label, hint, wide, span2, required, as: As = 'input', ...rest }: FieldProps) {
+export function Field({ label, hint, wide, span2, required, marca, as: As = 'input', ...rest }: FieldProps) {
   const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={cls}>
+    <div className={cls} data-tutorial={marca}>
       <label>
         {label}
         {required && <span className={styles.required}>*</span>}
