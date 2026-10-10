@@ -144,6 +144,16 @@ describe('D557 — o contrato com o servidor', () => {
     vi.stubGlobal('fetch', respostaFalsa(200, { itens: [{ descricao: 'x' }], ignoradas: [] }));
     await expect(extractItemsFromImages(['a'])).resolves.toMatchObject({ ignoradas: [] });
   });
+
+  it('D757: o 502 é nenhum dos dois fornecedores ter lido, e a frase não cita fornecedor', async () => {
+    vi.stubGlobal('fetch', respostaFalsa(502, {}));
+    const erroDaImagem = await extractItemsFromImages(['a']).catch((x: unknown) => x);
+    expect((erroDaImagem as Error).message).toBe('Os serviços de IA estão fora do ar. Tente novamente em instantes.');
+    vi.stubGlobal('fetch', respostaFalsa(502, {}));
+    const erroDoTexto = await organizarTexto('x').catch((x: unknown) => x);
+    expect((erroDoTexto as Error).message).toBe((erroDaImagem as Error).message);
+    expect((erroDaImagem as Error).message).not.toMatch(/OpenRouter|Anthropic/);
+  });
 });
 
 describe('D570 — o 422 da resposta cortada, com a frase REAL do servidor', () => {

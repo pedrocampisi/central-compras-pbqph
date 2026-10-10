@@ -2,7 +2,7 @@
  * Extração de itens de pedido via IA — agora pelo SERVIDOR.
  *
  * A chamada vai para a Edge Function `extrair-itens` do Supabase, que guarda a
- * chave da OpenRouter nos segredos do projeto e busca os ECRs no banco sozinha.
+ * chave dos fornecedores de IA nos segredos do projeto e busca os ECRs no banco sozinha.
  * O navegador não conhece chave nenhuma — antes, qualquer pessoa com o
  * inspetor aberto lia a chave no localStorage.
  *
@@ -105,6 +105,7 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
 
 // ── Erros da função do servidor, em português ─────────────────────────────────
 
+/** O 502 quer dizer que nenhum dos dois fornecedores leu (D757): a frase não cita nenhum. */
 function mensagemErro(status: number): string {
   switch (status) {
     case 401:
@@ -114,7 +115,7 @@ function mensagemErro(status: number): string {
     case 422:
       return 'A IA não conseguiu ler itens neste arquivo. Tente uma imagem mais nítida.';
     case 502:
-      return 'O serviço de IA (OpenRouter) está fora do ar. Tente novamente em instantes.';
+      return 'Os serviços de IA estão fora do ar. Tente novamente em instantes.';
     case 503:
       return 'A importação por IA ainda não foi configurada no servidor. Avise o administrador.';
     default:
