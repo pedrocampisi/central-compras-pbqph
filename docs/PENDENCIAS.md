@@ -110,6 +110,19 @@ Meta: 23/10.
 
 ---
 
+### 37. O tutorial da Nova OC e a frase do 502 (D763, D757): no ramo, esperando o CTO
+
+*Aberta em 10/10/2026, na decisão 99.* O ramo `d763-tutorial` (`a51ccba`) tem o tutorial "Fazer uma OC" e a frase
+nova do 502. **NÃO publicado.**
+
+**Falta, nesta ordem:**
+1. a conferência do CTO, com as fotos, os textos e o ponto dos "?" que não existem na tela;
+2. o percurso no banco de ensaio, por quem tiver sessão, com a contagem de OCs antes e depois;
+3. juntar e publicar, com o desfazer anotado;
+4. o teste do Pedro com uma pessoa de verdade.
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*

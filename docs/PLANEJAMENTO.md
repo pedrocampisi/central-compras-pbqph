@@ -3461,3 +3461,40 @@ conferiu o CI, o código e as fotos, e aceitou as três escolhas da casa.
 1. o CTO confere por fora;
 2. o Pedro senta e grava a Rev. 01 com a mão dele;
 3. na publicação seguinte, o rascunho sai do código.
+
+## Decisão 99 — o tutorial da Nova OC (piloto) e a frase do 502, no ramo · 10/10/2026
+
+**POR QUÊ:**
+- **CTO-D763**, pedido direto do Pedro ("pode"): um botão "Tutorial" na Nova OC. A pessoa faz de verdade, o tutorial
+  nunca emite, a oferta aparece uma vez só e o texto vem de uma fonte só.
+- **CTO-D757:** com dois fornecedores de IA, o 502 não cita mais a OpenRouter.
+
+**O QUE FOI FEITO** (ramo `d763-tutorial`, `a51ccba`, **NÃO publicado**):
+- **a D757** (`f606f2a`): "Os serviços de IA estão fora do ar. Tente novamente em instantes.", com o teste;
+- **o tutorial** (`986025f`, `a51ccba`):
+  - 7 passos: fornecedor, obra, entrega, itens, conferir, totais e emitir;
+  - nos passos de agir, ele segue quando a OC muda; nos de ler, no "Próximo";
+  - o último acende o "Emitir" e não aperta;
+  - componente da casa, sem biblioteca: as permitidas escurecem fora do campo, e a lista do fornecedor ficaria sem
+    clique;
+  - peso: +1,9 kB de código e +0,3 kB de estilo, comprimidos;
+- **a oferta:** uma vez, por pessoa, guardada no navegador; aparece na Nova OC, não no login;
+- **uma fonte só:** a dica da entrega, a tabela vazia e a dica da importação moram em `domain/tutorialDaNovaOc.ts`, e
+  a tela as lê dali. A Nova OC só tem o "?" da ECR, então os textos de fornecedor, obra, itens, totais e emitir são
+  novos. Se viram "?" dos campos, decide o CTO;
+- **a bateria:**
+  - 1034 testes, 21 novos;
+  - 8 sabotagens vermelhas. A do "Terminar emite" só ficou vermelha depois de o teste ganhar uma OC emitível;
+- **as fotos:** 40, a 1366 e a 375, claras e escuras (`docs/Capturas/2026-10-10_D763/`), no App sobre um banco falso:
+  0 escritas, 1 OC antes e 1 depois. Elas acharam dois lugares errados do balão, consertados em `a51ccba`;
+- **o tamanho:** 474 linhas na D763 e 3 na D757.
+
+**O que não foi feito:** o percurso no banco de ensaio. Ele precisa de sessão aberta, e eu não entro com senha. Ficou
+proposto na carta.
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere as fotos e os textos;
+2. junto e publico, com o desfazer anotado;
+3. o Pedro testa com uma pessoa de verdade.
