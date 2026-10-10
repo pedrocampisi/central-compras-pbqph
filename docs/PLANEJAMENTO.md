@@ -3498,3 +3498,30 @@ proposto na carta.
 1. o CTO confere as fotos e os textos;
 2. junto e publico, com o desfazer anotado;
 3. o Pedro testa com uma pessoa de verdade.
+
+## Decisão 100 — os dois retoques do tutorial, no ramo · 10/10/2026
+
+**POR QUÊ (CTO-D764):** o CTO conferiu as 40 fotos e pediu dois retoques antes de publicar:
+- o contorno laranja abraça o conteúdo, e não a caixa;
+- os textos novos viram o "?" dos campos.
+
+Ele dispensou o percurso no banco de ensaio e aceitou a oferta guardada por navegador.
+
+**O QUE FOI FEITO** (ramo `d763-tutorial`, `35d79ea`, **NÃO publicado**):
+- **o contorno:** o campo aceso encosta no topo da linha da grade e fica do tamanho do campo e da dica. Nos totais, o
+  alvo é só a coluna, e o balão vai para o vão da esquerda;
+- **os "?" novos:** Fornecedor, Obra, Itens (junto dos dois botões, porque o título já tem o da ECR), Totais e
+  Emitir. O texto mora uma vez só, em `domain/tutorialDaNovaOc.ts`, e o "?" e o passo leem dali. O passo 7 é o "?" do
+  Emitir mais a frase de que o tutorial não aperta;
+- **a bateria:**
+  - 1035 testes;
+  - 3 sabotagens novas, todas vermelhas;
+- **as fotos:** 48, todas refeitas: 0 escritas, 1 OC antes e 1 depois;
+- **o tamanho:** 548 linhas no ramo inteiro, mais 3 da D757.
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere;
+2. junto e publico, com o desfazer anotado, e a D757 sai junto;
+3. o Pedro testa com uma pessoa de verdade.
