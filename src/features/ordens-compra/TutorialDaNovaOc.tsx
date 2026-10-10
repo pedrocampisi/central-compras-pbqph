@@ -30,22 +30,31 @@ interface Props {
   passos?: readonly PassoDoTutorial[];
 }
 
-type Lugar = { faixa: true } | { faixa: false; top: number; left: number };
+type Lugar = { faixa: 'embaixo' | 'em-cima' } | { faixa: false; top: number; left: number };
 
 function alvoNaTela(passo: PassoDoTutorial): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-tutorial="${passo.alvo}"]`);
 }
 
-/** Acima do alvo (a lista do campo abre para baixo); sem espaço, embaixo. */
+/**
+ * Nunca embaixo do alvo, se der: a lista do campo abre para baixo, e o balão
+ * a cobriria. Acima; sem espaço, ao lado (direita, depois esquerda); só então
+ * embaixo. Na tela pequena, a faixa fica no pé — e sobe quando o alvo está lá.
+ */
 function lugarDoBalao(alvo: HTMLElement | null, balao: HTMLElement | null): Lugar {
-  if (window.innerWidth < LARGURA_DA_FAIXA || !alvo || !balao) return { faixa: true };
+  if (!alvo || !balao) return { faixa: 'embaixo' };
   const r = alvo.getBoundingClientRect();
   const h = balao.offsetHeight;
   const w = balao.offsetWidth;
-  const acima = r.top - DISTANCIA - h;
-  const top = acima >= MARGEM ? acima : Math.min(r.bottom + DISTANCIA, window.innerHeight - h - MARGEM);
-  const left = Math.max(MARGEM, Math.min(r.left, window.innerWidth - w - MARGEM));
-  return { faixa: false, top, left };
+  const altura = window.innerHeight;
+  const largura = window.innerWidth;
+  if (largura < LARGURA_DA_FAIXA) return { faixa: r.bottom > altura - h - 2 * DISTANCIA ? 'em-cima' : 'embaixo' };
+  const naAltura = (top: number) => Math.max(MARGEM, Math.min(top, altura - h - MARGEM));
+  const naLargura = (left: number) => Math.max(MARGEM, Math.min(left, largura - w - MARGEM));
+  if (r.top - DISTANCIA - h >= MARGEM) return { faixa: false, top: r.top - DISTANCIA - h, left: naLargura(r.left) };
+  if (r.right + DISTANCIA + w <= largura - MARGEM) return { faixa: false, top: naAltura(r.top), left: r.right + DISTANCIA };
+  if (r.left - DISTANCIA - w >= MARGEM) return { faixa: false, top: naAltura(r.top), left: r.left - DISTANCIA - w };
+  return { faixa: false, top: naAltura(r.bottom + DISTANCIA), left: naLargura(r.left) };
 }
 
 export function TutorialDaNovaOc({ oc, indice, onIr, onSair, passos = PASSOS_DA_NOVA_OC }: Props) {
@@ -53,7 +62,7 @@ export function TutorialDaNovaOc({ oc, indice, onIr, onSair, passos = PASSOS_DA_
   const ultimo = indice === passos.length - 1;
   const idDoTitulo = useId();
   const balaoRef = useRef<HTMLDivElement>(null);
-  const [lugar, setLugar] = useState<Lugar>({ faixa: true });
+  const [lugar, setLugar] = useState<Lugar>({ faixa: 'embaixo' });
   // O retrato da OC quando o passo começou: o passo segue quando ele muda.
   const naEntrada = useRef('');
 
@@ -102,7 +111,9 @@ export function TutorialDaNovaOc({ oc, indice, onIr, onSair, passos = PASSOS_DA_
       onKeyDown={(e) => {
         if (e.key === 'Escape') onSair();
       }}
-      className={[styles.balao, lugar.faixa ? styles.faixa : ''].filter(Boolean).join(' ')}
+      className={[styles.balao, lugar.faixa ? styles.faixa : '', lugar.faixa === 'em-cima' ? styles.faixaEmCima : '']
+        .filter(Boolean)
+        .join(' ')}
       style={lugar.faixa ? undefined : { top: lugar.top, left: lugar.left }}
       data-tutorial-balao={passo.alvo}
     >

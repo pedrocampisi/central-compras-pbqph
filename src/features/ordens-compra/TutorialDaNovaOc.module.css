@@ -32,6 +32,12 @@
   overflow-y: auto;
 }
 
+/* O alvo está no pé da tela (o "Emitir", no celular): a faixa sobe. */
+.faixaEmCima {
+  top: 12px;
+  bottom: auto;
+}
+
 .contagem {
   display: block;
   font-size: 11px;
