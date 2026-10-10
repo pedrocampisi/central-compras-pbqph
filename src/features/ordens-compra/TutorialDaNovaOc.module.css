@@ -1,0 +1,107 @@
+/* ── O tutorial da Nova OC (CTO-D763) ─────────────────────────────────────────
+   Nada cobre a página: o alvo ganha um contorno, e o balão fica ao lado.
+   Sem transição — o balão aparece no lugar (lei da casa: movimento só em
+   espera e no login). Abaixo de 700px, o balão vira faixa no pé da tela. */
+
+:global([data-tutorial-aceso]) {
+  outline: 3px solid var(--acento);
+  outline-offset: 4px;
+  border-radius: var(--raio-pequeno);
+  scroll-margin-top: 72px;
+}
+
+.balao {
+  position: fixed;
+  z-index: 80; /* acima da lista do campo (30); abaixo da gaveta (90), do aviso (200) e da pergunta (300) */
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px 12px;
+  background: var(--painel);
+  color: var(--texto);
+  border: 1px solid var(--borda-forte);
+  border-left: 4px solid var(--acento);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-elevada);
+}
+
+.faixa {
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: auto;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.contagem {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--terra);
+}
+
+.titulo {
+  margin: 2px 0 6px;
+  font-family: var(--fonte-display);
+  font-size: 17px;
+  color: var(--marca);
+}
+
+.texto {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto);
+}
+
+.fazer {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.direita {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── A oferta, uma vez só, no alto da tela ───────────────────────────────── */
+
+.oferta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--marca-fraca);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.ofertaTexto {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--texto);
+}
+
+.ofertaTexto strong {
+  display: block;
+  color: var(--marca);
+}
+
+.ofertaAcoes {
+  display: flex;
+  gap: 8px;
+}

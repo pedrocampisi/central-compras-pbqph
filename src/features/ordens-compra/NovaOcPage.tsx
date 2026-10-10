@@ -55,6 +55,12 @@ import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import { semLinhasEmBranco, travaDaQuantidade } from '../../domain/itensDaEmissao';
 import styles from './NovaOcPage.module.css';
+import tutorialStyles from './TutorialDaNovaOc.module.css';
+import { TutorialDaNovaOc } from './TutorialDaNovaOc';
+import {
+  DICA_DA_ENTREGA, DICA_DA_IMPORTACAO, OFERTA_DO_TUTORIAL, VAZIO_DOS_ITENS,
+} from '../../domain/tutorialDaNovaOc';
+import { deveOferecerTutorial, marcarTutorialOferecido } from '../../services/storage/tutorial';
 import {
   agruparPorEmpresa, apelidoDoFornecedor, chaveDaEmpresa, enderecoResumido, escolherEmpresa, fornecedoresParaOc,
   motivoForaDaOc, opcoesDeEmpresa, opcoesDeObra, travaDaFilial,
@@ -123,7 +129,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
     return (
       <EmptyState
         title="Nenhum item adicionado"
-        description={'Clique em "+ Adicionar Item" ou importe um pedido via IA.'}
+        description={VAZIO_DOS_ITENS}
         action={{ label: '+ Adicionar Item', onClick: onAdd }}
       />
     );
@@ -390,6 +396,19 @@ export function NovaOcPage() {
   /** O "Qualificar agora" aberto pela trava da emissão (CTO-D605): a frase e as ECRs já marcadas. */
   const [qualificando, setQualificando] = useState<{ porque: string; ecrs: number[] } | null>(null);
   const initializedRef = useRef(false);
+  // O tutorial (CTO-D763): o passo aberto, ou null. A oferta aparece uma vez por pessoa.
+  const [passoDoTutorial, setPassoDoTutorial] = useState<number | null>(null);
+  const [oferecerTutorial, setOferecerTutorial] = useState(() => deveOferecerTutorial(perfil?.user_id));
+  const sairDoTutorial = useCallback(() => setPassoDoTutorial(null), []);
+  const abrirTutorial = useCallback(() => {
+    marcarTutorialOferecido(perfil?.user_id);
+    setOferecerTutorial(false);
+    setPassoDoTutorial(0);
+  }, [perfil?.user_id]);
+  const recusarTutorial = useCallback(() => {
+    marcarTutorialOferecido(perfil?.user_id);
+    setOferecerTutorial(false);
+  }, [perfil?.user_id]);
 
   // ── Inicialização ───────────────────────────────────────────────────────────
   // Runs once on mount. If ocEditing already exists (navigated from Histórico),
@@ -852,6 +871,9 @@ export function NovaOcPage() {
           </p>
         </div>
         <div className={styles.acoesDoTopo}>
+          <Button variant="ghost" size="sm" onClick={abrirTutorial} title="Mostra, campo por campo, como fazer uma OC">
+            <Icon name="guia" size={13} /> Tutorial
+          </Button>
           <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
           <Button variant="ghost" size="sm" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
             <Icon name="eye" size={13} /> Visualizar
@@ -881,12 +903,27 @@ export function NovaOcPage() {
         </div>
       </div>
 
+      {oferecerTutorial && passoDoTutorial === null && (
+        <div className={tutorialStyles.oferta} data-oferta-do-tutorial="">
+          <span className={tutorialStyles.ofertaTexto}>
+            <strong>{OFERTA_DO_TUTORIAL.titulo}</strong>
+            {OFERTA_DO_TUTORIAL.texto}
+          </span>
+          <span className={tutorialStyles.ofertaAcoes}>
+            <Button variant="ghost" size="sm" onClick={recusarTutorial}>Agora não</Button>
+            <Button variant="navy" size="sm" onClick={abrirTutorial}>
+              <Icon name="guia" size={13} /> Ver o tutorial
+            </Button>
+          </span>
+        </div>
+      )}
+
       {/* ── Identificação ────────────────────────────────────────────────── */}
       <FieldGroup title="Identificação da OC">
         {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas.
             O Fornecedor é a EMPRESA (D542); a filial não se escolhe — quem decide
             a loja é o vendedor, e a OC grava a principal (D549). */}
-        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={pistaDoFornecedor}>
+        <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={pistaDoFornecedor} marca="fornecedor">
           <CampoPesquisavel
             id="oc-fornecedor"
             required
@@ -912,6 +949,7 @@ export function NovaOcPage() {
           label="Obra"
           required
           htmlFor="oc-obra"
+          marca="obra"
           hint={
             obraEscolhida
               ? rotuloFaturarPara(destinatarioDaObraEscolhida) || MENSAGEM_OBRA_SEM_DESTINATARIO
@@ -941,7 +979,8 @@ export function NovaOcPage() {
           label="Entrega prevista"
           aria-label="Entrega prevista"
           type="date"
-          hint="O dia combinado com o fornecedor. É o que o mestre vê na obra."
+          hint={DICA_DA_ENTREGA}
+          marca="entrega"
           value={ocEditing.entrega_prevista ?? ''}
           onChange={(e) => updateField('entrega_prevista', e.target.value)}
         />
@@ -972,7 +1011,7 @@ export function NovaOcPage() {
       {/* A sigla ECR tem o "?" na primeira vez que aparece (CTO-D728 §1): no selo
           do fornecedor, se ele mostra ECRs; senão, aqui, antes da coluna ECR. */}
       <FieldGroup title="Itens" ajuda={ecrsNoSelo ? undefined : <AjudaDaEcr />}>
-        <div style={{ gridColumn: '1 / -1' }}>
+        <div style={{ gridColumn: '1 / -1' }} data-tutorial="tabela">
           <ItemsTable
             items={ocEditing.itens}
             ecrs={data.ecrs}
@@ -1012,14 +1051,14 @@ export function NovaOcPage() {
               />
             </div>
           )}
-          <div className={styles.itemsActions}>
+          <div className={styles.itemsActions} data-tutorial="itens">
             <Button variant="outline" size="sm" onClick={addItem}>+ Adicionar Item</Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => { fecharImportacao(); setImportAberto(true); }}
               disabled={importAberto}
-              title="Importar os itens de um pedido (PDF, foto ou print) pela IA"
+              title={DICA_DA_IMPORTACAO}
             >
               <Icon name="sparkles" size={13} /> Importar Pedido (IA)
             </Button>
@@ -1029,7 +1068,7 @@ export function NovaOcPage() {
 
       {/* ── Totais ───────────────────────────────────────────────────────── */}
       <FieldGroup title="Totais">
-        <div style={{ gridColumn: '1 / -1' }}>
+        <div style={{ gridColumn: '1 / -1' }} data-tutorial="totais">
           <TotalsPanel
             oc={ocEditing}
             onChangeField={(field, value) => updateField(field, value)}
@@ -1054,6 +1093,7 @@ export function NovaOcPage() {
         </Button>
         <Button
           variant="primary"
+          data-tutorial="emitir"
           onClick={() => void handleEmitir()}
           loading={savingPdf}
           disabled={!emiteOk}
@@ -1062,6 +1102,10 @@ export function NovaOcPage() {
           <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
         </Button>
       </div>
+
+      {passoDoTutorial !== null && (
+        <TutorialDaNovaOc oc={ocEditing} indice={passoDoTutorial} onIr={setPassoDoTutorial} onSair={sairDoTutorial} />
+      )}
 
       {qualificando && filialDaOc && categoriaMaterial && (
         <QualificarDialogo
