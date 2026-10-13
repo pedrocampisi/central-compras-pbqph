@@ -133,7 +133,8 @@ Meta: 23/10.
   `20261013205131-05e6848`, pelo `main` `05e6848` (decisão 105). O desfazer é `2b8e223f`.
 
 **Falta:**
-1. a conferência do CTO por fora da D795, e a medida dele da primeira entrega com itens no banco;
+1. a conferência do CTO por fora da D795, e a medida dele da primeira entrega com itens no banco (a D797 ele já
+   conferiu por fora);
 2. o Pedro, e cada mestre, trocar o ícone no celular: remover o antigo e pôr de novo pelo Chrome.
 
 ---
