@@ -3596,3 +3596,31 @@ O CTO juntou a dívida da D768: a Central precisa do número da nota em dígitos
 1. o CTO confere as fotos;
 2. junto no `main`, publico com o desfazer anotado e meço por fora;
 3. a lista do "Só uma parte" fica para um ramo próprio, quando o Banco tiver a tabela e o CTO mandar o formato.
+
+## Decisão 103 — no ar: o ícone do castor, as perguntas do mestre, o número em dígitos e a lista com busca · 13/10/2026
+
+**POR QUÊ (CTO-D795):** o CTO conferiu seis das 17 fotos e aprovou, com um retoque que ele mesmo chamou de falha da
+carta dele: o mestre procura pela palavra que lembra ("beta" para "Cerâmica Beta"), e não só pelo começo do nome.
+
+**O QUE MUDOU:**
+- **o retoque** (`0b97589`):
+  - a busca acha pelo começo de qualquer palavra, sem acento e sem maiúscula;
+  - pelo meio da palavra não acha;
+  - quatro sabotagens, todas vermelhas; sem foto nova, porque a tela não mudou;
+- **o desfazer**, anotado antes: `656d33e5`, com 100% do tráfego;
+- **a junção:** `d792-mestre` no `main` em `2bb9b4b`, sem conflito;
+- **a bateria:** 1054 testes, tipos e lint limpos, o `conferir` 7 de 7;
+- **publicado pelo PowerShell às 16h52 de 13/10:** `2b8e223f-c3a3-4e10-b56f-36794db0e556`, versão
+  `20261013195159-2bb9b4b`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- o manifesto aponta os três ícones, e os quatro baixados do site têm a impressão do pacote;
+- a página traz o `apple-touch-icon`;
+- o código servido tem as perguntas novas, as dicas e a busca. "Chegou tudo?" ficou só na tela do escritório.
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere por fora e avisa o Pedro para trocar o ícone no celular;
+2. a lista do "Só uma parte" espera a tabela do Banco e o formato do envio (D794).

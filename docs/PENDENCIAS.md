@@ -124,23 +124,18 @@ Meta: 23/10.
 
 ---
 
-### 38. O ícone, as perguntas e a lista do mestre (D792, D793): no ramo, esperando o CTO; a quantidade por item, esperando o Banco
+### 38. O ícone, as perguntas e a lista do mestre (D792 a D795): no ar; a quantidade por item, esperando o Banco
 
-*Aberta em 13/10/2026, na decisão 102.* O ramo `d792-mestre` (`f2fdde2`) traz:
-- o ícone do castor;
-- as duas perguntas novas;
-- o número da nota em dígitos;
-- a lista fechada com busca.
-
-Ele **não** está publicado.
+*Aberta em 13/10/2026, na decisão 102.* O ícone do castor, as duas perguntas novas, o número da nota em dígitos e a
+lista fechada com busca por palavra estão **no ar** desde 16h52 de 13/10:
+- em `2b8e223f`, versão `20261013195159-2bb9b4b`, pelo `main` `2bb9b4b` (decisão 103);
+- o desfazer é `656d33e5`.
 
 **Falta, nesta ordem:**
-1. a conferência do CTO nas fotos;
-2. a junção no `main`, a publicação com o desfazer anotado e a medida por fora (o manifesto e as impressões dos
-   ícones);
-3. o Pedro trocar o ícone no celular dele, removendo e pondo de novo;
-4. a lista do "Só uma parte" com a quantidade por item, num ramo próprio. Ela vem **depois** da tabela do Banco e do
-   aviso do CTO com o formato do envio (D794).
+1. a conferência do CTO por fora;
+2. o Pedro, e cada mestre, trocar o ícone no celular: remover o antigo e pôr de novo pelo Chrome;
+3. a lista do "Só uma parte" com a quantidade por item, num ramo próprio. Ela vem **depois** da tabela do Banco e do
+   aviso do CTO com o formato do envio (D794, que fica na `Devolucoes` até lá).
 
 ---
 
