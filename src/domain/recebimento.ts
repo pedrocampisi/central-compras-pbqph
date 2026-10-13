@@ -9,11 +9,16 @@
  *   ─────────────────────────────       ─────────────────────────
  *   Chegou no dia combinado?            prazo conforme
  *   Chegou sem estrago?                 integridade conforme
- *   Chegou o que foi pedido?            confere com a OC e a ECR
- *   Chegou tudo? / Só uma parte         entrega parcial
+ *   Veio o material certo?              confere com a OC e a ECR
+ *   Veio a quantidade toda? / Só uma parte   entrega parcial
  *   O que aconteceu?                    observação, ou tratativa com 2+ "Não"
  *
  * Nenhuma das palavras da direita aparece para ele. Lógica pura, sem tela.
+ *
+ * As duas do meio diziam "Chegou o que foi pedido?" e "Chegou tudo?", e o
+ * Pedro leu as duas como a mesma pergunta (CTO-D792 §3). Uma é o material
+ * certo (o tipo, a marca, a medida); a outra, a quantidade toda. O banco
+ * guarda o mesmo de antes.
  */
 
 import { pedeTratativa, type Avaliacao } from './qualificacao';
@@ -28,13 +33,22 @@ export interface RespostasDoMestre {
 
 export const SEM_RESPOSTA: RespostasDoMestre = { noDia: null, semEstrago: null, oQueFoiPedido: null, tudo: null };
 
-/** As perguntas, na ordem da tela, com os dois botões de cada uma. */
+/** As perguntas, na ordem da tela, com os dois botões de cada uma e, nas duas que se confundiam, a dica. */
 export const PERGUNTAS_DO_MESTRE = [
-  { chave: 'noDia', texto: 'Chegou no dia combinado?', sim: 'Sim', nao: 'Não' },
-  { chave: 'semEstrago', texto: 'Chegou sem estrago?', sim: 'Sim', nao: 'Não' },
-  { chave: 'oQueFoiPedido', texto: 'Chegou o que foi pedido?', sim: 'Sim', nao: 'Não' },
-  { chave: 'tudo', texto: 'Chegou tudo?', sim: 'Sim', nao: 'Só uma parte' },
-] as const satisfies readonly { chave: keyof RespostasDoMestre; texto: string; sim: string; nao: string }[];
+  { chave: 'noDia', texto: 'Chegou no dia combinado?', sim: 'Sim', nao: 'Não', dica: '' },
+  { chave: 'semEstrago', texto: 'Chegou sem estrago?', sim: 'Sim', nao: 'Não', dica: '' },
+  { chave: 'oQueFoiPedido', texto: 'Veio o material certo?', sim: 'Sim', nao: 'Não', dica: 'O tipo, a marca e a medida do pedido.' },
+  { chave: 'tudo', texto: 'Veio a quantidade toda?', sim: 'Sim', nao: 'Só uma parte', dica: 'Se faltou alguma coisa, é só uma parte.' },
+] as const satisfies readonly { chave: keyof RespostasDoMestre; texto: string; sim: string; nao: string; dica: string }[];
+
+/**
+ * O número da nota só com os dígitos (CTO-D792 §4, a D768): a Central casa a
+ * nota com a OC por ele. A leitura da foto pode trazer "NF 1.234", e o campo
+ * aceita o que o teclado der. Os zeros da frente ficam: quem compara já os tira.
+ */
+export function numeroDaNotaEmDigitos(numero: string): string {
+  return numero.replace(/\D/g, '');
+}
 
 const paraAvaliar = (r: RespostasDoMestre) => ({
   prazoConforme: r.noDia,
@@ -61,7 +75,7 @@ export function oQueAconteceuObrigatorio(r: RespostasDoMestre): boolean {
 export function oQueFalta(r: RespostasDoMestre, numeroDaNota: string, oQueAconteceu: string): string {
   const semResposta = PERGUNTAS_DO_MESTRE.find((p) => r[p.chave] === null);
   if (semResposta) return `Falta responder: ${semResposta.texto}`;
-  if (!numeroDaNota.trim()) return 'Tire a foto da nota, ou escreva o número dela.';
+  if (!numeroDaNotaEmDigitos(numeroDaNota)) return 'Tire a foto da nota, ou escreva o número dela.';
   if (oQueAconteceuObrigatorio(r) && !oQueAconteceu.trim()) {
     return 'Conte o que aconteceu: tem mais de um "Não".';
   }
@@ -82,13 +96,28 @@ export function avaliacaoDoMestre(
   const texto = oQueAconteceu.trim();
   const tratativa = oQueAconteceuObrigatorio(r);
   return {
-    notaFiscal: numeroDaNota.trim(),
+    notaFiscal: numeroDaNotaEmDigitos(numeroDaNota),
     recebidoEm,
     ...paraAvaliar(r),
     observacao: tratativa ? '' : texto,
     tratativa: tratativa ? texto : '',
   };
 }
+
+/** Sem acento e sem maiúscula: "Cerâmica" e "ceramica" são a mesma busca. */
+const semAcento = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+/**
+ * A busca da lista do mestre (CTO-D793 §2.3): a empresa cujo nome COMEÇA com o
+ * que ele digitou, sem acento e sem maiúscula. Busca vazia acha todas.
+ */
+export function empresaComecaCom(fornecedor: string, busca: string): boolean {
+  const b = semAcento(busca);
+  return !b || semAcento(fornecedor).startsWith(b);
+}
+
+/** Com poucos pedidos, a lista cabe na tela e a busca só atrapalha: ela aparece a partir daqui. */
+export const BUSCA_A_PARTIR_DE = 4;
 
 /** Um pedido que o mestre espera, como o cartão mostra. */
 export interface CartaoAChegar {

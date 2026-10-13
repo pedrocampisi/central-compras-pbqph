@@ -5,8 +5,12 @@
  * suja e sinal fraco: uma coisa por vez, botões grandes, as palavras dele. Sem
  * menu: ele entra e cai aqui, na obra dele.
  *
- *   lista ──toque no cartão──▶ receber ──Pronto──▶ pronto ──▶ lista
+ *   lista ──toque no cartão──▶ abre ──Receber──▶ receber ──Pronto──▶ pronto ──▶ lista
  *     └──"Chegou material sem pedido"──▶ sem pedido ──Pronto──▶ pronto
+ *
+ * Na lista, o cartão fica fechado numa linha, a empresa e o valor, e abre no
+ * toque; com muitos pedidos, a busca acha a empresa pelo começo do nome
+ * (CTO-D793, palavra do Pedro: "Comarco R$ 290, aí ele clica para ver o que é").
  *
  * A tela não fala com o banco: quem a monta passa os pedidos e as funções de
  * gravar. O que ele preenche fica guardado no celular a cada toque, e o
@@ -17,8 +21,9 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
 import {
-  PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, oQueAconteceuObrigatorio, oQueFalta,
-  perguntaOQueAconteceu, quantidadeFalada, type CartaoAChegar, type ObraDoMestre, type RespostasDoMestre,
+  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, empresaComecaCom,
+  numeroDaNotaEmDigitos, oQueAconteceuObrigatorio, oQueFalta, perguntaOQueAconteceu, quantidadeFalada,
+  type CartaoAChegar, type ObraDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
@@ -75,6 +80,9 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   const fila = useFilaDoMestre(guarda, props.aoReceber, props.aoRegistrarSemPedido);
   const [tela, setTela] = useState<Tela>({ tipo: 'lista' });
   const [confirmarSaida, setConfirmarSaida] = useState(false);
+  // Um cartão aberto por vez. A busca fica ao voltar do receber; o cartão volta fechado.
+  const [aberto, setAberto] = useState('');
+  const [busca, setBusca] = useState('');
   // Só se diz "guardado no celular" quando o celular guarda de verdade.
   const [duravel, setDuravel] = useState(false);
   useEffect(() => {
@@ -106,6 +114,8 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
       guarda.ler<File>(CHAVES.fotoDoReceber(c.ocId)),
     ]);
     setTela({ tipo: 'receber', cartao: c, rascunho, foto, recusado: doCartao.get(c.ocId)?.envio.chave });
+    // De volta à lista, os cartões vêm fechados: o que ele recebeu não fica aberto à toa.
+    setAberto('');
   }
 
   async function abrirSemPedido() {
@@ -180,6 +190,9 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
 
   const { obras, hoje, cartoes, aoSair } = props;
   const variasObras = obras.length > 1;
+  // Sem a caixa de busca à vista (a lista encolheu), nenhuma busca esquecida esconde pedido.
+  const comBusca = cartoes.length >= BUSCA_A_PARTIR_DE;
+  const achados = comBusca ? cartoes.filter((c) => empresaComecaCom(c.fornecedor, busca)) : cartoes;
   return (
     <div className={styles.tela} data-tela-do-mestre="lista">
       <header className={styles.topo}>
@@ -192,10 +205,11 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
         )}
       </header>
 
-      {/* No alto, à vista: com dez pedidos na lista, no pé ele não acharia (D696 §2.1). */}
+      {/* No alto, à vista: com dez pedidos na lista, no pé ele não acharia (D696 §2.1). Menor que o
+          botão principal: a lista é o que ele mais usa (D793 §2.1). */}
       {obras.length > 0 && (
-        <button type="button" className={styles.secundario} onClick={() => void abrirSemPedido()}>
-          Chegou material sem pedido
+        <button type="button" className={styles.semPedido} onClick={() => void abrirSemPedido()}>
+          <Icon name="plus" size={18} /> Chegou material sem pedido
         </button>
       )}
 
@@ -235,39 +249,46 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
             : 'Nenhum material a chegar nesta obra.'}
         </p>
       ) : (
-        <ul className={styles.lista}>
-          {cartoes.map((c) => {
-            const g = doCartao.get(c.ocId);
-            // Guardado esperando sinal não abre: receber de novo faria duas entregas.
-            if (g?.estado === 'esperando') {
-              return (
-                <li key={c.ocId}>
-                  <div className={styles.cartaoGuardado}>
-                    <ResumoDoPedido cartao={c} hoje={hoje} comObra={variasObras} />
-                    <span className={styles.cartaoNota}>
-                      <Icon name="history" size={18} />{' '}
-                      {duravel ? 'Guardado no celular. Vai quando tiver sinal.' : 'Esperando sinal. Não feche o app.'}
-                    </span>
-                  </div>
-                </li>
-              );
-            }
-            return (
-              <li key={c.ocId}>
-                <button type="button" className={styles.cartao} onClick={() => void abrirCartao(c)}>
-                  <ResumoDoPedido cartao={c} hoje={hoje} comObra={variasObras} />
-                  {g?.estado === 'recusado' ? (
-                    <span className={styles.cartaoRecusado}>Não foi: {g.motivo} Toque para ver.</span>
-                  ) : (
-                    <span className={styles.cartaoAcao}>
-                      Toque para receber <Icon name="chevron" size={18} className={styles.seta} />
-                    </span>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <>
+          {comBusca && (
+            <label className={styles.busca}>
+              <Icon name="search" size={20} />
+              <input
+                type="search"
+                className={styles.buscaCampo}
+                aria-label="Procurar a empresa"
+                placeholder="Procurar a empresa"
+                autoComplete="off"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+            </label>
+          )}
+          {achados.length === 0 ? (
+            <div className={styles.semAchado}>
+              <p className={styles.vazio}>Nenhuma empresa começa com “{busca.trim()}”.</p>
+              <button type="button" className={styles.link} onClick={() => setBusca('')}>
+                Limpar a busca
+              </button>
+            </div>
+          ) : (
+            <ul className={styles.lista}>
+              {achados.map((c) => (
+                <CartaoDaLista
+                  key={c.ocId}
+                  cartao={c}
+                  hoje={hoje}
+                  comObra={variasObras}
+                  guardado={doCartao.get(c.ocId)}
+                  duravel={duravel}
+                  aberto={aberto === c.ocId}
+                  aoTocar={() => setAberto((a) => (a === c.ocId ? '' : c.ocId))}
+                  aoReceber={() => void abrirCartao(c)}
+                />
+              ))}
+            </ul>
+          )}
+        </>
       )}
 
       {props.rodape}
@@ -334,11 +355,75 @@ function RecusadoForaDaLista({ guardado: g, aoApagar }: { guardado: Guardado; ao
   );
 }
 
-function ResumoDoPedido({ cartao: c, hoje, comObra = false }: { cartao: CartaoAChegar; hoje: string; comObra?: boolean }) {
+/**
+ * O pedido na lista (D793 §2.2): fechado, uma linha — a empresa e o valor, e o
+ * dia combinado quando há. O toque abre os itens, o número e o "Receber".
+ */
+function CartaoDaLista({
+  cartao: c, hoje, comObra, guardado: g, duravel, aberto, aoTocar, aoReceber,
+}: {
+  cartao: CartaoAChegar;
+  hoje: string;
+  comObra: boolean;
+  guardado: Guardado | undefined;
+  duravel: boolean;
+  aberto: boolean;
+  aoTocar: () => void;
+  aoReceber: () => void;
+}) {
+  const dia = diaCombinado(c.combinadoPara, hoje);
+  const esperando = g?.estado === 'esperando';
+  const recusado = g?.estado === 'recusado';
+  return (
+    <li data-cartao={c.ocId} className={esperando ? styles.cartaoGuardado : styles.cartao}>
+      <button type="button" className={styles.linhaDoCartao} aria-expanded={aberto} onClick={aoTocar}>
+        {comObra && c.obra && <span className={`${styles.obraDoCartao} ${styles.larga}`}>{c.obra}</span>}
+        <span className={styles.fornecedorNaLinha}>{c.fornecedor}</span>
+        <strong className={styles.valorNaLinha}>{formatBrl(c.total)}</strong>
+        <Icon name="chevron" size={20} className={aberto ? styles.setaAberta : styles.setaFechada} />
+        {dia && (
+          <span className={`${styles.combinado} ${styles.larga}`}>
+            Combinado para <strong>{dia}</strong>
+          </span>
+        )}
+        {esperando && (
+          <span className={`${styles.cartaoNota} ${styles.larga}`}>
+            <Icon name="history" size={18} />{' '}
+            {duravel ? 'Guardado no celular. Vai quando tiver sinal.' : 'Esperando sinal. Não feche o app.'}
+          </span>
+        )}
+        {recusado && <span className={`${styles.cartaoRecusado} ${styles.larga}`}>Não foi: {g.motivo}</span>}
+      </button>
+      {aberto && (
+        <div className={styles.detalhe}>
+          <span className={styles.itens}>
+            {c.itens.map((i, n) => (
+              <span key={n} className={styles.item}>
+                <span className={styles.qtd}>
+                  {quantidadeFalada(i.quantidade)} {i.unidade}
+                </span>
+                <span>{i.descricao}</span>
+              </span>
+            ))}
+          </span>
+          <span className={styles.valor}>Pedido {c.numero}</span>
+          {/* Guardado esperando sinal não abre: receber de novo faria duas entregas. */}
+          {!esperando && (
+            <button type="button" className={styles.primario} onClick={aoReceber}>
+              {recusado ? 'Abrir de novo' : 'Receber'}
+            </button>
+          )}
+        </div>
+      )}
+    </li>
+  );
+}
+
+/** O pedido inteiro, no alto da tela do receber. */
+function ResumoDoPedido({ cartao: c, hoje }: { cartao: CartaoAChegar; hoje: string }) {
   const dia = diaCombinado(c.combinadoPara, hoje);
   return (
     <span className={styles.resumo}>
-      {comObra && c.obra && <span className={styles.obraDoCartao}>{c.obra}</span>}
       <span className={styles.fornecedor}>{c.fornecedor}</span>
       <span className={styles.combinado}>
         {dia ? (
@@ -442,6 +527,7 @@ function Receber({
       {PERGUNTAS_DO_MESTRE.map((p) => (
         <fieldset key={p.chave} className={styles.pergunta}>
           <legend className={styles.perguntaTexto}>{p.texto}</legend>
+          {p.dica && <p className={styles.dica}>{p.dica}</p>}
           <div className={styles.botoes}>
             <button
               type="button"
@@ -517,7 +603,7 @@ function FotoDaNota({
     setLendo(true);
     setLeu(null);
     try {
-      const n = (await lerNumeroDaNota(f)).trim();
+      const n = numeroDaNotaEmDigitos(await lerNumeroDaNota(f));
       if (n) aoMudarNumero(n);
       setLeu(n !== '');
     } catch {
@@ -551,7 +637,7 @@ function FotoDaNota({
             className={styles.numero}
             inputMode="numeric"
             value={numero}
-            onChange={(e) => aoMudarNumero(e.target.value)}
+            onChange={(e) => aoMudarNumero(numeroDaNotaEmDigitos(e.target.value))}
           />
         </label>
       ) : (
@@ -595,7 +681,7 @@ function ChegouSemPedido({
   async function pronto() {
     if (obras.length === 0) return setAviso('Você ainda não está em nenhuma obra. Fale com o engenheiro.');
     if (!obra) return setAviso('Falta responder: Em qual obra?');
-    if (!foto && !numero.trim()) return setAviso('Tire a foto da nota, ou escreva o número dela.');
+    if (!foto && !numeroDaNotaEmDigitos(numero)) return setAviso('Tire a foto da nota, ou escreva o número dela.');
     if (!oQueChegou.trim()) return setAviso('Conte o que chegou.');
     if (semEstrago === null) return setAviso('Falta responder: Chegou sem estrago?');
     setAviso('');
@@ -606,7 +692,7 @@ function ChegouSemPedido({
         chave: novaChave(),
         recebidoEm: hoje,
         intervencaoId: obra,
-        registro: { foto, numeroDaNota: numero.trim(), deQuem: deQuem.trim(), oQueChegou: oQueChegou.trim(), comEstrago: !semEstrago },
+        registro: { foto, numeroDaNota: numeroDaNotaEmDigitos(numero), deQuem: deQuem.trim(), oQueChegou: oQueChegou.trim(), comEstrago: !semEstrago },
       };
       const d = await mandar(envio);
       if (!d.foi && d.motivo) {
