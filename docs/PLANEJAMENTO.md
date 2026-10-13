@@ -3624,3 +3624,36 @@ carta dele: o mestre procura pela palavra que lembra ("beta" para "Cerâmica Bet
 **DAQUI EM DIANTE:**
 1. o CTO confere por fora e avisa o Pedro para trocar o ícone no celular;
 2. a lista do "Só uma parte" espera a tabela do Banco e o formato do envio (D794).
+
+## Decisão 104 — a lista do "Só uma parte" num ramo, esperando a migration do Banco na produção · 13/10/2026
+
+**POR QUÊ (CTO, depois da D795):** o Banco pôs no ensaio a quantidade recebida por item (`compras.entrega_item`), e o
+CTO conferiu. Ele mandou construir a lista num ramo próprio do `main`, provar com teste e sabotagem, fotografar a 375
+e escrever **antes** de publicar: a migration do Banco sobe à produção primeiro, na ordem dele.
+
+**O QUE MUDOU** (ramo `d794-so-uma-parte`, `40665dd`, saído do `main` `f640091`; 406 linhas, 328 sem comentário):
+- **a tela:** com "Só uma parte", aparece "Quanto veio de cada um?", com cada item e o pedido já escrito no campo. O
+  mestre baixa só o que veio a menos, e o campo baixado fica na cor de aviso;
+- **o "Pronto"** para:
+  - com um campo vazio ou sem número;
+  - com "Só uma parte" e nada a menos;
+- **a contagem** fica no rascunho do celular;
+- **o envio** leva `itens: [{posicao, quantidade}]` na `registrar_entrega`:
+  - "Sim" manda a quantidade pedida de cada item;
+  - o cartão antigo, sem posição, e o envio antigo da fila vão sem `itens` e gravam como antes;
+- **as recusas** 22023, 23514 e 23505 passam pela régua que já existia.
+
+**A PROVA:**
+- 1069 testes (eram 1054), tipos e lint limpos, o CI do ramo verde;
+- 12 sabotagens, todas vermelhas;
+- 8 fotos a 375, no claro e no escuro, em `docs/Capturas/2026-10-13_D794/`.
+
+**Não rodei contra o banco de ensaio:** a entrega pede uma sessão de mestre, e esta casa não entra com senha. A forma
+do envio está travada em teste contra a §3 do Banco. A ida e volta de verdade, se o CTO quiser, é com o Pedro.
+
+**O banco não mudou. Não publiquei.**
+
+**DAQUI EM DIANTE:**
+1. a migration do Banco sobe à produção, na ordem do CTO;
+2. o CTO avisa;
+3. eu junto o ramo no `main`, anoto o desfazer (hoje `2b8e223f`), publico e meço por fora.
