@@ -21,9 +21,10 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
 import {
-  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, empresaAchada,
-  numeroDaNotaEmDigitos, oQueAconteceuObrigatorio, oQueFalta, perguntaOQueAconteceu, quantidadeFalada,
-  type CartaoAChegar, type ObraDoMestre, type RespostasDoMestre,
+  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, contaPorItem, diaCombinado, empresaAchada,
+  escritoNoItem, itensDoEnvio, numeroDaNotaEmDigitos, oQueAconteceuObrigatorio, oQueFalta, perguntaOQueAconteceu,
+  problemaDaContagem, quantidadeEscrita, quantidadeFalada,
+  type CartaoAChegar, type ContagemDoMestre, type ObraDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
@@ -469,13 +470,16 @@ function Receber({
   const [foto, setFoto] = useState<File | null>(fotoGuardada ?? null);
   const [numero, setNumero] = useState(rascunho?.numero ?? '');
   const [texto, setTexto] = useState(rascunho?.texto ?? '');
+  const [contagem, setContagem] = useState<ContagemDoMestre>(rascunho?.contagem ?? {});
   const [aviso, setAviso] = useState('');
   const [mandando, setMandando] = useState(false);
 
   // Cada toque fica no celular: fechar o app não apaga nada (D696 §5.1).
   useEffect(() => {
-    void guarda.gravar(CHAVES.receber(cartao.ocId), { r, numero, texto } satisfies RascunhoDoReceber).catch(() => undefined);
-  }, [guarda, cartao.ocId, r, numero, texto]);
+    void guarda
+      .gravar(CHAVES.receber(cartao.ocId), { r, numero, texto, contagem } satisfies RascunhoDoReceber)
+      .catch(() => undefined);
+  }, [guarda, cartao.ocId, r, numero, texto, contagem]);
   useEffect(() => {
     const k = CHAVES.fotoDoReceber(cartao.ocId);
     void (foto ? guarda.gravar(k, foto) : guarda.apagar(k)).catch(() => undefined);
@@ -484,7 +488,7 @@ function Receber({
   const obrigatorio = oQueAconteceuObrigatorio(r);
 
   async function pronto() {
-    const falta = oQueFalta(r, numero, texto);
+    const falta = oQueFalta(r, numero, texto, problemaDaContagem(cartao, contagem));
     if (falta) {
       setAviso(falta);
       return;
@@ -500,6 +504,7 @@ function Receber({
         avaliacao: avaliacaoDoMestre(r, numero, texto, hoje),
         soUmaParte: r.tudo === false,
         foto,
+        itens: itensDoEnvio(cartao, r.tudo, contagem),
       };
       const d = await mandar(envio);
       if (!d.foi && d.motivo) {
@@ -549,6 +554,14 @@ function Receber({
         </fieldset>
       ))}
 
+      {r.tudo === false && contaPorItem(cartao) && (
+        <ContagemPorItem
+          cartao={cartao}
+          contagem={contagem}
+          aoMudar={(posicao, escrito) => setContagem((c) => ({ ...c, [posicao]: escrito }))}
+        />
+      )}
+
       <FotoDaNota foto={foto} numero={numero} aoMudarFoto={setFoto} aoMudarNumero={setNumero} lerNumeroDaNota={lerNumeroDaNota} />
 
       {perguntaOQueAconteceu(r) && (
@@ -575,6 +588,52 @@ function Receber({
         {mandando ? 'Mandando…' : 'Pronto'}
       </button>
     </div>
+  );
+}
+
+/**
+ * "Só uma parte": quanto veio de cada item (CTO-D794). O que foi pedido já vem
+ * escrito; ele muda só o que veio a menos, e 0 quando não veio.
+ */
+function ContagemPorItem({
+  cartao, contagem, aoMudar,
+}: {
+  cartao: CartaoAChegar;
+  contagem: ContagemDoMestre;
+  aoMudar: (posicao: number, escrito: string) => void;
+}) {
+  return (
+    <fieldset className={styles.pergunta} data-contagem-por-item>
+      <legend className={styles.perguntaTexto}>Quanto veio de cada um?</legend>
+      <p className={styles.dica}>Já está escrito o que foi pedido. Mude só o que veio a menos. Se não veio, escreva 0.</p>
+      <ul className={styles.contagem}>
+        {cartao.itens.map((i) => {
+          const escrito = escritoNoItem(i, contagem);
+          const q = quantidadeEscrita(escrito);
+          return (
+            <li key={i.posicao} className={styles.itemContado}>
+              <label className={styles.itemContadoNome} htmlFor={`contagem-${i.posicao}`}>
+                {i.descricao}
+                <span className={styles.dica}>
+                  Pedido: {quantidadeFalada(i.quantidade)} {i.unidade}
+                </span>
+              </label>
+              <span className={styles.itemContadoCampo}>
+                <input
+                  id={`contagem-${i.posicao}`}
+                  className={`${styles.numeroDoItem} ${q !== null && q < i.quantidade ? styles.aMenos : ''}`}
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={escrito}
+                  onChange={(e) => aoMudar(i.posicao!, e.target.value)}
+                />
+                <span>{i.unidade}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </fieldset>
   );
 }
 

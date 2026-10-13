@@ -57,7 +57,7 @@ window.matchMedia ??= ((q: string) => ({
 const CARTAO: CartaoAChegar = {
   ocId: 'oc-1', intervencaoId: 'obra-1', obra: 'Obra de Teste', numero: '2026/101',
   fornecedor: 'Fornecedor de Teste', combinadoPara: '', total: 100,
-  itens: [{ descricao: 'Cimento de teste', quantidade: 2, unidade: 'sc' }],
+  itens: [{ posicao: 1, descricao: 'Cimento de teste', quantidade: 2, unidade: 'sc' }],
 };
 
 beforeEach(() => {
@@ -154,7 +154,8 @@ describe('a tela do mestre, ligada ao banco', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     expect(await screen.findByText('Recebido.')).toBeTruthy();
     expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(
-      expect.objectContaining({ ocId: 'oc-1', intervencaoId: 'obra-1', soUmaParte: false, foto: null }),
+      // com "Sim", a quantidade pedida de cada item (D794)
+      expect.objectContaining({ ocId: 'oc-1', intervencaoId: 'obra-1', soUmaParte: false, foto: null, itens: [{ posicao: 1, quantidade: 2 }] }),
     );
     await waitFor(() => expect(servico.lerMaterialAChegar.mock.calls.length).toBeGreaterThan(leituras));
   });
@@ -205,7 +206,8 @@ describe('duas contas no mesmo celular (perícia 05/10, achado 3)', () => {
     render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
     expect(await screen.findByText('Fornecedor de Teste')).toBeTruthy();
     await waitFor(() =>
-      expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(expect.objectContaining({ chave: 'chave-da-a' })),
+      // o envio guardado pela versão de antes não tem itens: vai sem eles, e grava como antes (D794)
+      expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(expect.objectContaining({ chave: 'chave-da-a', itens: [] })),
     );
   });
 

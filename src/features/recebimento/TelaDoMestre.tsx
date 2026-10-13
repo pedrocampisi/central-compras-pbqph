@@ -103,6 +103,7 @@ function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) 
         avaliacao: e.avaliacao,
         soUmaParte: e.soUmaParte,
         foto: e.foto,
+        itens: e.itens ?? [],
       });
       void ler();
       return aviso;

@@ -635,3 +635,81 @@ describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
   });
 });
 
+describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
+  const PEDIDO: CartaoAChegar = {
+    ...CARTAO,
+    itens: [
+      { posicao: 1, descricao: 'Cimento de teste', quantidade: 40, unidade: 'sc' },
+      { posicao: 2, descricao: 'Areia de teste', quantidade: 3, unidade: 'm³' },
+    ],
+  };
+  const parte: [string, string][] = [...tudoSim.slice(0, 3), ['Veio a quantidade toda?', 'Só uma parte']];
+  const notaSemFoto = (n: string) => {
+    fireEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
+    fireEvent.change(screen.getByRole('textbox', { name: /Número da nota/ }), { target: { value: n } });
+  };
+  const campo = (nome: string) => screen.getByRole('textbox', { name: new RegExp(nome) }) as HTMLInputElement;
+
+  it('com "Só uma parte", a lista aparece com o pedido já escrito; ele muda o que veio a menos, e vai cada item', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(parte);
+    expect(screen.getByRole('group', { name: 'Quanto veio de cada um?' })).toBeTruthy();
+    expect(campo('Cimento').value).toBe('40');
+    expect(campo('Areia').value).toBe('3');
+    fireEvent.change(campo('Cimento'), { target: { value: '30' } });
+    fireEvent.change(campo('Areia'), { target: { value: '0' } });
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ soUmaParte: true, itens: [{ posicao: 1, quantidade: 30 }, { posicao: 2, quantidade: 0 }] }),
+    );
+  });
+
+  it('com "Sim", a lista não aparece, e vai a quantidade pedida de cada item', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tudoSim);
+    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ soUmaParte: false, itens: [{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 3 }] }),
+    );
+  });
+
+  it('"Só uma parte" sem nada a menos, ou um campo vazio: o "Pronto" diz o que falta e não manda', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(parte);
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(screen.getByRole('alert').textContent).toBe('Você disse "Só uma parte": mude a quantidade do que veio a menos.');
+    fireEvent.change(campo('Areia'), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(screen.getByRole('alert').textContent).toBe('Escreva quanto veio de Areia de teste. Se não veio, escreva 0.');
+    expect(p.aoReceber).not.toHaveBeenCalled();
+  });
+
+  it('o que ele contou fica no celular: fechar e abrir o app não apaga', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(parte);
+    fireEvent.change(campo('Cimento'), { target: { value: '12' } });
+    await waitFor(async () =>
+      expect(await p.guarda!.ler<{ contagem?: Record<number, string> }>('rascunho:receber:oc-1')).toMatchObject({ contagem: { 1: '12' } }),
+    );
+    reabrir(p);
+    await abrir();
+    expect(campo('Cimento').value).toBe('12');
+    expect(campo('Areia').value).toBe('3');
+  });
+
+  it('o cartão guardado por uma versão antiga (sem a posição): sem lista, e a entrega vai sem itens, como antes', async () => {
+    const p = montar();
+    await abrirEResponder(parte);
+    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(expect.objectContaining({ soUmaParte: true, itens: [] }));
+  });
+});

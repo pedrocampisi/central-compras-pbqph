@@ -16,7 +16,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Avaliacao } from '../../domain/qualificacao';
-import { RecusaDefinitiva, type CartaoAChegar, type RespostasDoMestre } from '../../domain/recebimento';
+import {
+  RecusaDefinitiva, type CartaoAChegar, type ContagemDoMestre, type ItemRecebido, type RespostasDoMestre,
+} from '../../domain/recebimento';
 import type { GuardaDoAparelho } from '../../services/guardaDoAparelho';
 
 export interface SemPedido {
@@ -34,6 +36,8 @@ export interface EnvioDeRecebimento {
   avaliacao: Avaliacao;
   soUmaParte: boolean;
   foto: File | null;
+  /** Quanto veio de cada item (D794); ausente no que a versão antiga deixou na fila, e aí vai como antes. */
+  itens?: ItemRecebido[];
 }
 
 export interface EnvioSemPedido {
@@ -61,6 +65,8 @@ export interface RascunhoDoReceber {
   r: RespostasDoMestre;
   numero: string;
   texto: string;
+  /** O que ele mudou na lista do "Só uma parte" (D794); ausente no rascunho da versão antiga. */
+  contagem?: ContagemDoMestre;
 }
 
 /** O que ele preencheu no "sem pedido", e ainda não foi. */

@@ -21,7 +21,7 @@ import { compras, core, supabase } from './client';
 import { todasAsLinhas } from './dados';
 import { paraBase64 } from '../../domain/pastaDaObra';
 import {
-  RecusaDefinitiva, oQueFazerComARecusa, oQueFazerComOStatus, type CartaoAChegar, type ObraDoMestre,
+  RecusaDefinitiva, oQueFazerComARecusa, oQueFazerComOStatus, type CartaoAChegar, type ItemRecebido, type ObraDoMestre,
 } from '../../domain/recebimento';
 import type { Avaliacao } from '../../domain/qualificacao';
 
@@ -42,7 +42,13 @@ export function cartaoDaLinha(l: Record<string, unknown>): CartaoAChegar {
     numero: txt(l['numero']),
     fornecedor: txt(l['fornecedor']),
     combinadoPara: txt(l['entrega_prevista']).slice(0, 10),
-    itens: itens.map((i) => ({ descricao: txt(i['descricao']), quantidade: num(i['quantidade']), unidade: txt(i['unidade']) })),
+    itens: itens.map((i) => ({
+      // a posição na OC: é ela que a quantidade por item leva de volta (Banco-D794 §3)
+      ...(Number.isInteger(Number(i['posicao'])) && Number(i['posicao']) >= 1 ? { posicao: Number(i['posicao']) } : {}),
+      descricao: txt(i['descricao']),
+      quantidade: num(i['quantidade']),
+      unidade: txt(i['unidade']),
+    })),
     total: num(l['valor_total']),
   };
 }
@@ -252,6 +258,8 @@ export interface EntregaDoMestre {
   avaliacao: Avaliacao;
   soUmaParte: boolean;
   foto: Blob | null;
+  /** Quanto veio de cada item (D794). Vazio, ou ausente no envio guardado por uma versão antiga: grava como antes. */
+  itens?: ItemRecebido[];
 }
 
 /**
@@ -271,6 +279,7 @@ export async function registrarEntregaDoMestre(e: EntregaDoMestre): Promise<stri
     ...(a.tratativa.trim() ? { tratativa: a.tratativa.trim() } : {}),
     chegou_tudo: !e.soUmaParte,
     ...(fotoId ? { foto_documento_id: fotoId } : {}),
+    ...(e.itens?.length ? { itens: e.itens.map((i) => ({ posicao: i.posicao, quantidade: i.quantidade })) } : {}),
     chave: e.chave,
   };
   // Sem versão: a entrega guardada horas no celular é o fato da obra (Banco D697 §2.2.3).
