@@ -124,8 +124,20 @@ describe('a lista do mestre (compras.material_a_chegar)', () => {
     expect(c).toEqual({
       ocId: 'oc-1', intervencaoId: 'obra-1', obra: 'Obra de Teste', numero: '2026/101',
       fornecedor: 'Fornecedor de Teste', combinadoPara: '2026-10-06', total: 1540.5,
-      itens: [{ descricao: 'Cimento de teste', quantidade: 40, unidade: 'sc' }],
+      itens: [{ posicao: 1, descricao: 'Cimento de teste', quantidade: 40, unidade: 'sc' }],
     });
+  });
+
+  it('a posição do item vem junto (D794); a que falta ou não é inteira fica de fora, e o cartão não conta por item', () => {
+    const c = cartaoDaLinha({
+      oc_id: 'oc-1',
+      itens: [
+        { posicao: 2, descricao: 'A', quantidade: 1, unidade: 'un' },
+        { descricao: 'B', quantidade: 1, unidade: 'un' },
+        { posicao: 'x', descricao: 'C', quantidade: 1, unidade: 'un' },
+      ],
+    });
+    expect(c.itens.map((i) => i.posicao)).toEqual([2, undefined, undefined]);
   });
 
   it('sem dia combinado, o cartão fica sem dia (e não "null")', () => {
@@ -369,5 +381,25 @@ describe('o escritório: ligar e descartar, com as chaves do contrato (Banco D69
     expect(banco.rpc.at(-1)).toEqual({
       esquema: 'compras', nome: 'descartar_sem_pedido', args: { p_id: 5, p_motivo: 'registrado em dobro' },
     });
+  });
+});
+
+describe('a quantidade por item no envio (CTO-D794; Banco-D794 §3)', () => {
+  it('com itens, eles vão em `p.itens`, só com a posição e a quantidade', async () => {
+    await registrarEntregaDoMestre(entrega({ soUmaParte: true, itens: [{ posicao: 1, quantidade: 6 }, { posicao: 2, quantidade: 0 }] }));
+    const p = banco.rpc[0]!.args['p'] as Record<string, unknown>;
+    expect(p['itens']).toEqual([{ posicao: 1, quantidade: 6 }, { posicao: 2, quantidade: 0 }]);
+    expect(p['chegou_tudo']).toBe(false);
+  });
+
+  it('sem itens (lista vazia, ou o envio antigo da fila, sem a chave): `p` não leva `itens`, e grava como antes', async () => {
+    await registrarEntregaDoMestre(entrega({ itens: [] }));
+    await registrarEntregaDoMestre(entrega());
+    for (const c of banco.rpc) expect(c.args['p']).not.toHaveProperty('itens');
+  });
+
+  it('o item recusado pelo banco (23514: posição fora da OC ou negativa) para a fila e mostra o motivo', async () => {
+    banco.respostas = [recusa('23514', 'O item 9 não é desta OC.')];
+    await expect(registrarEntregaDoMestre(entrega({ itens: [{ posicao: 9, quantidade: 1 }] }))).rejects.toBeInstanceOf(RecusaDefinitiva);
   });
 });

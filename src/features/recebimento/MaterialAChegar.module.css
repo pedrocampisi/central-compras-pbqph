@@ -399,6 +399,74 @@
   resize: vertical;
 }
 
+/* "Só uma parte": quanto veio de cada item (D794). O nome de um lado, o campo do outro. */
+.contagem {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.itemContado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+
+.itemContadoNome {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.itemContadoNome .dica {
+  font-weight: 400;
+}
+
+.itemContadoCampo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+}
+
+.numeroDoItem {
+  width: 92px;
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 2px solid var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-family: var(--fonte-mono);
+  font-size: 22px;
+  text-align: right;
+}
+
+.numeroDoItem:focus {
+  outline: 3px solid var(--marca);
+  outline-offset: 1px;
+}
+
+/* o que ele baixou fica à vista: veio a menos */
+.aMenos {
+  border-color: var(--aviso);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}
+
 .numero:focus,
 .linha:focus,
 .caixa:focus {

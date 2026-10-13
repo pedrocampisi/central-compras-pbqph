@@ -11,6 +11,7 @@
  *   Chegou sem estrago?                 integridade conforme
  *   Veio o material certo?              confere com a OC e a ECR
  *   Veio a quantidade toda? / Só uma parte   entrega parcial
+ *     └ Só uma parte: quanto veio de cada um    a quantidade por item (D794)
  *   O que aconteceu?                    observação, ou tratativa com 2+ "Não"
  *
  * Nenhuma das palavras da direita aparece para ele. Lógica pura, sem tela.
@@ -71,10 +72,15 @@ export function oQueAconteceuObrigatorio(r: RespostasDoMestre): boolean {
   return pedeTratativa(paraAvaliar(r));
 }
 
-/** O que falta para o "Pronto", na fala do canteiro; vazio quando pode. */
-export function oQueFalta(r: RespostasDoMestre, numeroDaNota: string, oQueAconteceu: string): string {
+/**
+ * O que falta para o "Pronto", na fala do canteiro, na ordem da tela; vazio
+ * quando pode. `problemaDosItens` é o da lista do "Só uma parte", que vem logo
+ * depois das perguntas (`problemaDaContagem`).
+ */
+export function oQueFalta(r: RespostasDoMestre, numeroDaNota: string, oQueAconteceu: string, problemaDosItens = ''): string {
   const semResposta = PERGUNTAS_DO_MESTRE.find((p) => r[p.chave] === null);
   if (semResposta) return `Falta responder: ${semResposta.texto}`;
+  if (r.tudo === false && problemaDosItens) return problemaDosItens;
   if (!numeroDaNotaEmDigitos(numeroDaNota)) return 'Tire a foto da nota, ou escreva o número dela.';
   if (oQueAconteceuObrigatorio(r) && !oQueAconteceu.trim()) {
     return 'Conte o que aconteceu: tem mais de um "Não".';
@@ -138,7 +144,11 @@ export interface CartaoAChegar {
   fornecedor: string;
   /** O dia combinado, `AAAA-MM-DD`; vazio quando o pedido não tem. */
   combinadoPara: string;
-  itens: { descricao: string; quantidade: number; unidade: string }[];
+  /**
+   * `posicao`: a do item na OC (`material_a_chegar`), que a contagem do "Só uma
+   * parte" leva ao banco (D794). Falta no cartão guardado por uma versão antiga.
+   */
+  itens: { posicao?: number; descricao: string; quantidade: number; unidade: string }[];
   total: number;
 }
 
@@ -159,6 +169,74 @@ export function diaCombinado(dia: string, hoje: string): string {
 /** A quantidade sem zeros à toa: 40, 2,5, 0,75. */
 export function quantidadeFalada(q: number): string {
   return Number.isInteger(q) ? String(q) : String(Math.round(q * 1000) / 1000).replace('.', ',');
+}
+
+// ---------------------------------------------------------------------------
+// A quantidade por item (CTO-D794; o envio é o da carta do Banco, §3)
+// ---------------------------------------------------------------------------
+
+/** O que ele escreveu em cada item, pela posição na OC; o item que ele não mexeu não está aqui. */
+export type ContagemDoMestre = Record<number, string>;
+
+/** Um item no envio: a posição na OC e quanto veio (0 = não veio; pode passar do pedido). */
+export interface ItemRecebido {
+  posicao: number;
+  quantidade: number;
+}
+
+/**
+ * O número que ele escreveu: "6", "2,5", "1.000". Vazio, negativo ou o que não
+ * é número → `null`. O ponto só é milhar quando separa grupos de três ("1.000");
+ * sozinho, é a vírgula de quem digitou no teclado de outro jeito ("2.5").
+ */
+export function quantidadeEscrita(escrito: string): number | null {
+  let t = escrito.trim().replace(/\s/g, '');
+  if (!t) return null;
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  if (!/^\d+(\.\d+)?$/.test(t)) return null;
+  return Number(t);
+}
+
+/** Os itens do cartão sabem a posição deles? O cartão guardado por uma versão antiga, não: aí não se conta. */
+export function contaPorItem(cartao: CartaoAChegar): boolean {
+  return cartao.itens.length > 0 && cartao.itens.every((i) => Number.isInteger(i.posicao) && i.posicao! >= 1);
+}
+
+/** O que está no campo do item: o que ele escreveu, ou a quantidade pedida, já escrita. */
+export function escritoNoItem(item: CartaoAChegar['itens'][number], contagem: ContagemDoMestre): string {
+  return contagem[item.posicao!] ?? quantidadeFalada(item.quantidade);
+}
+
+/**
+ * O que falta na contagem do "Só uma parte"; '' quando pode. Um item sem número
+ * pede o número; e, se tudo continua com o pedido, ele não disse o que faltou.
+ */
+export function problemaDaContagem(cartao: CartaoAChegar, contagem: ContagemDoMestre): string {
+  if (!contaPorItem(cartao)) return '';
+  for (const i of cartao.itens) {
+    if (quantidadeEscrita(escritoNoItem(i, contagem)) === null) {
+      return `Escreva quanto veio de ${i.descricao}. Se não veio, escreva 0.`;
+    }
+  }
+  if (cartao.itens.every((i) => quantidadeEscrita(escritoNoItem(i, contagem))! >= i.quantidade)) {
+    return 'Você disse "Só uma parte": mude a quantidade do que veio a menos.';
+  }
+  return '';
+}
+
+/**
+ * Os itens do envio (Banco-D794 §3). Com "Sim", a quantidade pedida de cada um;
+ * com "Só uma parte", a que ele deixou em cada campo. Sem a posição (o cartão
+ * antigo), nenhum: a entrega grava como antes, e o item fica "não informado",
+ * nunca zero.
+ */
+export function itensDoEnvio(cartao: CartaoAChegar, tudo: boolean | null, contagem: ContagemDoMestre): ItemRecebido[] {
+  if (tudo === null || !contaPorItem(cartao)) return [];
+  return cartao.itens.map((i) => ({
+    posicao: i.posicao!,
+    quantidade: tudo ? i.quantidade : quantidadeEscrita(escritoNoItem(i, contagem))!,
+  }));
 }
 
 /** Uma obra em que o mestre recebe, com o nome que o banco dá (o mesmo da lista). */

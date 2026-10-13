@@ -3,8 +3,12 @@ import {
   PERGUNTAS_DO_MESTRE,
   SEM_RESPOSTA,
   avaliacaoDoMestre,
+  contaPorItem,
   diaCombinado,
   empresaAchada,
+  itensDoEnvio,
+  problemaDaContagem,
+  quantidadeEscrita,
   naosDoMestre,
   numeroDaNotaEmDigitos,
   oQueAconteceuObrigatorio,
@@ -271,5 +275,58 @@ describe('o escritório liga o sem pedido a uma OC (CTO-D696 §5.2)', () => {
     expect(m.get('x')!.id).toBe(1);
     expect(m.get('y')!.id).toBe(3);
     expect(m.size).toBe(2);
+  });
+});
+
+describe('a quantidade por item do "Só uma parte" (CTO-D794)', () => {
+  const PEDIDO: CartaoAChegar = {
+    ocId: 'oc-1', intervencaoId: 'obra-1', obra: 'Obra de Teste', numero: '2026/101', fornecedor: 'Teste',
+    combinadoPara: '', total: 100,
+    itens: [
+      { posicao: 1, descricao: 'Cimento de teste', quantidade: 40, unidade: 'sc' },
+      { posicao: 2, descricao: 'Areia de teste', quantidade: 2.5, unidade: 'm³' },
+    ],
+  };
+  const ANTIGO: CartaoAChegar = { ...PEDIDO, itens: PEDIDO.itens.map((i) => ({ descricao: i.descricao, quantidade: i.quantidade, unidade: i.unidade })) };
+
+  it('o número que ele escreve: inteiro, com vírgula, com ponto de milhar; o resto não é número', () => {
+    expect(quantidadeEscrita('6')).toBe(6);
+    expect(quantidadeEscrita(' 0 ')).toBe(0);
+    expect(quantidadeEscrita('2,5')).toBe(2.5);
+    expect(quantidadeEscrita('2.5')).toBe(2.5);
+    expect(quantidadeEscrita('1.000')).toBe(1000);
+    expect(quantidadeEscrita('1.000,5')).toBe(1000.5);
+    for (const x of ['', '  ', '-1', 'seis', '2,5,1', '1,']) expect(quantidadeEscrita(x), x).toBeNull();
+  });
+
+  it('"Sim": vai a quantidade pedida de cada item', () => {
+    expect(itensDoEnvio(PEDIDO, true, { 1: '3' })).toEqual([{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 2.5 }]);
+  });
+
+  it('"Só uma parte": vai o que ficou em cada campo, e o que ele não mexeu vai como pedido', () => {
+    expect(itensDoEnvio(PEDIDO, false, { 1: '30' })).toEqual([{ posicao: 1, quantidade: 30 }, { posicao: 2, quantidade: 2.5 }]);
+    expect(itensDoEnvio(PEDIDO, false, { 2: '0' })).toEqual([{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 0 }]);
+  });
+
+  it('o cartão antigo, sem posição, não conta por item: nenhum item vai, e a entrega grava como antes', () => {
+    expect(contaPorItem(ANTIGO)).toBe(false);
+    expect(itensDoEnvio(ANTIGO, true, {})).toEqual([]);
+    expect(itensDoEnvio(ANTIGO, false, { 1: '3' })).toEqual([]);
+    expect(problemaDaContagem(ANTIGO, {})).toBe('');
+    expect(itensDoEnvio(PEDIDO, null, {})).toEqual([]);
+  });
+
+  it('o que falta na contagem: o campo sem número, e o "Só uma parte" sem nada a menos', () => {
+    expect(problemaDaContagem(PEDIDO, { 2: '' })).toBe('Escreva quanto veio de Areia de teste. Se não veio, escreva 0.');
+    expect(problemaDaContagem(PEDIDO, {})).toBe('Você disse "Só uma parte": mude a quantidade do que veio a menos.');
+    expect(problemaDaContagem(PEDIDO, { 1: '50', 2: '3' })).toBe('Você disse "Só uma parte": mude a quantidade do que veio a menos.');
+    expect(problemaDaContagem(PEDIDO, { 1: '39' })).toBe('');
+  });
+
+  it('o "Pronto" pede a contagem logo depois das perguntas, e só com "Só uma parte"', () => {
+    const parte = { ...tudoSim, tudo: false };
+    expect(oQueFalta(parte, '', '', 'falta a contagem')).toBe('falta a contagem');
+    expect(oQueFalta(tudoSim, '1', '', 'falta a contagem')).toBe('');
+    expect(oQueFalta({ ...parte, noDia: null }, '1', '', 'falta a contagem')).toBe('Falta responder: Chegou no dia combinado?');
   });
 });
