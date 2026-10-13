@@ -124,6 +124,26 @@ Meta: 23/10.
 
 ---
 
+### 38. O ícone, as perguntas e a lista do mestre (D792, D793): no ramo, esperando o CTO; a quantidade por item, esperando o Banco
+
+*Aberta em 13/10/2026, na decisão 102.* O ramo `d792-mestre` (`f2fdde2`) traz:
+- o ícone do castor;
+- as duas perguntas novas;
+- o número da nota em dígitos;
+- a lista fechada com busca.
+
+Ele **não** está publicado.
+
+**Falta, nesta ordem:**
+1. a conferência do CTO nas fotos;
+2. a junção no `main`, a publicação com o desfazer anotado e a medida por fora (o manifesto e as impressões dos
+   ícones);
+3. o Pedro trocar o ícone no celular dele, removendo e pondo de novo;
+4. a lista do "Só uma parte" com a quantidade por item, num ramo próprio. Ela vem **depois** da tabela do Banco e do
+   aviso do CTO com o formato do envio (D794).
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*

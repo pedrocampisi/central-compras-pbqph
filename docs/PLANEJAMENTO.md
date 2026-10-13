@@ -3553,3 +3553,46 @@ notas. Pela régua dele, sem comentários, deu 419 linhas; pela minha, 548. As d
 **DAQUI EM DIANTE:**
 1. o CTO confere por fora;
 2. o Pedro testa com uma pessoa de verdade, e o CTO conta as OCs antes e depois.
+
+## Decisão 102 — o ícone do castor, as perguntas do mestre, o número em dígitos e a lista fechada, no ramo · 13/10/2026
+
+**POR QUÊ (CTO-D792, D793, D794):** o Pedro testou o app do mestre no Android dele e devolveu:
+- o ícone quase não se via;
+- "Chegou o que foi pedido?" e "Chegou tudo?" pareciam a mesma pergunta;
+- a lista era comprida demais.
+
+O CTO juntou a dívida da D768: a Central precisa do número da nota em dígitos e da quantidade por item.
+
+**A MEDIDA ANTES DE CONSTRUIR (carta das 16h2x):**
+- o número da nota já era guardado (`avaliacoes_entrega.nota_fiscal`), mas não só com dígitos;
+- a quantidade por item não morava em lugar nenhum: precisa de tabela, e a peça é do Banco;
+- o CTO confirmou na D794 e mandou a carta ao Banco.
+
+**O QUE MUDOU, no ramo `d792-mestre` (`b70196e`, `f2fdde2`), NÃO publicado:**
+- **o ícone:**
+  - os três do manifesto e o `apple-touch-icon` novo são a cabeça laranja sobre o creme;
+  - no maskable, a cabeça cabe em 38% do lado (a área segura é 40%);
+- **as perguntas:**
+  - "Veio o material certo?" e "Veio a quantidade toda?", cada uma com uma dica embaixo;
+  - o banco guarda o mesmo;
+- **o número da nota:** só os dígitos, no campo, na leitura da foto, no rascunho antigo e no "sem pedido"; os zeros
+  da frente ficam;
+- **a lista:**
+  - o cartão fecha numa linha (a empresa, o valor e o dia, quando há) e abre no toque, um por vez;
+  - a busca acha pelo começo do nome, sem acento, e aparece a partir de quatro pedidos;
+  - o "sem pedido" ficou do tamanho de um botão de apoio.
+
+**A PROVA:**
+- 1054 testes;
+- tipos e lint limpos;
+- 16 sabotagens, todas vermelhas;
+- 17 fotos em `Capturas/2026-10-13_D792/`;
+- o pacote construído aponta os ícones novos;
+- 590 linhas (495 sem comentário): sem perícia.
+
+**O banco não mudou.**
+
+**DAQUI EM DIANTE:**
+1. o CTO confere as fotos;
+2. junto no `main`, publico com o desfazer anotado e meço por fora;
+3. a lista do "Só uma parte" fica para um ramo próprio, quando o Banco tiver a tabela e o CTO mandar o formato.
