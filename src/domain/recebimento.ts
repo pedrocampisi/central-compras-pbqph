@@ -108,12 +108,20 @@ export function avaliacaoDoMestre(
 const semAcento = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
 /**
- * A busca da lista do mestre (CTO-D793 §2.3): a empresa cujo nome COMEÇA com o
- * que ele digitou, sem acento e sem maiúscula. Busca vazia acha todas.
+ * A busca da lista do mestre (CTO-D793 §2.3, D795 §2): a empresa em que o que
+ * ele digitou COMEÇA uma palavra do nome — "beta" acha "Cerâmica Beta" —, sem
+ * acento e sem maiúscula. Pelo meio da palavra não acha ("eta" não acha "Beta").
+ * Busca vazia acha todas.
  */
-export function empresaComecaCom(fornecedor: string, busca: string): boolean {
+export function empresaAchada(fornecedor: string, busca: string): boolean {
   const b = semAcento(busca);
-  return !b || semAcento(fornecedor).startsWith(b);
+  if (!b) return true;
+  const nome = semAcento(fornecedor);
+  // cada começo de palavra: o início do nome, ou logo depois de algo que não é letra nem número
+  for (let i = 0; i < nome.length; i++) {
+    if ((i === 0 || !/[\p{L}\p{N}]/u.test(nome[i - 1]!)) && nome.startsWith(b, i)) return true;
+  }
+  return false;
 }
 
 /** Com poucos pedidos, a lista cabe na tela e a busca só atrapalha: ela aparece a partir daqui. */

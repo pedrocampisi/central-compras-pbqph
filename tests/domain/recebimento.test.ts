@@ -4,7 +4,7 @@ import {
   SEM_RESPOSTA,
   avaliacaoDoMestre,
   diaCombinado,
-  empresaComecaCom,
+  empresaAchada,
   naosDoMestre,
   numeroDaNotaEmDigitos,
   oQueAconteceuObrigatorio,
@@ -60,11 +60,16 @@ describe('as perguntas do mestre', () => {
     expect(avaliacaoDoMestre(tudoSim, 'nº 4.567', '', '2026-10-13').notaFiscal).toBe('4567');
   });
 
-  it('a busca da lista: o começo do nome, sem acento e sem maiúscula (D793 §2.3)', () => {
-    expect(empresaComecaCom('Cerâmica de Teste', 'cera')).toBe(true);
-    expect(empresaComecaCom('Ômega de Teste', 'OME')).toBe(true);
-    expect(empresaComecaCom('Cerâmica de Teste', 'teste')).toBe(false);
-    expect(empresaComecaCom('Cerâmica de Teste', '  ')).toBe(true);
+  it('a busca da lista: o começo de qualquer palavra, sem acento e sem maiúscula (D793 §2.3, D795 §2)', () => {
+    expect(empresaAchada('Cerâmica Beta', 'cera')).toBe(true);
+    expect(empresaAchada('Cerâmica Beta', 'BETA')).toBe(true);
+    expect(empresaAchada('Elétrica Ômega', 'ome')).toBe(true);
+    expect(empresaAchada('Cerâmica Beta', 'ceramica b')).toBe(true);
+    expect(empresaAchada('Ferragens-Sigma', 'sig')).toBe(true);
+    // pelo meio da palavra, não
+    expect(empresaAchada('Cerâmica Beta', 'eta')).toBe(false);
+    expect(empresaAchada('Cerâmica Beta', 'amica')).toBe(false);
+    expect(empresaAchada('Cerâmica Beta', '  ')).toBe(true);
   });
 
   it('nenhuma palavra do escritório aparece para ele', () => {

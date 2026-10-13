@@ -598,29 +598,33 @@ describe('o número da nota vai só com os dígitos (D792 §4, a D768)', () => {
   });
 });
 
-describe('a busca pela empresa (D793 §2.3)', () => {
-  const NOMES = ['Cerâmica de Teste', 'Cimento de Teste', 'Ômega de Teste', 'Areial de Teste'];
+describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
+  const NOMES = ['Cerâmica Beta (teste)', 'Cimento Gama (teste)', 'Elétrica Ômega (teste)', 'Areial Delta (teste)'];
   const varios = () => NOMES.map((fornecedor, n) => ({ ...CARTAO, ocId: `oc-${n}`, fornecedor }));
   const buscar = (b: string) => fireEvent.change(screen.getByRole('searchbox', { name: 'Procurar a empresa' }), { target: { value: b } });
-  const nomesNaLista = () => screen.getAllByRole('button', { expanded: false }).map((b) => within(b).getByText(/de Teste/).textContent);
+  const nomesNaLista = () => screen.getAllByRole('button', { expanded: false }).map((b) => within(b).getByText(/\(teste\)/).textContent);
 
-  it('acha pelo começo do nome, sem acento e sem maiúscula', () => {
+  it('acha pelo começo de qualquer palavra do nome, sem acento e sem maiúscula', () => {
     montar({ cartoes: varios() });
     buscar('CE');
-    expect(nomesNaLista()).toEqual(['Cerâmica de Teste']);
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
+    buscar('beta');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
     buscar('omeg');
-    expect(nomesNaLista()).toEqual(['Ômega de Teste']);
+    expect(nomesNaLista()).toEqual(['Elétrica Ômega (teste)']);
     buscar('c');
-    expect(nomesNaLista()).toEqual(['Cerâmica de Teste', 'Cimento de Teste']);
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)', 'Cimento Gama (teste)']);
+    buscar('ceramica be');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
     buscar('');
     expect(nomesNaLista()).toHaveLength(4);
   });
 
-  it('só pelo começo: o meio do nome não acha, e "nenhuma" oferece limpar', () => {
+  it('pelo meio da palavra não acha, e "nenhuma" oferece limpar', () => {
     montar({ cartoes: varios() });
-    buscar('teste');
+    buscar('eta');
     expect(screen.queryAllByRole('button', { expanded: false })).toHaveLength(0);
-    expect(screen.getByText('Nenhuma empresa começa com “teste”.')).toBeTruthy();
+    expect(screen.getByText('Nenhuma empresa começa com “eta”.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Limpar a busca' }));
     expect(nomesNaLista()).toHaveLength(4);
   });

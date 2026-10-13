@@ -21,7 +21,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl } from '../../domain/format';
 import {
-  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, empresaComecaCom,
+  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, diaCombinado, empresaAchada,
   numeroDaNotaEmDigitos, oQueAconteceuObrigatorio, oQueFalta, perguntaOQueAconteceu, quantidadeFalada,
   type CartaoAChegar, type ObraDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
@@ -192,7 +192,7 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
   const variasObras = obras.length > 1;
   // Sem a caixa de busca à vista (a lista encolheu), nenhuma busca esquecida esconde pedido.
   const comBusca = cartoes.length >= BUSCA_A_PARTIR_DE;
-  const achados = comBusca ? cartoes.filter((c) => empresaComecaCom(c.fornecedor, busca)) : cartoes;
+  const achados = comBusca ? cartoes.filter((c) => empresaAchada(c.fornecedor, busca)) : cartoes;
   return (
     <div className={styles.tela} data-tela-do-mestre="lista">
       <header className={styles.topo}>
