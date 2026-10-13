@@ -4,7 +4,9 @@ import {
   SEM_RESPOSTA,
   avaliacaoDoMestre,
   diaCombinado,
+  empresaAchada,
   naosDoMestre,
+  numeroDaNotaEmDigitos,
   oQueAconteceuObrigatorio,
   oQueFalta,
   perguntaOQueAconteceu,
@@ -34,10 +36,40 @@ describe('as perguntas do mestre', () => {
     expect(PERGUNTAS_DO_MESTRE.map((p) => p.texto)).toEqual([
       'Chegou no dia combinado?',
       'Chegou sem estrago?',
-      'Chegou o que foi pedido?',
-      'Chegou tudo?',
+      'Veio o material certo?',
+      'Veio a quantidade toda?',
     ]);
     expect(PERGUNTAS_DO_MESTRE[3].nao).toBe('Só uma parte');
+  });
+
+  it('as duas que o Pedro leu como a mesma dizem a diferença: o material certo, a quantidade toda (D792 §3)', () => {
+    const [, , material, quantidade] = PERGUNTAS_DO_MESTRE;
+    expect(material.texto).toMatch(/material certo/);
+    expect(quantidade.texto).toMatch(/quantidade toda/);
+    expect(material.dica).toMatch(/tipo.*marca.*medida/);
+    expect(quantidade.dica).toMatch(/faltou/);
+    // nenhuma das duas fala do que a outra fala
+    expect(material.texto + material.dica).not.toMatch(/quantidade|tudo|faltou/);
+    expect(quantidade.texto + quantidade.dica).not.toMatch(/material|marca|medida/);
+  });
+
+  it('o número da nota: só os dígitos, com os zeros da frente', () => {
+    expect(numeroDaNotaEmDigitos('NF 000.123-4')).toBe('0001234');
+    expect(numeroDaNotaEmDigitos('  ')).toBe('');
+    expect(oQueFalta(tudoSim, 'NF', '')).toBe('Tire a foto da nota, ou escreva o número dela.');
+    expect(avaliacaoDoMestre(tudoSim, 'nº 4.567', '', '2026-10-13').notaFiscal).toBe('4567');
+  });
+
+  it('a busca da lista: o começo de qualquer palavra, sem acento e sem maiúscula (D793 §2.3, D795 §2)', () => {
+    expect(empresaAchada('Cerâmica Beta', 'cera')).toBe(true);
+    expect(empresaAchada('Cerâmica Beta', 'BETA')).toBe(true);
+    expect(empresaAchada('Elétrica Ômega', 'ome')).toBe(true);
+    expect(empresaAchada('Cerâmica Beta', 'ceramica b')).toBe(true);
+    expect(empresaAchada('Ferragens-Sigma', 'sig')).toBe(true);
+    // pelo meio da palavra, não
+    expect(empresaAchada('Cerâmica Beta', 'eta')).toBe(false);
+    expect(empresaAchada('Cerâmica Beta', 'amica')).toBe(false);
+    expect(empresaAchada('Cerâmica Beta', '  ')).toBe(true);
   });
 
   it('nenhuma palavra do escritório aparece para ele', () => {
@@ -68,7 +100,7 @@ describe('os "Não"', () => {
 describe('o que falta para o "Pronto"', () => {
   it('a primeira pergunta sem resposta, pelo texto dela', () => {
     expect(oQueFalta(SEM_RESPOSTA, '1', '')).toBe('Falta responder: Chegou no dia combinado?');
-    expect(oQueFalta({ ...tudoSim, tudo: null }, '1', '')).toBe('Falta responder: Chegou tudo?');
+    expect(oQueFalta({ ...tudoSim, tudo: null }, '1', '')).toBe('Falta responder: Veio a quantidade toda?');
   });
 
   it('a nota: a foto ou o número', () => {

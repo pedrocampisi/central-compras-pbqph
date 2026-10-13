@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MaterialAChegar, type MaterialAChegarProps } from '../../src/features/recebimento/MaterialAChegar';
-import { RecusaDefinitiva, TENTAR_DE_NOVO_MS } from '../../src/features/recebimento/fila';
+import { CHAVES, RecusaDefinitiva, TENTAR_DE_NOVO_MS, type RascunhoSemPedido } from '../../src/features/recebimento/fila';
 import type { CartaoAChegar } from '../../src/domain/recebimento';
 import { guardaDoAparelho, guardaNaMemoria, type GuardaDoAparelho } from '../../src/services/guardaDoAparelho';
 
@@ -54,9 +54,14 @@ function reabrir(props: MaterialAChegarProps) {
 const responder = (pergunta: string, resposta: string) =>
   fireEvent.click(within(screen.getByRole('group', { name: pergunta })).getByRole('button', { name: resposta }));
 
+/** O cartão fechado da lista (D793): o toque abre, o "Receber" leva às perguntas. */
+const fechados = () => screen.getAllByRole('button', { expanded: false });
+
 async function abrir() {
-  fireEvent.click(await screen.findByRole('button', { name: /Toque para receber|Toque para ver/ }));
-  await screen.findByRole('group', { name: 'Chegou tudo?' });
+  await waitFor(() => expect(fechados().length).toBeGreaterThan(0));
+  fireEvent.click(fechados()[0]!);
+  fireEvent.click(screen.getByRole('button', { name: /^(Receber|Abrir de novo)$/ }));
+  await screen.findByRole('group', { name: 'Veio a quantidade toda?' });
 }
 
 async function abrirEResponder(respostas: [string, string][]) {
@@ -72,30 +77,70 @@ const escreverNumero = (n: string) => {
 const tudoSim: [string, string][] = [
   ['Chegou no dia combinado?', 'Sim'],
   ['Chegou sem estrago?', 'Sim'],
-  ['Chegou o que foi pedido?', 'Sim'],
-  ['Chegou tudo?', 'Sim'],
+  ['Veio o material certo?', 'Sim'],
+  ['Veio a quantidade toda?', 'Sim'],
 ];
 
 describe('Material a chegar: a lista', () => {
-  it('mostra o apelido, o dia, os itens e o preço', () => {
+  it('fechado, mostra o apelido, o preço e o dia; o toque abre os itens, o número e o "Receber" (D793 §2.2)', () => {
     montar();
-    expect(screen.getByText('Fornecedor de Teste')).toBeTruthy();
-    expect(screen.getByText('hoje')).toBeTruthy();
+    const linha = screen.getByRole('button', { expanded: false });
+    expect(within(linha).getByText('Fornecedor de Teste')).toBeTruthy();
+    expect(within(linha).getByText(/1\.540,00/)).toBeTruthy();
+    expect(within(linha).getByText('hoje')).toBeTruthy();
+    expect(screen.queryByText('40 sc')).toBeNull();
+    expect(screen.queryByText(/Pedido 2026\/101/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Receber' })).toBeNull();
+
+    fireEvent.click(linha);
+    expect(linha.getAttribute('aria-expanded')).toBe('true');
     expect(screen.getByText('40 sc')).toBeTruthy();
-    expect(screen.getByText(/1\.540,00/)).toBeTruthy();
+    expect(screen.getByText(/Pedido 2026\/101/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Receber' })).toBeTruthy();
+
+    fireEvent.click(linha);
+    expect(screen.queryByText('40 sc')).toBeNull();
   });
 
-  it('o pedido sem data diz "Sem dia combinado", e não "Combinado para sem dia combinado"', () => {
+  it('de volta do receber, o cartão vem fechado', async () => {
+    montar();
+    await abrir();
+    fireEvent.click(screen.getByRole('button', { name: /Voltar/ }));
+    expect(await screen.findByRole('button', { expanded: false })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Receber' })).toBeNull();
+  });
+
+  it('um cartão aberto por vez: abrir outro fecha o primeiro', () => {
+    montar({ cartoes: [CARTAO, { ...CARTAO, ocId: 'oc-2', fornecedor: 'Outra de Teste' }] });
+    const [a, b] = screen.getAllByRole('button', { expanded: false }) as [HTMLElement, HTMLElement];
+    fireEvent.click(a);
+    fireEvent.click(b);
+    expect(a.getAttribute('aria-expanded')).toBe('false');
+    expect(b.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getAllByRole('button', { name: 'Receber' })).toHaveLength(1);
+  });
+
+  it('o pedido sem data: a linha não fala de dia; aberto, diz "Sem dia combinado", e nunca "Combinado para sem dia"', async () => {
     montar({ cartoes: [{ ...CARTAO, combinadoPara: '' }, { ...CARTAO, ocId: 'oc-2', combinadoPara: '05/10' }] });
-    expect(screen.getAllByText('Sem dia combinado')).toHaveLength(2);
+    expect(screen.queryByText('Sem dia combinado')).toBeNull();
+    expect(document.body.textContent).not.toMatch(/Combinado para/);
+    await abrir();
+    expect(screen.getByText('Sem dia combinado')).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/Combinado para/);
   });
 
   it('"Chegou material sem pedido" vem ANTES dos pedidos, à vista (D696 §2.1)', () => {
     montar({ cartoes: Array.from({ length: 10 }, (_, n) => ({ ...CARTAO, ocId: `oc-${n}` })) });
     const semPedido = screen.getByRole('button', { name: 'Chegou material sem pedido' });
-    const primeiro = screen.getAllByRole('button', { name: /Toque para receber/ })[0]!;
+    const primeiro = fechados()[0]!;
     expect(semPedido.compareDocumentPosition(primeiro) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('"Chegou material sem pedido" continua no alto, mas não é mais o botão grande da tela (D793 §2.1)', () => {
+    montar();
+    const semPedido = screen.getByRole('button', { name: 'Chegou material sem pedido' });
+    expect(semPedido.className).toMatch(/semPedido/);
+    expect(semPedido.className).not.toMatch(/primario|secundario/);
   });
 
   it('o "Sair" pergunta antes; "Não, ficar" fica, "Sim, sair" sai (D696 §2.2)', () => {
@@ -165,7 +210,7 @@ describe('Material a chegar: receber', () => {
     const p = montar();
     await abrirEResponder(tudoSim.slice(0, 2));
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
-    expect(screen.getByRole('alert').textContent).toBe('Falta responder: Chegou o que foi pedido?');
+    expect(screen.getByRole('alert').textContent).toBe('Falta responder: Veio o material certo?');
     expect(p.aoReceber).not.toHaveBeenCalled();
   });
 
@@ -174,8 +219,8 @@ describe('Material a chegar: receber', () => {
     await abrirEResponder([
       ['Chegou no dia combinado?', 'Não'],
       ['Chegou sem estrago?', 'Não'],
-      ['Chegou o que foi pedido?', 'Sim'],
-      ['Chegou tudo?', 'Só uma parte'],
+      ['Veio o material certo?', 'Sim'],
+      ['Veio a quantidade toda?', 'Só uma parte'],
     ]);
     fireEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
     const [numero, caixa] = screen.getAllByRole('textbox') as [HTMLInputElement, HTMLTextAreaElement];
@@ -193,14 +238,22 @@ describe('Material a chegar: receber', () => {
     );
   });
 
+  it('as duas perguntas que pareciam a mesma trazem a dica embaixo (D792 §3)', async () => {
+    montar();
+    await abrir();
+    expect(within(screen.getByRole('group', { name: 'Veio o material certo?' })).getByText('O tipo, a marca e a medida do pedido.')).toBeTruthy();
+    expect(within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByText('Se faltou alguma coisa, é só uma parte.')).toBeTruthy();
+    expect(screen.queryByText(/Chegou o que foi pedido|Chegou tudo/)).toBeNull();
+  });
+
   it('nenhuma palavra do escritório aparece na tela dele', async () => {
     montar();
     const vistas: string[] = [document.body.textContent ?? ''];
     await abrirEResponder([
       ['Chegou no dia combinado?', 'Não'],
       ['Chegou sem estrago?', 'Não'],
-      ['Chegou o que foi pedido?', 'Não'],
-      ['Chegou tudo?', 'Só uma parte'],
+      ['Veio o material certo?', 'Não'],
+      ['Veio a quantidade toda?', 'Só uma parte'],
     ]);
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     vistas.push(document.body.textContent ?? '');
@@ -239,7 +292,9 @@ describe('Material a chegar: guardado no celular (D696 §5.1)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Voltar para a lista' }));
 
     expect(await screen.findByText(/Guardado no celular\. Vai quando tiver sinal\./)).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /Toque para receber/ })).toBeNull();
+    fireEvent.click(fechados()[0]!);
+    expect(screen.getByText('40 sc')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Receber' })).toBeNull();
     expect(screen.getByText(/1 recebimento guardado no celular/)).toBeTruthy();
 
     sinal = true;
@@ -279,7 +334,9 @@ describe('Material a chegar: guardado no celular (D696 §5.1)', () => {
     const deNovo = vi.fn(async () => undefined);
     reabrir({ ...p, aoReceber: deNovo });
     await waitFor(() => expect(deNovo).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(screen.getByRole('button', { name: /Toque para receber/ })).toBeTruthy());
+    await waitFor(() => expect(screen.queryByText(/Vai quando tiver sinal/)).toBeNull());
+    fireEvent.click(fechados()[0]!);
+    expect(screen.getByRole('button', { name: 'Receber' })).toBeTruthy();
   });
 
   it('e a cada 30 s, enquanto houver algo esperando', async () => {
@@ -327,7 +384,7 @@ describe('Material a chegar: guardado no celular (D696 §5.1)', () => {
     await act(async () => {
       window.dispatchEvent(new Event('online'));
     });
-    expect(await screen.findByText(/Não foi: Este pedido já foi recebido\. Toque para ver\./)).toBeTruthy();
+    expect(await screen.findByText('Não foi: Este pedido já foi recebido.')).toBeTruthy();
     await abrir();
     expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('4567');
   });
@@ -433,11 +490,11 @@ describe('Material a chegar: ligado ao banco (D696 §5.2)', () => {
 
   it('com mais de uma obra, o cartão diz de qual obra é o pedido', () => {
     montar({ obras: [OBRA, { id: 'obra-2', nome: 'Outra Obra' }] });
-    const cartao = screen.getByRole('button', { name: /Toque para receber/ });
+    const cartao = screen.getByRole('button', { expanded: false });
     expect(within(cartao).getByText('Obra de Teste')).toBeTruthy();
     cleanup();
     montar();
-    expect(within(screen.getByRole('button', { name: /Toque para receber/ })).queryByText('Obra de Teste')).toBeNull();
+    expect(within(screen.getByRole('button', { expanded: false })).queryByText('Obra de Teste')).toBeNull();
   });
 
   it('em nenhuma obra: diz para falar com o engenheiro, e não oferece o sem pedido', () => {
@@ -490,3 +547,91 @@ describe('a guarda do celular', () => {
     expect(await g.ler('fila:a')).toBeUndefined();
   });
 });
+
+describe('o número da nota vai só com os dígitos (D792 §4, a D768)', () => {
+  it('o que ele escreve com ponto ou letra fica só com os números, e assim vai', async () => {
+    const p = montar();
+    await abrirEResponder(tudoSim);
+    escreverNumero('NF 12.345-6');
+    expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ avaliacao: expect.objectContaining({ notaFiscal: '123456' }) }),
+    );
+  });
+
+  it('o número lido da foto também: "NF 000.123" vira "000123"', async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:teste');
+    URL.revokeObjectURL = vi.fn();
+    montar({ lerNumeroDaNota: vi.fn(async () => 'NF 000.123') });
+    await abrirEResponder(tudoSim);
+    const foto = new File(['x'], 'nota.jpg', { type: 'image/jpeg' });
+    fireEvent.change(document.querySelector('input[type=file]')!, { target: { files: [foto] } });
+    await waitFor(() => expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('000123'));
+  });
+
+  it('no sem pedido, a mesma régua: no campo e no rascunho que a versão de antes deixou no celular', async () => {
+    const guarda = guardaNaMemoria(true);
+    const deAntes: RascunhoSemPedido = { numero: 'nº 12.345', deQuem: '', oQueChegou: 'areia', semEstrago: true };
+    await guarda.gravar(CHAVES.semPedido, deAntes);
+    const p = montar({ guarda });
+    fireEvent.click(screen.getByRole('button', { name: 'Chegou material sem pedido' }));
+    await screen.findByDisplayValue('nº 12.345');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Registrado.');
+    expect(p.aoRegistrarSemPedido).toHaveBeenLastCalledWith(
+      expect.objectContaining({ registro: expect.objectContaining({ numeroDaNota: '12345' }) }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar para a lista' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Chegou material sem pedido' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Sem foto? Escreva o número' }));
+    const [numero, , oQue] = screen.getAllByRole('textbox') as HTMLInputElement[];
+    fireEvent.change(numero!, { target: { value: 'nº 4.567' } });
+    fireEvent.change(oQue!, { target: { value: 'areia' } });
+    fireEvent.click(within(screen.getByRole('group', { name: 'Chegou sem estrago?' })).getByRole('button', { name: 'Sim' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Registrado.');
+    expect(p.aoRegistrarSemPedido).toHaveBeenCalledWith(
+      expect.objectContaining({ registro: expect.objectContaining({ numeroDaNota: '4567' }) }),
+    );
+  });
+});
+
+describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
+  const NOMES = ['Cerâmica Beta (teste)', 'Cimento Gama (teste)', 'Elétrica Ômega (teste)', 'Areial Delta (teste)'];
+  const varios = () => NOMES.map((fornecedor, n) => ({ ...CARTAO, ocId: `oc-${n}`, fornecedor }));
+  const buscar = (b: string) => fireEvent.change(screen.getByRole('searchbox', { name: 'Procurar a empresa' }), { target: { value: b } });
+  const nomesNaLista = () => screen.getAllByRole('button', { expanded: false }).map((b) => within(b).getByText(/\(teste\)/).textContent);
+
+  it('acha pelo começo de qualquer palavra do nome, sem acento e sem maiúscula', () => {
+    montar({ cartoes: varios() });
+    buscar('CE');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
+    buscar('beta');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
+    buscar('omeg');
+    expect(nomesNaLista()).toEqual(['Elétrica Ômega (teste)']);
+    buscar('c');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)', 'Cimento Gama (teste)']);
+    buscar('ceramica be');
+    expect(nomesNaLista()).toEqual(['Cerâmica Beta (teste)']);
+    buscar('');
+    expect(nomesNaLista()).toHaveLength(4);
+  });
+
+  it('pelo meio da palavra não acha, e "nenhuma" oferece limpar', () => {
+    montar({ cartoes: varios() });
+    buscar('eta');
+    expect(screen.queryAllByRole('button', { expanded: false })).toHaveLength(0);
+    expect(screen.getByText('Nenhuma empresa começa com “eta”.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpar a busca' }));
+    expect(nomesNaLista()).toHaveLength(4);
+  });
+
+  it('com poucos pedidos, a lista cabe na tela: sem busca', () => {
+    montar({ cartoes: varios().slice(0, 3) });
+    expect(screen.queryByRole('searchbox')).toBeNull();
+  });
+});
+

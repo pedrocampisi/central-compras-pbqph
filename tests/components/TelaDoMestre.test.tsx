@@ -141,8 +141,9 @@ describe('a tela do mestre, ligada ao banco', () => {
 
   it('a entrega vai ao banco com a obra e o pedido do cartão, e a lista é lida de novo', async () => {
     render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
-    await userEvent.click(await screen.findByRole('button', { name: /Toque para receber/ }));
-    for (const p of ['Chegou no dia combinado?', 'Chegou sem estrago?', 'Chegou o que foi pedido?', 'Chegou tudo?']) {
+    await userEvent.click((await screen.findAllByRole('button', { expanded: false }))[0]!);
+    await userEvent.click(screen.getByRole('button', { name: 'Receber' }));
+    for (const p of ['Chegou no dia combinado?', 'Chegou sem estrago?', 'Veio o material certo?', 'Veio a quantidade toda?']) {
       await userEvent.click(
         screen.getAllByRole('group').find((g) => g.textContent?.startsWith(p))!.querySelector('button')!,
       );
