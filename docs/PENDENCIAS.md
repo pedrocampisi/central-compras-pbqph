@@ -124,22 +124,17 @@ Meta: 23/10.
 
 ---
 
-### 38. O ícone, as perguntas e a lista do mestre (D792 a D795): no ar; a quantidade por item, num ramo
+### 38. O ícone, as perguntas, a lista do mestre e o "Só uma parte" (D792 a D797): no ar
 
-*Aberta em 13/10/2026, na decisão 102.* O ícone do castor, as duas perguntas novas, o número da nota em dígitos e a
-lista fechada com busca por palavra estão **no ar** desde 16h52 de 13/10:
-- em `2b8e223f`, versão `20261013195159-2bb9b4b`, pelo `main` `2bb9b4b` (decisão 103);
-- o desfazer é `656d33e5`.
+*Aberta em 13/10/2026, na decisão 102.* Tudo está **no ar**:
+- o ícone do castor, as duas perguntas novas, o número da nota em dígitos e a lista fechada com busca por palavra,
+  desde 16h52 de 13/10 (decisão 103);
+- a lista do "Só uma parte", com a quantidade por item, desde 17h52 de 13/10, em `9e74c0f0`, versão
+  `20261013205131-05e6848`, pelo `main` `05e6848` (decisão 105). O desfazer é `2b8e223f`.
 
-A lista do "Só uma parte", com a quantidade por item, está **pronta no ramo** `d794-so-uma-parte` (`40665dd`, decisão
-104) e **aprovada pelo CTO** (D797). **Não está publicada:** espera o aviso dele.
-
-**Falta, nesta ordem:**
-1. a conferência do CTO por fora;
-2. o Pedro, e cada mestre, trocar o ícone no celular: remover o antigo e pôr de novo pelo Chrome;
-3. a migration do Banco subir à produção, na ordem do CTO, e ele avisar;
-4. só então, juntar o ramo no `main`, anotar o desfazer, publicar, medir por fora e escrever a carta curta. A D794 e
-   a D797 do CTO ficam na `Devolucoes` até lá.
+**Falta:**
+1. a conferência do CTO por fora da D795, e a medida dele da primeira entrega com itens no banco;
+2. o Pedro, e cada mestre, trocar o ícone no celular: remover o antigo e pôr de novo pelo Chrome.
 
 ---
 

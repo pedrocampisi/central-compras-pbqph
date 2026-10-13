@@ -3657,3 +3657,24 @@ do envio está travada em teste contra a §3 do Banco. A ida e volta de verdade,
 1. a migration do Banco sobe à produção, na ordem do CTO;
 2. o CTO avisa;
 3. eu junto o ramo no `main`, anoto o desfazer (hoje `2b8e223f`), publico e meço por fora.
+
+## Decisão 105 — no ar: o "Só uma parte" com a quantidade por item · 13/10/2026
+
+**POR QUÊ (CTO-D797 e o aviso dele):** o CTO aprovou o ramo, o Banco subiu a migration `20261013160000` à produção
+às 17h43, o CTO mediu, e então avisou: pode publicar.
+
+**O QUE MUDOU:**
+- **o desfazer**, anotado antes: `2b8e223f`, com 100% do tráfego;
+- **a junção:** `d794-so-uma-parte` (`40665dd`) no `main` em `05e6848`, sem conflito;
+- **a bateria:** 1069 testes, tipos e lint limpos, o `conferir` 7 de 7;
+- **publicado pelo PowerShell às 17h52 de 13/10:** `9e74c0f0-5b99-4e6a-bee0-cd962301688c`, versão
+  `20261013205131-05e6848`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- o código servido tem a lista, a dica e o aviso do "Pronto";
+- o envio leva `itens` só quando há itens, só com a posição e a quantidade.
+
+**O banco não mudou por esta casa.**
+
+**DAQUI EM DIANTE:** o CTO mede no banco a primeira entrega com itens.
