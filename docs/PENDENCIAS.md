@@ -138,6 +138,21 @@ Meta: 23/10.
 
 ---
 
+### 39. "Encarregado" em todas as telas e a busca sempre à vista (D799): no ramo, esperando o CTO
+
+*Aberta em 13/10/2026, na decisão 106.* Está pronto no ramo `d799-encarregado` (`9798e63`). **Não está publicado.**
+
+**Falta, nesta ordem:**
+1. o CTO conferir as fotos e avisar;
+2. juntar no `main`, anotar o desfazer (hoje `9e74c0f0`), publicar pelo PowerShell e medir por fora;
+3. **fora desta casa:**
+   - as recusas do banco que dizem "mestre", se o Pedro quiser, por carta ao Banco;
+   - a revisão do PS.02, com o Pedro.
+
+A D799 do CTO fica na `Devolucoes` até lá.
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*

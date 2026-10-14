@@ -3678,3 +3678,29 @@ do envio está travada em teste contra a §3 do Banco. A ida e volta de verdade,
 **O banco não mudou por esta casa.**
 
 **DAQUI EM DIANTE:** o CTO mede no banco a primeira entrega com itens.
+
+## Decisão 106 — "encarregado" em todas as telas, e a busca sempre à vista, num ramo · 13/10/2026
+
+**POR QUÊ (CTO-D799, palavras do Pedro):**
+- "esse nome 'Mestres' não está muito intuitivo": o menu vira "Acesso dos encarregados", e todo texto que alguém lê
+  troca "mestre" por "encarregado";
+- numa obra com 2 pedidos, "cadê o sistema de busca?": ela passa a ficar sempre visível.
+
+**O QUE MUDOU** (ramo `d799-encarregado`, `9798e63`, saído do `main` `8b3bc36`):
+- 21 textos em 9 arquivos, entre eles o menu, o título, a página do engenheiro, o app no celular, os erros e o nome
+  da lista nos erros de carga;
+- os nomes de dentro (papel, tabelas, funções, arquivos, componentes, id da tela), o ícone e o PS.02 **não** mudam;
+- `BUSCA_A_PARTIR_DE` passou de 4 para 1. Com zero pedidos, a busca não aparece;
+- **a varredura** `tests/textos/semMestreNaTela.test.ts` lê o código pela árvore do TypeScript e falha em qualquer
+  texto com "mestre" fora dos 12 nomes de dentro.
+
+**A PROVA:**
+- 1072 testes, tipos e lint limpos;
+- 12 sabotagens, todas vermelhas;
+- 8 fotos em `docs/Capturas/2026-10-13_D799/`. O menu está a 1280, porque a 375 ele mostra só os ícones.
+
+**FICOU FORA DESTA CASA:**
+- as recusas escritas pelo banco e pela função de borda ainda dizem "mestre". É carta ao Banco, se o Pedro quiser;
+- o PS.02 diz "mestre" 11 vezes, e "na tela Mestres" uma vez. A lista foi ao CTO, para a revisão do Pedro.
+
+**O banco não mudou. Não publiquei.**
