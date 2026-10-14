@@ -262,7 +262,7 @@ function LigarDialogo({
         {!item.notaFiscal && (
           <label className={caixa.campo}>
             <span>
-              Nota fiscal (o mestre mandou só a foto)<span className={caixa.obrigatorio}>*</span>
+              Nota fiscal (o encarregado mandou só a foto)<span className={caixa.obrigatorio}>*</span>
             </span>
             <input type="text" value={r.notaFiscal} onChange={(e) => mudar({ notaFiscal: e.target.value })} />
           </label>
@@ -270,7 +270,7 @@ function LigarDialogo({
 
         <p className={caixa.quem} data-integridade-do-mestre="">
           Integridade do material: <strong>{item.chegouComEstrago ? 'Não Conforme' : 'Conforme'}</strong>, pelo que o
-          mestre disse.
+          encarregado disse.
         </p>
 
         {PERGUNTAS.map((p) => (

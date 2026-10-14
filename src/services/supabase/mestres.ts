@@ -46,10 +46,10 @@ export interface MestreNaLista {
 /** Os mestres, com as obras abertas e o último QR. Desligados por último; depois, pelo nome. */
 export async function lerMestres(): Promise<MestreNaLista[]> {
   const [equipe, vinculos, registro] = await Promise.all([
-    todasAsLinhas('mestres', (de, ate) =>
+    todasAsLinhas('encarregados', (de, ate) =>
       core().from('equipe').select('user_id, nome, ativo', { count: 'exact' })
         .eq('papel', 'mestre').order('nome').order('user_id').range(de, ate)),
-    todasAsLinhas('obras dos mestres', (de, ate) =>
+    todasAsLinhas('obras dos encarregados', (de, ate) =>
       core().from('mestre_da_obra').select('id, user_id, intervencao_id, desde', { count: 'exact' })
         .is('ate', null).order('id').range(de, ate)),
     todasAsLinhas('registro do acesso', (de, ate) =>

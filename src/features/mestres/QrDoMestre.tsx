@@ -48,7 +48,7 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
         </h3>
         {falta ? (
           <>
-            <p className={styles.instrucao}>Aponte a câmera do celular do mestre para o QR.</p>
+            <p className={styles.instrucao}>Aponte a câmera do celular do encarregado para o QR.</p>
             <svg
               className={styles.qr}
               viewBox={`0 0 ${desenho.lado} ${desenho.lado}`}
@@ -73,7 +73,7 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
           </>
         ) : (
           <p className={caixa.aviso} role="alert">
-            Este QR venceu. Gere outro com o mestre do seu lado.
+            Este QR venceu. Gere outro com o encarregado do seu lado.
           </p>
         )}
         <div className={caixa.acoes}>

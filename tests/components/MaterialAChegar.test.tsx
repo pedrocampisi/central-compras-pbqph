@@ -629,8 +629,17 @@ describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
     expect(nomesNaLista()).toHaveLength(4);
   });
 
-  it('com poucos pedidos, a lista cabe na tela: sem busca', () => {
-    montar({ cartoes: varios().slice(0, 3) });
+  it('a busca está sempre à vista, a partir de um pedido (D799); com dois, ela já acha', () => {
+    montar({ cartoes: varios().slice(0, 1) });
+    expect(screen.getByRole('searchbox', { name: 'Procurar a empresa' })).toBeTruthy();
+    cleanup();
+    montar({ cartoes: varios().slice(0, 2) });
+    buscar('gama');
+    expect(nomesNaLista()).toEqual(['Cimento Gama (teste)']);
+  });
+
+  it('sem pedido nenhum, não há o que procurar: sem busca', () => {
+    montar({ cartoes: [] });
     expect(screen.queryByRole('searchbox')).toBeNull();
   });
 });

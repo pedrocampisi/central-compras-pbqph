@@ -75,7 +75,7 @@ export async function lerMaterialAChegar(): Promise<ListaDoMestre> {
         .order('numero')
         .order('oc_id')
         .range(de, ate)),
-    todasAsLinhas('obras do mestre', (de, ate) =>
+    todasAsLinhas('obras do encarregado', (de, ate) =>
       core().rpc('obras_do_mestre_com_nome', {}, { count: 'exact' }).order('obra').order('intervencao_id').range(de, ate)),
   ]);
   if (lista.error) throw new Error(lista.error.message);

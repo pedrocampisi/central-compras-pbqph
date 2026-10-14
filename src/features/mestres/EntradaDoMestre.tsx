@@ -96,7 +96,7 @@ export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
     }
     const acesso = acessoDoTextoLido(texto, origens);
     if (!acesso) {
-      setErro('Este QR não é o de entrada da OC. Peça ao engenheiro o QR da tela Mestres.');
+      setErro('Este QR não é o de entrada da OC. Peça ao engenheiro o QR da tela Acesso dos encarregados.');
       return;
     }
     setErro('');
@@ -117,7 +117,7 @@ export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
       <header className={styles.topo}>
         <h1 className={styles.titulo}>Central de Compras</h1>
       </header>
-      <p>Mestre de obra: peça o QR ao engenheiro e toque no botão.</p>
+      <p>Encarregado: peça o QR ao engenheiro e toque no botão.</p>
       {erro && (
         <p className={styles.aviso} role="alert">
           {erro}
