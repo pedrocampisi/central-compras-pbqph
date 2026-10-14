@@ -3728,3 +3728,27 @@ do envio está travada em teste contra a §3 do Banco. A ida e volta de verdade,
 
 **DAQUI EM DIANTE (D800 §2):** o rascunho da Rev. 01 do PS.02 com "encarregado", a tela nova e as perguntas da
 D792, num ramo novo.
+
+## Decisão 108 — o rascunho da Rev. 01 do PS.02 com "encarregado", num ramo · 13/10/2026
+
+**POR QUÊ (CTO-D800 §2):** a Rev. 00 gravada não diz "mestre". O rascunho da Rev. 01, que espera o "Gravar" do Pedro,
+dizia 11 vezes, e "na tela Mestres". Mudar o rascunho não muda documento controlado: o Pedro lê os trechos marcados
+antes de gravar.
+
+**O QUE MUDOU** (ramo `d800-ps02-encarregado`, `334feb6`, saído do `main` `b1d4c47`):
+- **pelo script** `scripts/rascunho-rev01-ps02.py`, e não à mão, as mudanças M03, M10, M14, M15, M26 e M34 dizem:
+  - "encarregado" e "app do encarregado";
+  - "na tela Acesso dos encarregados";
+  - o quadro "Encarregado de obra";
+- **os itens 1 e 4** trazem as quatro perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). Um
+  teste as confere contra `PERGUNTAS_DO_MESTRE`;
+- **a varredura do "mestre"** passa a ler os dois JSON;
+- **as marcas** continuam as 32 de antes, porque nenhuma âncora mudou.
+
+**A PROVA:**
+- 1075 testes, tipos e lint limpos;
+- 8 sabotagens, todas vermelhas;
+- 3 fotos a 1280 em `docs/Capturas/2026-10-13_D800/`;
+- **ninguém apertou "Gravar".**
+
+**O banco não mudou. Não publiquei.**

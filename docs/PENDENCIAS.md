@@ -145,11 +145,12 @@ Meta: 23/10.
 - o desfazer é `9e74c0f0`.
 
 **Falta:**
-1. **o rascunho da Rev. 01 do PS.02** (D800 §2):
-   - "encarregado" no lugar de "mestre", e a tela nova;
-   - as perguntas da D792;
-   - a varredura passa a ler também os dois JSON;
-   - fica num ramo, esperando o CTO. A D800 fica na `Devolucoes` até lá;
+1. **o rascunho da Rev. 01 do PS.02** (D800 §2) está pronto no ramo `d800-ps02-encarregado` (`334feb6`, decisão
+   108), **sem publicar**:
+   - falta o CTO conferir as fotos e avisar;
+   - depois, juntar no `main`, anotar o desfazer (hoje `685ccd1c`), publicar e medir por fora;
+   - a D800 fica na `Devolucoes` até lá;
+   - o "Gravar a Rev. 01" continua sendo só do Pedro;
 2. **fora desta casa:**
    - as recusas do banco, que já foram ao Banco;
    - o papel `encarregado` do banco, que é pergunta ao Pedro.
