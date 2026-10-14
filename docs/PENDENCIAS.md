@@ -138,22 +138,17 @@ Meta: 23/10.
 
 ---
 
-### 39. "Encarregado" em todas as telas e a busca sempre à vista (D799, D800): no ar; falta o PS.02
+### 39. "Encarregado" em todas as telas e no rascunho do PS.02 (D799, D800): no ar; o resto é de outros
 
-*Aberta em 13/10/2026, na decisão 106.* A D799 está **no ar** desde 22h02 de 13/10:
-- em `685ccd1c`, versão `20261014010123-ffc307a`, pelo `main` `ffc307a` (decisão 107);
-- o desfazer é `9e74c0f0`.
+*Aberta em 13/10/2026, na decisão 106.* Tudo desta casa está **no ar**:
+- **as telas e a busca:** desde 22h02 de 13/10 (decisão 107);
+- **o rascunho da Rev. 01 do PS.02:** desde 22h15 de 13/10, em `ea46638b`, versão `20261014011408-d81adc1`, pelo
+  `main` `d81adc1` (decisão 109). O desfazer é `685ccd1c`.
 
-**Falta:**
-1. **o rascunho da Rev. 01 do PS.02** (D800 §2) está pronto no ramo `d800-ps02-encarregado` (`334feb6`, decisão
-   108), **sem publicar**:
-   - falta o CTO conferir as fotos e avisar;
-   - depois, juntar no `main`, anotar o desfazer (hoje `685ccd1c`), publicar e medir por fora;
-   - a D800 fica na `Devolucoes` até lá;
-   - o "Gravar a Rev. 01" continua sendo só do Pedro;
-2. **fora desta casa:**
-   - as recusas do banco, que já foram ao Banco;
-   - o papel `encarregado` do banco, que é pergunta ao Pedro.
+**Falta, fora desta casa:**
+1. o Pedro ler o rascunho e apertar "Gravar a Rev. 01". Só ele aperta;
+2. o Banco trocar as recusas do banco que dizem "mestre" (CTO-D800 ao Banco);
+3. o Pedro decidir o que fazer com o papel `encarregado` do banco.
 
 ---
 

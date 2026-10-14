@@ -3752,3 +3752,24 @@ antes de gravar.
 - **ninguém apertou "Gravar".**
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 109 — no ar: o rascunho da Rev. 01 do PS.02 com "encarregado" · 13/10/2026
+
+**POR QUÊ:** o CTO olhou as 3 fotos, o diff e o CI, e aprovou. O "Conteúdo desta revisão" era o quadro que ele queria.
+
+**O QUE MUDOU:**
+- **o desfazer**, anotado antes: `685ccd1c`, com 100% do tráfego;
+- **a junção:** `d800-ps02-encarregado` (`334feb6`) no `main` em `d81adc1`, sem conflito;
+- **a bateria:** 1075 testes, tipos e lint limpos, o `conferir` 7 de 7;
+- **publicado pelo PowerShell às 22h15 de 13/10:** `ea46638b-6915-4ec6-b719-cb329b8222d0`, versão
+  `20261014011408-d81adc1`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- os dois pedaços do rascunho servidos (`documento-CvulCzxl.js` e `mudancas-78ZMElAs.js`) têm a mesma impressão
+  SHA-256 do pacote e zero "mestre";
+- o do documento traz "Encarregado de obra", "na tela Acesso dos encarregados", as perguntas novas (2 vezes cada) e
+  "quanto veio de cada item" (2 vezes).
+
+**A Rev. 00 gravada não mudou. Ninguém apertou "Gravar": a Rev. 01 continua esperando o Pedro.**
+**O banco não mudou por esta casa.**
