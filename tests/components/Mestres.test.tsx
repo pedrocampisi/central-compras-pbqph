@@ -96,18 +96,18 @@ describe('a lista', () => {
   it('nenhum mestre: diz, e o cadastrar continua à vista', async () => {
     srv.ler = vi.fn(async () => []);
     render(<MestresPage />);
-    expect(await screen.findByText(/Cadastre o primeiro mestre/)).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Cadastrar mestre' })).toBeTruthy();
+    expect(await screen.findByText(/Cadastre o primeiro encarregado/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Cadastrar encarregado' })).toBeTruthy();
   });
 });
 
 describe('cadastrar', () => {
   it('o nome é obrigatório; com ele, cadastra com a obra e avisa para gerar o QR', async () => {
     await montar();
-    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar mestre' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar encarregado' }));
     const d = document.querySelector<HTMLElement>('[data-dialogo-cadastrar]')!;
     fireEvent.click(within(d).getByRole('button', { name: 'Cadastrar' }));
-    expect(within(d).getByRole('alert').textContent).toBe('Escreva o nome do mestre.');
+    expect(within(d).getByRole('alert').textContent).toBe('Escreva o nome do encarregado.');
     expect(srv.cadastrar).not.toHaveBeenCalled();
     fireEvent.change(within(d).getByLabelText(/Nome/), { target: { value: 'Davi de Teste' } });
     fireEvent.change(within(d).getByLabelText(/Obra/), { target: { value: 'obra-2' } });
@@ -122,7 +122,7 @@ describe('cadastrar', () => {
   it('o cadastro foi mas a obra não: o aviso aparece; a recusa fica na caixa', async () => {
     srv.cadastrar = vi.fn(async () => ({ userId: 'm-9', aviso: 'O mestre foi cadastrado, mas não entrou na obra: x' }));
     await montar();
-    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar mestre' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar encarregado' }));
     let d = document.querySelector<HTMLElement>('[data-dialogo-cadastrar]')!;
     fireEvent.change(within(d).getByLabelText(/Nome/), { target: { value: 'Davi' } });
     await act(async () => {
@@ -133,7 +133,7 @@ describe('cadastrar', () => {
     srv.cadastrar = vi.fn(async () => {
       throw new Error('Este e-mail já tem login na plataforma.');
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar mestre' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar encarregado' }));
     d = document.querySelector<HTMLElement>('[data-dialogo-cadastrar]')!;
     fireEvent.change(within(d).getByLabelText(/Nome/), { target: { value: 'Eva' } });
     await act(async () => {

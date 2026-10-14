@@ -75,8 +75,8 @@ const NAV_COMPRAS: NavItem[] = [
   // A FO 8.4.1.1 no menu (CTO-D661): a qualificação achada sem passar pela ficha.
   { id: 'qualificacao', label: 'Qualificação', icon: 'selo' },
   { id: 'obras', label: 'Obras', icon: 'building' },
-  // O acesso do mestre de obra: só admin e engenharia (CTO-D696 §4).
-  { id: 'mestres', label: 'Mestres', icon: 'capacete' },
+  // O acesso do mestre de obra: só admin e engenharia (CTO-D696 §4). Na tela, "encarregado" (CTO-D799).
+  { id: 'mestres', label: 'Acesso dos encarregados', icon: 'capacete' },
   { id: 'catalogo', label: 'Catálogo de ECRs', icon: 'clipboard' },
   // O PS.02 no sistema, o manual de compras (CTO-D730 §3.1).
   { id: 'procedimento', label: NOME_NO_MENU, icon: 'livro' },
@@ -91,7 +91,7 @@ const PAPEL_LABEL: Record<Papel, string> = {
   engenharia: 'Engenharia',
   financeiro: 'Financeiro',
   leitura: 'Somente leitura',
-  mestre: 'Mestre de obra',
+  mestre: 'Encarregado de obra',
 };
 
 /**

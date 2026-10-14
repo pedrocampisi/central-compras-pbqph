@@ -54,7 +54,7 @@ async function menuDe(papel: string) {
   render(<App />);
   const menu = await screen.findByRole('navigation');
   await waitFor(() => expect(useDataStore.getState().data).not.toBeNull());
-  const botao = within(menu).queryByRole('button', { name: 'Mestres' });
+  const botao = within(menu).queryByRole('button', { name: 'Acesso dos encarregados' });
   // Pede a tela mesmo sem o botão (um link guardado, a aba de antes): ela não pode abrir.
   act(() => useUiStore.setState({ activeTab: 'mestres' }));
   return botao;
@@ -63,11 +63,11 @@ async function menuDe(papel: string) {
 describe('a tela Mestres, por papel', () => {
   it('engenharia vê o menu e a tela', async () => {
     expect(await menuDe('engenharia')).not.toBeNull();
-    expect(await screen.findByRole('heading', { name: 'Mestres de obra' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Acesso dos encarregados' })).toBeTruthy();
   });
 
   it.each(['financeiro', 'leitura'])('%s não vê o menu, nem a tela pedida', async (papel) => {
     expect(await menuDe(papel)).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Mestres de obra' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Acesso dos encarregados' })).toBeNull();
   });
 });

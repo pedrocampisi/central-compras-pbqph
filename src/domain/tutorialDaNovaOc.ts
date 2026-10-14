@@ -16,7 +16,7 @@ import { O_QUE_E_ECR } from './ecr';
 // ── As frases que a tela e o tutorial dividem ─────────────────────────────────
 
 /** A dica embaixo de "Entrega prevista". */
-export const DICA_DA_ENTREGA = 'O dia combinado com o fornecedor. É o que o mestre vê na obra.';
+export const DICA_DA_ENTREGA = 'O dia combinado com o fornecedor. É o que o encarregado vê na obra.';
 /** O vazio da tabela de itens. */
 export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar Item" ou importe um pedido via IA.';
 /** A dica do "Importar Pedido (IA)". */

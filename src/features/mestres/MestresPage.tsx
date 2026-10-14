@@ -47,7 +47,7 @@ export function MestresPage() {
       setMestres(await lerMestres());
       setErro('');
     } catch (e) {
-      setErro(e instanceof Error ? e.message : 'Falha ao ler os mestres.');
+      setErro(e instanceof Error ? e.message : 'Falha ao ler os encarregados.');
     }
   }, []);
 
@@ -97,13 +97,13 @@ export function MestresPage() {
     <div className="section">
       <div className="section-header">
         <div>
-          <h2>Mestres de obra</h2>
+          <h2>Acesso dos encarregados</h2>
           <p className="section-sub">
-            O mestre entra só pelo QR, sem senha. Cadastre, ponha na obra e gere o QR com ele do seu lado.
+            O encarregado entra só pelo QR, sem senha. Cadastre, ponha na obra e gere o QR com ele do seu lado.
           </p>
         </div>
         <Button variant="primary" onClick={() => setPedindo({ o: 'cadastrar' })}>
-          Cadastrar mestre
+          Cadastrar encarregado
         </Button>
       </div>
 
@@ -114,7 +114,7 @@ export function MestresPage() {
       )}
 
       {mestres && mestres.length === 0 && (
-        <EmptyState title="Nenhum mestre" description="Cadastre o primeiro mestre de obra para ele receber material pelo celular." />
+        <EmptyState title="Nenhum encarregado" description="Cadastre o primeiro encarregado para ele receber material pelo celular." />
       )}
 
       {mestres && mestres.length > 0 && (
@@ -306,7 +306,7 @@ function CadastrarDialogo({
 
   async function gravar() {
     if (!m.nome.trim()) {
-      setErro('Escreva o nome do mestre.');
+      setErro('Escreva o nome do encarregado.');
       return;
     }
     setErro('');
@@ -323,7 +323,7 @@ function CadastrarDialogo({
     <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="cadastrar-titulo">
       <div className={caixa.caixa} data-dialogo-cadastrar="">
         <h3 id="cadastrar-titulo" className={caixa.titulo}>
-          Cadastrar mestre
+          Cadastrar encarregado
         </h3>
         <p className={caixa.quem}>Ele entra pelo QR, sem senha. O e-mail é só para quem tiver e quiser usar “Esqueci minha senha”.</p>
         <label className={caixa.campo}>

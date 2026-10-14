@@ -196,7 +196,7 @@ describe('Recebimentos: ligar a uma OC', () => {
     responder('Confere com a OC e com a ECR', 'Conforme');
     responder('Chegou tudo?', 'Sim');
     fireEvent.click(within(caixa()).getByRole('button', { name: 'Ligar à OC' }));
-    expect(within(caixa()).getByRole('alert').textContent).toBe('Escreva o número da nota: o mestre mandou só a foto.');
+    expect(within(caixa()).getByRole('alert').textContent).toBe('Escreva o número da nota: o encarregado mandou só a foto.');
     fireEvent.change(within(caixa()).getByLabelText(/Nota fiscal/), { target: { value: '4321' } });
     await act(async () => {
       fireEvent.click(within(caixa()).getByRole('button', { name: 'Ligar à OC' }));

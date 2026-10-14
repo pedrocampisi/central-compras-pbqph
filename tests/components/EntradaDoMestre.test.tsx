@@ -147,7 +147,7 @@ describe('a câmera do ícone lê o QR', () => {
 
   it('QR de outro lugar: não tenta entrar, e diz qual QR é', async () => {
     await lerCom(`https://outro-lugar.invalid/#entrar=${CODIGO}&tipo=magiclink`);
-    expect((await screen.findByRole('alert')).textContent).toMatch(/não é o de entrada da OC/);
+    expect((await screen.findByRole('alert')).textContent).toBe('Este QR não é o de entrada da OC. Peça ao engenheiro o QR da tela Acesso dos encarregados.');
     expect(srv.entrar).not.toHaveBeenCalled();
   });
 

@@ -130,8 +130,11 @@ export function empresaAchada(fornecedor: string, busca: string): boolean {
   return false;
 }
 
-/** Com poucos pedidos, a lista cabe na tela e a busca só atrapalha: ela aparece a partir daqui. */
-export const BUSCA_A_PARTIR_DE = 4;
+/**
+ * A busca aparece a partir de um pedido (CTO-D799, palavra do Pedro: "sempre visível"). Era a partir de 4
+ * (D793), e numa obra com 2 pedidos ele procurou a busca e não achou.
+ */
+export const BUSCA_A_PARTIR_DE = 1;
 
 /** Um pedido que o mestre espera, como o cartão mostra. */
 export interface CartaoAChegar {
@@ -322,7 +325,7 @@ export function problemaDaLigacao(
 ): string {
   if (!r.ocId) return 'Escolha a OC.';
   if (!semPedido.notaFiscal.trim() && !r.notaFiscal.trim()) {
-    return 'Escreva o número da nota: o mestre mandou só a foto.';
+    return 'Escreva o número da nota: o encarregado mandou só a foto.';
   }
   if (r.prazoConforme === null) return 'Responda: Prazo de entrega.';
   if (r.ocEcrConforme === null) return 'Responda: Confere com a OC e com a ECR.';

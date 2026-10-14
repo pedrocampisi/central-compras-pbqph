@@ -239,7 +239,7 @@ describe('o escritório liga o sem pedido a uma OC (CTO-D696 §5.2)', () => {
 
   it('o mestre mandou só a foto: o número da nota é do escritório; em branco não serve', () => {
     const soFoto = { notaFiscal: '', chegouComEstrago: false };
-    const falta = 'Escreva o número da nota: o mestre mandou só a foto.';
+    const falta = 'Escreva o número da nota: o encarregado mandou só a foto.';
     expect(problemaDaLigacao(pronta, soFoto)).toBe(falta);
     expect(problemaDaLigacao({ ...pronta, notaFiscal: '  ' }, soFoto)).toBe(falta);
     expect(problemaDaLigacao({ ...pronta, notaFiscal: '4321' }, soFoto)).toBe('');
