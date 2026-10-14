@@ -3704,3 +3704,27 @@ do envio está travada em teste contra a §3 do Banco. A ida e volta de verdade,
 - o PS.02 diz "mestre" 11 vezes, e "na tela Mestres" uma vez. A lista foi ao CTO, para a revisão do Pedro.
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 107 — no ar: "encarregado" em todas as telas e a busca sempre à vista · 13/10/2026
+
+**POR QUÊ (CTO-D800 §1):** o CTO olhou as 8 fotos, o diff e o CI, e aprovou.
+
+**O QUE MUDOU:**
+- **o desfazer**, anotado antes: `9e74c0f0`, com 100% do tráfego;
+- **a junção:** `d799-encarregado` (`9798e63`) no `main` em `ffc307a`, sem conflito;
+- **a bateria:** 1072 testes, tipos e lint limpos, o `conferir` 7 de 7;
+- **publicado pelo PowerShell às 22h02 de 13/10:** `685ccd1c-c1b2-4fd0-a126-41fd4347efea`, versão
+  `20261014010123-ffc307a`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo;
+- o código servido tem "Acesso dos encarregados", "Cadastrar encarregado", "Encarregado de obra", o erro do QR com a
+  tela nova e o aviso da nota;
+- não tem "Mestres de obra", "Cadastrar mestre", "tela Mestres", "Mestre de obra" nem "o mestre mandou";
+- todo "mestre" que sobra no código servido é nome de dentro: tabelas, funções, papel, id da tela e atributos `data-`;
+- a busca servida usa `length>=1`.
+
+**O banco não mudou por esta casa.**
+
+**DAQUI EM DIANTE (D800 §2):** o rascunho da Rev. 01 do PS.02 com "encarregado", a tela nova e as perguntas da
+D792, num ramo novo.

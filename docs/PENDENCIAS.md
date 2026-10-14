@@ -138,18 +138,21 @@ Meta: 23/10.
 
 ---
 
-### 39. "Encarregado" em todas as telas e a busca sempre à vista (D799): no ramo, esperando o CTO
+### 39. "Encarregado" em todas as telas e a busca sempre à vista (D799, D800): no ar; falta o PS.02
 
-*Aberta em 13/10/2026, na decisão 106.* Está pronto no ramo `d799-encarregado` (`9798e63`). **Não está publicado.**
+*Aberta em 13/10/2026, na decisão 106.* A D799 está **no ar** desde 22h02 de 13/10:
+- em `685ccd1c`, versão `20261014010123-ffc307a`, pelo `main` `ffc307a` (decisão 107);
+- o desfazer é `9e74c0f0`.
 
-**Falta, nesta ordem:**
-1. o CTO conferir as fotos e avisar;
-2. juntar no `main`, anotar o desfazer (hoje `9e74c0f0`), publicar pelo PowerShell e medir por fora;
-3. **fora desta casa:**
-   - as recusas do banco que dizem "mestre", se o Pedro quiser, por carta ao Banco;
-   - a revisão do PS.02, com o Pedro.
-
-A D799 do CTO fica na `Devolucoes` até lá.
+**Falta:**
+1. **o rascunho da Rev. 01 do PS.02** (D800 §2):
+   - "encarregado" no lugar de "mestre", e a tela nova;
+   - as perguntas da D792;
+   - a varredura passa a ler também os dois JSON;
+   - fica num ramo, esperando o CTO. A D800 fica na `Devolucoes` até lá;
+2. **fora desta casa:**
+   - as recusas do banco, que já foram ao Banco;
+   - o papel `encarregado` do banco, que é pergunta ao Pedro.
 
 ---
 
