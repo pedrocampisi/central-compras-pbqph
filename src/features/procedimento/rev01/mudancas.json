@@ -1,6 +1,6 @@
 {
   "revisao_de": "00",
-  "descricao": "O procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do mestre e a tratativa no Dashboard entram no texto.",
+  "descricao": "O procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.",
   "mudancas": [
     {
       "id": "M01",
@@ -60,7 +60,7 @@
       "id": "M10",
       "item": "Fluxo, passo \"5 · Recebimento\"",
       "ancora": "fluxo.s5",
-      "motivo": "O recebimento de material virou o app do mestre (D730 §4.2)."
+      "motivo": "O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799)."
     },
     {
       "id": "M11",
@@ -84,13 +84,13 @@
       "id": "M14",
       "item": "1, quadro \"Obra / Engenharia\"",
       "ancora": "objetivo.q1.i3",
-      "motivo": "A tela Mestres é da engenharia (e do administrador)."
+      "motivo": "A tela Acesso dos encarregados é da engenharia (e do administrador)."
     },
     {
       "id": "M15",
-      "item": "1, quadro novo \"Mestre de obra\"",
+      "item": "1, quadro novo \"Encarregado de obra\"",
       "ancora": "objetivo.q1.i4",
-      "motivo": "O mestre passou a receber pelo sistema (o app do mestre, D693 e D696). O papel não estava no PS.02."
+      "motivo": "O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no \"Só uma parte\" (D797). O papel não estava no PS.02."
     },
     {
       "id": "M16",
@@ -156,7 +156,7 @@
       "id": "M26",
       "item": "4, quadro \"Materiais e locação\"",
       "ancora": "avaliacao.q1.i1",
-      "motivo": "O recebimento virou o app do mestre e o \"Entregue\" com a avaliação (D730 §4.2). O texto de antes fica inteiro, para o que é recebido fora do sistema."
+      "motivo": "O recebimento virou o app do encarregado e o \"Entregue\" com a avaliação (D730 §4.2), com as perguntas da tela (D792) e a quantidade por item no \"Só uma parte\" (D797). O texto de antes fica inteiro, para o que é recebido fora do sistema."
     },
     {
       "id": "M27",

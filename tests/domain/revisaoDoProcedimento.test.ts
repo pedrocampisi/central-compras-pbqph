@@ -16,6 +16,7 @@ import {
   type MudancasDoRascunho,
 } from '../../src/domain/revisaoDoProcedimento';
 import { letrasQueOPdfNaoImprime } from '../../src/domain/letrasDoPdf';
+import { PERGUNTAS_DO_MESTRE } from '../../src/domain/recebimento';
 import { ancorasDoDocumento, foraDaForma } from './formaDoProcedimento';
 
 const ler = (caminho: string): unknown => JSON.parse(readFileSync(join(__dirname, caminho), 'utf-8'));
@@ -89,11 +90,20 @@ describe('a frase da nota (D739 §2): na entrega da OC, o número é exigido; a 
     comoProcedimento(rascunho(), '01').secoes.flatMap((s) => s.blocos).flatMap((b) => (b.tipo === 'quadros' ? b.quadros : []))
       .find((q) => q.ancora === ancora)!.texto;
 
-  it('o quadro do mestre e o dos materiais registram o número da nota, e o app pode ler o número na foto', () => {
+  it('o quadro do encarregado e o dos materiais registram o número da nota, e o app pode ler o número na foto', () => {
     for (const a of ['objetivo.q1.i4', 'avaliacao.q1.i1']) {
       expect(quadro(a)).toMatch(/número da nota/);
       expect(quadro(a)).toMatch(/o app pode ler (o número )?na foto da nota/);
       expect(quadro(a)).not.toMatch(/foto ou o número/);
+    }
+  });
+
+  it('os dois quadros dizem as perguntas da tela, como a tela as diz, e a quantidade por item (CTO-D800 §2; D792, D797)', () => {
+    for (const a of ['objetivo.q1.i4', 'avaliacao.q1.i1']) {
+      for (const p of PERGUNTAS_DO_MESTRE) expect(quadro(a)).toContain(`“${p.texto}”`);
+      expect(quadro(a)).toMatch(/quando veio só uma parte, ele diz quanto veio de cada item/);
+      expect(quadro(a)).not.toMatch(/o que foi pedido|chegou tudo/);
+      expect(quadro(a)).toMatch(/app do encarregado/);
     }
   });
 });
@@ -116,7 +126,7 @@ describe('o que mudou, por âncora (D739 §4.1)', () => {
     expect(mudaram.at(-1)).toBe('revisoes.a1');
   });
 
-  it('o novo entra marcado: o quadro do mestre e o parágrafo da trava', () => {
+  it('o novo entra marcado: o quadro do encarregado e o parágrafo da trava', () => {
     const { mudaram } = oQueMudou(vigente(), proposto());
     expect(mudaram).toContain('objetivo.q1.i4');
     expect(mudaram).toContain('qualificacao.p3');
