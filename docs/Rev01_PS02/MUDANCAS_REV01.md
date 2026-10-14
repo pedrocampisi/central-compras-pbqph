@@ -47,7 +47,7 @@
 
 - **Âncora:** `fluxo.c1`
 - **Antes:** Qualificar → especificar pela ECR → emitir documento de compra → receber e avaliar.
-- **Depois:** Qualificar na tela Qualificação → especificar pela ECR do Catálogo de ECRs → emitir a OC na Nova OC → receber pelo app do mestre e avaliar.
+- **Depois:** Qualificar na tela Qualificação → especificar pela ECR do Catálogo de ECRs → emitir a OC na Nova OC → receber pelo app do encarregado e avaliar.
 - **Por quê:** O mesmo caminho, com a tela de cada passo.
 - **SiAC:** Nenhum requisito sai.
 
@@ -103,8 +103,8 @@
 
 - **Âncora:** `fluxo.s5`
 - **Antes:** Conferir o que foi entregue/executado.
-- **Depois:** Conferir o que foi entregue/executado. Material: o mestre registra no app do mestre.
-- **Por quê:** O recebimento de material virou o app do mestre (D730 §4.2).
+- **Depois:** Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado.
+- **Por quê:** O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799).
 - **SiAC:** Nenhum requisito sai.
 
 ### M11 — Fluxo, passo "6 · Avaliação"
@@ -136,16 +136,16 @@
 
 - **Âncora:** `objetivo.q1.i3`
 - **Antes:** Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação.
-- **Depois:** Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o mestre de obra, põe na obra e gera o QR de entrada dele, na tela Mestres.
-- **Por quê:** A tela Mestres é da engenharia (e do administrador).
+- **Depois:** Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o encarregado de obra, põe na obra e gera o QR de entrada dele, na tela Acesso dos encarregados.
+- **Por quê:** A tela Acesso dos encarregados é da engenharia (e do administrador).
 - **SiAC:** Nenhum requisito sai.
 
-### M15 — 1, quadro novo "Mestre de obra"
+### M15 — 1, quadro novo "Encarregado de obra"
 
 - **Âncora:** `objetivo.q1`
 - **Antes:** não existia.
-- **Depois (novo):** **Mestre de obra**: Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, e registra o número da nota (o app pode ler o número na foto da nota, e o mestre confere).
-- **Por quê:** O mestre passou a receber pelo sistema (o app do mestre, D693 e D696). O papel não estava no PS.02.
+- **Depois (novo):** **Encarregado de obra**: Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere).
+- **Por quê:** O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O papel não estava no PS.02.
 - **SiAC:** Nenhum requisito sai.
 
 ### M16 — 2, primeiro parágrafo
@@ -237,8 +237,8 @@
 
 - **Âncora:** `avaliacao.q1.i1`
 - **Antes:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável.
-- **Depois:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.
-- **Por quê:** O recebimento virou o app do mestre e o "Entregue" com a avaliação (D730 §4.2). O texto de antes fica inteiro, para o que é recebido fora do sistema.
+- **Depois:** Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o encarregado de obra registra no app do encarregado (“Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo "Entregue" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.
+- **Por quê:** O recebimento virou o app do encarregado e o "Entregue" com a avaliação (D730 §4.2), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O texto de antes fica inteiro, para o que é recebido fora do sistema.
 - **SiAC:** Nenhum requisito sai.
 
 ### M27 — 4, a regra operacional (informação)
@@ -302,7 +302,7 @@
 
 - **Âncora:** `revisoes.a1`
 - **Antes:** Conteúdo preparado para a próxima revisão formal: migração para o padrão HTML oficial, consolidação do fluxo de aquisição e correções de interpretação do SiAC 8.4.
-- **Depois:** **Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do mestre e a tratativa no Dashboard entram no texto.
+- **Depois:** **Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.
 - **Por quê:** O quadro descrevia a migração para o HTML, que a página já é (D732 §4).
 - **SiAC:** Nenhum requisito sai.
 

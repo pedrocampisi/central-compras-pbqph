@@ -103,7 +103,7 @@
         "titulo": "🧱 Material controlado",
         "texto": [
           {
-            "texto": "Qualificar na tela Qualificação → especificar pela ECR do Catálogo de ECRs → emitir a OC na Nova OC → receber pelo app do mestre e avaliar.",
+            "texto": "Qualificar na tela Qualificação → especificar pela ECR do Catálogo de ECRs → emitir a OC na Nova OC → receber pelo app do encarregado e avaliar.",
             "negrito": false
           }
         ]
@@ -205,7 +205,7 @@
           "rotulo": "5 · Recebimento",
           "texto": [
             {
-              "texto": "Conferir o que foi entregue/executado. Material: o mestre registra no app do mestre.",
+              "texto": "Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado.",
               "negrito": false
             }
           ]
@@ -275,17 +275,17 @@
               "titulo": "Obra / Engenharia",
               "texto": [
                 {
-                  "texto": "Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o mestre de obra, põe na obra e gera o QR de entrada dele, na tela Mestres.",
+                  "texto": "Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o encarregado de obra, põe na obra e gera o QR de entrada dele, na tela Acesso dos encarregados.",
                   "negrito": false
                 }
               ]
             },
             {
               "ancora": "objetivo.q1.i4",
-              "titulo": "Mestre de obra",
+              "titulo": "Encarregado de obra",
               "texto": [
                 {
-                  "texto": "Recebe o material na obra pelo app do mestre: diz se chegou no dia combinado, sem estrago, o que foi pedido e se chegou tudo, e registra o número da nota (o app pode ler o número na foto da nota, e o mestre confere).",
+                  "texto": "Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere).",
                   "negrito": false
                 }
               ]
@@ -664,7 +664,7 @@
               "titulo": "Materiais e locação",
               "texto": [
                 {
-                  "texto": "Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o mestre de obra registra no app do mestre (chegou no dia combinado, sem estrago, o que foi pedido, chegou tudo, e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo \"Entregue\" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.",
+                  "texto": "Registrar fornecedor, data/documento, responsável, prazo, integridade/avarias e conformidade com OC/ECR/contrato. O formulário digital ou bot é aceito quando o registro permanece rastreável. No sistema, para o que tem OC: o encarregado de obra registra no app do encarregado (“Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e o número da nota, que o app pode ler na foto da nota), ou o escritório registra pelo \"Entregue\" do Histórico; as duas formas gravam a mesma avaliação. O que chegou sem OC vai para a tela Recebimentos, para ligar a uma OC ou descartar com o motivo.",
                   "negrito": false
                 }
               ]
@@ -883,7 +883,7 @@
               "negrito": true
             },
             {
-              "texto": " o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do mestre e a tratativa no Dashboard entram no texto.",
+              "texto": " o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.",
               "negrito": false
             }
           ]
