@@ -89,6 +89,9 @@ export function ConfigPage() {
       </FieldGroup>
 
       {/* ── Textos legais ─────────────────────────────────────────────────── */}
+      {/* O "Requisito de Qualidade" saiu (CTO-D808 §3): o PDF não o usa mais, e a
+          política e o registro por ECR vêm do código e das ECRs (D805). A coluna
+          no banco fica. */}
       <fieldset disabled className="fieldset-reset">
         <FieldGroup title="Textos Legais">
           <Field
@@ -105,14 +108,6 @@ export function ConfigPage() {
             span2
             rows={3}
             value={cfg.texto_envio_nf}
-            readOnly
-          />
-          <Field
-            as="textarea"
-            label="Requisito de Qualidade"
-            span2
-            rows={3}
-            value={cfg.texto_qualidade}
             readOnly
           />
         </FieldGroup>
