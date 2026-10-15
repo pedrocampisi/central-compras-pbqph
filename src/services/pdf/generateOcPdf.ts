@@ -16,6 +16,16 @@ import { computeOcTotals } from '../../domain/compute';
 import { destinatarioParaImpressao, documentoRotulado, formatarDocumento } from '../../domain/destinatario';
 import { formatBrl, formatDate } from '../../domain/format';
 import { textoParaANotaFiscal } from '../../domain/notaFiscal';
+import {
+  OC_SEM_ECR,
+  POLITICA_DA_QUALIDADE,
+  TITULO_DA_POLITICA,
+  TITULO_DO_REGISTRO,
+  ecrsQuePedemRevisaoAntiga,
+  registrosDaOc,
+  type TextoDaRevisao,
+} from '../../domain/qualidadeNaOc';
+import { blocosDaSecao, linhaDoDocumento } from '../../domain/ecr';
 import { drawBox, addrLine } from './helpers';
 import { downloadBlob } from '../storage/download';
 import { corpoDaTabelaDeItens } from './tabelaDeItens';
@@ -106,14 +116,26 @@ function normalizeCondicoesContratacao(texto: string | undefined): string {
  * Recebe `oc` (a OC) e `data` (o estado completo com config, fornecedores, obras).
  */
 export async function generateOcPdfBlob(oc: OrdemCompra, data: Data): Promise<Blob> {
-  return desenhaPdfDaOc(oc, data, await loadCampisiLogo()).output('blob');
+  // O texto antigo da ECR só é pedido quando a revisão vigente é mais nova
+  // que a Data da OC (CTO-D805 §1 A2). O banco só entra nesse caso, e por
+  // import tardio: o desenho continua sem banco nenhum.
+  const pedem = ecrsQuePedemRevisaoAntiga(oc, data.ecrs ?? []);
+  const antigas = pedem.length > 0 ? await (await import('../supabase/ecrs')).textosDasRevisoes(pedem) : [];
+  return desenhaPdfDaOc(oc, data, await loadCampisiLogo(), antigas).output('blob');
 }
 
 /**
  * Desenha o PDF e devolve o documento (o teste lê o texto dele sem baixar).
  * `logoDataUrl` é a marca em data URL, ou `null` (o PDF sai sem ela).
+ * `antigas` são os textos das revisões de ECR mais velhas que a vigente, para
+ * as ECRs cuja revisão vigente é mais nova que a Data da OC.
  */
-export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string | null): JsPDFWithAutoTable {
+export function desenhaPdfDaOc(
+  oc: OrdemCompra,
+  data: Data,
+  logoDataUrl: string | null,
+  antigas: readonly TextoDaRevisao[] = [],
+): JsPDFWithAutoTable {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' }) as JsPDFWithAutoTable;
 
   // Resolução de destinatário, fornecedor e obra. O destinatário da nota é
@@ -392,14 +414,88 @@ export function desenhaPdfDaOc(oc: OrdemCompra, data: Data, logoDataUrl: string 
   y += 8;
   ensureSpace(16);
 
-  // ── Qualidade ──────────────────────────────────────────────────────────────
+  // ── O registro do fornecedor, por ECR (CTO-D805 §1 A2) ─────────────────────
+  // A seção "REGISTRO DO FORNECEDOR" de cada ECR dos itens, como está, na
+  // revisão que valia na Data da OC. Entra no lugar do antigo quadro
+  // "CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR", que não dizia qual ECR nem o quê.
+  const largura = pw - 2 * margin;
+  const LINHA_DO_REGISTRO = 3.4;
+  const registros = registrosDaOc(oc, data.ecrs ?? [], antigas);
+  y += 3;
+  ensureSpace(14);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  drawBox(doc, margin, y, pw - 2 * margin, 7);
-  const textoQualidade = data.config.texto_qualidade || 'CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR';
-  if (temSinal(textoQualidade)) escrita.desenha(textoQualidade, margin + 2, y + 5, 'bold');
-  else doc.text(textoQualidade, margin + 2, y + 5);
-  y += 12;
+  doc.setTextColor(...AZUL);
+  doc.text(TITULO_DO_REGISTRO, margin, y);
+  doc.setTextColor(0, 0, 0);
+  doc.setDrawColor(...AZUL);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y + 1.2, pw - margin, y + 1.2);
+  y += 5;
+  doc.setFontSize(7.5);
+  if (registros.length === 0) {
+    doc.setFont('helvetica', 'normal');
+    doc.text(OC_SEM_ECR, margin, y);
+    y += LINHA_DO_REGISTRO + 2;
+  }
+  for (const r of registros) {
+    ensureSpace(LINHA_DO_REGISTRO * 2 + 1);
+    for (const l of escrita.quebra(r.titulo, largura, 'bold')) {
+      ensureSpace(LINHA_DO_REGISTRO);
+      escrita.desenha(l, margin, y, 'bold');
+      y += LINHA_DO_REGISTRO;
+    }
+    const blocos = r.itens ? blocosDaSecao(r.itens) : [];
+    if (!r.itens) {
+      doc.setTextColor(150, 0, 0);
+      for (const l of escrita.quebra(r.falta, largura - 4)) {
+        ensureSpace(LINHA_DO_REGISTRO);
+        escrita.desenha(l, margin + 4, y, 'normal');
+        y += LINHA_DO_REGISTRO;
+      }
+      doc.setTextColor(0, 0, 0);
+    }
+    // As linhas da lista com o quadradinho, as notas em destaque, como no
+    // documento da ECR. "Não aplicável" sai como "Não aplicável".
+    for (const b of blocos) {
+      const itens = b.tipo === 'lista' ? b.itens : [b.item];
+      for (const item of itens) {
+        const naLista = b.tipo === 'lista';
+        const x = naLista ? margin + 6 : margin + 4;
+        if (!naLista) doc.setTextColor(255, 0, 0);
+        escrita.quebra(linhaDoDocumento(item), pw - margin - x, naLista ? 'normal' : 'bold').forEach((l, k) => {
+          ensureSpace(LINHA_DO_REGISTRO);
+          if (naLista && k === 0) {
+            doc.setFillColor(0, 0, 0);
+            doc.rect(margin + 3, y - 1.6, 1, 1, 'F');
+          }
+          escrita.desenha(l, x, y, naLista ? 'normal' : 'bold');
+          y += LINHA_DO_REGISTRO;
+        });
+        doc.setTextColor(0, 0, 0);
+      }
+    }
+    y += 1.5;
+  }
+  y += 1;
+
+  // ── A política da qualidade (CTO-D805 §1 A1) ───────────────────────────────
+  // Uma vez por OC, a frase do FO 5.2, guardada no código: a configuração não
+  // a tira do PDF.
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  const politica = escrita.quebra(POLITICA_DA_QUALIDADE, largura - 4);
+  const alturaDaPolitica = 5 + politica.length * LINHA_DO_REGISTRO + 1.5;
+  ensureSpace(alturaDaPolitica + 2);
+  doc.setLineWidth(0.3);
+  drawBox(doc, margin, y, largura, alturaDaPolitica);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...AZUL);
+  doc.text(TITULO_DA_POLITICA, margin + 2, y + 4);
+  doc.setTextColor(0, 0, 0);
+  politica.forEach((l, k) => escrita.desenha(l, margin + 2, y + 4 + (k + 1) * LINHA_DO_REGISTRO, 'normal'));
+  y += alturaDaPolitica + 4;
+  doc.setFontSize(8);
 
   // ── Observações ────────────────────────────────────────────────────────────
   if (oc.observacoes) {

@@ -147,14 +147,14 @@ describe('CTO-D661 — as colunas da planilha', () => {
     ]);
     const a = linhaDe('empresa-a').textContent!;
     expect(a).toContain('Alfa (teste)');
-    expect(a).toContain('CimentoECR 12');
+    expect(a).toContain('CimentoQualificada para ECR 12');
     expect(a).toContain('07/05/2026');
     expect(a).toContain('07/05/2027');
     expect(a).toContain('2 de 3mínimo 2');
     // As entregas dos últimos 12 meses, curtas, na coluna da nota; inteiras no passar do mouse.
     const entregas = linhaDe('empresa-a').querySelector<HTMLElement>('[data-entregas]')!;
     expect(entregas.textContent).toBe('4 entregas, 3 no prazo');
-    expect(entregas.title).toBe('Nos últimos 12 meses: 4 entregas avaliadas — 3 no prazo, 4 inteiras, 3 conformes com a OC e a ECR.');
+    expect(entregas.parentElement!.title).toBe('Nos últimos 12 meses: 4 entregas avaliadas — 3 no prazo, 4 inteiras, 3 conformes com a OC e a ECR.');
     expect(a).toContain('Qualificada até 05/2027');
     expect(within(linhaDe('empresa-a')).getByText('Sim')).toBeTruthy();
     expect(within(linhaDe('empresa-b')).getByText('Não')).toBeTruthy();
@@ -286,5 +286,39 @@ describe('CTO-D680 — a busca da Qualificação pelo que bate melhor', () => {
     fireEvent.change(screen.getByRole('searchbox', { name: 'Buscar empresa ou tipo…' }), { target: { value: 'a' } });
     // "Alfa" começa por "a" (nota 1); "Beta" e "Gama" só o têm no meio (nota 3).
     expect(ordem()).toEqual(['empresa-a', 'empresa-b', 'empresa-c']);
+  });
+});
+
+describe('CTO-D805 A3 — a tela diz o que é cada coisa', () => {
+  it('no alto: a qualificação vem ANTES da compra, e a avaliação DEPOIS da entrega', () => {
+    render(<QualificacaoPage />);
+    const alto = document.querySelector<HTMLElement>('[data-antes-e-depois]')!;
+    expect(alto.textContent).toContain('Qualificação, ANTES da compra.');
+    expect(alto.textContent).toContain('Os três critérios do PS.02 dão a nota, e só a empresa qualificada recebe OC.');
+    expect(alto.textContent).toContain('Avaliação, DEPOIS da entrega.');
+    expect(alto.textContent).toContain('É o carimbo do recebimento. As entregas avaliadas contam na próxima requalificação.');
+  });
+
+  it('a nota diz que é dos critérios, e as entregas embaixo dela têm nome', () => {
+    render(<QualificacaoPage />);
+    const th = [...tabela().querySelectorAll('thead th')].find((x) => x.textContent === 'Nota de desempenho')!;
+    expect(th.getAttribute('title')).toBe(
+      'A nota dos três critérios desta qualificação, feita antes da compra. Embaixo, as entregas avaliadas no ' +
+        'recebimento nos últimos 12 meses: elas contam na próxima requalificação.',
+    );
+    const a = linhaDe('empresa-a').querySelector<HTMLElement>('[data-entregas]')!.parentElement!;
+    expect(a.textContent).toBe('Entregas avaliadas4 entregas, 3 no prazo');
+  });
+
+  it('as ECRs embaixo do tipo são as da qualificação, e não itens comprados', () => {
+    render(<QualificacaoPage />);
+    const ecrs = linhaDe('empresa-a').querySelector<HTMLElement>('[data-ecrs-qualificadas]')!;
+    expect(ecrs.textContent).toBe('Qualificada para ECR 12');
+    expect(ecrs.title).toBe('As ECRs para as quais a empresa está qualificada. Não são itens comprados.');
+  });
+
+  it('as perguntas dos critérios continuam as do PS.02', () => {
+    render(<QualificacaoPage />);
+    expect(cabecalho().slice(4, 7)).toEqual(['1. Atende a ECR', '2. Menor preço', '3. Prazo']);
   });
 });

@@ -35,7 +35,16 @@ import {
   textoDoDesempenho,
   type Categoria,
 } from '../../domain/qualificacao';
-import { desempenhoCurto, linhasDaTela, type LinhaDaTela } from '../../domain/telaDaQualificacao';
+import {
+  ENTREGAS_AVALIADAS,
+  O_QUE_E_A_NOTA,
+  ANTES_E_DEPOIS,
+  O_QUE_SAO_AS_ECRS,
+  QUALIFICADA_PARA,
+  desempenhoCurto,
+  linhasDaTela,
+  type LinhaDaTela,
+} from '../../domain/telaDaQualificacao';
 import type { Fornecedor } from '../../domain/types';
 import { podeEmitirOc } from '../../services/supabase/auth';
 import type { CategoriaDaQualificacao, QualificacaoGravada } from '../../services/supabase/qualificacao';
@@ -132,6 +141,16 @@ export function QualificacaoPage() {
         </Button>
       </div>
 
+      {/* Antes e depois da compra (CTO-D805 A3): a qualificação não é a avaliação do carimbo. */}
+      <dl className={styles.antesEDepois} data-antes-e-depois="">
+        {ANTES_E_DEPOIS.map(([quando, oQue]) => (
+          <div key={quando}>
+            <dt>{quando}</dt>
+            <dd>{oQue}</dd>
+          </div>
+        ))}
+      </dl>
+
       <div className={styles.abas} role="tablist" aria-label="Categorias da FO 8.4.1.1">
         {CATEGORIAS.map((c) => {
           const linhas = dados ? linhasDaTela(dados.linhas, c, data.fornecedores) : [];
@@ -213,7 +232,7 @@ export function QualificacaoPage() {
                         </span>
                       </th>
                     ))}
-                    <th>{comTipo ? 'Nota de desempenho' : 'Desempenho'}</th>
+                    <th title={O_QUE_E_A_NOTA}>{comTipo ? 'Nota de desempenho' : 'Desempenho'}</th>
                     <th>Situação</th>
                     {material && <th>Permissão para compra</th>}
                   </tr>
@@ -250,7 +269,11 @@ export function QualificacaoPage() {
                         {comTipo && (
                           <td className={styles.tipo}>
                             {v.tipo || '—'}
-                            {material && v.ecrs.length > 0 && <div className={styles.ecrs}>{nomeDasEcrs(v.ecrs)}</div>}
+                            {material && v.ecrs.length > 0 && (
+                              <div className={styles.ecrs} title={O_QUE_SAO_AS_ECRS} data-ecrs-qualificadas="">
+                                {QUALIFICADA_PARA} {nomeDasEcrs(v.ecrs)}
+                              </div>
+                            )}
                           </td>
                         )}
                         <td className="mono">{dataBr(v.qualificadaEm)}</td>
@@ -276,12 +299,13 @@ export function QualificacaoPage() {
                             </td>
                           );
                         })}
-                        {/* A nota dos critérios, e embaixo as entregas dos últimos 12 meses: a prova do que se marcou. */}
+                        {/* A nota dos critérios, e embaixo as entregas avaliadas dos últimos 12 meses, com o nome (CTO-D805 A3). */}
                         <td className={styles.nota}>
                           {v.nota} de {v.criterios.length || 3}
                           <div className={styles.minimo}>mínimo {v.minimo}</div>
-                          <div className={styles.entregas} title={textoDoDesempenho(d)} data-entregas="">
-                            {desempenhoCurto(d)}
+                          <div className={styles.entregas} title={textoDoDesempenho(d)}>
+                            <span className={styles.rotuloDasEntregas}>{ENTREGAS_AVALIADAS}</span>
+                            <span data-entregas="">{desempenhoCurto(d)}</span>
                           </div>
                         </td>
                         <td className={styles.situacao}>
