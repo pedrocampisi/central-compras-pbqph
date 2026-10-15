@@ -160,11 +160,15 @@ Meta: 23/10.
    - depois, juntar no `main`, anotar o desfazer (hoje `ea46638b`), publicar e medir por fora;
 2. **a trava da Data** (a OC com Data anterior à qualificação) espera a decisão do CTO;
 3. **a parte C** (os certificados por ECR) é só proposta, e espera a palavra do Pedro;
-4. **a parte B** (a IA monta o alto e os totais da OC) vem num ramo próprio. Ela liga de verdade quando o Banco
-   publicar o `cabecalho` da `extrair-itens` no ensaio, e o Pedro testa com um orçamento real antes de publicar;
+4. **a parte B** (a IA monta o alto e os totais da OC) está pronta no ramo `d805b-ia-monta-a-oc` (`01e8900`,
+   decisão 111), **sem publicar**. Ela liga de verdade quando o Banco publicar o `cabecalho` da `extrair-itens` no
+   ensaio, e o Pedro testa com um orçamento real antes de publicar;
 5. **a sobra:** o campo "Requisito de Qualidade" da Configuração não é mais usado pelo PDF. Sai se o CTO quiser.
 
-A D805 e a D806 ficam na `Devolucoes` até lá.
+**A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
+publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
+
+A D805, a D806 e a D808 ficam na `Devolucoes` até lá.
 
 ---
 

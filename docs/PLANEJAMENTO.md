@@ -3810,3 +3810,31 @@ validade" em cada linha, depois a guarda). Nada construído.
 - 371 linhas a mais e 16 a menos, sem os testes.
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 111 — a IA monta o alto da OC a partir do orçamento, num ramo · 15/10/2026
+
+**POR QUÊ (CTO-D805 §2, visão do Pedro na D804):** a mesma leitura que já põe os itens na OC propõe também o
+fornecedor, a condição, a entrega e os totais. A pessoa confere.
+
+**O QUE MUDOU** (ramo `d805b-ia-monta-a-oc`, `01e8900`, saído do `main` `f2685b2`):
+- **O contrato:** o `cabecalho` opcional da `extrair-itens`. Sem ele, nada muda. Construído contra uma resposta
+  falsa; liga de verdade quando o Banco publicar no ensaio.
+- **O fornecedor pelo CNPJ do emitente,** só entre os cadastrados. Entra a filial que bate. Sem CNPJ, sem cadastro
+  ou com o CNPJ em duas empresas, fica vazio e a tela diz por quê. A IA nunca cadastra.
+- **A condição** como o papel escreve. **A entrega** pela data impressa, ou pelos dias a partir da Data da OC (úteis
+  de segunda a sexta, sem feriados, quando o papel diz "úteis"; senão corridos). **Frete, outras despesas e desconto
+  material.** A obra e as observações não entram.
+- **O total do orçamento ao lado do da OC,** com a diferença em centavos e o lado dela.
+- **Cada campo preenchido ganha o "Confira" com o "Está certo".** Mexer no campo também tira o aviso.
+
+**A ESCOLHA DA REGRA 4 (não pisar no que a pessoa pôs):** está livre o campo vazio, o automático e o que a própria
+leitura pôs. Não está livre o que a pessoa escolheu ou conferiu nesta tela, nem o que já estava gravado no rascunho.
+No campo que não está livre fica o da pessoa, e o alto da tela diz o que o papel dizia.
+
+**A PROVA:**
+- 1101 testes, tipos e lint limpos;
+- 27 sabotagens, todas vermelhas;
+- 5 fotos em `docs/Capturas/2026-10-15_D805B/`;
+- 458 linhas a mais e 11 a menos, sem os testes. Não pede perícia.
+
+**O banco não mudou. Não publiquei:** o Pedro testa com um orçamento real no ensaio antes.
