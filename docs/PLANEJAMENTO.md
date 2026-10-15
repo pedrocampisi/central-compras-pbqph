@@ -3810,3 +3810,59 @@ validade" em cada linha, depois a guarda). Nada construído.
 - 371 linhas a mais e 16 a menos, sem os testes.
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 111 — a IA monta o alto da OC a partir do orçamento, num ramo · 15/10/2026
+
+**POR QUÊ (CTO-D805 §2, visão do Pedro na D804):** a mesma leitura que já põe os itens na OC propõe também o
+fornecedor, a condição, a entrega e os totais. A pessoa confere.
+
+**O QUE MUDOU** (ramo `d805b-ia-monta-a-oc`, `01e8900`, saído do `main` `f2685b2`):
+- **O contrato:** o `cabecalho` opcional da `extrair-itens`. Sem ele, nada muda. Construído contra uma resposta
+  falsa; liga de verdade quando o Banco publicar no ensaio.
+- **O fornecedor pelo CNPJ do emitente,** só entre os cadastrados. Entra a filial que bate. Sem CNPJ, sem cadastro
+  ou com o CNPJ em duas empresas, fica vazio e a tela diz por quê. A IA nunca cadastra.
+- **A condição** como o papel escreve. **A entrega** pela data impressa, ou pelos dias a partir da Data da OC (úteis
+  de segunda a sexta, sem feriados, quando o papel diz "úteis"; senão corridos). **Frete, outras despesas e desconto
+  material.** A obra e as observações não entram.
+- **O total do orçamento ao lado do da OC,** com a diferença em centavos e o lado dela.
+- **Cada campo preenchido ganha o "Confira" com o "Está certo".** Mexer no campo também tira o aviso.
+
+**A ESCOLHA DA REGRA 4 (não pisar no que a pessoa pôs):** está livre o campo vazio, o automático e o que a própria
+leitura pôs. Não está livre o que a pessoa escolheu ou conferiu nesta tela, nem o que já estava gravado no rascunho.
+No campo que não está livre fica o da pessoa, e o alto da tela diz o que o papel dizia.
+
+**A PROVA:**
+- 1101 testes, tipos e lint limpos;
+- 27 sabotagens, todas vermelhas;
+- 5 fotos em `docs/Capturas/2026-10-15_D805B/`;
+- 458 linhas a mais e 11 a menos, sem os testes. Não pede perícia.
+
+**O banco não mudou. Não publiquei:** o Pedro testa com um orçamento real no ensaio antes.
+
+## Decisão 112 — no ar: a política e o registro por ECR no PDF, a tela da qualificação e a Configuração sem o "Requisito de Qualidade" · 15/10/2026
+
+**POR QUÊ (CTO-D808 §1 e §3):** o CTO conferiu as 8 fotos, o código e o CI, e aprovou. O campo "Requisito de
+Qualidade" sai antes, porque o PDF não o usa mais.
+
+**O QUE MUDOU:**
+- **o campo saiu da Configuração** no ramo da parte A (`3485a01`), com o teste. A coluna no banco ficou;
+- **o desfazer**, anotado antes: `ea46638b`, com 100% do tráfego;
+- **a junção:** `d805a-pdf-qualificacao` (`3485a01`) no `main` em `1f530e7`, sem conflito;
+- **a bateria:** 1092 testes, tipos e lint limpos;
+- **publicado pelo PowerShell às 16h19 de 15/10:** `6547e313-1266-41cc-b683-7e3645eb59c7`, versão
+  `20261015191902-1f530e7`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` é o novo, e o pedaço servido com o PDF e as telas tem a mesma impressão SHA-256 do pacote;
+- nele estão a política inteira, o título do registro, a frase da OC sem ECR e os textos novos da qualificação; o
+  quadro velho e o "Requisito de Qualidade" não estão;
+- **o PDF das 4 OCs da produção**, desenhado com o código publicado e os itens e as ECRs reais (lidos só para
+  consulta; fornecedor e obra inventados; nada gravado):
+  - a política sai uma vez em cada;
+  - as 3 com ECR trazem o título certo e todas as linhas do registro;
+  - a 2026/010 traz a frase da OC sem ECR;
+  - nenhuma pede revisão antiga.
+
+**DAQUI EM DIANTE:** a tela da trava da Data, depois da parte B e quando a parte do Banco estiver no ensaio.
+
+**O banco não mudou por esta casa.**

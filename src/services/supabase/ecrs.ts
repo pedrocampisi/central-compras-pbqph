@@ -10,7 +10,8 @@
 
 import { compras, core } from './client';
 import type { EcrSecao } from '../../domain/types';
-import { fraseDaRecusaDaRevisao } from '../../domain/ecr';
+import { fraseDaRecusaDaRevisao, secoesDoBanco } from '../../domain/ecr';
+import type { TextoDaRevisao } from '../../domain/qualidadeNaOc';
 
 /** `true` só para o usuário do Pedro. Qualquer falha é `false`: o botão não aparece. */
 export async function podeRevisarEcr(): Promise<boolean> {
@@ -51,4 +52,25 @@ export async function revisarEcr(
     revisao: String(r['revisao'] ?? ''),
     emitida_em: String(r['emitida_em'] ?? ''),
   };
+}
+
+/**
+ * O texto das revisões destas ECRs (`compras.ecr_revisoes`, D588/D589 §1),
+ * para o PDF da OC mostrar a revisão que valia na Data dela (CTO-D805 §1 A2).
+ * Só é chamado quando a revisão vigente é mais nova que a Data da OC. A falha
+ * sobe: o PDF não sai com o texto de outra revisão.
+ */
+export async function textosDasRevisoes(ecrIds: readonly number[]): Promise<TextoDaRevisao[]> {
+  if (ecrIds.length === 0) return [];
+  const { data, error } = await compras()
+    .from('ecr_revisoes')
+    .select('ecr_id, revisao, emitida_em, secoes')
+    .in('ecr_id', [...ecrIds]);
+  if (error) throw new Error(`Não consegui ler a revisão da ECR que valia na Data desta OC (${error.message}).`);
+  return ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+    ecr_id: Number(r['ecr_id']),
+    revisao: String(r['revisao'] ?? ''),
+    emitida_em: String(r['emitida_em'] ?? ''),
+    secoes: secoesDoBanco(r['secoes']),
+  }));
 }

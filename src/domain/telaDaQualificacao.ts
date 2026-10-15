@@ -27,6 +27,32 @@ import {
 } from './qualificacao';
 import type { Fornecedor } from './types';
 
+// ── O que a tela diz de cada coisa (CTO-D805 §1 A3) ─────────────────────────
+// A qualificação vem ANTES da compra; a avaliação do carimbo vem DEPOIS da
+// entrega. A tela diz isso no alto e em cada coluna, porque a consultora do
+// PBQP-H leu as entregas como a avaliação e as ECRs como itens comprados.
+// As perguntas dos critérios não mudam aqui: são do PS.02 (D729 §3).
+
+/** As duas linhas do alto da tela: o que vem antes da compra, e o que vem depois. */
+export const ANTES_E_DEPOIS: readonly (readonly [string, string])[] = [
+  ['Qualificação, ANTES da compra.', 'Os três critérios do PS.02 dão a nota, e só a empresa qualificada recebe OC.'],
+  ['Avaliação, DEPOIS da entrega.', 'É o carimbo do recebimento. As entregas avaliadas contam na próxima requalificação.'],
+];
+
+/** O passar do mouse no cabeçalho da nota. */
+export const O_QUE_E_A_NOTA =
+  'A nota dos três critérios desta qualificação, feita antes da compra. Embaixo, as entregas avaliadas no ' +
+  'recebimento nos últimos 12 meses: elas contam na próxima requalificação.';
+
+/** O rótulo das entregas, embaixo da nota. */
+export const ENTREGAS_AVALIADAS = 'Entregas avaliadas';
+
+/** Antes da lista de ECRs, embaixo do tipo. */
+export const QUALIFICADA_PARA = 'Qualificada para';
+
+/** O passar do mouse na lista de ECRs. */
+export const O_QUE_SAO_AS_ECRS = 'As ECRs para as quais a empresa está qualificada. Não são itens comprados.';
+
 /** O nome da folha do auditor para quem não está no cadastro (`folhasDoAuditor.ts`). */
 export const FORA_DO_CADASTRO = 'Empresa fora do cadastro da OC';
 
