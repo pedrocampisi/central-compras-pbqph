@@ -32,12 +32,12 @@ const CARTAO: CartaoAChegar = {
     {
       ecrId: 19, pede: true, porque: 'nada guardado ainda', revisao: '00', posicoes: [1],
       linhas: [
-        { texto: 'FISPQ do produto (teste)', numerado: true },
-        { texto: 'Certificado conforme a norma (teste)', numerado: true },
+        { rotulo: null, texto: 'FISPQ do produto (teste)', numerado: true },
+        { rotulo: null, texto: 'Certificado conforme a norma (teste)', numerado: true },
       ],
     },
     // O banco disse que não pede (já guardado, ou "Não aplicável"): a tela não pergunta.
-    { ecrId: 6, pede: false, porque: 'a licença vale até 30/06/2027', revisao: '00', posicoes: [2], linhas: [{ texto: 'Licença (teste)', numerado: true }] },
+    { ecrId: 6, pede: false, porque: 'a licença vale até 30/06/2027', revisao: '00', posicoes: [2], linhas: [{ rotulo: null, texto: 'Licença (teste)', numerado: true }] },
   ],
 };
 
@@ -103,8 +103,34 @@ describe('o papel do fornecedor no carimbo (D811 §3)', () => {
     montar();
     await chegarAoPapel();
     const g = papel().cloneNode(true) as HTMLElement;
-    g.querySelector('ul')!.remove();
+    g.querySelector('[data-palavras-da-ecr]')!.remove();
     expect(g.textContent).not.toMatch(/ecr|conforme|tratativa/i);
+  });
+
+  it('as linhas saem como na ECR: a numerada na lista, com o rótulo, e a sem número como nota (D813 §3)', async () => {
+    const registros = [{
+      ...CARTAO.registros![0]!,
+      linhas: [
+        { rotulo: 'GCA', texto: 'a guia de cada transporte (teste)', numerado: true },
+        { rotulo: null, texto: 'O documento fiscal (teste)', numerado: true },
+        { rotulo: 'Atenção', texto: 'exceto compensado (teste)', numerado: false },
+      ],
+    }];
+    montar({ cartoes: [{ ...CARTAO, registros }] });
+    await chegarAoPapel();
+    const itens = within(papel()).getAllByRole('listitem').map((li) => li.textContent);
+    expect(itens).toEqual(['GCA: a guia de cada transporte (teste)', 'O documento fiscal (teste)']);
+    const nota = within(papel()).getByText('Atenção: exceto compensado (teste)');
+    expect(nota.tagName).toBe('P');
+    expect(nota.closest('ul')).toBeNull();
+  });
+
+  it('a revisão sem o texto no sistema: a pergunta vai, sem a caixa vazia (D813 §3, a ECR 04 na revisão 00)', async () => {
+    montar({ cartoes: [{ ...CARTAO, registros: [{ ...CARTAO.registros![0]!, linhas: [] }] }] });
+    await chegarAoPapel();
+    expect(within(papel()).getByRole('button', { name: 'Veio' })).toBeTruthy();
+    expect(within(papel()).queryByText('O que o fornecedor tem de mandar:')).toBeNull();
+    expect(papel().querySelector('[data-palavras-da-ecr]')).toBeNull();
   });
 
   it('o cartão sem `registros` (o banco de antes, ou a lista guardada por uma versão antiga): não pergunta, e grava como antes', async () => {

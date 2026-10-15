@@ -10,7 +10,7 @@ import {
  */
 
 const pedido = (ecrId: number, posicoes: number[], pede = true): RegistroPedido => ({
-  ecrId, pede, porque: '', revisao: '00', linhas: [{ texto: 'O papel (teste)', numerado: true }], posicoes,
+  ecrId, pede, porque: '', revisao: '00', linhas: [{ rotulo: null, texto: 'O papel (teste)', numerado: true }], posicoes,
 });
 const ITENS = [
   { posicao: 1, descricao: 'Tubo de teste' },

@@ -20,6 +20,7 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '../../components/Icon/Icon';
+import { blocosDaSecao, linhaDoDocumento } from '../../domain/ecr';
 import { formatBrl } from '../../domain/format';
 import {
   BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, contaPorItem, diaCombinado, empresaAchada,
@@ -717,12 +718,25 @@ function PapelDoFornecedor({
   return (
     <fieldset className={styles.pergunta} data-papel-da-ecr={pedido.ecrId}>
       <legend className={styles.perguntaTexto}>{perguntaDoRegistro(material)}</legend>
-      <p className={styles.dica}>O que o fornecedor tem de mandar:</p>
-      <ul className={styles.oQuePede}>
-        {pedido.linhas.map((l, i) => (
-          <li key={i}>{l.texto}</li>
-        ))}
-      </ul>
+      {/* As linhas como na ECR: a numerada na lista, a sem número como nota. Sem texto no sistema, sem caixa. */}
+      {pedido.linhas.length > 0 && (
+        <div className={styles.palavrasDaEcr} data-palavras-da-ecr="">
+          <p className={styles.dica}>O que o fornecedor tem de mandar:</p>
+          {blocosDaSecao(pedido.linhas).map((b, i) =>
+            b.tipo === 'lista' ? (
+              <ul key={i} className={styles.oQuePede}>
+                {b.itens.map((l, j) => (
+                  <li key={j}>{linhaDoDocumento(l)}</li>
+                ))}
+              </ul>
+            ) : (
+              <p key={i} className={styles.notaDaEcr}>
+                {linhaDoDocumento(b.item)}
+              </p>
+            ),
+          )}
+        </div>
+      )}
       <div className={styles.botoesDoPapel}>
         {RESPOSTAS_DO_PAPEL.map((b) => (
           <button

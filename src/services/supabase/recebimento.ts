@@ -6,7 +6,8 @@
  *   as obras dele ...... core.obras_do_mestre_com_nome  (Banco-D710)
  *   a foto da nota ..... arquivar-documento, origem `recebimento-obra`
  *   o número na foto ... ler-documento, origem `ordem-compra`
- *   o papel da ECR ..... arquivar-documento, `origem_item` `registro-ecr-NN`; a leitura, origem `registro-ecr` (D811)
+ *   o papel da ECR ..... arquivar-documento, `origem_item` `registro-ecr-NN`, com a leitura em `extracao`;
+ *                        a leitura, ler-documento, origem `registro-ecr` (D811; o contrato do Banco, D813)
  *   a entrega .......... compras.registrar_entrega  (sem versão: para o mestre não é conferida)
  *   o sem pedido ....... compras.registrar_sem_pedido
  *
@@ -36,16 +37,30 @@ import {
 const num = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 const txt = (v: unknown) => (v === null || v === undefined ? '' : String(v));
 
-/** O registro do fornecedor de uma ECR da entrega, como a `material_a_chegar` o manda (D811 §3). */
+const objeto = (v: unknown): Record<string, unknown> =>
+  v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+
+/**
+ * O registro do fornecedor de uma ECR da entrega, como a `material_a_chegar` o
+ * manda (o contrato do Banco, D813 §2): o `o_que_pede` é `{ecr, revisao,
+ * emitida_em, itens}`, e `itens` é nulo quando a revisão não tem o texto.
+ */
 function registroDaLinha(r: Record<string, unknown>): RegistroPedido {
-  const linhas = Array.isArray(r['o_que_pede']) ? (r['o_que_pede'] as Record<string, unknown>[]) : [];
+  const oQuePede = objeto(r['o_que_pede']);
+  const itens = Array.isArray(oQuePede['itens']) ? (oQuePede['itens'] as unknown[]) : [];
   const posicoes = Array.isArray(r['posicoes']) ? (r['posicoes'] as unknown[]) : [];
   return {
     ecrId: num(r['ecr_id']),
     pede: r['pede'] === true,
     porque: txt(r['porque']),
-    revisao: txt(r['revisao']),
-    linhas: linhas.map((x) => ({ texto: txt(x['texto']), numerado: x['numerado'] !== false })).filter((x) => x.texto.trim()),
+    revisao: txt(oQuePede['revisao']),
+    linhas: itens
+      .map((i) => {
+        const it = objeto(i);
+        const rotulo = typeof it['rotulo'] === 'string' && it['rotulo'].trim() ? it['rotulo'] : null;
+        return { rotulo, texto: txt(it['texto']), numerado: it['numerado'] === true };
+      })
+      .filter((x) => x.texto.trim()),
     posicoes: posicoes.map(Number).filter((p) => Number.isInteger(p) && p >= 1),
   };
 }
@@ -206,13 +221,15 @@ const fotosArquivadas = new Map<string, string>();
 
 /**
  * Guarda a foto na pasta da obra; devolve o id do documento. A da nota, ou o
- * papel de uma ECR (`origemItem` `registro-ecr-08`, com a chave própria dele).
+ * papel de uma ECR (`origemItem` `registro-ecr-08`, com a chave própria dele e
+ * a leitura em `extracao`, que o banco guarda no documento).
  */
 export async function arquivarFotoDoRecebimento(
   foto: Blob,
   intervencaoId: string,
   chave: string,
   origemItem = 'foto-da-nota',
+  extracao?: Record<string, unknown>,
 ): Promise<string> {
   const ja = fotosArquivadas.get(chave);
   if (ja) return ja;
@@ -227,6 +244,7 @@ export async function arquivarFotoDoRecebimento(
       origem_id: chave,
       origem_item: origemItem,
       intervencao_id: intervencaoId,
+      ...(extracao ? { extracao } : {}),
     },
     TEMPO_DA_FOTO_MS,
   );
@@ -275,6 +293,7 @@ export async function lerRegistroNaFoto(foto: Blob): Promise<LeituraDoRegistro |
       alcance: (ALCANCES as readonly string[]).includes(alcance) ? (alcance as Alcance) : null,
       validoAte: txt(json['valido_ate']).slice(0, 10),
       confira: txt(json['confira']),
+      bruta: json,
     };
   } catch {
     return null;
@@ -322,14 +341,18 @@ export interface EntregaDoMestre {
 
 const doisDigitos = (n: number) => String(n).padStart(2, '0');
 
-/** Cada papel sobe com a chave dele; o envio leva o documento, a resposta e o alcance conferido. */
+/**
+ * Cada papel sobe com a chave dele e a leitura como veio; o envio leva o
+ * documento, a resposta e o alcance conferido. A leitura não vai na entrega:
+ * mora no documento (Banco-D812 §4).
+ */
 async function registrosParaGravar(e: EntregaDoMestre): Promise<Record<string, unknown>[]> {
   const out: Record<string, unknown>[] = [];
   for (const r of e.registros ?? []) {
     const ecr = doisDigitos(r.ecrId);
     const documentoId =
       r.resposta === 'veio' && r.foto
-        ? await arquivarFotoDoRecebimento(r.foto, e.intervencaoId, `${e.chave}-ecr-${ecr}`, `registro-ecr-${ecr}`)
+        ? await arquivarFotoDoRecebimento(r.foto, e.intervencaoId, `${e.chave}-ecr-${ecr}`, `registro-ecr-${ecr}`, r.lido?.bruta)
         : '';
     out.push({
       ecr_id: r.ecrId,
@@ -338,9 +361,6 @@ async function registrosParaGravar(e: EntregaDoMestre): Promise<Record<string, u
       ...(documentoId ? { documento_id: documentoId } : {}),
       ...(r.resposta === 'veio' && r.alcance ? { alcance: r.alcance } : {}),
       ...(r.resposta === 'veio' && r.alcance === 'vale_ate' && r.validoAte ? { valido_ate: r.validoAte } : {}),
-      ...(r.resposta === 'veio' && r.lido
-        ? { lido_pela_ia: { alcance: r.lido.alcance, valido_ate: r.lido.validoAte || null, confira: r.lido.confira } }
-        : {}),
     });
   }
   return out;

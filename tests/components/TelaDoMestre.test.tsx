@@ -166,7 +166,7 @@ describe('a tela do mestre, ligada ao banco', () => {
       cartoes: [{
         ...CARTAO,
         registros: [{
-          ecrId: 19, pede: true, porque: '', revisao: '00', posicoes: [1], linhas: [{ texto: 'FISPQ (teste)', numerado: true }],
+          ecrId: 19, pede: true, porque: '', revisao: '00', posicoes: [1], linhas: [{ rotulo: null, texto: 'FISPQ (teste)', numerado: true }],
         }],
       }],
       obras: [{ id: 'obra-1', nome: 'Obra de Teste' }],

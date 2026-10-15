@@ -19,6 +19,7 @@
  */
 
 import { formatDate } from './format';
+import type { EcrItem } from './types';
 
 /**
  * Os alcances, na ordem dos botões. ⚠️ Com a outra opção do Pedro (o item 24),
@@ -27,11 +28,11 @@ import { formatDate } from './format';
 export const ALCANCES = ['lote', 'vale_ate', 'produto'] as const;
 export type Alcance = (typeof ALCANCES)[number];
 
-/** Uma linha do "REGISTRO DO FORNECEDOR", como está na ECR. */
-export interface LinhaDoRegistro {
-  texto: string;
-  numerado: boolean;
-}
+/**
+ * Uma linha do "REGISTRO DO FORNECEDOR", como está na ECR (CTO-D813 §3): a
+ * numerada é da lista, a sem número é nota (a da CDL, na 02).
+ */
+export type LinhaDoRegistro = EcrItem;
 
 /** O que o banco diz de uma ECR da entrega (`material_a_chegar.registros`). */
 export interface RegistroPedido {
@@ -42,7 +43,7 @@ export interface RegistroPedido {
   porque: string;
   /** A revisão da ECR que valia na Data da OC. */
   revisao: string;
-  /** O que a ECR pede, linha por linha, como está. */
+  /** O que a ECR pede, linha por linha, como está; vazio quando a revisão não tem o texto no sistema. */
   linhas: LinhaDoRegistro[];
   /** As posições, na OC, dos itens desta ECR. */
   posicoes: number[];
@@ -56,6 +57,11 @@ export interface LeituraDoRegistro {
   /** AAAA-MM-DD, só no `vale_ate`. */
   validoAte: string;
   confira: string;
+  /**
+   * A resposta da leitura como veio. Ela sobe com o papel, no `extracao` da
+   * arquivar-documento, e o banco a guarda uma vez só, no documento (Banco-D812 §4).
+   */
+  bruta?: Record<string, unknown>;
 }
 
 /** O que o encarregado respondeu para uma ECR (a foto mora fora, no celular). */
@@ -68,7 +74,7 @@ export interface RegistroRespondido {
   validoAte: string;
   /** Ele tocou em "Está certo", ou escolheu outro. */
   conferido: boolean;
-  /** A leitura, como veio, para o banco guardar (`lido_pela_ia`). */
+  /** A leitura, como veio: sobe com o papel (`extracao`). */
   lido: LeituraDoRegistro | null;
 }
 
