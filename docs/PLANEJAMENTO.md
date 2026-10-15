@@ -3955,3 +3955,28 @@ passa pela conferência do gatilho.
 lote deixam de ser pedidos quando o documento da empresa chega primeiro.
 
 **O banco não mudou.**
+
+## Decisão 117 — no ar: a tela da trava da Data pergunta ao banco nas duas portas de emissão · 15/10/2026
+
+**POR QUÊ (CTO-D812 §1):** o CTO conferiu o CI, o código e as 4 fotos, e mandou publicar sem esperar a parte B. A
+tela não depende dela, e conserta o caminho que estava no ar desde as 17h05: com a Data passada, o "Qualificar
+agora" abria e o banco recusava depois.
+
+**O QUE MUDOU:**
+- **a junção:** `d808-trava-da-data` (`0a3ec63`) no `main` em `3e09378`, sem conflito;
+- **a bateria:** 1110 testes, tipos e lint limpos;
+- **o desfazer**, anotado antes: `6547e313`, com 100% do tráfego;
+- **publicado pelo PowerShell às 18h05 de 15/10:** `f47f687c-3744-4c7a-b947-f502de49cb21`, versão
+  `20261015210401-3e09378`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` servido é o novo;
+- os dois pedaços que mudaram têm a mesma impressão SHA-256 do pacote gerado;
+- no servido estão a chamada `qualificacao_na_data`, a dica da emissão e o "(sem número)";
+- nenhuma OC foi emitida para medir.
+
+**DAQUI EM DIANTE:**
+- a parte C pelo recebimento, com os três ajustes da D812 §2, contra o banco falso;
+- a parte B espera o teste do Pedro, e junta o `main` antes de ir ao ar.
+
+**O banco não mudou por esta casa.**
