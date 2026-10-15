@@ -3911,3 +3911,47 @@ validade; quem anexou confere.
 **O TAMANHO:** cerca de 780 linhas sem os testes, em dois ramos: o recebimento primeiro, a qualificação depois.
 
 **Nada construído. O banco não mudou.**
+
+## Decisão 115 — a tela da trava da Data pergunta ao banco, no ramo `d808-trava-da-data` · 15/10/2026
+
+**POR QUÊ (CTO-D810, D811 §2):** a `compras.qualificacao_na_data` está na produção desde as 17h05. A regra mora no
+banco, e a tela só a antecipa nas duas portas de emissão.
+
+**O QUE MUDOU** (ramo `d808-trava-da-data`, `0a3ec63`, sobre o `main` `eea5daa`, numa cópia própria):
+- a "Emitir OC" da Nova OC e a "emitida" do Histórico perguntam ao banco, com o fornecedor, as ECRs e a Data da OC,
+  sem gravar;
+- a recusa sai como "A OC (sem número) não pode ser emitida: <motivo do banco>." e a dica da D810. A dica é a da
+  emissão, ou a sem rascunho na OC já emitida;
+- **a recusa da Data não abre o "Qualificar agora".** Quando a de hoje recusa e a Data é hoje ou adiante, abre como
+  antes, sem perguntar. Quando a Data é passada, pergunta primeiro;
+- a pergunta que falha segue para a gravação, onde o gatilho confere de novo.
+
+**A PROVA:**
+- 1110 testes (18 novos), tipos e lint limpos;
+- 20 sabotagens vermelhas;
+- 4 fotos em `docs/Capturas/2026-10-15_D810/`;
+- junta com a parte B sem conflito;
+- +95 e −3 linhas em `src`.
+
+**DOIS ACHADOS AO BANCO:** a Data de uma OC emitida não muda pela tela hoje; e a cancelada que volta a emitida não
+passa pela conferência do gatilho.
+
+**O banco não mudou. Não publiquei.** Na produção, depois da parte B.
+
+## Decisão 116 — o desenho da parte C revisto: o alcance de três valores, as palavras da ECR e os seis casos · 15/10/2026
+
+**POR QUÊ (CTO-D811 §3):** a medida das 20 ECRs mostrou três furos: a palavra "certificado", o documento sem prazo
+(a FISPQ), e a ECR com mais de um item.
+
+**O DESENHO** (carta de 15/10, sem construir):
+- o alcance: "deste lote", "vale até" ou "vale para o produto", com a recomendação do CTO. Com a outra opção do Pedro,
+  sai o terceiro;
+- a tela diz o que a ECR pede, com a lista do "REGISTRO DO FORNECEDOR" da revisão da Data da OC;
+- a regra do "pede" mora no banco, em seis regras na ordem, e os seis casos viram teste lá;
+- o carimbo tem três respostas: "Veio", "Não veio" e "Não se aplica a esta entrega", esta com uma frase;
+- ~820 linhas, em dois ramos.
+
+**A PERGUNTA AO CTO:** a marca "a cada entrega" na revisão de 3 ECRs (01, 02, 17). Sem ela, a GCA e o certificado do
+lote deixam de ser pedidos quando o documento da empresa chega primeiro.
+
+**O banco não mudou.**

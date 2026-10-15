@@ -157,12 +157,11 @@ Meta: 23/10.
 *Aberta em 15/10/2026, na decisão 110.*
 1. ~~**a parte A**~~ **no ar** em `6547e313`, versão `20261015191902-1f530e7`, pelo `main` `1f530e7` (decisão 112),
    com a medida por fora; o desfazer é `ea46638b`;
-2. **a trava da Data:** o CTO disse sim (D808 §2). O Banco faz primeiro; a tela desta casa vem depois da parte B e
-   quando a parte do Banco estiver no ensaio, nas duas portas de emissão, com o teste de que tela e banco dão a mesma
-   resposta;
-3. **a parte C** (os certificados por ECR): o Pedro escolheu a opção 1 sem a marca, e a IA diz se o certificado tem
-   validade (D809 §3). O desenho em uma página foi ao CTO (decisão 114), com três perguntas; nada se constrói
-   antes da conferência dele;
+2. **a trava da Data:** a função do Banco está na produção. A tela está pronta no ramo `d808-trava-da-data`
+   (`0a3ec63`, decisão 115), **sem publicar**: falta a conferência do CTO, e na produção ela vai depois da parte B;
+3. **a parte C** (o registro do fornecedor por ECR): o desenho revisto foi ao CTO (decisão 116), com o alcance de
+   três valores e os seis casos. Esperam-se a resposta do Pedro sobre o documento sem prazo e a do CTO sobre a marca
+   "a cada entrega". Constrói-se depois da parte B no ar e da trava da Data, em dois ramos;
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
    computador, pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
    - falta o teste do Pedro com um orçamento real;
@@ -173,8 +172,7 @@ Meta: 23/10.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D808, a D809 e a D810 ficam na `Devolucoes` até lá. A D810: a tela da trava da Data chama a
-`compras.qualificacao_na_data` do Banco, sem reescrever a regra. A D806 foi ao arquivo morto.
+A D805, a D808 e a D811 ficam na `Devolucoes` até lá. A D806, a D809 e a D810 foram ao arquivo morto.
 
 ---
 
