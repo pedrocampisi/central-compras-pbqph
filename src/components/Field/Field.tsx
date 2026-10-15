@@ -9,6 +9,8 @@ interface FieldBaseProps {
   required?: boolean;
   /** Onde o balão do tutorial acende (`data-tutorial`, CTO-D763). */
   marca?: string;
+  /** Embaixo da dica: o "confira" do que a IA preencheu (CTO-D805 §2). */
+  aviso?: ReactNode;
 }
 
 // ── Input Field ────────────────────────────────────────────────────────────────
@@ -34,7 +36,7 @@ export type FieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps
  * `htmlFor` liga o rótulo ao controle, para o leitor de tela e para o clique.
  */
 export function FieldShell({
-  label, hint, wide, span2, required, marca, ajuda, htmlFor, children,
+  label, hint, wide, span2, required, marca, ajuda, aviso, htmlFor, children,
 }: FieldBaseProps & { htmlFor: string; children: ReactNode; /** Um "?" ao lado do rótulo (CTO-D764). */ ajuda?: ReactNode }) {
   const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
@@ -57,11 +59,12 @@ export function FieldShell({
       )}
       {children}
       {hint && <span className={styles.hint}>{hint}</span>}
+      {aviso}
     </div>
   );
 }
 
-export function Field({ label, hint, wide, span2, required, marca, as: As = 'input', ...rest }: FieldProps) {
+export function Field({ label, hint, wide, span2, required, marca, aviso, as: As = 'input', ...rest }: FieldProps) {
   const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
     .join(' ');
@@ -82,6 +85,7 @@ export function Field({ label, hint, wide, span2, required, marca, as: As = 'inp
         <input {...(rest as InputHTMLAttributes<HTMLInputElement>)} />
       )}
       {hint && <span className={styles.hint}>{hint}</span>}
+      {aviso}
     </div>
   );
 }
