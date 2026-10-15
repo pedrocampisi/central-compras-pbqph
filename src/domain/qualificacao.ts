@@ -428,6 +428,29 @@ export function fraseDaTravaDoBanco(e: ErroDoBanco): string {
   return `${e.message.trim().replace(/\.$/, '')}.${dica}`;
 }
 
+/**
+ * A trava da Data (CTO-D808, D810): quando a OC sai do rascunho, ou quando a
+ * Data de uma OC já emitida muda. As duas dicas são as do gatilho do banco.
+ */
+export type OcasiaoDaData = 'emissao' | 'data_mudou';
+
+export const DICA_DA_DATA: Record<OcasiaoDaData, string> = {
+  emissao: 'A qualificação vem antes da compra (PS.02): confira a Data da OC, ou salve como rascunho.',
+  data_mudou: 'A qualificação vem antes da compra (PS.02): confira a Data da OC.',
+};
+
+/**
+ * A recusa da Data, na forma da recusa da emissão. O motivo é o que a
+ * `compras.qualificacao_na_data` devolveu, como veio: a regra mora no banco,
+ * e a tela só põe a moldura e a dica (D810). Sem número, como o banco escreve.
+ */
+export function fraseDaTravaDaData(numero: string, motivo: string, ocasiao: OcasiaoDaData): string {
+  return fraseDaTravaDoBanco({
+    message: `A OC ${numero.trim() || '(sem número)'} não pode ser emitida: ${motivo.trim()}`,
+    hint: DICA_DA_DATA[ocasiao],
+  });
+}
+
 export function fraseDaRecusaDaQualificacao(e: ErroDoBanco): string {
   switch (e.code) {
     case '42501':

@@ -12,9 +12,10 @@
  */
 
 import type { Fornecedor, OrdemCompra } from '../../domain/types';
-import { ecrsDaOc, seloDaFilial, travaDaQualificacao, type Selo } from '../../domain/qualificacao';
+import { ecrsDaOc, fraseDaTravaDaData, seloDaFilial, travaDaQualificacao, type Selo } from '../../domain/qualificacao';
 import { qualificacoesDoDia, useQualificacaoStore } from '../../stores/useQualificacaoStore';
 import { hojeEmSaoPaulo } from '../../domain/ecr';
+import { qualificacaoNaData } from '../../services/supabase/qualificacao';
 
 export interface QualificacaoParaEmitir {
   /** '' = pode emitir; senão, a frase para a pessoa, que termina mandando à ficha da empresa. */
@@ -43,4 +44,36 @@ export function qualificacaoParaEmitir(
     selo,
     ecrs,
   };
+}
+
+/**
+ * A segunda pergunta, feita ao banco: a qualificação valia na Data da OC
+ * (CTO-D808, D810)? A regra mora na `compras.qualificacao_na_data`; a tela só
+ * mostra o motivo dela, na moldura da recusa da emissão. '' = pode emitir.
+ *
+ * - Sem ECR, sem fornecedor ou sem Data, não pergunta: não há o que conferir,
+ *   ou a outra validação da tela recusa antes.
+ * - A de hoje já recusou e a Data é hoje ou adiante: não pergunta. Quem decide
+ *   é o "Qualificar agora", que resolve as duas.
+ * - A Data é passada: pergunta mesmo com a de hoje recusada. Uma qualificação
+ *   de hoje não vale para ela, e o "Qualificar agora" não pode ser a saída.
+ * - A pergunta falhou (sem rede, sessão caída): segue. O banco confere a mesma
+ *   regra ao gravar, e recusa com a mesma frase.
+ */
+export async function travaDaDataParaEmitir(
+  oc: Pick<OrdemCompra, 'numero' | 'status' | 'fornecedor_id' | 'data'>,
+  q: Pick<QualificacaoParaEmitir, 'trava' | 'ecrs'>,
+): Promise<string> {
+  if (q.ecrs.length === 0 || !oc.fornecedor_id || !oc.data) return '';
+  if (q.trava && oc.data >= hojeEmSaoPaulo()) return '';
+  let r;
+  try {
+    r = await qualificacaoNaData(oc.fornecedor_id, q.ecrs, oc.data);
+  } catch {
+    return '';
+  }
+  if (r.emite) return '';
+  // Sai do rascunho (ou da cancelada) = emissão; a OC que já estava emitida só muda a Data.
+  const ocasiao = oc.status === 'rascunho' || oc.status === 'cancelada' ? 'emissao' : 'data_mudou';
+  return fraseDaTravaDaData(oc.numero, r.motivo, ocasiao);
 }

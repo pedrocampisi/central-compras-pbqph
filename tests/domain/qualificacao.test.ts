@@ -9,6 +9,7 @@ import {
   fraseDaRecusaDaCiencia,
   fraseDaRecusaDaEntrega,
   fraseDaRecusaDaQualificacao,
+  fraseDaTravaDaData,
   fraseDaTravaDoBanco,
   historicoDaFilial,
   naoConformes,
@@ -197,6 +198,18 @@ describe('as recusas do banco (contrato de 28/09 §2 e §4), em frase de gente',
       }),
     ).toBe(
       'A OC 2026/009 não pode ser emitida: a empresa está sem qualificação de material. Qualifique a empresa antes.',
+    );
+  });
+
+  it('D810 — a trava da Data: o motivo do banco na moldura da emissão, com a dica de cada ocasião', () => {
+    const motivo = 'na Data da OC (10/01/2026), a qualificação de material do fornecedor não cobria as ECRs 03, 07 e 10';
+    expect(fraseDaTravaDaData('', motivo, 'emissao')).toBe(
+      'A OC (sem número) não pode ser emitida: na Data da OC (10/01/2026), a qualificação de material do fornecedor ' +
+        'não cobria as ECRs 03, 07 e 10. A qualificação vem antes da compra (PS.02): confira a Data da OC, ou salve como rascunho.',
+    );
+    expect(fraseDaTravaDaData('2026/012', 'a Data da OC (10/01/2026) é anterior à qualificação de material do fornecedor (07/05/2026)', 'data_mudou')).toBe(
+      'A OC 2026/012 não pode ser emitida: a Data da OC (10/01/2026) é anterior à qualificação de material do fornecedor ' +
+        '(07/05/2026). A qualificação vem antes da compra (PS.02): confira a Data da OC.',
     );
   });
 

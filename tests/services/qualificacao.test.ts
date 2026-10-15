@@ -65,6 +65,7 @@ import {
   carregarQualificacoes,
   darCienciaTratativa,
   lerAvaliacoesDeEntrega,
+  qualificacaoNaData,
   qualificarEmpresa,
   registrarEntrega,
 } from '../../src/services/supabase/qualificacao';
@@ -341,5 +342,31 @@ describe('Perícia 28/09 (fornecedores), achado 5 — o desempenho com mais linh
     } finally {
       vi.restoreAllMocks();
     }
+  });
+});
+
+describe('D810 — a trava da Data perguntada ao banco, com as chaves da função', () => {
+  it('chama a compras.qualificacao_na_data com o fornecedor, as ECRs e a Data, e lê a linha que volta', async () => {
+    banco.estado.rpc = [];
+    banco.estado.resposta = {
+      data: [{ data: '2026-01-10', emite: false, motivo: 'o motivo do banco (teste)', situacao: 'sem_qualificacao' }],
+      error: null,
+    };
+    const r = await qualificacaoNaData('filial-a', [12, 19], '2026-01-10');
+    expect(banco.estado.rpc).toEqual([
+      { nome: 'qualificacao_na_data', args: { p_fornecedor_id: 'filial-a', p_ecrs: [12, 19], p_data: '2026-01-10' } },
+    ]);
+    expect(r).toEqual({ emite: false, motivo: 'o motivo do banco (teste)' });
+  });
+
+  it('emite só com verdadeiro de fato; sem linha, ou com erro (o 42501 de quem não entrou), sobe erro', async () => {
+    banco.estado.resposta = { data: [{ emite: true, motivo: 'sem item de ECR: não é material controlado' }], error: null };
+    expect((await qualificacaoNaData('f', [12], '2026-01-10')).emite).toBe(true);
+    banco.estado.resposta = { data: [{ emite: 'true', motivo: '' }], error: null };
+    expect((await qualificacaoNaData('f', [12], '2026-01-10')).emite).toBe(false);
+    banco.estado.resposta = { data: [], error: null };
+    await expect(qualificacaoNaData('f', [12], '2026-01-10')).rejects.toThrow('não respondeu');
+    banco.estado.resposta = { data: null, error: { code: '42501', message: 'permission denied' } };
+    await expect(qualificacaoNaData('f', [12], '2026-01-10')).rejects.toThrow('permission denied');
   });
 });
