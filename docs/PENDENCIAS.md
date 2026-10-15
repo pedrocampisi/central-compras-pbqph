@@ -160,16 +160,20 @@ Meta: 23/10.
 2. **a trava da Data:** o CTO disse sim (D808 §2). O Banco faz primeiro; a tela desta casa vem depois da parte B e
    quando a parte do Banco estiver no ensaio, nas duas portas de emissão, com o teste de que tela e banco dão a mesma
    resposta;
-3. **a parte C** (os certificados por ECR) é só proposta, e espera a palavra do Pedro;
-4. **a parte B** (a IA monta o alto e os totais da OC) está pronta no ramo `d805b-ia-monta-a-oc` (`01e8900`,
-   decisão 111), **sem publicar**. Ela liga de verdade quando o Banco publicar o `cabecalho` da `extrair-itens` no
-   ensaio, e o Pedro testa com um orçamento real antes de publicar;
+3. **a parte C** (os certificados por ECR): o Pedro escolheu a opção 1 sem a marca, e a IA diz se o certificado tem
+   validade (D809 §3). O desenho em uma página vai ao CTO antes de construir;
+4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
+   computador, pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
+   - falta o teste do Pedro com um orçamento real;
+   - depois, a aprovação do CTO. Na produção, a parte B vai primeiro e a versão 24 do Banco depois;
+   - depois do teste, desligar o servidor e devolver o `launch.json` (a cópia está no rascunho da sessão);
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D808 ficam na `Devolucoes` até lá. A D806 foi ao arquivo morto.
+A D805, a D808, a D809 e a D810 ficam na `Devolucoes` até lá. A D810: a tela da trava da Data chama a
+`compras.qualificacao_na_data` do Banco, sem reescrever a regra. A D806 foi ao arquivo morto.
 
 ---
 

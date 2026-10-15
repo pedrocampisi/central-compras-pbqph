@@ -3866,3 +3866,30 @@ Qualidade" sai antes, porque o PDF não o usa mais.
 **DAQUI EM DIANTE:** a tela da trava da Data, depois da parte B e quando a parte do Banco estiver no ensaio.
 
 **O banco não mudou por esta casa.**
+
+## Decisão 113 — a parte B ligada no ensaio, medida com as 14 leituras reais da versão 24 · 15/10/2026
+
+**POR QUÊ (CTO-D809 §2):** o CTO conferiu o ramo da parte B, e o Banco pôs o `cabecalho` no ensaio (a `extrair-itens`
+versão 24). Falta o teste do Pedro com um orçamento real dele.
+
+**O QUE MUDOU** (ramo `d805b-ia-monta-a-oc`):
+- **um conserto achado na medida** (`6b3b9e0`): a versão 24 manda as dez chaves sempre, e a lista de materiais colada
+  falava do fornecedor à toa. O cabeçalho todo vazio agora conta como não lido. Com o teste e a sabotagem;
+- **o `main` de hoje junto no ramo** (`1647826`), para o ensaio mostrar o programa inteiro;
+- **o ensaio ligado neste computador:** http://localhost:5174, no modo `ensaio`. O código servido aponta para o
+  `banco-de-ensaio`. O Pedro entra com a conta dele do ensaio (administrador), ou com a "Conta de ensaio"; quem
+  digita a senha é ele.
+
+**A MEDIDA:** as 14 respostas reais da versão 24, guardadas pelo Banco, passaram pela Nova OC de verdade, sem login:
+- o fornecedor sai pelo CNPJ do emitente, nunca pelo do cliente;
+- o frete nunca entra duas vezes;
+- a conferência do total bate em 5 dos papéis. No P2 ela mostra a diferença, que é o desconto em porcentagem;
+- a lista sem cabeçalho não mexe no alto.
+
+**A PROVA:** 1119 testes (com a parte A), tipos e lint limpos, 28 sabotagens da parte B vermelhas. São 463 linhas a mais e
+11 a menos sem os testes.
+
+**A ORDEM DA PRODUÇÃO (D809):** depois do teste do Pedro e da aprovação do CTO, a parte B primeiro (o desfazer hoje é
+`6547e313`), e a versão 24 do Banco depois. Nunca o contrário.
+
+**O banco não mudou. Não publiquei.**
