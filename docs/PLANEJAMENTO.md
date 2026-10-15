@@ -3893,3 +3893,21 @@ versão 24). Falta o teste do Pedro com um orçamento real dele.
 `6547e313`), e a versão 24 do Banco depois. Nunca o contrário.
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 114 — o desenho da parte C (os certificados por ECR) foi ao CTO, sem construir · 15/10/2026
+
+**POR QUÊ (CTO-D809 §3):** o Pedro escolheu a opção 1, sem a marca nas linhas. A IA lê o certificado e diz se ele tem
+validade; quem anexou confere.
+
+**O DESENHO:**
+- o certificado com validade fica na empresa e na ECR até a data; o de lote fica na OC e no item; na dúvida, conta
+  como de lote;
+- no carimbo do recebimento, a pergunta "veio o certificado?" aparece por ECR, só quando não há um com validade em
+  arquivo;
+- na qualificação, por ECR, a linha "Certificados com validade", com o anexar e o aviso de vencimento;
+- o contrato pedido ao Banco: a `compras.certificados`, duas gravações, o `pede_certificado` na `material_a_chegar`, e a
+  `ler-documento` com a origem `certificado`. O arquivo entra pela `arquivar-documento`.
+
+**O TAMANHO:** cerca de 780 linhas sem os testes, em dois ramos: o recebimento primeiro, a qualificação depois.
+
+**Nada construído. O banco não mudou.**

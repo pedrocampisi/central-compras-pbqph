@@ -161,7 +161,8 @@ Meta: 23/10.
    quando a parte do Banco estiver no ensaio, nas duas portas de emissão, com o teste de que tela e banco dão a mesma
    resposta;
 3. **a parte C** (os certificados por ECR): o Pedro escolheu a opção 1 sem a marca, e a IA diz se o certificado tem
-   validade (D809 §3). O desenho em uma página vai ao CTO antes de construir;
+   validade (D809 §3). O desenho em uma página foi ao CTO (decisão 114), com três perguntas; nada se constrói
+   antes da conferência dele;
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
    computador, pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
    - falta o teste do Pedro com um orçamento real;
