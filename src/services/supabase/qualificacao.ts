@@ -231,6 +231,34 @@ export async function qualificarEmpresa(q: QualificacaoNova): Promise<Qualificac
   };
 }
 
+/** O que a `compras.qualificacao_na_data` responde e a tela usa: emite, ou o motivo da recusa. */
+export interface QualificacaoNaData {
+  emite: boolean;
+  motivo: string;
+}
+
+/**
+ * A trava da Data perguntada ao banco, sem gravar nada (CTO-D810): valia, na
+ * Data da OC, a qualificação de material do fornecedor para estas ECRs? Serve
+ * também para o rascunho que ainda não foi gravado. Quem não entrou recebe
+ * 42501, e aqui vira erro.
+ */
+export async function qualificacaoNaData(
+  fornecedorId: string,
+  ecrs: readonly number[],
+  data: string,
+): Promise<QualificacaoNaData> {
+  const { data: linhas, error } = await compras().rpc('qualificacao_na_data', {
+    p_fornecedor_id: fornecedorId,
+    p_ecrs: ecrs,
+    p_data: data,
+  });
+  if (error) throw new Error(error.message);
+  const r = (Array.isArray(linhas) ? linhas[0] : linhas) as Record<string, unknown> | null | undefined;
+  if (!r) throw new Error('O banco não respondeu sobre a Data da OC.');
+  return { emite: r['emite'] === true, motivo: txt(r['motivo']) };
+}
+
 export interface EntregaGravada {
   avaliacaoId: number;
   status: string;
