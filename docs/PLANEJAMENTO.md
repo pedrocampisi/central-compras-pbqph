@@ -3773,3 +3773,40 @@ antes de gravar.
 
 **A Rev. 00 gravada não mudou. Ninguém apertou "Gravar": a Rev. 01 continua esperando o Pedro.**
 **O banco não mudou por esta casa.**
+
+## Decisão 110 — a política e o registro por ECR no PDF da OC, e a tela da qualificação, num ramo · 15/10/2026
+
+**POR QUÊ (CTO-D805 §1):** na aula do PBQP-H de 15/10, a consultora pediu duas coisas:
+- a política da qualidade dentro do PDF da OC;
+- o que o fornecedor deve mandar, por ECR, no lugar do "CRITÉRIO DE QUALIFICAÇÃO CONFORME ECR".
+
+E leu a tela da qualificação ao contrário: tomou as entregas pela avaliação e as ECRs por itens comprados.
+
+**O QUE MUDOU** (ramo `d805a-pdf-qualificacao`, `6e2c80f`, saído do `main` `1804d16`):
+- **A1:** o quadro "POLÍTICA DA QUALIDADE (FO 5.2)", com a frase do FO 5.2, uma vez por OC.
+  - A frase foi conferida contra o arquivo do SGQ e está guardada no código.
+  - A configuração não a tira e não a troca.
+- **A2:** a seção "REGISTRO DO FORNECEDOR" de cada ECR dos itens, como está, na ordem da primeira aparição.
+  - **A revisão que vale é a da Data da OC.** O texto antigo vem de `compras.ecr_revisoes` só quando a vigente é mais
+    nova que a Data. Se faltar, o PDF diz, e nunca põe o texto de outra revisão.
+  - A OC sem ECR diz isso no quadro. Na produção, é 1 das 4.
+- **A3:** no alto da tela, "Qualificação, ANTES da compra" e "Avaliação, DEPOIS da entrega".
+  - As entregas embaixo da nota ganharam nome.
+  - A lista de ECRs diz "Qualificada para".
+  - As perguntas do PS.02 não mudaram.
+
+**A MEDIDA DA DATA:** a OC pode sair com a Data anterior à qualificação.
+- O campo aceita qualquer dia, e a trava do banco olha a qualificação de hoje.
+- Na produção, nenhuma das 4 OCs está assim. Mas 3 têm a Data de 9 a 16 dias antes do dia em que foram criadas.
+- A trava, no banco e na tela, ficou proposta ao CTO, sem construir.
+
+**A PARTE C:** só a proposta dos certificados por ECR, com duas opções e a recomendação (a marca "por lote" ou "por
+validade" em cada linha, depois a guarda). Nada construído.
+
+**A PROVA:**
+- 1091 testes, tipos e lint limpos;
+- 14 sabotagens, todas vermelhas;
+- 8 fotos em `docs/Capturas/2026-10-15_D805A/`;
+- 371 linhas a mais e 16 a menos, sem os testes.
+
+**O banco não mudou. Não publiquei.**

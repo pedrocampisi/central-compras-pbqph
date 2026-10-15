@@ -152,6 +152,22 @@ Meta: 23/10.
 
 ---
 
+### 40. A D805: a política e o registro por ECR no PDF, a tela da qualificação, e a IA que monta a OC
+
+*Aberta em 15/10/2026, na decisão 110.*
+1. **a parte A** está pronta no ramo `d805a-pdf-qualificacao` (`6e2c80f`, decisão 110), **sem publicar**:
+   - falta o CTO conferir as fotos e avisar;
+   - depois, juntar no `main`, anotar o desfazer (hoje `ea46638b`), publicar e medir por fora;
+2. **a trava da Data** (a OC com Data anterior à qualificação) espera a decisão do CTO;
+3. **a parte C** (os certificados por ECR) é só proposta, e espera a palavra do Pedro;
+4. **a parte B** (a IA monta o alto e os totais da OC) vem num ramo próprio. Ela liga de verdade quando o Banco
+   publicar o `cabecalho` da `extrair-itens` no ensaio, e o Pedro testa com um orçamento real antes de publicar;
+5. **a sobra:** o campo "Requisito de Qualidade" da Configuração não é mais usado pelo PDF. Sai se o CTO quiser.
+
+A D805 e a D806 ficam na `Devolucoes` até lá.
+
+---
+
 ### 2. Dívida: `extractItems.ts` lê o endereço do banco sem conferir se veio
 
 *Minha, para quando o congelamento sair em **06/09/2026** — entra junto com o item 3.*
