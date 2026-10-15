@@ -54,14 +54,18 @@ function diaValido(dia: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(dia) && !Number.isNaN(Date.parse(`${dia}T00:00:00Z`));
 }
 
-/** O `cabecalho` como veio do servidor; `null` se não veio (a v4 não manda). */
+/**
+ * O `cabecalho` como veio do servidor; `null` se não veio (a v4 não manda) ou
+ * se veio todo vazio. A v24 manda as dez chaves sempre, e a lista de materiais
+ * colada não é orçamento: sem nada no papel, a tela não fala do alto da OC.
+ */
 export function cabecalhoDoServidor(v: unknown): CabecalhoLido | null {
   if (!v || typeof v !== 'object') return null;
   const c = v as Record<string, unknown>;
   const cnpj = texto(c['cnpj_emitente']).replace(/\D/g, '');
   const dias = c['entrega_dias'];
   const data = texto(c['entrega_data']);
-  return {
+  const lido: CabecalhoLido = {
     // Só CNPJ: 14 dígitos. CPF (11) ou número quebrado não vale.
     cnpj_emitente: cnpj.length === 14 ? cnpj : '',
     condicao_pagamento: texto(c['condicao_pagamento']),
@@ -74,6 +78,7 @@ export function cabecalhoDoServidor(v: unknown): CabecalhoLido | null {
     total: reais(c['total']),
     confira: texto(c['confira']),
   };
+  return Object.values(lido).some((x) => x !== '' && x !== null) ? lido : null;
 }
 
 export type FornecedorDoCnpj =

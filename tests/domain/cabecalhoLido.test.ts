@@ -36,10 +36,11 @@ const ALFA_FILIAL = filial('a2', '11111111000281', 'alfa');
 const BETA = filial('b1', '22222222000100');
 const TODOS = [ALFA_MATRIZ, ALFA_FILIAL, BETA];
 
-const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({
-  ...cabecalhoDoServidor({})!,
-  ...c,
-});
+const VAZIO: CabecalhoLido = {
+  cnpj_emitente: '', condicao_pagamento: '', entrega_texto: '', entrega_dias: null, entrega_data: '',
+  frete: null, outras_despesas: null, desconto: null, total: null, confira: '',
+};
+const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({ ...VAZIO, ...c });
 
 describe('o contrato do cabeçalho', () => {
   it('a v4 não manda cabeçalho: nada muda', () => {
@@ -60,8 +61,13 @@ describe('o contrato do cabeçalho', () => {
     });
   });
 
+  it('a v24 manda as dez chaves sempre: todas vazias (a lista de materiais colada) é como não ter vindo', () => {
+    expect(paraResultado({ itens: [], cabecalho: { ...VAZIO } })).not.toHaveProperty('cabecalho');
+    expect(cabecalhoDoServidor({ ...VAZIO, frete: 0 })).toMatchObject({ frete: 0 });
+  });
+
   it('CPF, data quebrada, prazo negativo e valor negativo não entram', () => {
-    const c = cabecalhoDoServidor({ cnpj_emitente: '123.456.789-09', entrega_data: '2026-13-40', entrega_dias: -3, frete: -1 })!;
+    const c = cabecalhoDoServidor({ cnpj_emitente: '123.456.789-09', entrega_data: '2026-13-40', entrega_dias: -3, frete: -1, total: 10 })!;
     expect(c.cnpj_emitente).toBe('');
     expect(c.entrega_data).toBe('');
     expect(c.entrega_dias).toBeNull();

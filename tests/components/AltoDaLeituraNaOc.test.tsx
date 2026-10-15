@@ -25,7 +25,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { normalizeFornecedor, normalizeOC } from '../../src/domain/normalize';
 import { somaDias } from '../../src/domain/qualificacao';
-import { cabecalhoDoServidor, type CabecalhoLido } from '../../src/domain/cabecalhoLido';
+import type { CabecalhoLido } from '../../src/domain/cabecalhoLido';
 import type { Data } from '../../src/domain/types';
 
 const fornecedor = (id: string, cnpj: string) => ({
@@ -46,7 +46,10 @@ const DADOS = {
 
 const ITEM = { id: 'i1', descricao: 'Cimento (teste)', observacao: '', quantidade: 10, unidade: 'sc', preco_unit: 100, ipi_pct: 0, desc_pct: 0, ecr_id: null };
 
-const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({ ...cabecalhoDoServidor({})!, ...c });
+const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({
+  cnpj_emitente: '', condicao_pagamento: '', entrega_texto: '', entrega_dias: null, entrega_data: '',
+  frete: null, outras_despesas: null, desconto: null, total: null, confira: '', ...c,
+});
 const ORCAMENTO = cab({
   cnpj_emitente: '22222222000100', condicao_pagamento: '28 dias', entrega_texto: '3 dias', entrega_dias: 3,
   frete: 80, desconto: 12.5, total: 1000,
