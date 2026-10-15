@@ -16,6 +16,7 @@ const servico = vi.hoisted(() => ({
   registrarEntregaDoMestre: vi.fn(async () => ''),
   registrarSemPedidoDoMestre: vi.fn(async () => undefined),
   lerNumeroDaNotaNaFoto: vi.fn(async () => ''),
+  lerRegistroNaFoto: vi.fn(async () => null),
 }));
 vi.mock('../../src/services/supabase/recebimento', () => servico);
 
@@ -158,6 +159,36 @@ describe('a tela do mestre, ligada ao banco', () => {
       expect.objectContaining({ ocId: 'oc-1', intervencaoId: 'obra-1', soUmaParte: false, foto: null, itens: [{ posicao: 1, quantidade: 2 }] }),
     );
     await waitFor(() => expect(servico.lerMaterialAChegar.mock.calls.length).toBeGreaterThan(leituras));
+  });
+
+  it('o papel do fornecedor que o banco pede vai ao banco com a entrega (D811 §3)', async () => {
+    servico.lerMaterialAChegar.mockResolvedValue({
+      cartoes: [{
+        ...CARTAO,
+        registros: [{
+          ecrId: 19, pede: true, porque: '', revisao: '00', posicoes: [1], linhas: [{ texto: 'FISPQ (teste)', numerado: true }],
+        }],
+      }],
+      obras: [{ id: 'obra-1', nome: 'Obra de Teste' }],
+    });
+    render(<TelaDoMestre aoSair={() => {}} guarda={celular.guarda!} dono="conta-a" />);
+    await userEvent.click((await screen.findAllByRole('button', { expanded: false }))[0]!);
+    await userEvent.click(screen.getByRole('button', { name: 'Receber' }));
+    for (const p of ['Chegou no dia combinado?', 'Chegou sem estrago?', 'Veio o material certo?', 'Veio a quantidade toda?']) {
+      await userEvent.click(
+        screen.getAllByRole('group').find((g) => g.textContent?.startsWith(p))!.querySelector('button')!,
+      );
+    }
+    await userEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
+    await userEvent.type(screen.getByRole('textbox'), '4567');
+    const papel = screen.getByRole('group', { name: 'Veio o papel do fornecedor para Cimento de teste?' });
+    await userEvent.click(within(papel).getByRole('button', { name: 'Não se aplica a esta entrega' }));
+    await userEvent.type(within(papel).getByRole('textbox'), 'é compensado');
+    await userEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(await screen.findByText('Recebido.')).toBeTruthy();
+    expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(
+      expect.objectContaining({ registros: [{ ecrId: 19, resposta: 'nao_se_aplica', motivo: 'é compensado', foto: null }] }),
+    );
   });
 });
 

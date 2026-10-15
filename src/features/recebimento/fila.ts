@@ -19,6 +19,7 @@ import type { Avaliacao } from '../../domain/qualificacao';
 import {
   RecusaDefinitiva, type CartaoAChegar, type ContagemDoMestre, type ItemRecebido, type RespostasDoMestre,
 } from '../../domain/recebimento';
+import type { RegistroNoEnvio, RegistroRespondido } from '../../domain/registroDoFornecedor';
 import type { GuardaDoAparelho } from '../../services/guardaDoAparelho';
 
 export interface SemPedido {
@@ -38,6 +39,8 @@ export interface EnvioDeRecebimento {
   foto: File | null;
   /** Quanto veio de cada item (D794); ausente no que a versão antiga deixou na fila, e aí vai como antes. */
   itens?: ItemRecebido[];
+  /** O papel do fornecedor de cada ECR que o banco pediu (D811), com a foto quando veio. */
+  registros?: (RegistroNoEnvio & { foto?: File | null })[];
 }
 
 export interface EnvioSemPedido {
@@ -67,6 +70,8 @@ export interface RascunhoDoReceber {
   texto: string;
   /** O que ele mudou na lista do "Só uma parte" (D794); ausente no rascunho da versão antiga. */
   contagem?: ContagemDoMestre;
+  /** O que ele respondeu do papel de cada ECR, pelo id da ECR (D811); as fotos moram à parte. */
+  registros?: Record<number, RegistroRespondido>;
 }
 
 /** O que ele preencheu no "sem pedido", e ainda não foi. */
@@ -83,6 +88,8 @@ export const CHAVES = {
   fila: 'fila:',
   receber: (ocId: string) => `rascunho:receber:${ocId}`,
   fotoDoReceber: (ocId: string) => `foto:receber:${ocId}`,
+  /** A foto do papel de uma ECR; sem a ECR, o começo de todas as do pedido. */
+  fotoDoRegistro: (ocId: string, ecrId?: number) => `foto:registro:${ocId}:${ecrId ?? ''}`,
   semPedido: 'rascunho:sem-pedido',
   fotoDoSemPedido: 'foto:sem-pedido',
 };
@@ -140,6 +147,7 @@ export function useFilaDoMestre(
       if (g.envio.tipo === 'receber') {
         await guarda.apagar(CHAVES.receber(g.envio.cartao.ocId));
         await guarda.apagar(CHAVES.fotoDoReceber(g.envio.cartao.ocId));
+        for (const k of await guarda.chaves(CHAVES.fotoDoRegistro(g.envio.cartao.ocId))) await guarda.apagar(k);
       }
       return aviso ? { foi: true, aviso } : { foi: true };
     },

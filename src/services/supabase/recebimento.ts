@@ -6,6 +6,7 @@
  *   as obras dele ...... core.obras_do_mestre_com_nome  (Banco-D710)
  *   a foto da nota ..... arquivar-documento, origem `recebimento-obra`
  *   o número na foto ... ler-documento, origem `ordem-compra`
+ *   o papel da ECR ..... arquivar-documento, `origem_item` `registro-ecr-NN`; a leitura, origem `registro-ecr` (D811)
  *   a entrega .......... compras.registrar_entrega  (sem versão: para o mestre não é conferida)
  *   o sem pedido ....... compras.registrar_sem_pedido
  *
@@ -24,6 +25,9 @@ import {
   RecusaDefinitiva, oQueFazerComARecusa, oQueFazerComOStatus, type CartaoAChegar, type ItemRecebido, type ObraDoMestre,
 } from '../../domain/recebimento';
 import type { Avaliacao } from '../../domain/qualificacao';
+import {
+  ALCANCES, type Alcance, type LeituraDoRegistro, type RegistroNoEnvio, type RegistroPedido,
+} from '../../domain/registroDoFornecedor';
 
 // ---------------------------------------------------------------------------
 // A lista
@@ -32,9 +36,24 @@ import type { Avaliacao } from '../../domain/qualificacao';
 const num = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 const txt = (v: unknown) => (v === null || v === undefined ? '' : String(v));
 
+/** O registro do fornecedor de uma ECR da entrega, como a `material_a_chegar` o manda (D811 §3). */
+function registroDaLinha(r: Record<string, unknown>): RegistroPedido {
+  const linhas = Array.isArray(r['o_que_pede']) ? (r['o_que_pede'] as Record<string, unknown>[]) : [];
+  const posicoes = Array.isArray(r['posicoes']) ? (r['posicoes'] as unknown[]) : [];
+  return {
+    ecrId: num(r['ecr_id']),
+    pede: r['pede'] === true,
+    porque: txt(r['porque']),
+    revisao: txt(r['revisao']),
+    linhas: linhas.map((x) => ({ texto: txt(x['texto']), numerado: x['numerado'] !== false })).filter((x) => x.texto.trim()),
+    posicoes: posicoes.map(Number).filter((p) => Number.isInteger(p) && p >= 1),
+  };
+}
+
 /** Uma linha da `compras.material_a_chegar` → o cartão que o mestre vê. */
 export function cartaoDaLinha(l: Record<string, unknown>): CartaoAChegar {
   const itens = Array.isArray(l['itens']) ? (l['itens'] as Record<string, unknown>[]) : [];
+  const registros = l['registros'];
   return {
     ocId: txt(l['oc_id']),
     intervencaoId: txt(l['intervencao_id']),
@@ -50,6 +69,10 @@ export function cartaoDaLinha(l: Record<string, unknown>): CartaoAChegar {
       unidade: txt(i['unidade']),
     })),
     total: num(l['valor_total']),
+    // Só quando o banco manda: sem a chave, o carimbo fica como antes.
+    ...(Array.isArray(registros) && {
+      registros: (registros as Record<string, unknown>[]).map(registroDaLinha).filter((r) => r.ecrId > 0),
+    }),
   };
 }
 
@@ -181,8 +204,16 @@ export async function chamarFuncao(
  */
 const fotosArquivadas = new Map<string, string>();
 
-/** Guarda a foto da nota na pasta da obra; devolve o id do documento. */
-export async function arquivarFotoDoRecebimento(foto: Blob, intervencaoId: string, chave: string): Promise<string> {
+/**
+ * Guarda a foto na pasta da obra; devolve o id do documento. A da nota, ou o
+ * papel de uma ECR (`origemItem` `registro-ecr-08`, com a chave própria dele).
+ */
+export async function arquivarFotoDoRecebimento(
+  foto: Blob,
+  intervencaoId: string,
+  chave: string,
+  origemItem = 'foto-da-nota',
+): Promise<string> {
   const ja = fotosArquivadas.get(chave);
   if (ja) return ja;
   const { base64, mime } = await prepararFoto(foto);
@@ -194,7 +225,7 @@ export async function arquivarFotoDoRecebimento(foto: Blob, intervencaoId: strin
       mime,
       origem: 'recebimento-obra',
       origem_id: chave,
-      origem_item: 'foto-da-nota',
+      origem_item: origemItem,
       intervencao_id: intervencaoId,
     },
     TEMPO_DA_FOTO_MS,
@@ -205,7 +236,7 @@ export async function arquivarFotoDoRecebimento(foto: Blob, intervencaoId: strin
     fotosArquivadas.set(chave, id);
     return id;
   }
-  const motivo = txt(json['erro']) || 'A foto da nota não foi aceita.';
+  const motivo = txt(json['erro']) || (origemItem === 'foto-da-nota' ? 'A foto da nota não foi aceita.' : 'A foto do papel não foi aceita.');
   if (status !== 200 && oQueFazerComOStatus(status) === 'para') throw new RecusaDefinitiva(motivo);
   throw new Error(motivo);
 }
@@ -222,6 +253,31 @@ export async function lerNumeroDaNotaNaFoto(foto: Blob): Promise<string> {
     return status === 200 ? txt(json['numero_documento']).trim() : '';
   } catch {
     return '';
+  }
+}
+
+/**
+ * Lê o papel da ECR na foto: deste lote, vale até uma data, ou vale para o
+ * produto (D811 §3). Nunca lança: sem leitura, `null`, e a tela conta como
+ * deste lote.
+ */
+export async function lerRegistroNaFoto(foto: Blob): Promise<LeituraDoRegistro | null> {
+  try {
+    const { base64, mime } = await prepararFoto(foto);
+    const { status, json } = await chamarFuncao(
+      'ler-documento',
+      { imagem_base64: base64, mime, origem: 'registro-ecr' },
+      TEMPO_DA_LEITURA_MS,
+    );
+    if (status !== 200) return null;
+    const alcance = txt(json['alcance']);
+    return {
+      alcance: (ALCANCES as readonly string[]).includes(alcance) ? (alcance as Alcance) : null,
+      validoAte: txt(json['valido_ate']).slice(0, 10),
+      confira: txt(json['confira']),
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -260,6 +316,34 @@ export interface EntregaDoMestre {
   foto: Blob | null;
   /** Quanto veio de cada item (D794). Vazio, ou ausente no envio guardado por uma versão antiga: grava como antes. */
   itens?: ItemRecebido[];
+  /** O registro do fornecedor de cada ECR que o banco pediu (D811), com a foto do papel quando veio. */
+  registros?: (RegistroNoEnvio & { foto?: Blob | null })[];
+}
+
+const doisDigitos = (n: number) => String(n).padStart(2, '0');
+
+/** Cada papel sobe com a chave dele; o envio leva o documento, a resposta e o alcance conferido. */
+async function registrosParaGravar(e: EntregaDoMestre): Promise<Record<string, unknown>[]> {
+  const out: Record<string, unknown>[] = [];
+  for (const r of e.registros ?? []) {
+    const ecr = doisDigitos(r.ecrId);
+    const documentoId =
+      r.resposta === 'veio' && r.foto
+        ? await arquivarFotoDoRecebimento(r.foto, e.intervencaoId, `${e.chave}-ecr-${ecr}`, `registro-ecr-${ecr}`)
+        : '';
+    out.push({
+      ecr_id: r.ecrId,
+      resposta: r.resposta,
+      ...(r.motivo?.trim() ? { motivo: r.motivo.trim() } : {}),
+      ...(documentoId ? { documento_id: documentoId } : {}),
+      ...(r.resposta === 'veio' && r.alcance ? { alcance: r.alcance } : {}),
+      ...(r.resposta === 'veio' && r.alcance === 'vale_ate' && r.validoAte ? { valido_ate: r.validoAte } : {}),
+      ...(r.resposta === 'veio' && r.lido
+        ? { lido_pela_ia: { alcance: r.lido.alcance, valido_ate: r.lido.validoAte || null, confira: r.lido.confira } }
+        : {}),
+    });
+  }
+  return out;
 }
 
 /**
@@ -268,6 +352,7 @@ export interface EntregaDoMestre {
  */
 export async function registrarEntregaDoMestre(e: EntregaDoMestre): Promise<string> {
   const fotoId = e.foto ? await arquivarFotoDoRecebimento(e.foto, e.intervencaoId, e.chave) : '';
+  const registros = await registrosParaGravar(e);
   const a = e.avaliacao;
   const p = {
     nota_fiscal: a.notaFiscal.trim(),
@@ -280,6 +365,8 @@ export async function registrarEntregaDoMestre(e: EntregaDoMestre): Promise<stri
     chegou_tudo: !e.soUmaParte,
     ...(fotoId ? { foto_documento_id: fotoId } : {}),
     ...(e.itens?.length ? { itens: e.itens.map((i) => ({ posicao: i.posicao, quantidade: i.quantidade })) } : {}),
+    // Sem ECR pedida, a chave nem vai: o banco de antes recebe como sempre recebeu.
+    ...(registros.length ? { registros } : {}),
     chave: e.chave,
   };
   // Sem versão: a entrega guardada horas no celular é o fato da obra (Banco D697 §2.2.3).

@@ -18,7 +18,7 @@ import { todayIso } from '../../domain/format';
 import { obrasDoMestre, type CartaoAChegar, type ObraDoMestre } from '../../domain/recebimento';
 import { guardaDoAparelho, guardaDoDono, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
-  lerMaterialAChegar, lerNumeroDaNotaNaFoto, registrarEntregaDoMestre, registrarSemPedidoDoMestre,
+  lerMaterialAChegar, lerNumeroDaNotaNaFoto, lerRegistroNaFoto, registrarEntregaDoMestre, registrarSemPedidoDoMestre,
 } from '../../services/supabase/recebimento';
 import { ListaPelaMetade } from '../../services/supabase/dados';
 import type { EnvioDeRecebimento, EnvioSemPedido } from './fila';
@@ -104,6 +104,7 @@ function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) 
         soUmaParte: e.soUmaParte,
         foto: e.foto,
         itens: e.itens ?? [],
+        registros: e.registros ?? [],
       });
       void ler();
       return aviso;
@@ -147,6 +148,7 @@ function TelaDaConta({ aoSair, dono, guarda: guardaDeFora }: TelaDoMestreProps) 
       hoje={todayIso()}
       cartoes={lista.cartoes}
       lerNumeroDaNota={lerNumeroDaNotaNaFoto}
+      lerRegistro={lerRegistroNaFoto}
       aoReceber={aoReceber}
       aoRegistrarSemPedido={aoRegistrarSemPedido}
       aoSair={aoSair}

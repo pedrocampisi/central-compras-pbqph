@@ -632,3 +632,41 @@
   background: var(--aviso-bg);
   color: var(--aviso);
 }
+
+/* O papel do fornecedor (D811): a lista da ECR como está, e as três respostas. */
+.oQuePede {
+  margin: 0;
+  padding: 12px 12px 12px 32px;
+  border-left: 4px solid var(--marca-media);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  color: var(--texto);
+  font-size: 17px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.botoesDoPapel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* "Não se aplica a esta entrega" é comprido: a linha inteira, embaixo. */
+.botoesDoPapel > :last-child {
+  grid-column: 1 / -1;
+}
+
+.marcado {
+  border-color: var(--marca);
+  background: var(--marca-fraca);
+  color: var(--texto);
+}
+
+.alcance {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
