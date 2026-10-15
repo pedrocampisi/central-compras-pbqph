@@ -164,8 +164,11 @@ Meta: 23/10.
    - a marca "a cada entrega" nas ECRs 01, 02 e 17;
    - o alcance que o encarregado conferiu.
 
-   O primeiro ramo é o recebimento, contra o banco falso, enquanto o Banco faz o contrato. Constrói-se com a
-   recomendação até a resposta do Pedro (o item 24 dele);
+   - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`69e92d7`, decisão 118),
+     **sem publicar**: vai ao ar depois da medida no ensaio, com o contrato do Banco;
+   - **o segundo ramo, a qualificação,** espera o sim do CTO.
+
+   Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
    computador, pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
    - falta o teste do Pedro com um orçamento real;
@@ -176,7 +179,7 @@ Meta: 23/10.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D811 e a D812 ficam na `Devolucoes` até lá. A D806, a D808, a D809 e a D810 foram ao arquivo morto.
+A D805 e a D812 ficam na `Devolucoes` até lá. A D806, a D808, a D809, a D810 e a D811 foram ao arquivo morto.
 
 ---
 

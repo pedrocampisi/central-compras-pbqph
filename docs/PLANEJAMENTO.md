@@ -3980,3 +3980,26 @@ agora" abria e o banco recusava depois.
 - a parte B espera o teste do Pedro, e junta o `main` antes de ir ao ar.
 
 **O banco não mudou por esta casa.**
+
+## Decisão 118 — a parte C, primeiro ramo: o papel do fornecedor no carimbo, no ramo `69e92d7` · 15/10/2026
+
+**POR QUÊ (CTO-D812 §2 e §3.2):** o desenho da parte C está aprovado, com três ajustes. O primeiro ramo é o
+recebimento, contra o banco falso, enquanto o Banco faz o contrato no ensaio.
+
+**O QUE MUDOU** (ramo `d812-c1-registro-no-recebimento`, `69e92d7`, sobre o `main` `ae2d93d`, numa cópia própria):
+- o carimbo do encarregado pergunta, por ECR em que a `material_a_chegar` diz `pede`, se veio o papel do fornecedor,
+  com as linhas do "REGISTRO DO FORNECEDOR" como o banco mandar;
+- três respostas: veio (com a foto), não veio, e não se aplica a esta entrega (com a frase);
+- no "veio", a leitura pela `ler-documento` (origem `registro-ecr`), e o encarregado confere o alcance: deste lote,
+  vale até uma data, ou vale para o produto (ajuste 3). Na dúvida, deste lote;
+- a `registrar_entrega` leva `p.registros` só quando há o que levar; o papel sobe pela `arquivar-documento` com
+  `origem_item` `registro-ecr-NN`;
+- sem `registros` na lista, o carimbo fica igual ao de hoje.
+
+**A PROVA:**
+- 1141 testes (31 novos), tipos e lint limpos;
+- 31 sabotagens vermelhas;
+- 4 fotos em `docs/Capturas/2026-10-15_D812_C1/`;
+- +568 e −14 linhas em `src`, e +473 em testes.
+
+**O banco não mudou. Não publiquei.** O ramo vai ao ar depois da medida no ensaio, com o contrato do Banco.
