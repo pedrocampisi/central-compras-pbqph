@@ -152,6 +152,19 @@ Meta: 23/10.
 
 ---
 
+### 41. A D814: o perfil sem a Ordem de Compra
+
+*Aberta em 15/10/2026, na decisão 119.* Decisão do Pedro: uma pessoa do financeiro entra na Central de Dados, e não
+precisa da Ordem de Compra.
+- **A trava é do banco:** a marca `core.perfis.sem_ordem_de_compra`, e a recusa "Seu acesso não inclui a Ordem de
+  Compra.".
+- **A tela só avisa:** ela lê a marca na `perfilAtual`, e com a marca não entra, com a frase e o "Sair". Sem a marca,
+  fica tudo como hoje.
+- **Os testes:** com a marca, o aviso; sem a marca, como hoje; e uma sabotagem que deixa entrar.
+- **Num ramo, contra o banco falso, sem publicar.** Vem antes do ramo 2 da parte C. A carta volta com as fotos e o CI.
+
+---
+
 ### 40. A D805: a política e o registro por ECR no PDF, a tela da qualificação, e a IA que monta a OC
 
 *Aberta em 15/10/2026, na decisão 110.*
@@ -164,9 +177,11 @@ Meta: 23/10.
    - a marca "a cada entrega" nas ECRs 01, 02 e 17;
    - o alcance que o encarregado conferiu.
 
-   - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`69e92d7`, decisão 118),
-     **sem publicar**: vai ao ar depois da medida no ensaio, com o contrato do Banco;
-   - **o segundo ramo, a qualificação,** espera o sim do CTO.
+   - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
+     119), **sem publicar**, com o contrato do Banco e medido no ensaio só lendo. Falta medir a gravação de uma
+     entrega, que proponho no teste do Pedro;
+   - **o segundo ramo, a qualificação,** vem depois da D814 (item 41), contra o banco falso, com os nomes do Banco
+     (D813 §4).
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
@@ -179,7 +194,7 @@ Meta: 23/10.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D812 ficam na `Devolucoes` até lá. A D806, a D808, a D809, a D810 e a D811 foram ao arquivo morto.
+A D805 e a D813 ficam na `Devolucoes` até lá. A D806, a D808, a D809, a D810, a D811 e a D812 foram ao arquivo morto.
 
 ---
 

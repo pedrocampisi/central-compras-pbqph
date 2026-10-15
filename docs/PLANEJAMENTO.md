@@ -4003,3 +4003,28 @@ recebimento, contra o banco falso, enquanto o Banco faz o contrato no ensaio.
 - +568 e −14 linhas em `src`, e +473 em testes.
 
 **O banco não mudou. Não publiquei.** O ramo vai ao ar depois da medida no ensaio, com o contrato do Banco.
+
+## Decisão 119 — o ramo 1 da parte C segue o contrato do Banco, medido no ensaio · 15/10/2026
+
+**POR QUÊ (CTO-D813 §2 e §3):** o Banco fez o contrato no ensaio (`0e1b3a9`), e duas chaves eram diferentes das que a
+tela esperava. Vale o do Banco: ele já está no ensaio e guarda a leitura da IA junto do papel, uma vez só.
+
+**O QUE MUDOU** (ramo `d812-c1-registro-no-recebimento`, `3204be1`):
+- o `o_que_pede` é objeto: a tela lê `itens` e `revisao` dele;
+- as linhas saem como na ECR, com as peças do catálogo: a numerada na lista, com o rótulo, e a sem número como nota em
+  destaque. Sem linhas, sem a caixa;
+- a leitura sobe com o papel, no `extracao` da `arquivar-documento`; a `registrar_entrega` não leva mais a leitura.
+
+**A MEDIDA NO ENSAIO, só lendo:**
+- a `compras.registro_pede` (que não grava) nas 20 ECRs: as 20 vieram na forma do contrato;
+- nove casos reais passados pelo leitor e pela tela, todos certos (a nota da CDL na 02, os rótulos da 12, a nota no
+  meio da 13, a 15 que não pergunta, a 04 sem texto);
+- não medi a gravação de uma entrega, que pede login e grava: proposta ao CTO como parte do teste do Pedro.
+
+**A PROVA:**
+- 1143 testes, tipos e lint limpos;
+- 40 sabotagens vermelhas;
+- 3 fotos com o texto real das ECRs em `docs/Capturas/2026-10-15_D813_C1/`;
+- o ramo inteiro com +627 e −14 linhas em `src`.
+
+**O banco não mudou. Não publiquei.**
