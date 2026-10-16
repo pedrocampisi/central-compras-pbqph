@@ -92,7 +92,7 @@ export function coberturaDaLinha(l: Record<string, unknown>): CoberturaDaEntrega
   };
 }
 
-/** A cobertura de todas as entregas, numa chamada só; com a máscara, só as da obra dela. */
+/** A cobertura de todas as entregas, página por página; com a máscara, só as da obra dela. */
 export async function lerCoberturaDasEntregas(obra: string | null = obraDaMascara()): Promise<CoberturaDaEntrega[]> {
   const { data, error } = await todasAsLinhas('cobertura das entregas', pagina('cobertura_das_entregas', obra));
   if (error) throw new Error(`Falha ao ler o papel das entregas: ${error.message}`);
