@@ -4142,3 +4142,27 @@ do ramo 1 no ensaio: 11 de 11.
 **A perícia vem depois da conferência dos consertos.** É uma só para a parte C, e quem dispara é o Pedro.
 
 **O banco não mudou.**
+
+## Decisão 125 — os ramos da parte C congelados; a data do lançamento da qualificação, num ramo próprio · 15/10/2026
+
+**POR QUÊ (CTO-D821 e D819):** o CTO aceitou os três consertos e pediu mais um ajuste antes da perícia. Na D819, ele
+mediu que a tela não mostra quando a qualificação foi lançada no sistema.
+
+**A PARTE C:**
+- **o ajuste:** no "Anexar papel", a escolha vazia no meio da leitura deixava o "Lendo" preso. Agora não deixa
+  (`87f991b`, com teste e sabotagem vermelha, CI verde);
+- **congelados até a triagem da perícia**, salvo carta do CTO: o ramo 1 em `39c594e` e o ramo 2 em `87f991b`;
+- **a foto da nota vai com o ramo 1**, e não sozinha.
+
+**A D819:** o ramo `d819-qualificacao-lancada` (`566bae5`), a partir do `main`, **sem publicar**.
+- **O que a tela mostra:** "lançada no sistema em DD/MM/AAAA", na linha aberta e no Histórico, quando o lançamento
+  (dia de São Paulo) é depois da data da qualificação. Não trava nada.
+- **O PDF dos qualificados não muda.**
+- **A medida, só lendo, na produção:**
+  - a vista já tem o `criado_em`, com leitura para quem entra;
+  - as 21 qualificações foram lançadas em 28/09, depois da data delas.
+- **O retoque das fotos:** no celular, a linha aberta cabe na largura que se vê.
+- **A prova:** 7 testes novos; 7 sabotagens vermelhas; +33 −3 em `src`.
+- **A junção com o ramo 2 da parte C** dá um conflito, só na regra `.rolagem` do CSS, e o conserto é simples.
+
+**O banco não mudou.**

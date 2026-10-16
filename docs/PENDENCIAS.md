@@ -152,6 +152,18 @@ Meta: 23/10.
 
 ---
 
+### 42. A D819: quando a qualificação foi lançada no sistema
+
+*Aberta em 15/10/2026, na decisão 125.*
+- **O ramo:** `d819-qualificacao-lancada` (`566bae5`), **sem publicar**.
+  - A tela mostra "lançada no sistema em DD/MM/AAAA" na linha aberta e no Histórico, quando o lançamento é depois da
+    data. Não trava, e o PDF não muda.
+- **Falta:**
+  1. a conferência do CTO;
+  2. a publicação pela emenda 3. Não vai à perícia.
+- **Na junção com o ramo 2 da parte C,** o conflito na `.rolagem` do CSS se resolve com uma regra só.
+- **A D819 fica na `Devolucoes` até lá.**
+
 ### 41. ~~A D814: o perfil sem a Ordem de Compra~~ — no ar
 
 *Aberta em 15/10/2026, na decisão 119.* Decisão do Pedro: uma pessoa do financeiro entra na Central de Dados, e não
@@ -187,8 +199,9 @@ precisa da Ordem de Compra.
      com o corpo que mandei (decisão 121): **deu 11 de 11.** O conserto da D818 está em `39c594e` (decisão 124);
    - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
      conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
+   - **congelados até a triagem da perícia** (D821): o ramo 1 em `39c594e`, o ramo 2 em `87f991b` (decisão 125).
    - **daqui em diante, a ordem é:**
-     1. a conferência dos consertos;
+     1. ~~a conferência dos consertos~~ feita (D821);
      2. a perícia, uma só para a parte C, que o Pedro dispara;
      3. o contrato do Banco na produção;
      4. publicar os dois ramos juntos.
@@ -204,7 +217,7 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D816, a D818 e a D819 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
+A D805 e a D816 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
 **A D815 §3 foi medida** (decisão 123): recomendei que o "Registrar entrega" do escritório pergunte o papel, como o
 carimbo. **A pergunta é do Pedro** (D818 §4), e o CTO leva a ele. Não construir antes da palavra dele.
 
