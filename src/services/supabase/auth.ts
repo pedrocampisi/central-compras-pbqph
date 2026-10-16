@@ -28,7 +28,17 @@ export interface PerfilUsuario {
   nome: string;
   papel: Papel;
   ativo: boolean;
+  /**
+   * A Ordem de Compra barrada para este perfil (CTO-D814, decisão do Pedro):
+   * quem entra na Central de Dados e não precisa dela. A trava é do banco, que
+   * recusa os atos; a tela só avisa e não entra. Ausente (o perfil de uma
+   * versão antiga) é o mesmo que falso.
+   */
+  sem_ordem_de_compra?: boolean;
 }
+
+/** A frase do banco para o perfil com a Ordem de Compra barrada (CTO-D814 §2). */
+export const SEM_ORDEM_DE_COMPRA = 'Seu acesso não inclui a Ordem de Compra.';
 
 export async function entrar(email: string, senha: string): Promise<Session> {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
@@ -63,13 +73,21 @@ export async function perfilAtual(): Promise<PerfilUsuario | null> {
   // quebra. Confiar só na RLS aqui funcionava para papel comum, não para admin.
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) return null;
-  const { data, error } = await core()
-    .from('perfis')
-    .select('user_id, nome, papel, ativo')
-    .eq('user_id', u.user.id)
-    .maybeSingle();
+  const ler = (colunas: string) => core().from('perfis').select(colunas).eq('user_id', u.user.id).maybeSingle();
+  let { data, error } = await ler('user_id, nome, papel, ativo, sem_ordem_de_compra');
+  // O banco que ainda não tem a marca (42703, coluna que não existe): lê como
+  // antes, e ninguém fica de fora por causa de uma coluna que vem depois.
+  if (error?.code === '42703') ({ data, error } = await ler('user_id, nome, papel, ativo'));
   if (error) throw new Error(`Falha ao carregar seu perfil: ${error.message}`);
-  return data && data.ativo ? (data as PerfilUsuario) : null;
+  const p = data as Record<string, unknown> | null;
+  if (!p || !p['ativo']) return null;
+  return {
+    user_id: String(p['user_id']),
+    nome: String(p['nome'] ?? ''),
+    papel: p['papel'] as Papel,
+    ativo: true,
+    sem_ordem_de_compra: p['sem_ordem_de_compra'] === true,
+  };
 }
 
 /**
