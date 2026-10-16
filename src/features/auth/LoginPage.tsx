@@ -15,7 +15,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { entrar, traduzErroAuth } from '../../services/supabase/auth';
+import { SEM_ORDEM_DE_COMPRA, entrar, traduzErroAuth } from '../../services/supabase/auth';
 import { supabase } from '../../services/supabase/client';
 import { useUiStore } from '../../stores/useUiStore';
 import { FALTA_EMAIL, TEXTOS_DO_ACESSO, type ModoDoAcesso } from './textosDoAcesso';
@@ -290,6 +290,36 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
  * Login e permissão são dois atos separados de propósito — esta tela
  * distingue "senha errada" de "entrou mas ninguém liberou o acesso".
  */
+/**
+ * O perfil com a Ordem de Compra barrada (CTO-D814): a pessoa entra na Central
+ * de Dados, mas não aqui. A frase é a do banco, e a saída é a mesma de quem
+ * entrou sem perfil.
+ */
+export function SemOrdemDeCompraPage({ email, onSair }: { email: string; onSair: () => void }) {
+  return (
+    <main className={styles.wrap}>
+      <div className={styles.card}>
+        <img
+          src={`${MARCA}mascote-corpo.png`}
+          alt=""
+          className={styles.logo}
+          style={{ width: 150 }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <h1 className={styles.brandName}>Sem a Ordem de Compra</h1>
+        <p className={styles.brandSub}>
+          Você entrou como <strong>{email}</strong>. {SEM_ORDEM_DE_COMPRA}
+        </p>
+        <button type="button" className={styles.btnSecundario} onClick={onSair}>
+          Sair
+        </button>
+      </div>
+    </main>
+  );
+}
+
 export function SemAcessoPage({ email, onSair }: { email: string; onSair: () => void }) {
   return (
     <main className={styles.wrap}>
