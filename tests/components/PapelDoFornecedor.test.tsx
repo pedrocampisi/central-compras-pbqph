@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MaterialAChegar, type MaterialAChegarProps } from '../../src/features/recebimento/MaterialAChegar';
 import { CHAVES } from '../../src/features/recebimento/fila';
 import type { CartaoAChegar } from '../../src/domain/recebimento';
@@ -231,6 +231,28 @@ describe('o papel do fornecedor no carimbo (D811 §3)', () => {
     fireEvent.change(papel().querySelector('input[type=file]')!, { target: { files: [FOTO] } });
     expect(await within(papel()).findByText('O papel diz: vale para o produto, sem prazo.')).toBeTruthy();
     expect(within(papel()).getByRole('button', { name: 'Está certo' })).toBeTruthy();
+  });
+
+  it('trocou a foto no meio da leitura: vale só a leitura da última, e a da primeira, que chega depois, não cai em cima (D818 §2)', async () => {
+    const respostas: ((l: LeituraDoRegistro | null) => void)[] = [];
+    const p = montar({ lerRegistro: vi.fn(() => new Promise<LeituraDoRegistro | null>((r) => respostas.push(r))) });
+    await chegarAoPapel();
+    responder(PERGUNTA, 'Veio');
+    const segunda = new File(['q'], 'papel-2.jpg', { type: 'image/jpeg' });
+    fireEvent.change(papel().querySelector('input[type=file]')!, { target: { files: [FOTO] } });
+    fireEvent.change(papel().querySelector('input[type=file]')!, { target: { files: [segunda] } });
+    await waitFor(() => expect(respostas).toHaveLength(2));
+    act(() => respostas[1]!({ alcance: 'produto', validoAte: '', confira: '' }));
+    expect(await within(papel()).findByText('O papel diz: vale para o produto, sem prazo.')).toBeTruthy();
+    act(() => respostas[0]!({ alcance: 'vale_ate', validoAte: '2027-06-30', confira: '' }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(within(papel()).getByText('O papel diz: vale para o produto, sem prazo.')).toBeTruthy();
+    fireEvent.click(within(papel()).getByRole('button', { name: 'Está certo' }));
+    pronto();
+    await screen.findByText('Recebido.');
+    expect(registrosEnviados(p)).toEqual([
+      { ecrId: 19, resposta: 'veio', alcance: 'produto', lido: { alcance: 'produto', validoAte: '', confira: '' }, foto: segunda },
+    ]);
   });
 
   it('o que ele respondeu e a foto do papel sobrevivem a fechar o app; depois de ir, a foto sai do celular', async () => {
