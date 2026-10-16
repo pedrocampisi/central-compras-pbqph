@@ -95,7 +95,7 @@ describe('ler: os papéis, as correções e a marca', () => {
         },
         {
           id: 9, documento_id: 'doc-9', ecr_id: 2, empresa_raiz_id: null, fornecedor_id: 'forn-2', alcance: 'lote',
-          valido_ate: null, oc_id: 'oc-3', entrou_por: 'entrega', conferido_por_nome: 'Comprador de Teste',
+          valido_ate: null, oc_id: 'oc-3', entrou_por: 'lista', conferido_por_nome: 'Comprador de Teste',
           conferido_em: '2026-10-12T12:00:00+00:00', avaliacao_id: 32,
         },
       ],
@@ -127,7 +127,7 @@ describe('ler: os papéis, as correções e a marca', () => {
     ]);
     expect(r.registros[1]).toMatchObject({ fornecedorId: 'forn-2', alcance: 'lote', validoAte: '', ocId: 'oc-2', avaliacaoId: 31, correcoes: [] });
     // O papel anexado pela lista das entregas sem papel (o pedido 3 da D840 ao Banco).
-    expect(r.registros[2]).toMatchObject({ ocId: 'oc-3', avaliacaoId: 32, entrouPor: 'entrega' });
+    expect(r.registros[2]).toMatchObject({ ocId: 'oc-3', avaliacaoId: 32, entrouPor: 'lista' });
   });
 
   it('a falha de uma das três sobe, com a frase do banco', async () => {

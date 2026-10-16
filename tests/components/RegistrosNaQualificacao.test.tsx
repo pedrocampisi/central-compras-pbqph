@@ -172,7 +172,7 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
   it('o papel de lote que nomeia a entrega diz qual: o dia e a OC (D840 §2.4); o lote sem entrega não diz', async () => {
     banco.carregar = vi.fn(async () => ({
       ...GUARDADOS,
-      registros: GUARDADOS.registros.map((r) => (r.id === 2 ? { ...r, avaliacaoId: 31, entrouPor: 'entrega' as const } : r)),
+      registros: GUARDADOS.registros.map((r) => (r.id === 2 ? { ...r, avaliacaoId: 31, entrouPor: 'lista' as const } : r)),
     }));
     banco.avaliacoes = vi.fn(async () => [{ id: 31, recebidoEm: '2026-10-14' }]);
     useDataStore.setState({ data: { ...dados(), ordens_compra: [{ id: 'oc-1', numero: '2026/101' }] } as unknown as Data });

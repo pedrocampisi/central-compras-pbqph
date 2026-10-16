@@ -34,7 +34,7 @@ export interface CorrecaoDoAlcance {
   corrigidoEm: string;
 }
 
-export type EntrouPor = 'recebimento' | 'qualificacao' | 'oc' | 'entrega';
+export type EntrouPor = 'recebimento' | 'qualificacao' | 'oc' | 'lista';
 
 /** Um papel guardado (`compras.registros_do_fornecedor`), com as correções dele, da mais antiga à última. */
 export interface RegistroGuardado {
@@ -110,7 +110,7 @@ export const NOME_DO_ALCANCE: Record<Alcance, string> = {
 const ENTROU_POR: Record<EntrouPor, string> = {
   recebimento: 'chegou com o material, na obra',
   oc: 'anexado na OC',
-  entrega: 'anexado na entrega, pela lista das entregas sem papel',
+  lista: 'anexado na entrega, pela lista das entregas sem papel',
   qualificacao: 'anexado na qualificação',
 };
 

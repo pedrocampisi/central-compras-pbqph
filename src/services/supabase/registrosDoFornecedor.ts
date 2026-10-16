@@ -53,7 +53,7 @@ function paraRegistro(r: Record<string, unknown>, correcoes: CorrecaoDoAlcance[]
     validoAte: dia(r['valido_ate']),
     ocId: txt(r['oc_id']),
     avaliacaoId: num(r['avaliacao_id']),
-    entrouPor: (['recebimento', 'qualificacao', 'oc', 'entrega'].includes(entrou) ? entrou : 'qualificacao') as EntrouPor,
+    entrouPor: (['recebimento', 'qualificacao', 'oc', 'lista'].includes(entrou) ? entrou : 'qualificacao') as EntrouPor,
     conferidoPorNome: txt(r['conferido_por_nome']),
     conferidoEm: txt(r['conferido_em']),
     correcoes,
