@@ -185,8 +185,9 @@ precisa da Ordem de Compra.
    - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
      119), **sem publicar**, conferido pelo CTO (D815). A gravação de uma entrega é medida pelo Banco no ensaio,
      com o corpo que mandei (decisão 121). Vai ao ar depois da medida, da conferência e do contrato na produção;
-   - **o segundo ramo, a qualificação,** começa agora (a D814 foi, item 41), contra o banco falso, com os nomes do
-     Banco (D813 §4).
+   - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao` (`dbdeb58`, decisão 123),
+     **sem publicar**, CI verde, mandado ao CTO. Passa de mil linhas: **a perícia vem antes da produção.** Os dois
+     ramos podem ir juntos.
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
@@ -200,7 +201,8 @@ precisa da Ordem de Compra.
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
 A D805, a D815 e a D816 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
-**A D815 §3 pede uma medida depois do ramo 2:** se o "Registrar entrega" do escritório deve perguntar o papel também. Não construir antes da resposta do CTO.
+**A D815 §3 foi medida** (decisão 123): recomendei que o "Registrar entrega" do escritório pergunte o papel, como o
+carimbo. Não construir antes da resposta do CTO.
 
 ---
 

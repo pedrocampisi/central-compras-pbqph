@@ -4091,3 +4091,26 @@ de comentário, sem outra conferência. A publicação não espera a marca do Ba
 **A parte C e a parte B não foram junto.**
 
 **O banco não mudou por esta casa.**
+
+## Decisão 123 — a parte C, segundo ramo: os papéis do fornecedor na qualificação, no ramo `dbdeb58` · 15/10/2026
+
+**POR QUÊ (CTO-D815 §4.3 e §3):** o ramo 2 vinha contra o banco falso, com os nomes do Banco (`0e1b3a9`); e o CTO
+pediu a medida do "Registrar entrega" do escritório, sem construir.
+
+**O QUE FOI:** o ramo `d815-c2-registro-na-qualificacao`, em `dbdeb58`, sobre o ramo 1. **Não está publicado.**
+- a qualificação ganhou o botão "Papéis": por ECR, o que a revisão pede ao lado do que está guardado, com a vigência,
+  o aviso de 30 dias, o vencido, as correções e o "Abrir";
+- o "Anexar papel" na qualificação (sem o lote) e na OC (os três alcances), com a leitura da IA;
+- o "Corrigir" do alcance, com o motivo;
+- a marca "a cada entrega" na qualificação e no catálogo de ECRs;
+- o papel anexado na OC vai pela origem `qualificacao-fornecedor`: é uma escolha minha, que mandei ao CTO conferir;
+- a leitura dos registros fica fora da carga da qualificação: um registro que falha não trava a OC.
+
+**A PROVA:** CI verde; 1182 testes (39 novos); 28 sabotagens vermelhas; 7 fotos em `docs/Capturas/2026-10-15_D815_C2/`.
+
+**O TAMANHO:** +1183 em `src`, sem os testes. **A perícia vem antes da produção** (D812 §3).
+
+**A D815 §3, medida só lendo:** a janela do escritório grava a entrega sem `registros`, e o banco aceita. Recomendei
+que ela pergunte, como o carimbo, sem mudar o banco (cerca de 200 a 250 linhas, num ramo 3). **Não construí.**
+
+**O banco não mudou.**
