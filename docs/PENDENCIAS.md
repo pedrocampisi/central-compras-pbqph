@@ -180,8 +180,8 @@ precisa da Ordem de Compra.
    - o alcance que o encarregado conferiu.
 
    - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
-     119), **sem publicar**, com o contrato do Banco e medido no ensaio só lendo. Falta medir a gravação de uma
-     entrega, que proponho no teste do Pedro;
+     119), **sem publicar**, conferido pelo CTO (D815). A gravação de uma entrega é medida pelo Banco no ensaio,
+     com o corpo que mandei (decisão 121). Vai ao ar depois da medida, da conferência e do contrato na produção;
    - **o segundo ramo, a qualificação,** começa agora (a D814 foi, item 41), contra o banco falso, com os nomes do
      Banco (D813 §4).
 
@@ -196,7 +196,8 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D813 ficam na `Devolucoes` até lá. A D806, a D808, a D809, a D810, a D811 e a D812 foram ao arquivo morto.
+A D805, a D814 e a D815 ficam na `Devolucoes` até lá. A D806, e da D808 à D813, foram ao arquivo morto.
+**A D815 §3 pede uma medida depois do ramo 2:** se o "Registrar entrega" do escritório deve perguntar o papel também. Não construir antes da resposta do CTO.
 
 ---
 

@@ -4052,3 +4052,19 @@ avisa.
 Um teste mentia: o perfil do teste anterior ficava guardado e respondia pelo seguinte. Consertado antes da carta.
 
 **O banco não mudou. Não publiquei.** Publicar é pela emenda 3, depois da conferência do CTO.
+
+## Decisão 121 — o corpo do carimbo vai ao Banco, que mede a gravação no ensaio · 15/10/2026
+
+**POR QUÊ (CTO-D815 §2):** o teste do Pedro não chega ao carimbo, que só abre para o papel `mestre`, e o login dele
+é `admin`. O Banco tem a ferramenta da D710: um encarregado temporário, que entra pelo código do QR e é apagado no fim.
+
+**O QUE FOI:** uma carta ao Banco, com cópia ao CTO, com o corpo que a `registrarEntregaDoMestre` do `3204be1` monta.
+- Saiu do caminho de verdade, contra o banco falso dos testes.
+- Os ids vão como marcadores, e a foto não vai.
+- As três chamadas: a foto da nota, o papel da ECR 06 com o `extracao`, e a `registrar_entrega` com uma ECR de cada
+  resposta.
+
+**O RAMO 1 VAI AO AR SÓ DEPOIS DE TRÊS COISAS**, nesta ordem: a medida do Banco, a conferência do CTO, e o contrato do
+Banco na produção.
+
+**O banco não mudou.**
