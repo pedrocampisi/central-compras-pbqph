@@ -286,11 +286,6 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
 }
 
 /**
- * Logado, mas sem acesso concedido (perfil inexistente ou inativo).
- * Login e permissão são dois atos separados de propósito — esta tela
- * distingue "senha errada" de "entrou mas ninguém liberou o acesso".
- */
-/**
  * O perfil com a Ordem de Compra barrada (CTO-D814): a pessoa entra na Central
  * de Dados, mas não aqui. A frase é a do banco, e a saída é a mesma de quem
  * entrou sem perfil.
@@ -320,6 +315,11 @@ export function SemOrdemDeCompraPage({ email, onSair }: { email: string; onSair:
   );
 }
 
+/**
+ * Logado, mas sem acesso concedido (perfil inexistente ou inativo).
+ * Login e permissão são dois atos separados de propósito — esta tela
+ * distingue "senha errada" de "entrou mas ninguém liberou o acesso".
+ */
 export function SemAcessoPage({ email, onSair }: { email: string; onSair: () => void }) {
   return (
     <main className={styles.wrap}>
