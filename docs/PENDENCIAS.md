@@ -199,13 +199,14 @@ precisa da Ordem de Compra.
    - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
      conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
    - **congelados até a triagem da perícia** (D821): o ramo 1 em `39c594e`, o ramo 2 em `87f991b` (decisão 125).
-   - **a parte C vai ser refeita** (CTO-D840, decisão 127): o papel entra pelo escritório, e o carimbo só tem um
-     botão opcional. O plano das telas foi ao CTO e ao Banco em 16/10, e **não há código antes da aprovação**. Os dois
-     ramos ficam congelados.
+   - **a parte C foi refeita** (CTO-D840, decisão 127): o papel entra pelo escritório, e o carimbo só tem um
+     botão opcional. O plano foi aprovado pela D845, e **o ramo novo é o `d840-parte-c-refeita` (`07f3835`)**, sem
+     publicar, com 1250 testes, 97 de 98 sabotagens vermelhas e 11 fotos (decisão 128). O Banco já construiu a parte
+     dele no ensaio (a D842 dele). Os dois ramos velhos seguem congelados;
    - **daqui em diante, a ordem é:**
-     1. a aprovação do plano;
-     2. o ramo novo;
-     3. a medida no ensaio;
+     1. ~~a aprovação do plano~~ (D845);
+     2. ~~o ramo novo~~ (decisão 128);
+     3. a medida no ensaio, só lendo: **a próxima**;
      4. a perícia, uma só, sobre o código final;
      5. o contrato do Banco na produção;
      6. publicar.
@@ -221,7 +222,7 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D816 e as duas D840 (a do CTO e a do Banco) ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
+A D805 e a D816 ficam na `Devolucoes` até lá; a D845 do CTO e a D842 do Banco ficam até a medida no ensaio. As duas D840 e a cópia da D845 ao Banco foram ao arquivo morto (decisão 128). A D806, e da D808 à D814, foram ao arquivo morto.
 **A D815 §3 foi decidida pelo Pedro** (CTO-D840): ninguém pergunta o papel na entrega, e a pergunta do escritório
 morreu. O papel entra pelo escritório.
 

@@ -4219,3 +4219,32 @@ da entrega." Depois do desenho do CTO, ele respondeu "ok, pode ser". O Banco man
 **A D837:** o papel `encarregado` foi aposentado pelo Pedro. Nada muda nas telas, e o item 39.3 fecha.
 
 **O banco não mudou.**
+
+## Decisão 128 — a parte C refeita, no ramo `d840-parte-c-refeita` (`07f3835`) · 16/10/2026
+
+**POR QUÊ (CTO-D845):** o plano das telas (decisão 127) foi aprovado inteiro, com as quatro escolhas: a lista em
+Recebimentos, o número no menu, a coluna no PDF e o ramo novo a partir do `87f991b`. A ordem do CTO: construir contra
+o banco falso, depois medir no ensaio só lendo, depois a perícia, e a produção pela carta dele.
+
+**O QUE FOI:** o ramo `d840-parte-c-refeita`, sem publicar, com o `main` junto (`f2da489`):
+- `d6e7771` o carimbo sem a pergunta, com o "Anexar papel do fornecedor" opcional, o lote fixo na ECR com a marca e o
+  "Tirar";
+- `67e91df` o "Anexar papel" pela OC, pela qualificação e pela entrega; na ECR com a marca, o lote só pela entrega;
+- `97af84d` a lista "Entregas sem papel do fornecedor" em Recebimentos, o "Não se aplica a esta entrega" com motivo,
+  e o número no menu;
+- `8cbfb68` a cobertura na linha da última entrega da OC e a coluna "Registro do fornecedor" no PDF das avaliações;
+- `b2c3c14` o teste do "Tirar" confere também o rascunho do celular;
+- `07f3835` o `entrou_por` da lista com o nome do Banco, `lista`.
+
+**OS NÚMEROS:**
+- 1250 testes de 1250, em 99 arquivos; `tsc` e `eslint` limpos; o CI verde;
+- `src` contra o `main`: +2640 / −32. O plano dizia perto de +2300;
+- 98 sabotagens, 97 vermelhas. A que sobra ("a leitura sugere o lote na qualificação") é segunda trava: a janela
+  já calcula o alcance escolhido de dentro dos permitidos, e nenhum caminho da tela a mostra;
+- 11 fotos em `Capturas/2026-10-16_D845/`, com dados inventados e o banco falso.
+
+**OS NOMES DO BANCO:** a D842 dele chegou no meio do trabalho. Dos nomes do meu §5, só o `entrou_por` mudou
+(`entrega` → `lista`), já acertado. A linha da lista não traz o `fornecedor_id`: a tela o tira da OC carregada, com a
+mesma máscara, e não pede coluna nova.
+
+**O banco não mudou.**
