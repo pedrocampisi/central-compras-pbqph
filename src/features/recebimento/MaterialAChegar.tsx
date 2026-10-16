@@ -33,6 +33,7 @@ import {
   registrosDoEnvio, registrosPedidos, textoDoAlcance,
   type Alcance, type LeituraDoRegistro, type RegistroPedido, type RegistroRespondido, type RespostaDoRegistro,
 } from '../../domain/registroDoFornecedor';
+import { useUltimaEscolha } from '../../hooks/useUltimaEscolha';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
 import {
   CHAVES, novaChave, useFilaDoMestre, type Desfecho, type Envio, type EnvioDeRecebimento, type EnvioSemPedido,
@@ -690,6 +691,7 @@ function PapelDoFornecedor({
 }) {
   const [lendo, setLendo] = useState(false);
   const [escolhendo, setEscolhendo] = useState(false);
+  const novaEscolha = useUltimaEscolha();
   const miniatura = useMemo(() => (foto ? URL.createObjectURL(foto) : ''), [foto]);
   useEffect(() => () => {
     if (miniatura) URL.revokeObjectURL(miniatura);
@@ -697,6 +699,7 @@ function PapelDoFornecedor({
 
   async function escolheu(f: File | undefined) {
     if (!f) return;
+    const daVez = novaEscolha();
     aoMudarFoto(f);
     setEscolhendo(false);
     // Foto nova, conferência nova: o que ele conferiu era da foto de antes.
@@ -704,9 +707,10 @@ function PapelDoFornecedor({
     setLendo(true);
     try {
       const lido = await lerRegistro(f).catch(() => null);
-      aoMudar({ lido, ...alcanceDaLeitura(lido) });
+      // A leitura de uma foto trocada no meio não cai em cima da foto nova.
+      if (daVez()) aoMudar({ lido, ...alcanceDaLeitura(lido) });
     } finally {
-      setLendo(false);
+      if (daVez()) setLendo(false);
     }
   }
 
@@ -897,6 +901,7 @@ function FotoDaNota({
   const [lendo, setLendo] = useState(false);
   const [leu, setLeu] = useState<boolean | null>(null);
   const [semFoto, setSemFoto] = useState(false);
+  const novaEscolha = useUltimaEscolha();
   // A miniatura nasce da foto; o endereço dela é solto quando a foto muda ou a tela sai.
   const miniatura = useMemo(() => (foto ? URL.createObjectURL(foto) : ''), [foto]);
   useEffect(() => () => {
@@ -905,17 +910,20 @@ function FotoDaNota({
 
   async function escolheu(f: File | undefined) {
     if (!f) return;
+    const daVez = novaEscolha();
     aoMudarFoto(f);
     setLendo(true);
     setLeu(null);
     try {
       const n = numeroDaNotaEmDigitos(await lerNumeroDaNota(f));
+      // O número de uma foto trocada no meio não cai em cima da foto nova.
+      if (!daVez()) return;
       if (n) aoMudarNumero(n);
       setLeu(n !== '');
     } catch {
-      setLeu(false);
+      if (daVez()) setLeu(false);
     } finally {
-      setLendo(false);
+      if (daVez()) setLendo(false);
     }
   }
 
