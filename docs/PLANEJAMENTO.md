@@ -4187,3 +4187,35 @@ publicar pela emenda 3.
 **A parte C e a parte B não foram junto.**
 
 **O banco não mudou por esta casa.**
+
+## Decisão 127 — a parte C refeita: o papel do fornecedor entra pelo escritório; o plano das telas · 16/10/2026
+
+**POR QUÊ (CTO-D840):** a palavra do Pedro em 16/10: "esse papel seria ideal eles enviarem o digital. E não na hora
+da entrega." Depois do desenho do CTO, ele respondeu "ok, pode ser". O Banco mandou o plano dele, e o CTO aprovou
+(D842).
+
+**O QUE FOI:** só o plano, sem código, numa carta ao CTO com cópia ao Banco.
+- **o carimbo** deixa de perguntar o papel e ganha o botão opcional "Anexar papel do fornecedor". Nas ECRs "a cada
+  entrega", fica "deste lote", sem escolha;
+- **o "Entregue" do escritório** não muda;
+- **na OC,** o lote sai das ECRs com a marca;
+- **na qualificação,** o papel de lote diz a entrega que cobre;
+- **a lista "Entregas sem papel do fornecedor"** fica em Recebimentos, com "Anexar papel" e "Não se aplica a esta
+  entrega";
+- **o auditor** vê a cobertura na linha da última entrega da OC e numa coluna nova do PDF das avaliações;
+- **o tamanho:** perto de −150 e +610 em `src`. Os dois ramos ficam perto de +2300, então a perícia vem antes da
+  produção;
+- **ao Banco, quatro pedidos:**
+  - a cobertura de muitas entregas numa chamada;
+  - a marca "a cada entrega" no cartão e na lista;
+  - a entrega que o papel cobre, na leitura;
+  - o arquivo pela `qualificacao-fornecedor`;
+- **ao CTO, quatro escolhas:**
+  - onde a lista mora;
+  - o número no menu;
+  - a coluna no PDF;
+  - um ramo novo, `d840-parte-c-refeita`, a partir do `87f991b`, com o `main` junto.
+
+**A D837:** o papel `encarregado` foi aposentado pelo Pedro. Nada muda nas telas, e o item 39.3 fecha.
+
+**O banco não mudou.**

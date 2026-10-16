@@ -148,7 +148,7 @@ Meta: 23/10.
 **Falta, fora desta casa:**
 1. o Pedro ler o rascunho e apertar "Gravar a Rev. 01". Só ele aperta;
 2. o Banco trocar as recusas do banco que dizem "mestre" (CTO-D800 ao Banco);
-3. o Pedro decidir o que fazer com o papel `encarregado` do banco.
+3. ~~o Pedro decidir o que fazer com o papel `encarregado` do banco~~: aposentado (CTO-D837, decisão 127).
 
 ---
 
@@ -199,11 +199,16 @@ precisa da Ordem de Compra.
    - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
      conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
    - **congelados até a triagem da perícia** (D821): o ramo 1 em `39c594e`, o ramo 2 em `87f991b` (decisão 125).
+   - **a parte C vai ser refeita** (CTO-D840, decisão 127): o papel entra pelo escritório, e o carimbo só tem um
+     botão opcional. O plano das telas foi ao CTO e ao Banco em 16/10, e **não há código antes da aprovação**. Os dois
+     ramos ficam congelados.
    - **daqui em diante, a ordem é:**
-     1. ~~a conferência dos consertos~~ feita (D821);
-     2. a perícia, uma só para a parte C, que o Pedro dispara;
-     3. o contrato do Banco na produção;
-     4. publicar os dois ramos juntos.
+     1. a aprovação do plano;
+     2. o ramo novo;
+     3. a medida no ensaio;
+     4. a perícia, uma só, sobre o código final;
+     5. o contrato do Banco na produção;
+     6. publicar.
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
@@ -216,9 +221,9 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D816 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
-**A D815 §3 foi medida** (decisão 123): recomendei que o "Registrar entrega" do escritório pergunte o papel, como o
-carimbo. **A pergunta é do Pedro** (D818 §4), e o CTO leva a ele. Não construir antes da palavra dele.
+A D805, a D816 e as duas D840 (a do CTO e a do Banco) ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
+**A D815 §3 foi decidida pelo Pedro** (CTO-D840): ninguém pergunta o papel na entrega, e a pergunta do escritório
+morreu. O papel entra pelo escritório.
 
 ---
 
