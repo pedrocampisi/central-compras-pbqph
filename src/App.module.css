@@ -128,6 +128,20 @@
     background var(--transicao),
     color var(--transicao);
 }
+/* O número no item do menu (CTO-D845 §2): o que espera o escritório. No fim da linha, pela ordem. */
+.contador {
+  order: 1;
+  margin-left: auto;
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: var(--raio-pill);
+  background: var(--aviso-bg);
+  color: var(--aviso);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .tabBtn:hover {
   background: var(--marca-fraca);
 }
@@ -316,8 +330,17 @@
     display: none;
   }
   .tabBtn {
+    position: relative;
     padding: 10px;
     justify-content: center;
+  }
+  .contador {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    padding: 0 4px;
+    font-size: 10.5px;
   }
   .brand,
   .sfIdentidade {

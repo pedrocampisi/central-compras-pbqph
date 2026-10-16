@@ -1,7 +1,8 @@
 /**
  * Recebimentos — o lado do escritório do que chegou na obra (CTO-D696 §5.2).
  *
- * A fila do "chegou sem pedido" (`compras.sem_pedido_na_fila`): o que o mestre
+ * Em cima, as entregas sem o papel do fornecedor (CTO-D840 §2.5,
+ * `EntregasSemPapel`). Embaixo, a fila do "chegou sem pedido" (`compras.sem_pedido_na_fila`): o que o mestre
  * registrou sem OC, e as entregas que chegaram depois de a OC ser cancelada
  * (D699 §2: a entrega nunca some, vem para cá com a OC anotada). Quem emite OC
  * resolve cada uma:
@@ -33,6 +34,7 @@ import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
+import { EntregasSemPapel } from './EntregasSemPapel';
 import styles from './RecebimentosPage.module.css';
 
 export function RecebimentosPage() {
@@ -86,10 +88,16 @@ export function RecebimentosPage() {
         <div>
           <h2>Recebimentos</h2>
           <p className="section-sub">
-            O que chegou na obra sem pedido: ligue à OC certa, ou descarte com o motivo.
+            O que chegou na obra: o papel do fornecedor que falta, e o que chegou sem pedido.
           </p>
         </div>
       </div>
+
+      {/* A régua da lista no banco é a de quem emite OC: quem só lê nem a pede. */}
+      {gravaOk && <EntregasSemPapel />}
+
+      <h3 className={styles.tituloDaSecao}>Chegou sem pedido</h3>
+      <p className={styles.subDaSecao}>Ligue à OC certa, ou descarte com o motivo.</p>
 
       {erro && (
         <p className={caixa.erro} role="alert">

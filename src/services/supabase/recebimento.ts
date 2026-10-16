@@ -27,7 +27,7 @@ import {
 } from '../../domain/recebimento';
 import type { Avaliacao } from '../../domain/qualificacao';
 import {
-  ALCANCES, type Alcance, type LeituraDoRegistro, type RegistroNoEnvio, type RegistroPedido,
+  ALCANCES, type Alcance, type LeituraDoRegistro, type LinhaDoRegistro, type RegistroNoEnvio, type RegistroPedido,
 } from '../../domain/registroDoFornecedor';
 
 // ---------------------------------------------------------------------------
@@ -47,24 +47,33 @@ const objeto = (v: unknown): Record<string, unknown> =>
  * marca `a_cada_entrega` é das ECRs 01, 02 e 17 (o pedido 2 da D840 ao Banco).
  */
 function registroDaLinha(r: Record<string, unknown>): RegistroPedido {
-  const oQuePede = objeto(r['o_que_pede']);
-  const itens = Array.isArray(oQuePede['itens']) ? (oQuePede['itens'] as unknown[]) : [];
-  const posicoes = Array.isArray(r['posicoes']) ? (r['posicoes'] as unknown[]) : [];
   return {
     ecrId: num(r['ecr_id']),
     pede: r['pede'] === true,
     aCadaEntrega: r['a_cada_entrega'] === true,
     porque: txt(r['porque']),
-    revisao: txt(oQuePede['revisao']),
-    linhas: itens
-      .map((i) => {
-        const it = objeto(i);
-        const rotulo = typeof it['rotulo'] === 'string' && it['rotulo'].trim() ? it['rotulo'] : null;
-        return { rotulo, texto: txt(it['texto']), numerado: it['numerado'] === true };
-      })
-      .filter((x) => x.texto.trim()),
-    posicoes: posicoes.map(Number).filter((p) => Number.isInteger(p) && p >= 1),
+    revisao: txt(objeto(r['o_que_pede'])['revisao']),
+    linhas: linhasDoOQuePede(r['o_que_pede']),
+    posicoes: posicoesDaLinha(r['posicoes']),
   };
+}
+
+/** As linhas do `o_que_pede` (`{ecr, revisao, emitida_em, itens}`), como estão; vazio sem o texto. */
+export function linhasDoOQuePede(oQuePede: unknown): LinhaDoRegistro[] {
+  const o = objeto(oQuePede);
+  const itens = Array.isArray(o['itens']) ? (o['itens'] as unknown[]) : [];
+  return itens
+    .map((i) => {
+      const it = objeto(i);
+      const rotulo = typeof it['rotulo'] === 'string' && it['rotulo'].trim() ? it['rotulo'] : null;
+      return { rotulo, texto: txt(it['texto']), numerado: it['numerado'] === true };
+    })
+    .filter((x) => x.texto.trim());
+}
+
+/** As posições na OC, só as que são posição de verdade. */
+export function posicoesDaLinha(v: unknown): number[] {
+  return (Array.isArray(v) ? (v as unknown[]) : []).map(Number).filter((p) => Number.isInteger(p) && p >= 1);
 }
 
 /** Uma linha da `compras.material_a_chegar` → o cartão que o mestre vê. */
