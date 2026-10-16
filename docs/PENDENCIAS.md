@@ -152,7 +152,7 @@ Meta: 23/10.
 
 ---
 
-### 41. A D814: o perfil sem a Ordem de Compra
+### 41. ~~A D814: o perfil sem a Ordem de Compra~~ — no ar
 
 *Aberta em 15/10/2026, na decisão 119.* Decisão do Pedro: uma pessoa do financeiro entra na Central de Dados, e não
 precisa da Ordem de Compra.
@@ -162,8 +162,10 @@ precisa da Ordem de Compra.
   fica tudo como hoje.
 - **Os testes:** com a marca, o aviso; sem a marca, como hoje; e uma sabotagem que deixa entrar.
 - ~~**Num ramo, contra o banco falso, sem publicar.**~~ **Feito** no ramo `d814-perfil-sem-oc` (`b4128df`, decisão
-  120), com o CI verde, 8 sabotagens vermelhas e 3 fotos. A carta foi às 21h0x de 15/10. **Falta:** a conferência e a
-  ordem de publicar do CTO. A tela pode ir ao ar antes da marca no banco.
+  120), com o CI verde, 8 sabotagens vermelhas e 3 fotos.
+- ~~**A conferência e a ordem de publicar do CTO.**~~ **No ar** em `9178a00a`, versão `20261016001818-b3e7722`, pelo
+  `main` `b3e7722` (D816, decisão 122), com a medida por fora; o desfazer é `f47f687c`.
+- **Fechada para esta casa.** A marca no banco é do Banco; até ela chegar, todos entram como antes.
 
 ---
 
@@ -173,7 +175,8 @@ precisa da Ordem de Compra.
 1. ~~**a parte A**~~ **no ar** em `6547e313`, versão `20261015191902-1f530e7`, pelo `main` `1f530e7` (decisão 112),
    com a medida por fora; o desfazer é `ea46638b`;
 2. ~~**a trava da Data**~~ **no ar** em `f47f687c`, versão `20261015210401-3e09378`, pelo `main` `3e09378`
-   (decisões 115 e 117), com a medida por fora; o desfazer é `6547e313`;
+   (decisões 115 e 117), com a medida por fora; o desfazer é `6547e313`. Desde as 21h18 de 15/10, o no ar é o
+   `9178a00a` (o aviso da D814, item 41);
 3. **a parte C** (o registro do fornecedor por ECR): **o desenho está aprovado** (D812 §2), com três ajustes:
    - o comprador corrige o alcance, com registro;
    - a marca "a cada entrega" nas ECRs 01, 02 e 17;
@@ -196,7 +199,7 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D814 e a D815 ficam na `Devolucoes` até lá. A D806, e da D808 à D813, foram ao arquivo morto.
+A D805, a D815 e a D816 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
 **A D815 §3 pede uma medida depois do ramo 2:** se o "Registrar entrega" do escritório deve perguntar o papel também. Não construir antes da resposta do CTO.
 
 ---

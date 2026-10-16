@@ -4068,3 +4068,26 @@ Um teste mentia: o perfil do teste anterior ficava guardado e respondia pelo seg
 Banco na produção.
 
 **O banco não mudou.**
+
+## Decisão 122 — no ar: o perfil sem a Ordem de Compra vê o aviso e não entra · 15/10/2026
+
+**POR QUÊ (CTO-D816):** o CTO conferiu o CI, o código e as 3 fotos do `b4128df`, e mandou publicar depois de um retoque
+de comentário, sem outra conferência. A publicação não espera a marca do Banco: o `42703` cobre a ordem.
+
+**O QUE MUDOU:**
+- **o retoque:** o comentário da `SemAcessoPage` voltou para cima dela (`14fe8a4`, CI verde);
+- **a junção:** `d814-perfil-sem-oc` (`14fe8a4`) no `main` em `b3e7722`, sem conflito;
+- **a bateria:** 1119 testes, tipos e lint limpos;
+- **o desfazer**, anotado antes: `f47f687c`, com 100% do tráfego;
+- **publicado pelo PowerShell às 21h18 de 15/10:** `9178a00a-4913-4a4d-8f34-f7b707af2d11`, versão
+  `20261016001818-b3e7722`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` servido é o novo;
+- os dois pedaços que mudaram têm a mesma impressão SHA-256 do pacote gerado;
+- no servido está a frase "Seu acesso não inclui a Ordem de Compra.";
+- ninguém marcado foi usado para medir: a marca é do Banco, e até ela chegar todos entram como antes.
+
+**A parte C e a parte B não foram junto.**
+
+**O banco não mudou por esta casa.**
