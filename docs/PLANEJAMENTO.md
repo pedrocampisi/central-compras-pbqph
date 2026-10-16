@@ -4248,3 +4248,18 @@ o banco falso, depois medir no ensaio só lendo, depois a perícia, e a produç�
 mesma máscara, e não pede coluna nova.
 
 **O banco não mudou.**
+
+## Decisão 129 — a medida da parte C no ensaio, só lendo; a porta 5174 de pé · 16/10/2026
+
+**POR QUÊ (CTO-D848):** o CTO conferiu o ramo `07f3835` sem conserto a pedir, e a segunda trava fica. Mandou medir no
+ensaio, só lendo, e subir de novo a parte B, que tinha caído.
+
+**O QUE FOI:**
+- **a medida:** as funções que a tela chama existem no ensaio com os mesmos nomes, parâmetros, colunas e direitos. As
+  tabelas que ela lê têm as colunas e as travas esperadas, com o `entrou_por` `lista`. Os leitores do ramo, rodados
+  sobre as formas do ensaio e as palavras reais da `registro_pede` (ECRs 02, 06 e 17), deram 3 de 3;
+- **o que não se mediu:** o ensaio não tem entrega nenhuma, então não houve linha de verdade. Criar uma seria gravar:
+  parei e escrevi. As saídas, o Banco mostrar com o teste dele ou o Pedro fazer uma entrega de teste, ficam com o CTO;
+- **a porta 5174:** de pé às 19h07, com a parte B em `1647826`, sem mudança. Ela anda presa à sessão que a sobe.
+
+**Nada foi gravado. O banco não mudou.**
