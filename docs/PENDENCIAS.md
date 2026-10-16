@@ -184,10 +184,14 @@ precisa da Ordem de Compra.
 
    - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
      119), **sem publicar**, conferido pelo CTO (D815). A gravação de uma entrega é medida pelo Banco no ensaio,
-     com o corpo que mandei (decisão 121). Vai ao ar depois da medida, da conferência e do contrato na produção;
-   - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao` (`dbdeb58`, decisão 123),
-     **sem publicar**, CI verde, mandado ao CTO. Passa de mil linhas: **a perícia vem antes da produção.** Os dois
-     ramos podem ir juntos.
+     com o corpo que mandei (decisão 121): **deu 11 de 11.** O conserto da D818 está em `39c594e` (decisão 124);
+   - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
+     conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
+   - **daqui em diante, a ordem é:**
+     1. a conferência dos consertos;
+     2. a perícia, uma só para a parte C, que o Pedro dispara;
+     3. o contrato do Banco na produção;
+     4. publicar os dois ramos juntos.
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
@@ -200,9 +204,9 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D815 e a D816 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
+A D805, a D816, a D818 e a D819 ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
 **A D815 §3 foi medida** (decisão 123): recomendei que o "Registrar entrega" do escritório pergunte o papel, como o
-carimbo. Não construir antes da resposta do CTO.
+carimbo. **A pergunta é do Pedro** (D818 §4), e o CTO leva a ele. Não construir antes da palavra dele.
 
 ---
 

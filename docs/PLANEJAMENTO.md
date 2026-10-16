@@ -4114,3 +4114,31 @@ pediu a medida do "Registrar entrega" do escritório, sem construir.
 que ela pergunte, como o carimbo, sem mudar o banco (cerca de 200 a 250 linhas, num ramo 3). **Não construí.**
 
 **O banco não mudou.**
+
+## Decisão 124 — os três consertos da D818, nos dois ramos da parte C · 15/10/2026
+
+**POR QUÊ (CTO-D818 §2):** o CTO conferiu o ramo 2 e pediu três consertos antes da perícia. O Banco mediu a gravação
+do ramo 1 no ensaio: 11 de 11.
+
+**O QUE MUDOU** (nada publicado):
+- **vale só o último arquivo escolhido** (`useUltimaEscolha`): no papel do carimbo e na foto da nota (ramo 1, `39c594e`)
+  e no "Anexar papel" (ramo 2). A foto da nota, que já está no ar, vai junto com o ramo 1;
+- **o aviso da ECR segue as regras do banco, na ordem:** "Não aplicável" não pede; a marca fala pela caixa dela; o lote
+  pede mesmo com um "vale até" valendo; o vencido; o nada guardado;
+- **"Tentar de novo"** quando a leitura dos papéis falha.
+
+**OS COMMITS:**
+- o ramo 2 recebeu o ramo 1 por junção (`6ab6b25`), não por rebase;
+- os consertos do ramo 2 estão em `4d949e2`.
+
+**A PROVA:** 1192 testes (10 novos); 12 sabotagens dos consertos, todas vermelhas; as 28 do ramo 2, de novo vermelhas.
+
+**O TAMANHO:** os dois ramos sobre o `main` dão +1865 e −19 em `src`.
+
+**A pasta do papel anexado na OC fica a da qualificação** (D818 §3).
+
+**A pergunta do escritório é do Pedro** (D818 §4), e o CTO leva a ele.
+
+**A perícia vem depois da conferência dos consertos.** É uma só para a parte C, e quem dispara é o Pedro.
+
+**O banco não mudou.**
