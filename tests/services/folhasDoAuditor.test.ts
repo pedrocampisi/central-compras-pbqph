@@ -107,6 +107,15 @@ describe('D604 §3.5 — a lista de qualificados, no desenho da FO 8.4.1.1', () 
     expect(t).toContain('Página 1 de');
     expect(t).not.toContain('01/01/2025'); // a linha velha não vai
   });
+
+  it('CTO-D819: o PDF não muda com o lançamento no sistema; a data é a da qualificação', () => {
+    const lancadas = LINHAS.map((l) => ({ ...l, lancadaEm: '2026-09-28T13:00:00+00:00' }));
+    const comLancamento = secoesDosQualificados(lancadas, CATEGORIAS, FORNECEDORES);
+    expect(comLancamento).toEqual(secoes);
+    const t = textoTodo(pdfDosQualificados(comLancamento, '2026-10-16', null));
+    expect(t).not.toContain('sistema em');
+    expect(t).not.toContain('28/09/2026');
+  });
 });
 
 describe('D604 §3.5 — as avaliações de entrega', () => {
