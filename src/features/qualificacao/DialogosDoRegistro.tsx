@@ -16,6 +16,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button/Button';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import { Loader } from '../../components/Loader/Loader';
+import { useUltimaEscolha } from '../../hooks/useUltimaEscolha';
 import { alcanceDaLeitura, fraseDaLeitura, type Alcance, type LeituraDoRegistro } from '../../domain/registroDoFornecedor';
 import {
   NOME_DO_ALCANCE,
@@ -100,10 +101,13 @@ export function AnexarPapelDialogo({
   const [validoAte, setValidoAte] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [erro, setErro] = useState('');
+  const novaEscolha = useUltimaEscolha();
 
   const permitidos = alcancesPossiveis(naOc);
 
   async function escolher(f: File | null) {
+    // Um arquivo trocado no meio da leitura: o que chega do de antes não sobe com o nome do novo.
+    const daVez = novaEscolha();
     setArquivo(f);
     setPapel(null);
     setLeitura(undefined);
@@ -114,8 +118,10 @@ export function AnexarPapelDialogo({
     setLendo(true);
     try {
       const pronto = await prepararPapel(f);
+      if (!daVez()) return;
       setPapel(pronto);
       const lido = await lerPapelDoFornecedor(pronto);
+      if (!daVez()) return;
       setLeitura(lido);
       // A leitura sugere; na dúvida é deste lote (D809 §3). Onde o lote não entra, ninguém escolhe por ele.
       const sugerido = alcanceDaLeitura(lido);
@@ -124,9 +130,9 @@ export function AnexarPapelDialogo({
         setValidoAte(sugerido.validoAte);
       }
     } catch (e) {
-      setErro(e instanceof Error ? e.message : 'Não consegui usar este arquivo.');
+      if (daVez()) setErro(e instanceof Error ? e.message : 'Não consegui usar este arquivo.');
     } finally {
-      setLendo(false);
+      if (daVez()) setLendo(false);
     }
   }
 

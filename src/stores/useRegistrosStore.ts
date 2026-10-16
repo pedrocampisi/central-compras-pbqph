@@ -29,7 +29,8 @@ export const useRegistrosStore = create<RegistrosState>((set, get) => ({
   carregar: async (deNovo = false) => {
     const agora = get();
     if (!deNovo && (agora.carregando || agora.dados || agora.erro)) return;
-    set({ carregando: true });
+    // Lendo de novo, a falha de antes sai da tela: volta o "Lendo os papéis…".
+    set({ carregando: true, erro: '' });
     try {
       set({ dados: await carregarRegistrosDoFornecedor(), erro: '', carregando: false });
     } catch (e) {

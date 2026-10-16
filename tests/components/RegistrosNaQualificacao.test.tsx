@@ -169,6 +169,29 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
     expect(caixa.querySelector('[data-a-cada-entrega]')!.textContent).toBe(
       'Pede o papel a cada entrega: a guia acompanha cada carga (teste)',
     );
+    // A marca vem antes do lote, como no banco (regra 2 antes da 3): a caixa dela já diz.
+    expect(caixa.querySelector('[data-aviso-da-ecr]')).toBeNull();
+  });
+
+  it('o aviso segue a ordem do banco: o lote pede mesmo com um "vale até" valendo; a seção "Não aplicável" não pede (D818 §2)', async () => {
+    banco.carregar = vi.fn(async () => ({ ...GUARDADOS, marcas: [] }));
+    const caixa = await abrirPapeis();
+    expect(caixa.querySelector('[data-aviso-da-ecr]')!.textContent).toBe(
+      'Esta empresa já mandou papel valendo só para o lote: cada entrega pede o papel, mesmo com outro guardado.',
+    );
+  });
+
+  it('a ECR cuja seção diz "Não aplicável": o aviso diz que não pede, e não soa como falta (D818 §2)', async () => {
+    banco.carregar = vi.fn(async () => ({ registros: [], marcas: [] }));
+    const semRegistro = {
+      ...ECR_12,
+      secoes: [{ titulo: 'REGISTRO DO FORNECEDOR', itens: [{ rotulo: null, texto: 'Não aplicável.', numerado: false }] }],
+    };
+    useDataStore.setState({ data: { ...dados(), ecrs: [semRegistro] } as unknown as Data });
+    render(<QualificacaoPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Papéis' }));
+    expect(await screen.findByText('A ECR diz "Não aplicável" no registro do fornecedor: nenhuma entrega pede o papel.')).toBeTruthy();
+    expect(screen.queryByText('Nenhum papel guardado para esta ECR.')).toBeNull();
   });
 
   it('sem nada guardado, a tela diz; a falha da leitura avisa, e não finge lista vazia', async () => {
@@ -186,6 +209,17 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
     });
     expect(screen.getByRole('alert').textContent).toContain('Não consegui ler os papéis guardados');
     expect(screen.queryByText('Nenhum papel guardado para esta ECR.')).toBeNull();
+
+    // "Tentar de novo" lê outra vez, sem recarregar a página (D818 §2).
+    const leitura: { pronta?: (d: unknown) => void } = {};
+    banco.carregar = vi.fn(() => new Promise((r) => (leitura.pronta = r)));
+    fireEvent.click(within(screen.getByRole('alert')).getByRole('button', { name: 'Tentar de novo' }));
+    // Lendo de novo: a falha de antes sai, e volta o "Lendo".
+    expect(await screen.findByText('Lendo os papéis…')).toBeTruthy();
+    expect(screen.queryByRole('alert')).toBeNull();
+    await act(async () => leitura.pronta!(GUARDADOS));
+    expect(document.querySelectorAll('[data-registro]').length).toBe(2);
+    expect(banco.carregar).toHaveBeenCalledTimes(1);
   });
 
   it('quem só lê vê os papéis, mas não anexa nem corrige', async () => {
@@ -234,6 +268,51 @@ describe('"Anexar papel" na qualificação', () => {
     fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
     expect(within(janela).getByRole('alert').textContent).toBe('Escolha a quem o papel vale.');
     expect(banco.arquivar).not.toHaveBeenCalled();
+  });
+
+  it('trocou o arquivo no meio da leitura: sobem os bytes e a leitura do último, com o nome dele (D818 §2)', async () => {
+    const primeiro: { pronto?: (p: unknown) => void } = {};
+    const PAPEL_2 = { base64: 'U0VHVU5ETw==', mime: 'application/pdf' };
+    banco.preparar = vi.fn((f: File) =>
+      f.name === 'primeiro.pdf' ? new Promise((r) => (primeiro.pronto = r)) : Promise.resolve(PAPEL_2));
+    banco.ler = vi.fn(async (p: unknown) =>
+      p === PAPEL_2 ? { alcance: 'produto', validoAte: '', confira: '', bruta: { segundo: true } } : LIDO_VALE_ATE);
+    const caixa = await abrirPapeis();
+    fireEvent.click(within(caixa).getByRole('button', { name: /Anexar papel/ }));
+    const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
+    const input = janela.querySelector<HTMLInputElement>('input[type="file"]')!;
+    fireEvent.change(input, { target: { files: [arquivo('primeiro.pdf')] } });
+    fireEvent.change(input, { target: { files: [arquivo('segundo.pdf')] } });
+    await waitFor(() => expect(within(janela).getByLabelText<HTMLInputElement>('Vale para o produto, sem prazo').checked).toBe(true));
+    // O primeiro chega depois: não cai em cima do segundo.
+    await act(async () => primeiro.pronto!(PAPEL_PRONTO));
+    expect(within(janela).getByLabelText<HTMLInputElement>('Vale para o produto, sem prazo').checked).toBe(true);
+    expect(banco.ler).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
+    await waitFor(() => expect(banco.guardar).toHaveBeenCalledTimes(1));
+    expect(banco.arquivar).toHaveBeenCalledWith(PAPEL_2, 'segundo.pdf', 12, { fornecedorId: 'a1' }, { segundo: true });
+  });
+
+  it('trocou o arquivo enquanto a IA lia o primeiro: a leitura do primeiro, que chega depois, não vale (D818 §2)', async () => {
+    const PAPEL_2 = { base64: 'U0VHVU5ETw==', mime: 'application/pdf' };
+    const primeiro: { lido?: (l: unknown) => void } = {};
+    banco.preparar = vi.fn(async (f: File) => (f.name === 'primeiro.pdf' ? PAPEL_PRONTO : PAPEL_2));
+    banco.ler = vi.fn((p: unknown) =>
+      p === PAPEL_PRONTO
+        ? new Promise((r) => (primeiro.lido = r))
+        : Promise.resolve({ alcance: 'produto', validoAte: '', confira: '', bruta: { segundo: true } }));
+    const caixa = await abrirPapeis();
+    fireEvent.click(within(caixa).getByRole('button', { name: /Anexar papel/ }));
+    const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
+    const input = janela.querySelector<HTMLInputElement>('input[type="file"]')!;
+    fireEvent.change(input, { target: { files: [arquivo('primeiro.pdf')] } });
+    await waitFor(() => expect(primeiro.lido).toBeTruthy());
+    fireEvent.change(input, { target: { files: [arquivo('segundo.pdf')] } });
+    await waitFor(() => expect(within(janela).getByLabelText<HTMLInputElement>('Vale para o produto, sem prazo').checked).toBe(true));
+    await act(async () => primeiro.lido!(LIDO_VALE_ATE));
+    expect(within(janela).getByLabelText<HTMLInputElement>('Vale para o produto, sem prazo').checked).toBe(true);
+    expect(janela.querySelector('[data-leitura]')!.textContent).not.toContain('30/06/2027');
   });
 
   it('a recusa do banco aparece na janela, e ela fica aberta', async () => {

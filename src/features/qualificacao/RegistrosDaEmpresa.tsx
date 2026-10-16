@@ -96,12 +96,21 @@ export function RegistrosDaEmpresa({
   return (
     <div className={styles.registros} data-registros-de={chave}>
       <h4 className={styles.titulo}>Papéis do fornecedor, por ECR</h4>
-      {erro && <p className={styles.erro} role="alert">Não consegui ler os papéis guardados: {erro}</p>}
+      {erro && (
+        <div className={styles.erro} role="alert">
+          Não consegui ler os papéis guardados: {erro}{' '}
+          {/* A falha não se cura sozinha: sem isto, só recarregando a página (CTO-D818 §2). */}
+          <Button variant="outline" size="sm" onClick={() => void carregar(true)}>
+            Tentar de novo
+          </Button>
+        </div>
+      )}
       {ecrIds.map((id) => {
         const ecr = ecrs.find((e) => e.id === id);
         const papeis = daEcr(id);
         const marca = dados?.marcas.find((m) => m.ecrId === id);
-        const aviso = dados ? avisoDaEcr(papeis, hoje) : '';
+        const itens = ecr?.secoes ? itensDoRegistro(ecr.secoes) : null;
+        const aviso = dados ? avisoDaEcr(papeis, hoje, { itens, temMarca: !!marca }) : '';
         return (
           <section key={id} className={styles.ecr} data-registros-da-ecr={id}>
             <h5>{rotuloDaEcr(ecrs, id)}</h5>

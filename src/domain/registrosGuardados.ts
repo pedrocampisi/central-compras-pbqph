@@ -141,13 +141,34 @@ export function registrosDaEcr(
     );
 }
 
-/** O que a tela diz de uma ECR sem nada que valha além do lote; '' quando há. */
-export function avisoDaEcr(papeis: readonly RegistroGuardado[], hoje: string): string {
-  if (papeis.length === 0) return 'Nenhum papel guardado para esta ECR.';
+const NAO_APLICAVEL = /^\s*n[ãa]o\s+aplic[áa]vel\s*\.?\s*$/i;
+
+/**
+ * O que a tela diz de uma ECR, na ordem das regras do "pede" do banco
+ * (`compras.registro_pede`, CTO-D818 §2): a primeira que vale.
+ *
+ * 1. a seção diz só "Não aplicável": nenhuma entrega pede;
+ * 2. a marca "a cada entrega": a caixa dela já diz, e o aviso fica '';
+ * 3. já chegou um papel de lote da empresa: cada entrega pede, mesmo com outro valendo;
+ * 4. um "vale até" que vale hoje, e 5. um "vale para o produto": nada a avisar;
+ * 6. o resto: o "vale até" venceu, ou nada guardado.
+ */
+export function avisoDaEcr(
+  papeis: readonly RegistroGuardado[],
+  hoje: string,
+  ecr: { itens: readonly { texto: string }[] | null; temMarca: boolean },
+): string {
+  if (ecr.itens && ecr.itens.length > 0 && ecr.itens.every((i) => NAO_APLICAVEL.test(i.texto))) {
+    return 'A ECR diz "Não aplicável" no registro do fornecedor: nenhuma entrega pede o papel.';
+  }
+  if (ecr.temMarca) return '';
+  if (papeis.some((r) => r.alcance === 'lote')) {
+    return 'Esta empresa já mandou papel valendo só para o lote: cada entrega pede o papel, mesmo com outro guardado.';
+  }
   const vigencias = papeis.map((r) => vigenciaDoRegistro(r, hoje));
-  if (vigencias.some((v) => v === 'vale' || v === 'produto' || v === 'vence_em_30_dias')) return '';
+  if (vigencias.some((v) => v === 'vale' || v === 'vence_em_30_dias' || v === 'produto')) return '';
   if (vigencias.includes('vencido')) return 'O papel que valia até uma data venceu. A próxima entrega vai pedir de novo.';
-  return 'Só papéis de lote: cada entrega pede o seu.';
+  return 'Nenhum papel guardado para esta ECR.';
 }
 
 const DIA = /^\d{4}-\d{2}-\d{2}$/;

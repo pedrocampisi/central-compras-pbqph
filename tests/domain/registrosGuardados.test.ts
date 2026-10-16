@@ -68,13 +68,46 @@ describe('a vigência no dia, e o aviso de 30 dias', () => {
     expect(textoDaVigencia(papel({ alcance: 'produto', validoAte: '' }), HOJE)).toBe('Vale para o produto, sem prazo');
   });
 
-  it('o aviso da ECR: nada guardado, só lote, ou o "vale até" vencido; sem aviso quando algo vale', () => {
-    expect(avisoDaEcr([], HOJE)).toBe('Nenhum papel guardado para esta ECR.');
-    expect(avisoDaEcr([papel({ alcance: 'lote', validoAte: '' })], HOJE)).toBe('Só papéis de lote: cada entrega pede o seu.');
-    expect(avisoDaEcr([papel({ validoAte: '2026-09-30' }), papel({ alcance: 'lote', validoAte: '' })], HOJE))
-      .toBe('O papel que valia até uma data venceu. A próxima entrega vai pedir de novo.');
-    expect(avisoDaEcr([papel({ validoAte: '2026-09-30' }), papel({ alcance: 'produto', validoAte: '' })], HOJE)).toBe('');
-    expect(avisoDaEcr([papel({ validoAte: '2026-10-20' })], HOJE)).toBe('');
+  describe('o aviso da ECR, na ordem das regras do banco (CTO-D818 §2)', () => {
+    const PEDE = { itens: [{ texto: 'Licença (teste)' }], temMarca: false };
+    const NAO_APLICAVEL = { itens: [{ texto: 'Não aplicável.' }], temMarca: false };
+    const NADA = 'Nenhum papel guardado para esta ECR.';
+    const LOTE = 'Esta empresa já mandou papel valendo só para o lote: cada entrega pede o papel, mesmo com outro guardado.';
+    const VENCEU = 'O papel que valia até uma data venceu. A próxima entrega vai pedir de novo.';
+    const lote = papel({ alcance: 'lote', validoAte: '' });
+
+    it('1: a seção que diz "Não aplicável" não pede, nem com a marca, e não soa como falta', () => {
+      const aviso = 'A ECR diz "Não aplicável" no registro do fornecedor: nenhuma entrega pede o papel.';
+      expect(avisoDaEcr([], HOJE, NAO_APLICAVEL)).toBe(aviso);
+      expect(avisoDaEcr([], HOJE, { itens: [{ texto: ' nao aplicavel ' }], temMarca: true })).toBe(aviso);
+      // Uma linha que pede, junto: a seção não é "Não aplicável".
+      expect(avisoDaEcr([], HOJE, { itens: [{ texto: 'Não aplicável.' }, { texto: 'Licença (teste)' }], temMarca: false })).toBe(NADA);
+    });
+
+    it('2: com a marca, a caixa dela diz, e o aviso fica calado', () => {
+      expect(avisoDaEcr([], HOJE, { ...PEDE, temMarca: true })).toBe('');
+      expect(avisoDaEcr([lote], HOJE, { ...PEDE, temMarca: true })).toBe('');
+    });
+
+    it('3 antes de 4 e 5: um lote, mesmo com um "vale até" valendo ou um "produto", pede em toda entrega', () => {
+      expect(avisoDaEcr([lote], HOJE, PEDE)).toBe(LOTE);
+      expect(avisoDaEcr([papel({ validoAte: '2027-06-30' }), lote], HOJE, PEDE)).toBe(LOTE);
+      expect(avisoDaEcr([papel({ alcance: 'produto', validoAte: '' }), lote], HOJE, PEDE)).toBe(LOTE);
+      expect(avisoDaEcr([papel({ validoAte: '2026-09-30' }), lote], HOJE, PEDE)).toBe(LOTE);
+    });
+
+    it('4 e 5: o "vale até" que vale hoje, ou o "produto", calam o aviso', () => {
+      expect(avisoDaEcr([papel({ validoAte: '2026-10-20' })], HOJE, PEDE)).toBe('');
+      expect(avisoDaEcr([papel({ validoAte: HOJE })], HOJE, PEDE)).toBe('');
+      expect(avisoDaEcr([papel({ validoAte: '2026-09-30' }), papel({ alcance: 'produto', validoAte: '' })], HOJE, PEDE)).toBe('');
+    });
+
+    it('6: o vencido, ou nada guardado (também sem o texto da ECR no sistema)', () => {
+      expect(avisoDaEcr([papel({ validoAte: '2026-10-14' })], HOJE, PEDE)).toBe(VENCEU);
+      expect(avisoDaEcr([], HOJE, PEDE)).toBe(NADA);
+      expect(avisoDaEcr([], HOJE, { itens: null, temMarca: false })).toBe(NADA);
+      expect(avisoDaEcr([], HOJE, { itens: [], temMarca: false })).toBe(NADA);
+    });
   });
 });
 
