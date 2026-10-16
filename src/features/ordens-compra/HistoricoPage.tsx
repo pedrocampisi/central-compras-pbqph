@@ -70,6 +70,11 @@ export function HistoricoPage() {
   const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
   /** A OC em que o comprador anexa o papel do fornecedor que chegou por e-mail (CTO-D811 §4.3). */
   const [anexando, setAnexando] = useState<OrdemCompra | null>(null);
+  // As marcas "a cada entrega", para a janela do "Anexar papel" (D840 §2.3): lidas quando ela abre.
+  const marcas = useRegistrosStore((s) => s.dados?.marcas);
+  useEffect(() => {
+    if (anexando) void useRegistrosStore.getState().carregar();
+  }, [anexando]);
   /** O ✓ de cada OC (D685); `null` enquanto não leu, ou se a leitura falhou: aí a coluna não aparece. */
   const [naPasta, setNaPasta] = useState<Map<string, PdfNaPasta> | null>(null);
   /** A OC que está indo para a pasta agora: o botão dela espera. */
@@ -570,10 +575,12 @@ export function HistoricoPage() {
       {anexando && (
         <AnexarPapelDialogo
           quem={`OC ${anexando.numero || '(sem número)'} · ${fornecedorNome.get(anexando.fornecedor_id) ?? ''}`}
-          naOc
+          porOnde="oc"
           ecrs={ecrsNaOrdemDosItens(anexando.itens).map((id) => {
             const e = data?.ecrs.find((x) => x.id === id);
-            return { id, rotulo: e ? `${e.codigo} — ${e.nome}` : `ECR ${id}` };
+            // A marca "a cada entrega" tira o lote daqui (D840 §2.3); o banco recusa o lote sem entrega do mesmo jeito.
+            const aCadaEntrega = !!marcas?.some((m) => m.ecrId === id);
+            return { id, rotulo: e ? `${e.codigo} — ${e.nome}` : `ECR ${id}`, aCadaEntrega };
           })}
           // As posições ficam com o banco: por padrão, os itens desta OC com a ECR.
           onde={() => ({ ocId: anexando.id, fornecedorId: anexando.fornecedor_id })}

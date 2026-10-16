@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import {
   ALCANCES_DA_QUALIFICACAO,
   alcancesPossiveis,
+  codigoDaEcr,
+  dicasDoAlcance,
   avisoDaEcr,
   correcaoSemMudanca,
   problemaDoAlcance,
   quemConferiu,
   registrosDaEcr,
   textoDaCorrecao,
+  textoDaEntregaCoberta,
   textoDaVigencia,
   vigenciaDoRegistro,
   type RegistroGuardado,
@@ -23,7 +26,7 @@ const HOJE = '2026-10-15';
 function papel(extra: Partial<RegistroGuardado> = {}): RegistroGuardado {
   return {
     id: 1, documentoId: 'doc-1', ecrId: 6, empresaRaizId: 'raiz-1', fornecedorId: null, alcance: 'vale_ate',
-    validoAte: '2027-06-30', ocId: '', entrouPor: 'qualificacao', conferidoPorNome: 'Comprador de Teste',
+    validoAte: '2027-06-30', ocId: '', avaliacaoId: 0, entrouPor: 'qualificacao', conferidoPorNome: 'Comprador de Teste',
     conferidoEm: '2026-10-10T12:00:00+00:00', correcoes: [], ...extra,
   };
 }
@@ -31,19 +34,52 @@ function papel(extra: Partial<RegistroGuardado> = {}): RegistroGuardado {
 describe('os alcances que cada caminho aceita', () => {
   it('a qualificação não aceita o lote; a OC aceita os três', () => {
     expect(ALCANCES_DA_QUALIFICACAO).toEqual(['vale_ate', 'produto']);
-    expect(alcancesPossiveis(false)).toEqual(['vale_ate', 'produto']);
-    expect(alcancesPossiveis(true)).toEqual(['lote', 'vale_ate', 'produto']);
+    expect(alcancesPossiveis('qualificacao')).toEqual(['vale_ate', 'produto']);
+    expect(alcancesPossiveis('oc')).toEqual(['lote', 'vale_ate', 'produto']);
   });
 
   it('o que falta: a escolha, o lote fora da OC, a data do "vale até"', () => {
-    const q = alcancesPossiveis(false);
+    const q = alcancesPossiveis('qualificacao');
     expect(problemaDoAlcance(null, '', q)).toBe('Escolha a quem o papel vale.');
     expect(problemaDoAlcance('lote', '', q)).toBe('O papel "deste lote" se anexa na OC em que chegou.');
     expect(problemaDoAlcance('vale_ate', '', q)).toBe('Escreva até quando o papel vale.');
     expect(problemaDoAlcance('vale_ate', '30/06/2027', q)).toBe('Escreva até quando o papel vale.');
     expect(problemaDoAlcance('vale_ate', '2027-06-30', q)).toBe('');
     expect(problemaDoAlcance('produto', '', q)).toBe('');
-    expect(problemaDoAlcance('lote', '', alcancesPossiveis(true))).toBe('');
+    expect(problemaDoAlcance('lote', '', alcancesPossiveis('oc'))).toBe('');
+  });
+});
+
+describe('a ECR com a marca "a cada entrega" (D840 §2.3, §2.5)', () => {
+  it('pela OC e pela qualificação, o lote não entra; pela entrega, ele é o único', () => {
+    expect(alcancesPossiveis('oc', true)).toEqual(['vale_ate', 'produto']);
+    expect(alcancesPossiveis('qualificacao', true)).toEqual(['vale_ate', 'produto']);
+    expect(alcancesPossiveis('entrega', true)).toEqual(['lote']);
+    expect(alcancesPossiveis('entrega')).toEqual(['lote', 'vale_ate', 'produto']);
+  });
+
+  it('a janela diz por onde o lote entra, e que o "vale até" e o "produto" não cobrem a entrega', () => {
+    expect(codigoDaEcr(2)).toBe('ECR 02');
+    expect(dicasDoAlcance('oc', 2, true)).toEqual([
+      'A ECR 02 pede o papel a cada entrega: anexe pela entrega, em Recebimentos, na lista das entregas sem papel.',
+      'Aqui, o "vale até" e o "vale para o produto" guardam o papel, mas não cobrem as entregas desta ECR.',
+    ]);
+    expect(dicasDoAlcance('qualificacao', 17, true)[0]).toMatch(/^A ECR 17 pede o papel a cada entrega/);
+    expect(dicasDoAlcance('entrega', 1, true)).toEqual(['Este papel vale para esta entrega.']);
+    expect(dicasDoAlcance('qualificacao', 6, false)).toEqual(['O papel deste lote se anexa na OC em que ele chegou, em Ordens de compra.']);
+    expect(dicasDoAlcance('oc', 6, false)).toEqual([]);
+    expect(dicasDoAlcance('entrega', 6, false)).toEqual([]);
+  });
+});
+
+describe('a entrega que o papel de lote cobre (D840 §2.4)', () => {
+  it('o dia e a OC; sem o dia, só a OC; o que não é lote, ou não nomeia entrega, não diz', () => {
+    const lote = { alcance: 'lote' as const, avaliacaoId: 31 };
+    expect(textoDaEntregaCoberta(lote, '2026-10-14', '2026/101')).toBe('cobre a entrega de 14/10, OC 2026/101');
+    expect(textoDaEntregaCoberta(lote, '2026-10-14T13:00:00Z', '')).toBe('cobre a entrega de 14/10, OC (sem número)');
+    expect(textoDaEntregaCoberta(lote, '', '2026/101')).toBe('cobre uma entrega da OC 2026/101');
+    expect(textoDaEntregaCoberta({ alcance: 'lote', avaliacaoId: 0 }, '2026-10-14', '2026/101')).toBe('');
+    expect(textoDaEntregaCoberta({ alcance: 'vale_ate', avaliacaoId: 31 }, '2026-10-14', '2026/101')).toBe('');
   });
 });
 

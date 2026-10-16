@@ -15,7 +15,7 @@ vi.mock('../../src/services/supabase/client', () => ({
   compras: () => ({}),
 }));
 const banco = vi.hoisted(() => ({}) as {
-  carregar: Mock; preparar: Mock; ler: Mock; arquivar: Mock; guardar: Mock; corrigir: Mock;
+  carregar: Mock; preparar: Mock; ler: Mock; arquivar: Mock; guardar: Mock; corrigir: Mock; avaliacoes: Mock;
 });
 vi.mock('../../src/services/supabase/registrosDoFornecedor', () => ({
   carregarRegistrosDoFornecedor: () => banco.carregar(),
@@ -28,6 +28,10 @@ vi.mock('../../src/services/supabase/registrosDoFornecedor', () => ({
 vi.mock('../../src/services/supabase/recebimento', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/recebimento')>()),
   lerLinksDasFotos: async (ids: string[]) => new Map(ids.map((id) => [id, `https://pasta.invalid/${id}`])),
+}));
+vi.mock('../../src/services/supabase/qualificacao', async (original) => ({
+  ...(await original<typeof import('../../src/services/supabase/qualificacao')>()),
+  lerAvaliacoesDeEntrega: () => banco.avaliacoes(),
 }));
 vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: vi.fn() }));
 vi.mock('../../src/hooks/useHojeEmSaoPaulo', () => ({ useHojeEmSaoPaulo: () => '2026-10-15' }));
@@ -77,7 +81,7 @@ function dados(): Data {
 
 const papel = (o: Partial<RegistroGuardado>): RegistroGuardado => ({
   id: 1, documentoId: 'doc-1', ecrId: 12, empresaRaizId: 'empresa-a', fornecedorId: null, alcance: 'vale_ate',
-  validoAte: '2026-10-30', ocId: '', entrouPor: 'qualificacao', conferidoPorNome: 'Comprador de Teste',
+  validoAte: '2026-10-30', ocId: '', avaliacaoId: 0, entrouPor: 'qualificacao', conferidoPorNome: 'Comprador de Teste',
   conferidoEm: '2026-10-01T12:00:00Z', correcoes: [], ...o,
 });
 
@@ -122,6 +126,7 @@ beforeEach(() => {
   banco.arquivar = vi.fn(async () => 'doc-novo');
   banco.guardar = vi.fn(async () => 50);
   banco.corrigir = vi.fn(async () => {});
+  banco.avaliacoes = vi.fn(async () => []);
   useDataStore.setState({ data: dados() });
   useAuthStore.setState({ perfil: { papel: 'admin' } as never });
   useUiStore.setState({ toasts: [] });
@@ -162,6 +167,26 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
       /^Corrigido de "Vale para o produto, sem prazo" para "Deste lote" — Comprador de Teste, .*\. Motivo: é da carga \(teste\)$/,
     );
     expect(caixa.querySelector('[data-registro="3"]')).toBeNull();
+  });
+
+  it('o papel de lote que nomeia a entrega diz qual: o dia e a OC (D840 §2.4); o lote sem entrega não diz', async () => {
+    banco.carregar = vi.fn(async () => ({
+      ...GUARDADOS,
+      registros: GUARDADOS.registros.map((r) => (r.id === 2 ? { ...r, avaliacaoId: 31, entrouPor: 'entrega' as const } : r)),
+    }));
+    banco.avaliacoes = vi.fn(async () => [{ id: 31, recebidoEm: '2026-10-14' }]);
+    useDataStore.setState({ data: { ...dados(), ordens_compra: [{ id: 'oc-1', numero: '2026/101' }] } as unknown as Data });
+    const caixa = await abrirPapeis();
+    const dois = caixa.querySelector<HTMLElement>('[data-registro="2"]')!;
+    await waitFor(() => expect(dois.querySelector('[data-entrega-coberta]')!.textContent).toBe('cobre a entrega de 14/10, OC 2026/101'));
+    expect(dois.textContent).toContain('anexado na entrega, pela lista das entregas sem papel');
+    expect(caixa.querySelector('[data-registro="1"] [data-entrega-coberta]')).toBeNull();
+    expect(banco.avaliacoes).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem papel que nomeie entrega, as entregas nem são lidas', async () => {
+    await abrirPapeis();
+    expect(banco.avaliacoes).not.toHaveBeenCalled();
   });
 
   it('a marca "a cada entrega" aparece na ECR, com o porquê do Banco', async () => {
@@ -263,11 +288,24 @@ describe('"Anexar papel" na qualificação', () => {
     const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
     fireEvent.change(janela.querySelector('input[type="file"]')!, { target: { files: [arquivo('gca.pdf')] } });
     await waitFor(() => expect(janela.querySelector('[data-leitura]')!.textContent).toContain('Confira: cita o número da nota'));
-    expect(janela.textContent).toContain('O papel deste lote se anexa na OC em que ele chegou');
+    // A ECR 12 tem a marca "a cada entrega": o lote entra pela entrega, não pela OC (D840 §2.3).
+    expect(janela.textContent).toContain('A ECR 12 pede o papel a cada entrega: anexe pela entrega');
+    expect(janela.textContent).not.toContain('se anexa na OC em que ele chegou');
     expect(janela.querySelectorAll<HTMLInputElement>('[data-alcance-escolha] input[type="radio"]:checked').length).toBe(0);
     fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
     expect(within(janela).getByRole('alert').textContent).toBe('Escolha a quem o papel vale.');
     expect(banco.arquivar).not.toHaveBeenCalled();
+  });
+
+  it('sem a marca, o lote manda à OC em que ele chegou', async () => {
+    banco.carregar = vi.fn(async () => ({ ...GUARDADOS, marcas: [] }));
+    banco.ler = vi.fn(async () => null);
+    const caixa = await abrirPapeis();
+    fireEvent.click(within(caixa).getByRole('button', { name: /Anexar papel/ }));
+    const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
+    fireEvent.change(janela.querySelector('input[type="file"]')!, { target: { files: [arquivo('gca.pdf')] } });
+    await waitFor(() => expect(janela.textContent).toContain('O papel deste lote se anexa na OC em que ele chegou'));
+    expect(janela.textContent).not.toContain('a cada entrega');
   });
 
   it('trocou o arquivo no meio da leitura: sobem os bytes e a leitura do último, com o nome dele (D818 §2)', async () => {
@@ -387,7 +425,7 @@ describe('"Anexar papel" na OC (CTO-D811 §4.3)', () => {
     render(
       <AnexarPapelDialogo
         quem="OC 2026/101 · Alfa (teste)"
-        naOc
+        porOnde="oc"
         ecrs={[{ id: 12, rotulo: 'ECR 12 — Madeira (teste)' }, { id: 6, rotulo: 'ECR 06 — Aço (teste)' }]}
         onde={() => ({ ocId: 'oc-1', fornecedorId: 'a1' })}
         aoFechar={() => {}}

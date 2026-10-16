@@ -112,6 +112,32 @@ describe('o "Anexar papel" na lista das OCs', () => {
     expect(banco.guardar).toHaveBeenCalledWith({
       documentoId: 'doc-novo', ecrId: 12, alcance: 'lote', validoAte: '', onde: { ocId, fornecedorId: 'filial-a' },
     });
-    await waitFor(() => expect(banco.carregar).toHaveBeenCalledTimes(1));
+    // Uma ao abrir (as marcas), e outra depois de guardar.
+    await waitFor(() => expect(banco.carregar).toHaveBeenCalledTimes(2));
+  });
+
+  it('na ECR com a marca "a cada entrega", o lote não entra pela OC, e a janela manda à lista das entregas sem papel (D840 §2.3)', async () => {
+    banco.carregar = vi.fn(async () => ({ registros: [], marcas: [{ ecrId: 12, porque: 'a GCA de cada transporte (teste)' }] }));
+    render(<HistoricoPage />);
+    fireEvent.click(within(linhaDa('2026/001')).getByRole('button', { name: 'Anexar papel' }));
+    const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
+    await waitFor(() => expect(useRegistrosStore.getState().dados).not.toBeNull());
+    fireEvent.change(janela.querySelector('input[type="file"]')!, {
+      target: { files: [new File([new Uint8Array([1])], 'licenca.pdf', { type: 'application/pdf' })] },
+    });
+    await waitFor(() => expect(within(janela).getByLabelText('Vale até uma data')).toBeTruthy());
+    expect(within(janela).queryByLabelText('Deste lote')).toBeNull();
+    expect(janela.textContent).toContain(
+      'A ECR 12 pede o papel a cada entrega: anexe pela entrega, em Recebimentos, na lista das entregas sem papel.',
+    );
+    expect(janela.textContent).toContain('não cobrem as entregas desta ECR');
+    fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
+    expect(within(janela).getByRole('alert').textContent).toBe('Escolha a quem o papel vale.');
+    expect(banco.guardar).not.toHaveBeenCalled();
+    fireEvent.click(within(janela).getByLabelText('Vale até uma data'));
+    fireEvent.change(within(janela).getByLabelText('Vale até'), { target: { value: '2027-06-30' } });
+    fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
+    await waitFor(() => expect(banco.guardar).toHaveBeenCalledTimes(1));
+    expect(banco.guardar.mock.calls[0]![0]).toMatchObject({ ecrId: 12, alcance: 'vale_ate', validoAte: '2027-06-30' });
   });
 });

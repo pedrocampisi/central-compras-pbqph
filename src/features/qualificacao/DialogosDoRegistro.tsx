@@ -4,7 +4,9 @@
  *
  * - **Anexar papel:** o comprador escolhe a foto ou o PDF, a IA lê, ele confere
  *   o alcance e guarda. Pela qualificação, o papel vale para a empresa; pela
- *   OC, ele fica anotado na OC e nos itens daquela ECR.
+ *   OC, ele fica anotado na OC e nos itens daquela ECR; pela entrega da lista
+ *   sem papel (D840 §2.5), ele nomeia a entrega. Na ECR com a marca "a cada
+ *   entrega", o lote só entra pela entrega, e ali sem escolha.
  * - **Corrigir o alcance:** de um papel já guardado. A correção fica escrita,
  *   com quem, quando e de quê para quê, e aparece embaixo do papel.
  *
@@ -22,9 +24,11 @@ import {
   NOME_DO_ALCANCE,
   alcancesPossiveis,
   correcaoSemMudanca,
+  dicasDoAlcance,
   problemaDoAlcance,
   textoDaCorrecao,
   textoDaVigencia,
+  type PorOndeAnexa,
   type RegistroGuardado,
 } from '../../domain/registrosGuardados';
 import {
@@ -39,35 +43,44 @@ import { useUiStore } from '../../stores/useUiStore';
 import styles from '../fornecedores/QualificarDialogo.module.css';
 import meu from './DialogosDoRegistro.module.css';
 
-/** O alcance em botões de escolha, e a data quando é "vale até". */
+/** O alcance em botões de escolha, e a data quando é "vale até". Com um só, ele vem escrito, sem escolha. */
 function EscolhaDoAlcance({
-  permitidos, alcance, validoAte, aoMudar,
+  permitidos, alcance, validoAte, dicas, aoMudar,
 }: {
   permitidos: readonly Alcance[];
   alcance: Alcance | null;
   validoAte: string;
+  dicas: readonly string[];
   aoMudar: (alcance: Alcance, validoAte: string) => void;
 }) {
   return (
     <fieldset className={styles.criterio} data-alcance-escolha="">
       <legend>A quem o papel vale</legend>
-      <div className={meu.alcances}>
-        {permitidos.map((a) => (
-          <label key={a}>
-            <input type="radio" name="alcance" checked={alcance === a} onChange={() => aoMudar(a, validoAte)} />
-            {NOME_DO_ALCANCE[a]}
-          </label>
-        ))}
-      </div>
+      {permitidos.length === 1 ? (
+        <p className={meu.ecr} data-alcance-fixo={permitidos[0]}>
+          {NOME_DO_ALCANCE[permitidos[0]!]}
+        </p>
+      ) : (
+        <div className={meu.alcances}>
+          {permitidos.map((a) => (
+            <label key={a}>
+              <input type="radio" name="alcance" checked={alcance === a} onChange={() => aoMudar(a, validoAte)} />
+              {NOME_DO_ALCANCE[a]}
+            </label>
+          ))}
+        </div>
+      )}
       {alcance === 'vale_ate' && (
         <label className={styles.campo}>
           Vale até
           <input type="date" value={validoAte} onChange={(e) => aoMudar('vale_ate', e.target.value)} />
         </label>
       )}
-      {!permitidos.includes('lote') && (
-        <p className={meu.dica}>O papel deste lote se anexa na OC em que ele chegou, em Ordens de compra.</p>
-      )}
+      {dicas.map((d) => (
+        <p key={d} className={meu.dica}>
+          {d}
+        </p>
+      ))}
     </fieldset>
   );
 }
@@ -76,15 +89,17 @@ export interface EcrParaAnexar {
   id: number;
   /** "ECR 06 — Madeira" */
   rotulo: string;
+  /** A marca "a cada entrega" (ECRs 01, 02, 17): o lote só pela entrega. */
+  aCadaEntrega?: boolean;
 }
 
 export function AnexarPapelDialogo({
-  quem, naOc, ecrs, onde, aoFechar, aoGuardar,
+  quem, porOnde, ecrs, onde, aoFechar, aoGuardar,
 }: {
-  /** A empresa, ou a OC e a empresa, numa linha. */
+  /** A empresa, a OC e a empresa, ou a entrega, numa linha. */
   quem: string;
-  /** Pelo "Anexar" na OC: o lote entra. Pela qualificação, não. */
-  naOc: boolean;
+  /** Pela qualificação, o lote não entra; pela OC, entra, menos na ECR com a marca; pela entrega, entra sempre. */
+  porOnde: PorOndeAnexa;
   ecrs: readonly EcrParaAnexar[];
   /** Onde o papel entra, para cada ECR (a OC dá as posições dos itens daquela ECR). */
   onde: (ecrId: number) => OndeEntra;
@@ -103,7 +118,10 @@ export function AnexarPapelDialogo({
   const [erro, setErro] = useState('');
   const novaEscolha = useUltimaEscolha();
 
-  const permitidos = alcancesPossiveis(naOc);
+  const ecr = ecrs.find((e) => e.id === ecrId);
+  const permitidos = alcancesPossiveis(porOnde, !!ecr?.aCadaEntrega);
+  // Com um alcance só (o lote, na entrega com a marca), ele é o escolhido; trocou a ECR, o de antes que não cabe sai.
+  const escolhido = permitidos.length === 1 ? permitidos[0]! : alcance && permitidos.includes(alcance) ? alcance : null;
 
   async function escolher(f: File | null) {
     // Um arquivo trocado no meio da leitura: o que chega do de antes não sobe com o nome do novo.
@@ -126,7 +144,7 @@ export function AnexarPapelDialogo({
       setLeitura(lido);
       // A leitura sugere; na dúvida é deste lote (D809 §3). Onde o lote não entra, ninguém escolhe por ele.
       const sugerido = alcanceDaLeitura(lido);
-      if (permitidos.includes(sugerido.alcance) && (lido?.alcance || naOc)) {
+      if (permitidos.includes(sugerido.alcance) && (lido?.alcance || porOnde !== 'qualificacao')) {
         setAlcance(sugerido.alcance);
         setValidoAte(sugerido.validoAte);
       }
@@ -142,8 +160,8 @@ export function AnexarPapelDialogo({
       ? 'Escolha a ECR do papel.'
       : !papel
         ? 'Escolha a foto ou o PDF do papel.'
-        : problemaDoAlcance(alcance, validoAte, permitidos);
-    if (problema || ecrId === null || !papel || !alcance || !arquivo) {
+        : problemaDoAlcance(escolhido, validoAte, permitidos);
+    if (problema || ecrId === null || !papel || !escolhido || !arquivo) {
       setErro(problema);
       return;
     }
@@ -152,7 +170,7 @@ export function AnexarPapelDialogo({
     try {
       const destino = onde(ecrId);
       const documentoId = await arquivarPapelDoFornecedor(papel, arquivo.name, ecrId, destino, leitura?.bruta);
-      await guardarRegistroDoFornecedor({ documentoId, ecrId, alcance, validoAte, onde: destino });
+      await guardarRegistroDoFornecedor({ documentoId, ecrId, alcance: escolhido, validoAte, onde: destino });
       showToast('Papel guardado.', 'success');
       aoGuardar();
       aoFechar();
@@ -207,8 +225,9 @@ export function AnexarPapelDialogo({
         {papel && !lendo && (
           <EscolhaDoAlcance
             permitidos={permitidos}
-            alcance={alcance}
+            alcance={escolhido}
             validoAte={validoAte}
+            dicas={ecrId === null ? [] : dicasDoAlcance(porOnde, ecrId, !!ecr?.aCadaEntrega)}
             aoMudar={(a, d) => {
               setAlcance(a);
               setValidoAte(d);
@@ -246,7 +265,7 @@ export function CorrigirAlcanceDialogo({
   aoCorrigir: () => void;
 }) {
   const showToast = useUiStore((s) => s.showToast);
-  const permitidos = alcancesPossiveis(!!registro.ocId);
+  const permitidos = alcancesPossiveis(registro.ocId ? 'oc' : 'qualificacao');
   const [alcance, setAlcance] = useState<Alcance>(registro.alcance);
   const [validoAte, setValidoAte] = useState(registro.validoAte);
   const [motivo, setMotivo] = useState('');
@@ -285,6 +304,7 @@ export function CorrigirAlcanceDialogo({
           permitidos={permitidos}
           alcance={alcance}
           validoAte={validoAte}
+          dicas={registro.ocId ? [] : dicasDoAlcance('qualificacao', registro.ecrId, false)}
           aoMudar={(a, d) => {
             setAlcance(a);
             setValidoAte(d);

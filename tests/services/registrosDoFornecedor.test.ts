@@ -91,7 +91,12 @@ describe('ler: os papéis, as correções e a marca', () => {
         {
           id: 8, documento_id: 'doc-8', ecr_id: 2, empresa_raiz_id: null, fornecedor_id: 'forn-2', alcance: 'lote',
           valido_ate: null, oc_id: 'oc-2', entrou_por: 'recebimento', conferido_por_nome: 'Encarregado de Teste',
-          conferido_em: '2026-10-11T12:00:00+00:00',
+          conferido_em: '2026-10-11T12:00:00+00:00', avaliacao_id: 31,
+        },
+        {
+          id: 9, documento_id: 'doc-9', ecr_id: 2, empresa_raiz_id: null, fornecedor_id: 'forn-2', alcance: 'lote',
+          valido_ate: null, oc_id: 'oc-3', entrou_por: 'entrega', conferido_por_nome: 'Comprador de Teste',
+          conferido_em: '2026-10-12T12:00:00+00:00', avaliacao_id: 32,
         },
       ],
       registros_do_fornecedor_correcoes: [
@@ -114,13 +119,15 @@ describe('ler: os papéis, as correções e a marca', () => {
     expect(r.marcas).toEqual([{ ecrId: 2, porque: 'acompanha cada carga (teste)' }]);
     expect(r.registros[0]).toMatchObject({
       id: 7, documentoId: 'doc-7', ecrId: 6, empresaRaizId: 'raiz-1', fornecedorId: null, alcance: 'vale_ate',
-      validoAte: '2027-06-30', ocId: '', entrouPor: 'qualificacao',
+      validoAte: '2027-06-30', ocId: '', avaliacaoId: 0, entrouPor: 'qualificacao',
     });
     expect(r.registros[0]!.correcoes.map((c) => [c.alcanceAntes, c.alcanceDepois, c.validoAteDepois, c.motivo])).toEqual([
       ['lote', 'produto', '', ''],
       ['produto', 'vale_ate', '2027-06-30', 'a licença tem prazo'],
     ]);
-    expect(r.registros[1]).toMatchObject({ fornecedorId: 'forn-2', alcance: 'lote', validoAte: '', ocId: 'oc-2', correcoes: [] });
+    expect(r.registros[1]).toMatchObject({ fornecedorId: 'forn-2', alcance: 'lote', validoAte: '', ocId: 'oc-2', avaliacaoId: 31, correcoes: [] });
+    // O papel anexado pela lista das entregas sem papel (o pedido 3 da D840 ao Banco).
+    expect(r.registros[2]).toMatchObject({ ocId: 'oc-3', avaliacaoId: 32, entrouPor: 'entrega' });
   });
 
   it('a falha de uma das três sobe, com a frase do banco', async () => {
@@ -149,6 +156,13 @@ describe('guardar: os nomes da guardar_registro_do_fornecedor', () => {
       documentoId: 'doc-2', ecrId: 1, alcance: 'lote', validoAte: '2027-01-01', onde: { ocId: 'oc-1', fornecedorId: 'forn-1' },
     });
     expect(banco.rpc[0]!.args).toEqual({ p: { documento_id: 'doc-2', ecr_id: 1, alcance: 'lote', oc_id: 'oc-1' } });
+  });
+
+  it('pela entrega da lista sem papel: a OC e a entrega (avaliacao_id) que o papel cobre (D840 §2.5)', async () => {
+    await guardarRegistroDoFornecedor({
+      documentoId: 'doc-3', ecrId: 2, alcance: 'lote', validoAte: '', onde: { ocId: 'oc-1', fornecedorId: 'forn-1', avaliacaoId: 31 },
+    });
+    expect(banco.rpc[0]!.args).toEqual({ p: { documento_id: 'doc-3', ecr_id: 2, alcance: 'lote', oc_id: 'oc-1', avaliacao_id: 31 } });
   });
 
   it('a recusa sobe como o banco disse; o papel repetido (23505) em frase de gente', async () => {
@@ -225,6 +239,12 @@ describe('o arquivo e a leitura', () => {
     await arquivarPapelDoFornecedor({ base64: 'x', mime: 'image/jpeg' }, 'gca.jpg', 2, { ocId: 'oc-1', fornecedorId: 'forn-1' });
     expect(funcao.chamadas[0]!.corpo).toMatchObject({ origem_id: 'oc-1', fornecedor_id: 'forn-1' });
     expect(funcao.chamadas[0]!.corpo).not.toHaveProperty('extracao');
+  });
+
+  it('pela entrega, o envelope é a OC dela (D840 §5, pedido 4)', async () => {
+    funcao.responde = { status: 200, corpo: { documento: { id: 'doc-11' } } };
+    await arquivarPapelDoFornecedor({ base64: 'x', mime: 'image/jpeg' }, 'gca.jpg', 2, { ocId: 'oc-1', fornecedorId: 'forn-1', avaliacaoId: 31 });
+    expect(funcao.chamadas[0]!.corpo).toMatchObject({ origem: 'qualificacao-fornecedor', origem_id: 'oc-1', fornecedor_id: 'forn-1' });
   });
 
   it('a recusa do arquivo sobe com a frase da função', async () => {

@@ -9,6 +9,10 @@
  *   alcance; o caminho por onde ele entrou fica só anotado.
  * - **O "deste lote" precisa da OC** em que chegou: pela qualificação, só o
  *   "vale até" e o "vale para o produto"; pelo "Anexar" na OC, os três.
+ * - **Na ECR com a marca "a cada entrega"** (01, 02, 17), o lote precisa da
+ *   entrega (D840 §2.3): pela OC, ele não entra, e a tela manda à lista das
+ *   entregas sem papel; pela entrega, ele é o único, sem escolha. O "vale até" e
+ *   o "produto" guardam o papel, mas não cobrem a entrega (Banco-D840, escolha 1).
  * - **O aviso de 30 dias** fica aqui, como o da qualificação.
  *
  * Lógica pura, sem tela. Quem diz se a obra pede o papel de novo é o banco
@@ -30,7 +34,7 @@ export interface CorrecaoDoAlcance {
   corrigidoEm: string;
 }
 
-export type EntrouPor = 'recebimento' | 'qualificacao' | 'oc';
+export type EntrouPor = 'recebimento' | 'qualificacao' | 'oc' | 'entrega';
 
 /** Um papel guardado (`compras.registros_do_fornecedor`), com as correções dele, da mais antiga à última. */
 export interface RegistroGuardado {
@@ -45,6 +49,8 @@ export interface RegistroGuardado {
   validoAte: string;
   /** A OC em que chegou; '' quando entrou pela qualificação. */
   ocId: string;
+  /** A entrega que o papel de lote nomeia (`avaliacao_id`); 0 quando não nomeia (o pedido 3 da D840 ao Banco). */
+  avaliacaoId: number;
   entrouPor: EntrouPor;
   conferidoPorNome: string;
   conferidoEm: string;
@@ -65,9 +71,33 @@ export interface RegistrosDoFornecedor {
 /** Na qualificação, o lote não entra: ele precisa da OC em que chegou (a trava do banco). */
 export const ALCANCES_DA_QUALIFICACAO: readonly Alcance[] = ALCANCES.filter((a) => a !== 'lote');
 
-/** Os alcances que um papel aceita: o lote só com a OC. */
-export function alcancesPossiveis(temOc: boolean): readonly Alcance[] {
-  return temOc ? ALCANCES : ALCANCES_DA_QUALIFICACAO;
+/** Por onde o papel entra no escritório: a qualificação, o "Anexar" na OC, ou a entrega da lista sem papel (D840 §2.5). */
+export type PorOndeAnexa = 'qualificacao' | 'oc' | 'entrega';
+
+/**
+ * Os alcances que um papel aceita: o lote só com a OC; na ECR com a marca, o
+ * lote só com a entrega, e pela entrega ele é o único.
+ */
+export function alcancesPossiveis(porOnde: PorOndeAnexa, aCadaEntrega = false): readonly Alcance[] {
+  if (porOnde === 'qualificacao') return ALCANCES_DA_QUALIFICACAO;
+  if (!aCadaEntrega) return ALCANCES;
+  return porOnde === 'entrega' ? ['lote'] : ALCANCES_DA_QUALIFICACAO;
+}
+
+/** "ECR 02", pelo id. */
+export const codigoDaEcr = (ecrId: number) => `ECR ${String(ecrId).padStart(2, '0')}`;
+
+/** O que a janela diz embaixo do alcance, pela entrada e pela marca da ECR. */
+export function dicasDoAlcance(porOnde: PorOndeAnexa, ecrId: number, aCadaEntrega: boolean): string[] {
+  if (aCadaEntrega && porOnde === 'entrega') return ['Este papel vale para esta entrega.'];
+  if (aCadaEntrega) {
+    return [
+      `A ${codigoDaEcr(ecrId)} pede o papel a cada entrega: anexe pela entrega, em Recebimentos, na lista das entregas sem papel.`,
+      'Aqui, o "vale até" e o "vale para o produto" guardam o papel, mas não cobrem as entregas desta ECR.',
+    ];
+  }
+  if (porOnde === 'qualificacao') return ['O papel deste lote se anexa na OC em que ele chegou, em Ordens de compra.'];
+  return [];
 }
 
 /** O alcance por extenso, para os botões de escolha. */
@@ -80,6 +110,7 @@ export const NOME_DO_ALCANCE: Record<Alcance, string> = {
 const ENTROU_POR: Record<EntrouPor, string> = {
   recebimento: 'chegou com o material, na obra',
   oc: 'anexado na OC',
+  entrega: 'anexado na entrega, pela lista das entregas sem papel',
   qualificacao: 'anexado na qualificação',
 };
 
@@ -106,6 +137,21 @@ export function quemConferiu(r: Pick<RegistroGuardado, 'entrouPor' | 'conferidoP
   return [ENTROU_POR[r.entrouPor], `conferido por ${r.conferidoPorNome || 'alguém sem nome'}`, quando]
     .filter(Boolean)
     .join(' · ');
+}
+
+/**
+ * "cobre a entrega de 14/10, OC 2026/101": o papel de lote que nomeia a entrega
+ * (D840 §2.4); '' nos outros. Sem o dia da entrega (a leitura não chegou), só a OC.
+ */
+export function textoDaEntregaCoberta(
+  r: Pick<RegistroGuardado, 'alcance' | 'avaliacaoId'>,
+  recebidoEm: string,
+  numeroDaOc: string,
+): string {
+  if (r.alcance !== 'lote' || !r.avaliacaoId) return '';
+  const oc = `OC ${numeroDaOc || '(sem número)'}`;
+  const dia = /^\d{4}-\d{2}-\d{2}/.test(recebidoEm) ? `${recebidoEm.slice(8, 10)}/${recebidoEm.slice(5, 7)}` : '';
+  return dia ? `cobre a entrega de ${dia}, ${oc}` : `cobre uma entrega da ${oc}`;
 }
 
 /** Uma correção numa linha: 'Corrigido de "Deste lote" para "Vale até 30/06/2027" — Fulano, 15/10/2026 21:00. Motivo: …'. */

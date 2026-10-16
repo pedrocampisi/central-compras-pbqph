@@ -7,7 +7,8 @@
  *                     "a cada entrega" (compras.ecrs_registro_a_cada_entrega)
  *   a leitura ....... ler-documento, origem `registro-ecr` (foto ou PDF)
  *   o arquivo ....... arquivar-documento, origem `qualificacao-fornecedor`, com o `fornecedor_id`
- *   guardar ......... compras.guardar_registro_do_fornecedor (a qualificação, ou o "Anexar" na OC)
+ *   guardar ......... compras.guardar_registro_do_fornecedor (a qualificação, o "Anexar" na OC,
+ *                     ou a entrega da lista sem papel, com o `avaliacao_id`: D840 §2.5)
  *   corrigir ........ compras.corrigir_registro_do_fornecedor (a correção fica escrita)
  *
  * Ninguém escreve direto nas tabelas, e o banco recusa quem tentar. A recusa
@@ -51,7 +52,8 @@ function paraRegistro(r: Record<string, unknown>, correcoes: CorrecaoDoAlcance[]
     alcance: alcance(r['alcance']),
     validoAte: dia(r['valido_ate']),
     ocId: txt(r['oc_id']),
-    entrouPor: (['recebimento', 'qualificacao', 'oc'].includes(entrou) ? entrou : 'qualificacao') as EntrouPor,
+    avaliacaoId: num(r['avaliacao_id']),
+    entrouPor: (['recebimento', 'qualificacao', 'oc', 'entrega'].includes(entrou) ? entrou : 'qualificacao') as EntrouPor,
     conferidoPorNome: txt(r['conferido_por_nome']),
     conferidoEm: txt(r['conferido_em']),
     correcoes,
@@ -111,8 +113,13 @@ export async function lerPapelDoFornecedor(papel: { base64: string; mime: string
   }
 }
 
-/** Onde o papel entra: a empresa, pela qualificação; ou a OC, pelo "Anexar" na OC. */
-export type OndeEntra = { fornecedorId: string } | { ocId: string; fornecedorId: string; posicoes?: number[] };
+/**
+ * Onde o papel entra: a empresa, pela qualificação; a OC, pelo "Anexar" na OC;
+ * ou a entrega, pela lista das entregas sem papel, com a OC dela de envelope.
+ */
+export type OndeEntra =
+  | { fornecedorId: string }
+  | { ocId: string; fornecedorId: string; posicoes?: number[]; avaliacaoId?: number };
 
 const nn = (ecrId: number) => String(ecrId).padStart(2, '0');
 
@@ -170,7 +177,11 @@ export async function guardarRegistroDoFornecedor(g: PapelParaGuardar): Promise<
     alcance: g.alcance,
     ...(g.alcance === 'vale_ate' ? { valido_ate: g.validoAte } : {}),
     ...('ocId' in g.onde
-      ? { oc_id: g.onde.ocId, ...(g.onde.posicoes?.length ? { oc_posicoes: g.onde.posicoes } : {}) }
+      ? {
+          oc_id: g.onde.ocId,
+          ...(g.onde.posicoes?.length ? { oc_posicoes: g.onde.posicoes } : {}),
+          ...(g.onde.avaliacaoId ? { avaliacao_id: g.onde.avaliacaoId } : {}),
+        }
       : { fornecedor_id: g.onde.fornecedorId }),
   };
   const { data, error } = await compras().rpc('guardar_registro_do_fornecedor', { p });

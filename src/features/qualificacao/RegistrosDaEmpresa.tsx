@@ -17,13 +17,16 @@ import {
   quemConferiu,
   registrosDaEcr,
   textoDaCorrecao,
+  textoDaEntregaCoberta,
   textoDaVigencia,
   vigenciaDoRegistro,
   type RegistroGuardado,
 } from '../../domain/registrosGuardados';
 import type { Ecr, Fornecedor } from '../../domain/types';
 import { useHojeEmSaoPaulo } from '../../hooks/useHojeEmSaoPaulo';
+import { lerAvaliacoesDeEntrega } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
+import { useDataStore } from '../../stores/useDataStore';
 import { useRegistrosStore } from '../../stores/useRegistrosStore';
 import { AnexarPapelDialogo, CorrigirAlcanceDialogo } from './DialogosDoRegistro';
 import styles from './RegistrosDaEmpresa.module.css';
@@ -75,11 +78,15 @@ export function RegistrosDaEmpresa({
   const [anexando, setAnexando] = useState<number | null>(null);
   const [corrigindo, setCorrigindo] = useState<RegistroGuardado | null>(null);
   const [links, setLinks] = useState<Map<string, string>>(new Map());
+  const ordens = useDataStore((s) => s.data?.ordens_compra);
+  /** O dia de cada entrega que um papel de lote nomeia (D840 §2.4); lido só quando há um. */
+  const [diaDaEntrega, setDiaDaEntrega] = useState<Map<number, string>>(new Map());
 
   const chavePorFornecedor = new Map(fornecedores.map((f) => [f.id, chaveDaEmpresa(f)]));
   const daEcr = (id: number) =>
     dados ? registrosDaEcr(dados.registros, chave, id, (f) => chavePorFornecedor.get(f), hoje) : [];
   const documentos = ecrIds.flatMap((id) => daEcr(id).map((r) => r.documentoId)).join(',');
+  const nomeiaEntrega = ecrIds.some((id) => daEcr(id).some((r) => r.alcance === 'lote' && r.avaliacaoId > 0));
 
   useEffect(() => {
     void carregar();
@@ -91,6 +98,18 @@ export function RegistrosDaEmpresa({
       vivo = false;
     };
   }, [documentos]);
+
+  useEffect(() => {
+    if (!nomeiaEntrega) return;
+    let vivo = true;
+    // Sem o dia, a linha diz só a OC: a falha desta leitura não tira nada da tela.
+    lerAvaliacoesDeEntrega()
+      .then((as) => vivo && setDiaDaEntrega(new Map(as.map((a) => [a.id, a.recebidoEm]))))
+      .catch(() => undefined);
+    return () => {
+      vivo = false;
+    };
+  }, [nomeiaEntrega]);
 
   if (ecrIds.length === 0) return null;
   return (
@@ -145,6 +164,15 @@ export function RegistrosDaEmpresa({
                             </Button>
                           )}
                         </div>
+                        {textoDaEntregaCoberta(r, '', '') && (
+                          <div className={styles.quem} data-entrega-coberta={r.avaliacaoId}>
+                            {textoDaEntregaCoberta(
+                              r,
+                              diaDaEntrega.get(r.avaliacaoId) ?? '',
+                              ordens?.find((o) => o.id === r.ocId)?.numero ?? '',
+                            )}
+                          </div>
+                        )}
                         <div className={styles.quem}>{quemConferiu(r)}</div>
                         {r.correcoes.map((c, i) => (
                           <div key={i} className={styles.correcao} data-correcao="">
@@ -170,8 +198,8 @@ export function RegistrosDaEmpresa({
       {anexando !== null && filial && (
         <AnexarPapelDialogo
           quem={nome}
-          naOc={false}
-          ecrs={[{ id: anexando, rotulo: rotuloDaEcr(ecrs, anexando) }]}
+          porOnde="qualificacao"
+          ecrs={[{ id: anexando, rotulo: rotuloDaEcr(ecrs, anexando), aCadaEntrega: !!dados?.marcas.some((m) => m.ecrId === anexando) }]}
           onde={() => ({ fornecedorId: filial.id })}
           aoFechar={() => setAnexando(null)}
           aoGuardar={() => void carregar(true)}
