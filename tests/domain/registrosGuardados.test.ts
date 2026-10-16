@@ -113,7 +113,7 @@ describe('quem conferiu, e a correção escrita', () => {
       motivo: 'a licença tem prazo', corrigidoPorNome: 'Comprador de Teste', corrigidoEm: '2026-10-13T15:00:00Z',
     };
     expect(textoDaCorrecao(c)).toMatch(
-      /^Corrigido de deste lote para vale até 30\/06\/2027 — Comprador de Teste, 13\/10\/2026.*\. Motivo: a licença tem prazo$/,
+      /^Corrigido de "Deste lote" para "Vale até 30\/06\/2027" — Comprador de Teste, 13\/10\/2026.*\. Motivo: a licença tem prazo$/,
     );
     expect(textoDaCorrecao({ ...c, motivo: '' })).not.toContain('Motivo');
   });

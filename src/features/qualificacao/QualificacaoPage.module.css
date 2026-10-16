@@ -210,6 +210,8 @@
 .detalhe td {
   background: var(--fundo);
 }
+/* A largura que se vê da tabela: os papéis da linha aberta cabem nela (`cqw`), e não na tabela inteira. */
+.rolagem { container-type: inline-size; }
 .criterios {
   margin: 0;
   padding-left: 18px;

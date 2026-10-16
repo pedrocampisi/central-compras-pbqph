@@ -98,7 +98,7 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
   const marca = useRegistrosStore((s) => s.dados?.marcas.find((m) => m.ecrId === ecr.id));
   const aviso = marca && (
     <p className={styles.marca} data-a-cada-entrega="">
-      <strong>Pede o papel a cada entrega.</strong> {marca.porque}. A marca não muda com a revisão.
+      <strong>Pede o papel a cada entrega:</strong> {marca.porque}. A marca não muda com a revisão.
     </p>
   );
   // A ECR em edição fica aberta: o rascunho não se esconde. Mas só para quem

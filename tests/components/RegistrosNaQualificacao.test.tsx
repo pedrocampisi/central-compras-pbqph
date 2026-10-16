@@ -159,7 +159,7 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
     expect(dois!.textContent).toContain('Deste lote');
     expect(dois!.textContent).toContain('chegou com o material, na obra · conferido por Encarregado de Teste');
     expect(dois!.querySelector('[data-correcao]')!.textContent).toMatch(
-      /^Corrigido de vale para o produto, sem prazo para deste lote — Comprador de Teste, .*\. Motivo: é da carga \(teste\)$/,
+      /^Corrigido de "Vale para o produto, sem prazo" para "Deste lote" — Comprador de Teste, .*\. Motivo: é da carga \(teste\)$/,
     );
     expect(caixa.querySelector('[data-registro="3"]')).toBeNull();
   });

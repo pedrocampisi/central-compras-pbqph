@@ -1,6 +1,10 @@
 /* Os papéis do fornecedor, por ECR, embaixo dos critérios (CTO-D812). */
 
 .registros {
+  /* Na tabela que rola de lado (o celular), a caixa fica na parte que se vê. */
+  position: sticky;
+  left: 8px;
+  max-width: calc(100cqw - 32px);
   display: flex;
   flex-direction: column;
   gap: 10px;

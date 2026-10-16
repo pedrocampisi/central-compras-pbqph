@@ -219,7 +219,7 @@ describe('CTO-D812 §2 — a marca "a cada entrega" na ECR', () => {
     marcas.lista = [{ ecrId: 8, porque: 'o papel do lote acompanha cada carga (teste)' }];
     montar([ecr(0), ecr(1)]);
     const aberta = abrir('ECR 08');
-    const marca = await within(aberta).findByText(/Pede o papel a cada entrega\./);
+    const marca = await within(aberta).findByText(/Pede o papel a cada entrega:/);
     expect(marca.closest('[data-a-cada-entrega]')!.textContent).toContain('o papel do lote acompanha cada carga (teste)');
     // Na seção 03, logo depois do título, e não em outra.
     const secao = marca.closest('section')!;

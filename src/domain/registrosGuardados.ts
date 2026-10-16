@@ -108,12 +108,12 @@ export function quemConferiu(r: Pick<RegistroGuardado, 'entrouPor' | 'conferidoP
     .join(' · ');
 }
 
-/** Uma correção numa linha: "De deste lote para vale até 30/06/2027 — Fulano, 15/10/2026 21:00. Motivo: …". */
+/** Uma correção numa linha: 'Corrigido de "Deste lote" para "Vale até 30/06/2027" — Fulano, 15/10/2026 21:00. Motivo: …'. */
 export function textoDaCorrecao(c: CorrecaoDoAlcance): string {
-  const de = textoDoAlcance(c.alcanceAntes, c.validoAteAntes).toLowerCase();
-  const para = textoDoAlcance(c.alcanceDepois, c.validoAteDepois).toLowerCase();
+  const de = textoDoAlcance(c.alcanceAntes, c.validoAteAntes);
+  const para = textoDoAlcance(c.alcanceDepois, c.validoAteDepois);
   const quem = [c.corrigidoPorNome, c.corrigidoEm ? formatTimestamp(c.corrigidoEm) : ''].filter(Boolean).join(', ');
-  return `Corrigido de ${de} para ${para} — ${quem}.${c.motivo ? ` Motivo: ${c.motivo}` : ''}`;
+  return `Corrigido de "${de}" para "${para}" — ${quem}.${c.motivo ? ` Motivo: ${c.motivo}` : ''}`;
 }
 
 /**
