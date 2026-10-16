@@ -4028,3 +4028,27 @@ tela esperava. Vale o do Banco: ele já está no ensaio e guarda a leitura da IA
 - o ramo inteiro com +627 e −14 linhas em `src`.
 
 **O banco não mudou. Não publiquei.**
+
+## Decisão 120 — o perfil sem a Ordem de Compra avisa e não entra, no ramo `d814-perfil-sem-oc` · 15/10/2026
+
+**POR QUÊ (CTO-D814, decisão do Pedro):** uma pessoa do financeiro entra na Central de Dados com o papel
+`engenharia`, e não precisa da Ordem de Compra. A trava é do banco (`core.perfis.sem_ordem_de_compra`); a tela só
+avisa.
+
+**O QUE MUDOU** (ramo `d814-perfil-sem-oc`, `b4128df`, sobre o `main` `49d4a6b`):
+- a `perfilAtual` lê a marca; só o `true` barra;
+- com a marca: "Seu acesso não inclui a Ordem de Compra.", com o "Sair", no cartão de quem entrou sem perfil. Nada é
+  lido do banco. Vale para todo papel, o do encarregado também;
+- sem a marca, como hoje;
+- **o banco sem a coluna (42703) lê o perfil como antes**: a tela pode ir ao ar antes da marca, e ninguém fica de fora.
+
+**A PROVA:**
+- o CI verde;
+- 1119 testes (9 novos), tipos e lint limpos;
+- 8 sabotagens vermelhas;
+- 3 fotos em `docs/Capturas/2026-10-15_D814/`;
+- +71 e −10 linhas em `src`.
+
+Um teste mentia: o perfil do teste anterior ficava guardado e respondia pelo seguinte. Consertado antes da carta.
+
+**O banco não mudou. Não publiquei.** Publicar é pela emenda 3, depois da conferência do CTO.

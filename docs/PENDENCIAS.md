@@ -161,7 +161,9 @@ precisa da Ordem de Compra.
 - **A tela só avisa:** ela lê a marca na `perfilAtual`, e com a marca não entra, com a frase e o "Sair". Sem a marca,
   fica tudo como hoje.
 - **Os testes:** com a marca, o aviso; sem a marca, como hoje; e uma sabotagem que deixa entrar.
-- **Num ramo, contra o banco falso, sem publicar.** Vem antes do ramo 2 da parte C. A carta volta com as fotos e o CI.
+- ~~**Num ramo, contra o banco falso, sem publicar.**~~ **Feito** no ramo `d814-perfil-sem-oc` (`b4128df`, decisão
+  120), com o CI verde, 8 sabotagens vermelhas e 3 fotos. A carta foi às 21h0x de 15/10. **Falta:** a conferência e a
+  ordem de publicar do CTO. A tela pode ir ao ar antes da marca no banco.
 
 ---
 
@@ -180,8 +182,8 @@ precisa da Ordem de Compra.
    - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
      119), **sem publicar**, com o contrato do Banco e medido no ensaio só lendo. Falta medir a gravação de uma
      entrega, que proponho no teste do Pedro;
-   - **o segundo ramo, a qualificação,** vem depois da D814 (item 41), contra o banco falso, com os nomes do Banco
-     (D813 §4).
+   - **o segundo ramo, a qualificação,** começa agora (a D814 foi, item 41), contra o banco falso, com os nomes do
+     Banco (D813 §4).
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
