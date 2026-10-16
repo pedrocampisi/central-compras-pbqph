@@ -45,6 +45,8 @@ import { entregarPdfDaOc, lerPdfsNaPasta } from '../../services/supabase/pastaDa
 import type { AvaliacaoGravada } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
 import { ultimaEntregaPorOc } from '../../domain/recebimento';
+import { coberturaPorEntrega, textoDaCobertura, type CoberturaDaEntrega } from '../../domain/entregasSemPapel';
+import { lerCoberturaDasEntregas } from '../../services/supabase/entregasSemPapel';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
 import { ecrsNaOrdemDosItens } from '../../domain/qualidadeNaOc';
 import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
@@ -98,6 +100,31 @@ export function HistoricoPage() {
    */
   const [entregas, setEntregas] = useState<Map<string, AvaliacaoGravada>>(new Map());
   const [fotosDasEntregas, setFotosDasEntregas] = useState<Map<string, string>>(new Map());
+  /**
+   * O papel do fornecedor de cada entrega, por ECR (CTO-D840 §2.6): o que cobre,
+   * o "não se aplica", ou a falta. Uma chamada só para todas; sem leitura, a
+   * linha da entrega fica como era, sem dizer nada do papel.
+   */
+  const [cobertura, setCobertura] = useState<Map<number, CoberturaDaEntrega[]>>(new Map());
+  const [linksDosPapeis, setLinksDosPapeis] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    let vivo = true;
+    void (async () => {
+      try {
+        const c = coberturaPorEntrega(await lerCoberturaDasEntregas());
+        if (!vivo) return;
+        setCobertura(c);
+        const docs = [...c.values()].flat().filter((x) => x.situacao === 'coberta').map((x) => x.documentoId);
+        const links = await lerLinksDasFotos(docs);
+        if (vivo) setLinksDosPapeis(links);
+      } catch {
+        /* sem a cobertura: a linha da entrega segue sem o papel */
+      }
+    })();
+    return () => {
+      vivo = false;
+    };
+  }, [data]);
   useEffect(() => {
     let vivo = true;
     void (async () => {
@@ -270,13 +297,14 @@ export function HistoricoPage() {
   async function handlePdfDasAvaliacoes() {
     try {
       const mascara = obraDaMascara();
-      const avaliacoes = await lerAvaliacoesDeEntrega(mascara);
+      // Sem a cobertura, não há folha: a coluna em branco diria ao auditor que nenhuma ECR pedia o papel.
+      const [avaliacoes, papeis] = await Promise.all([lerAvaliacoesDeEntrega(mascara), lerCoberturaDasEntregas(mascara)]);
       if (obraDaMascara() !== mascara) {
         showToast('A opção "mostrar só uma obra" ligou ou desligou enquanto o PDF era preparado. Gere o PDF de novo.', 'warning');
         return;
       }
       await baixarPdfDasAvaliacoes(
-        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras),
+        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras, coberturaPorEntrega(papeis)),
         mascara ? (obraNome.get(mascara) ?? 'Obra da auditoria') : null,
         hojeEmSaoPaulo(),
       );
@@ -336,7 +364,7 @@ export function HistoricoPage() {
     );
   }
 
-  /** A última entrega: o dia, quem recebeu, "só uma parte" e a foto da nota. */
+  /** A última entrega: o dia, quem recebeu, "só uma parte", a foto da nota, e o papel do fornecedor por ECR. */
   function recebimentoDaOc(o: OrdemCompra) {
     const a = entregas.get(o.id);
     if (!a) return null;
@@ -355,6 +383,27 @@ export function HistoricoPage() {
             Foto da nota
           </a>
         )}
+        {(cobertura.get(a.id) ?? []).map((c) => {
+          const papel = c.situacao === 'coberta' ? linkSeguro(linksDosPapeis.get(c.documentoId) ?? '') : '';
+          return (
+            <span
+              key={c.ecrId}
+              data-cobertura={c.ecrId}
+              data-situacao={c.situacao}
+              style={c.situacao === 'sem_papel' ? { color: 'var(--aviso)', fontWeight: 600 } : undefined}
+            >
+              {textoDaCobertura(c)}
+              {papel && (
+                <>
+                  {' · '}
+                  <a href={papel} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+                    Abrir
+                  </a>
+                </>
+              )}
+            </span>
+          );
+        })}
       </div>
     );
   }
