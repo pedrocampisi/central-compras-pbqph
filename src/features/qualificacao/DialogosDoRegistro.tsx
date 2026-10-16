@@ -114,7 +114,8 @@ export function AnexarPapelDialogo({
     setAlcance(null);
     setValidoAte('');
     setErro('');
-    if (!f) return;
+    // A escolha vazia (a janela de arquivo cancelada) tirou a vez da leitura de antes: o "Lendo" sai aqui (CTO-D821).
+    if (!f) return setLendo(false);
     setLendo(true);
     try {
       const pronto = await prepararPapel(f);

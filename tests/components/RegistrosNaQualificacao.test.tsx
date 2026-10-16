@@ -315,6 +315,25 @@ describe('"Anexar papel" na qualificação', () => {
     expect(janela.querySelector('[data-leitura]')!.textContent).not.toContain('30/06/2027');
   });
 
+  it('a escolha vazia no meio da leitura (a janela de arquivo cancelada): o "Lendo" não fica preso (D821 §2)', async () => {
+    const primeiro: { lido?: (l: unknown) => void } = {};
+    banco.ler = vi.fn(() => new Promise((r) => (primeiro.lido = r)));
+    const caixa = await abrirPapeis();
+    fireEvent.click(within(caixa).getByRole('button', { name: /Anexar papel/ }));
+    const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
+    const input = janela.querySelector<HTMLInputElement>('input[type="file"]')!;
+    const guardar = () => within(janela).getByRole('button', { name: 'Guardar papel' });
+    fireEvent.change(input, { target: { files: [arquivo('primeiro.pdf')] } });
+    await waitFor(() => expect(primeiro.lido).toBeTruthy());
+    expect(guardar().hasAttribute('disabled')).toBe(true);
+    fireEvent.change(input, { target: { files: [] } });
+    await waitFor(() => expect(guardar().hasAttribute('disabled')).toBe(false));
+    // A leitura de antes, que chega depois, não volta a valer.
+    await act(async () => primeiro.lido!(LIDO_VALE_ATE));
+    expect(janela.querySelector('[data-leitura]')).toBeNull();
+    expect(guardar().hasAttribute('disabled')).toBe(false);
+  });
+
   it('a recusa do banco aparece na janela, e ela fica aberta', async () => {
     banco.guardar = vi.fn(async () => {
       throw new Error('Este papel já está guardado para esta ECR.');
