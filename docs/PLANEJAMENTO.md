@@ -4263,3 +4263,25 @@ ensaio, só lendo, e subir de novo a parte B, que tinha caído.
 - **a porta 5174:** de pé às 19h07, com a parte B em `1647826`, sem mudança. Ela anda presa à sessão que a sobe.
 
 **Nada foi gravado. O banco não mudou.**
+
+## Decisão 130 — a perícia da parte C: os meus quatro achados eram verdadeiros, consertados em `a986686` · 16/10/2026
+
+**POR QUÊ (CTO-D850):** o perito leu o ramo `07f3835` e deduziu sete achados; os meus são o 2, o 5, o 7 e uma metade
+do 4. O CTO só aceita achado com a medida: verdadeiro ou falso, com o teste, e o conserto provado nos verdadeiros.
+
+**O QUE FOI:**
+- **a medida:** os quatro são verdadeiros; 11 testes novos falham no `07f3835` e passam agora;
+- **achado 2:** a virada da máscara tira da lista das entregas sem papel as outras obras, e a busca mais velha, ou
+  sem a máscara, não grava ao chegar tarde. A guarda repetida (a vez passada à frente na virada) saiu, porque a
+  sabotagem dela ficou verde;
+- **achado 5:** a lista e a cobertura leem página por página pelo `todasAsLinhas`, em ordem fixa (`recebido_em`,
+  `avaliacao_id`, `ecr_id`), e acusam a lista pela metade. O limite e a ordem garantida são a metade do Banco;
+- **achado 7:** o papel guardado pela OC relê a cobertura do Histórico e as pendências do menu; o guardado ou corrigido
+  pela qualificação relê as pendências;
+- **achado 4, a minha metade:** o `origem_item` não leva o nome do arquivo. O `nome_arquivo` é a metade do Banco, no
+  servidor;
+- **a prova:** `e2057ee` e `a986686` no ramo `d840-parte-c-refeita`, 1258 testes, `tsc` e `eslint` limpos, o CI
+  verde, 11 de 11 sabotagens vermelhas. A tela não mudou de cara, então não há foto;
+- **a porta 5174:** de pé às 20h37, com a parte B em `1647826`, sem mudança.
+
+**Nada foi gravado. O banco não mudou.** A produção sai pela carta do CTO.
