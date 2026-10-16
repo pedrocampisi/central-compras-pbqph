@@ -4166,3 +4166,24 @@ mediu que a tela não mostra quando a qualificação foi lançada no sistema.
 - **A junção com o ramo 2 da parte C** dá um conflito, só na regra `.rolagem` do CSS, e o conserto é simples.
 
 **O banco não mudou.**
+
+## Decisão 126 — no ar: a data em que a qualificação foi lançada · 15/10/2026
+
+**POR QUÊ (CTO-D822):** o CTO conferiu o código, a medida na produção e as quatro fotos do `566bae5`, e mandou
+publicar pela emenda 3.
+
+**O QUE MUDOU:**
+- **a junção:** `d819-qualificacao-lancada` (`566bae5`) no `main` em `5a07ec2`, sem conflito;
+- **a bateria:** 1126 testes, com tipos e lint limpos; o CI verde;
+- **o desfazer**, anotado antes: `9178a00a`, que tinha 100% do tráfego;
+- **publicado pelo PowerShell às 22h49 de 15/10:** `2e116146-9349-4e08-8864-356fc01aa116`, versão
+  `20261016014924-5a07ec2`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` servido é o novo;
+- o código e o estilo que mudaram têm a mesma impressão SHA-256 do pacote;
+- a frase "lançada no sistema em" está no código servido.
+
+**A parte C e a parte B não foram junto.**
+
+**O banco não mudou por esta casa.**

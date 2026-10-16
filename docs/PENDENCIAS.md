@@ -152,17 +152,16 @@ Meta: 23/10.
 
 ---
 
-### 42. A D819: quando a qualificação foi lançada no sistema
+### 42. ~~A D819: quando a qualificação foi lançada no sistema~~ — no ar
 
 *Aberta em 15/10/2026, na decisão 125.*
 - **O ramo:** `d819-qualificacao-lancada` (`566bae5`), **sem publicar**.
   - A tela mostra "lançada no sistema em DD/MM/AAAA" na linha aberta e no Histórico, quando o lançamento é depois da
     data. Não trava, e o PDF não muda.
-- **Falta:**
-  1. a conferência do CTO;
-  2. a publicação pela emenda 3. Não vai à perícia.
+- **No ar desde as 22h49 de 15/10** (decisão 126): está em `2e116146`, versão `20261016014924-5a07ec2`, pelo `main`
+  `5a07ec2`, com a medida por fora. O desfazer é `9178a00a`.
 - **Na junção com o ramo 2 da parte C,** o conflito na `.rolagem` do CSS se resolve com uma regra só.
-- **A D819 fica na `Devolucoes` até lá.**
+- A D819 e a D822 foram ao arquivo morto.
 
 ### 41. ~~A D814: o perfil sem a Ordem de Compra~~ — no ar
 
