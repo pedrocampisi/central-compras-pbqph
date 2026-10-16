@@ -98,6 +98,7 @@ function paraLinha(l: Record<string, unknown>): LinhaDeQualificacao | null {
     situacao: paraSituacao(l['situacao']),
     ecrs: Array.isArray(l['ecrs']) ? (l['ecrs'] as unknown[]).map(Number).sort((a, b) => a - b) : [],
     vigente: l['vigente'] === true,
+    lancadaEm: txt(l['criado_em']),
   };
 }
 

@@ -33,6 +33,7 @@ import {
   nomeDasEcrs,
   seloDaFilial,
   textoDoDesempenho,
+  textoDoLancamento,
   type Categoria,
 } from '../../domain/qualificacao';
 import {
@@ -217,7 +218,7 @@ export function QualificacaoPage() {
               }
             />
           ) : (
-            <div className={tabela.wrap}>
+            <div className={`${tabela.wrap} ${styles.rolagem}`}>
               <table className={`${tabela.table} ${styles.tabela}`} data-tabela-da-qualificacao="">
                 <thead>
                   <tr>
@@ -334,7 +335,9 @@ export function QualificacaoPage() {
                             ))}
                           </ol>
                           <p className={styles.quem}>
-                            {[v.qualificadoPorNome && `Qualificada por ${v.qualificadoPorNome}`, v.origem].filter(Boolean).join(' · ')}
+                            {[v.qualificadoPorNome && `Qualificada por ${v.qualificadoPorNome}`, v.origem, textoDoLancamento(v)]
+                              .filter(Boolean)
+                              .join(' · ')}
                           </p>
                         </td>
                       </tr>,

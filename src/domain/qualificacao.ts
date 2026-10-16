@@ -13,6 +13,8 @@
  * O "hoje" é o de São Paulo, o mesmo do banco: `hojeEmSaoPaulo`, de `ecr.ts`.
  */
 
+import { todayIso } from './format';
+
 export type Categoria = 'material' | 'servico' | 'controle_tecnologico' | 'projeto' | 'locacao';
 
 export const CATEGORIAS: readonly Categoria[] = ['material', 'servico', 'controle_tecnologico', 'projeto', 'locacao'];
@@ -73,6 +75,21 @@ export interface LinhaDeQualificacao {
   ecrs: number[];
   /** A última do mesmo sujeito e categoria: é a que vale. */
   vigente: boolean;
+  /** Quando foi lançada no sistema (`criado_em`, instante ISO); ausente quando não se sabe. */
+  lancadaEm?: string;
+}
+
+/**
+ * "lançada no sistema em DD/MM/AAAA", quando o lançamento, no dia de São
+ * Paulo, é depois da data da qualificação; '' quando é no mesmo dia, ou não se
+ * sabe (CTO-D819). Não trava nada: a qualificação feita no papel e lançada
+ * depois é legítima. Só não pode parecer feita no sistema naquele dia.
+ */
+export function textoDoLancamento(l: Pick<LinhaDeQualificacao, 'qualificadaEm' | 'lancadaEm'>): string {
+  const quando = l.lancadaEm ? new Date(l.lancadaEm) : null;
+  if (!quando || Number.isNaN(quando.getTime())) return '';
+  const dia = todayIso(quando);
+  return dia > l.qualificadaEm ? `lançada no sistema em ${dataBr(dia)}` : '';
 }
 
 /** De quem é a qualificação que uma filial mostra: a da empresa dela, ou a dela mesma. */

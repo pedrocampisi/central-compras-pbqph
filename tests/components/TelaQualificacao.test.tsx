@@ -181,6 +181,30 @@ describe('CTO-D661 — as colunas da planilha', () => {
     expect(aberto.textContent).toContain('Qualificada por Pessoa de teste');
   });
 
+  it('a lançada no sistema depois da data diz quando, na linha aberta e no Histórico; a do mesmo dia, não (CTO-D819)', () => {
+    useQualificacaoStore.getState().definir(qualificacoes([
+      linha({ id: 1, qualificadaEm: '2025-05-07', venceEm: '2026-05-07', situacao: 'vencida', vigente: false,
+        lancadaEm: '2026-09-28T13:00:00+00:00' }),
+      linha({ id: 2, qualificadaEm: '2026-05-07', lancadaEm: '2026-09-28T14:00:00+00:00' }),
+      linha({ id: 3, empresaRaizId: 'empresa-b', qualificadaEm: '2026-10-01', lancadaEm: '2026-10-01T15:00:00+00:00' }),
+    ]));
+    render(<QualificacaoPage />);
+    fireEvent.click(within(linhaDe('empresa-a')).getByRole('button', { name: 'Não atende' }));
+    const aberto = document.querySelector<HTMLElement>('[data-criterios-de="empresa-a"]')!;
+    expect(aberto.textContent).toContain('Qualificada por Pessoa de teste · lançada no sistema em 28/09/2026');
+    // A data da qualificação não muda: é a do papel.
+    expect(linhaDe('empresa-a').textContent).toContain('07/05/2026');
+
+    fireEvent.click(within(linhaDe('empresa-b')).getByRole('button', { name: 'Não atende' }));
+    expect(document.querySelector('[data-criterios-de="empresa-b"]')!.textContent).not.toContain('lançada no sistema');
+
+    fireEvent.click(within(linhaDe('empresa-a')).getByRole('button', { name: 'Histórico' }));
+    const ficha = document.querySelector<HTMLElement>('[data-ficha-da-empresa]')!;
+    const itens = [...ficha.querySelectorAll<HTMLElement>('[data-categoria="material"] details ol > li')];
+    expect(itens).toHaveLength(2);
+    for (const li of itens) expect(li.textContent).toContain('lançada no sistema em 28/09/2026');
+  });
+
   it('o filtro "pedem ação" deixa só a vencida e a desqualificada', () => {
     render(<QualificacaoPage />);
     fireEvent.click(screen.getByRole('button', { name: 'Pedem ação' }));
