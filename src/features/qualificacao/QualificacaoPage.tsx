@@ -218,7 +218,7 @@ export function QualificacaoPage() {
               }
             />
           ) : (
-            <div className={tabela.wrap}>
+            <div className={`${tabela.wrap} ${styles.rolagem}`}>
               <table className={`${tabela.table} ${styles.tabela}`} data-tabela-da-qualificacao="">
                 <thead>
                   <tr>
