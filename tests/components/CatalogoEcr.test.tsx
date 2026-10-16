@@ -13,10 +13,16 @@ vi.mock('../../src/services/pdf/generateEcrPdf', () => ({ baixarPdfDaEcr: (e: un
 // Nada aqui fala com o banco (o .env.local aponta para a produção): quem pergunta se pode revisar ouve "não".
 vi.mock('../../src/services/supabase/ecrs', () => ({ podeRevisarEcr: async () => false, revisarEcr: vi.fn() }));
 vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: vi.fn() }));
+// A marca "a cada entrega" vem do banco falso (CTO-D812 §2, ajuste 2): a ECR 08 marcada, com um porquê inventado.
+const marcas = vi.hoisted(() => ({ lista: [] as { ecrId: number; porque: string }[] }));
+vi.mock('../../src/services/supabase/registrosDoFornecedor', () => ({
+  carregarRegistrosDoFornecedor: async () => ({ registros: [], marcas: marcas.lista }),
+}));
 
 import { CatalogoPage } from '../../src/features/catalogo-ecr/CatalogoPage';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useUiStore } from '../../src/stores/useUiStore';
+import { useRegistrosStore } from '../../src/stores/useRegistrosStore';
 import { secoesDoBanco } from '../../src/domain/ecr';
 import { normalizeEcr } from '../../src/domain/normalize';
 import type { Data, Ecr } from '../../src/domain/types';
@@ -62,6 +68,8 @@ function abrir(codigo: string) {
 
 beforeEach(() => {
   useUiStore.setState({ catalogoFilter: { search: '' } });
+  useRegistrosStore.setState({ dados: null, erro: '', carregando: false });
+  marcas.lista = [];
   baixar.mockClear();
 });
 
@@ -203,5 +211,28 @@ describe('CTO-D644 — a busca do Catálogo segue o tema', () => {
     fireEvent.change(caixa, { target: { value: 'revestimento' } });
     expect(screen.queryByText('Concreto Usinado')).toBeNull();
     expect(screen.getByText('Revestimento de Parede e Piso')).toBeTruthy();
+  });
+});
+
+describe('CTO-D812 §2 — a marca "a cada entrega" na ECR', () => {
+  it('a ECR marcada mostra a marca e o porquê na seção do registro do fornecedor; a outra, não', async () => {
+    marcas.lista = [{ ecrId: 8, porque: 'o papel do lote acompanha cada carga (teste)' }];
+    montar([ecr(0), ecr(1)]);
+    const aberta = abrir('ECR 08');
+    const marca = await within(aberta).findByText(/Pede o papel a cada entrega\./);
+    expect(marca.closest('[data-a-cada-entrega]')!.textContent).toContain('o papel do lote acompanha cada carga (teste)');
+    // Na seção 03, logo depois do título, e não em outra.
+    const secao = marca.closest('section')!;
+    expect(secao.querySelector('h4')!.textContent).toContain('REGISTRO DO FORNECEDOR');
+    fireEvent.click(screen.getByText('ECR 08').closest('button')!);
+    const outra = abrir('ECR 03');
+    expect(outra.querySelector('[data-a-cada-entrega]')).toBeNull();
+  });
+
+  it('sem marca no banco, nada aparece', async () => {
+    montar([ecr(1)]);
+    const aberta = abrir('ECR 08');
+    await Promise.resolve();
+    expect(aberta.querySelector('[data-a-cada-entrega]')).toBeNull();
   });
 });

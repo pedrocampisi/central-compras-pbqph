@@ -1,0 +1,42 @@
+/* As janelas do registro do fornecedor: o resto vem do QualificarDialogo. */
+
+.alcances {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--texto);
+}
+.alcances label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+.dica {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.ecr {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.select {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+  color: var(--texto);
+  font: inherit;
+}
+
+.correcoes {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}

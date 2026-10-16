@@ -28,6 +28,8 @@ import {
 import { baixarPdfDaEcr } from '../../services/pdf/generateEcrPdf';
 import { podeRevisarEcr } from '../../services/supabase/ecrs';
 import { useRevisaoEcrStore } from '../../stores/useRevisaoEcrStore';
+import { useRegistrosStore } from '../../stores/useRegistrosStore';
+import { REGISTRO_DO_FORNECEDOR } from '../../domain/qualidadeNaOc';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { EditorDaEcr } from './EditorDaEcr';
 import { Button } from '../../components/Button/Button';
@@ -92,6 +94,13 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
   const abrirRevisao = useRevisaoEcrStore((s) => s.abrir);
   const meuId = useAuthStore((s) => s.sessao?.user.id ?? '');
   const revisao = revisaoDaEcr(ecr);
+  // A marca "a cada entrega" (CTO-D812 §2, ajuste 2): é do Banco, mora fora do texto, e não muda com a revisão.
+  const marca = useRegistrosStore((s) => s.dados?.marcas.find((m) => m.ecrId === ecr.id));
+  const aviso = marca && (
+    <p className={styles.marca} data-a-cada-entrega="">
+      <strong>Pede o papel a cada entrega.</strong> {marca.porque}. A marca não muda com a revisão.
+    </p>
+  );
   // A ECR em edição fica aberta: o rascunho não se esconde. Mas só para quem
   // revisa E abriu o rascunho: outra conta não o enxerga (perícia 27/09, achado 4).
   const editando = podeRevisar && emEdicao === ecr.id && !!meuId && dono === meuId;
@@ -154,6 +163,7 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
 
       {aberta && (
         <div className={styles.body} data-ecr-aberta="">
+          {editando && aviso}
           {editando ? (
             <EditorDaEcr ecr={ecr} />
           ) : ecr.secoes ? (
@@ -162,6 +172,7 @@ function EcrCard({ ecr, podeRevisar }: { ecr: Ecr; podeRevisar: boolean }) {
                 <h4>
                   {numeroDaSecao(i)} {s.titulo}
                 </h4>
+                {s.titulo === REGISTRO_DO_FORNECEDOR && aviso}
                 {blocosDaSecao(s.itens).map((b, j) =>
                   b.tipo === 'lista' ? (
                     <ul key={j} className={styles.lista}>
@@ -215,6 +226,10 @@ export function CatalogoPage() {
   const meuId = useAuthStore((s) => s.sessao?.user.id ?? '');
   const [resposta, setResposta] = useState<{ conta: string; pode: boolean } | null>(null);
   const podeRevisar = !!resposta && resposta.conta === meuId && resposta.pode;
+  const carregarRegistros = useRegistrosStore((s) => s.carregar);
+  useEffect(() => {
+    void carregarRegistros();
+  }, [carregarRegistros]);
   useEffect(() => {
     let vivo = true;
     podeRevisarEcr().then(

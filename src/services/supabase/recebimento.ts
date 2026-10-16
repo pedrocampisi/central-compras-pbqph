@@ -138,7 +138,7 @@ const MIMES_DA_FOTO = ['image/jpeg', 'image/png', 'image/webp'];
 export const TEMPO_DA_FOTO_MS = 60_000;
 export const TEMPO_DA_LEITURA_MS = 25_000;
 
-async function bytesDoBlob(blob: Blob): Promise<Uint8Array> {
+export async function bytesDoBlob(blob: Blob): Promise<Uint8Array> {
   if (typeof blob.arrayBuffer === 'function') return new Uint8Array(await blob.arrayBuffer());
   return new Uint8Array(
     await new Promise<ArrayBuffer>((ok, falha) => {
@@ -287,17 +287,21 @@ export async function lerRegistroNaFoto(foto: Blob): Promise<LeituraDoRegistro |
       { imagem_base64: base64, mime, origem: 'registro-ecr' },
       TEMPO_DA_LEITURA_MS,
     );
-    if (status !== 200) return null;
-    const alcance = txt(json['alcance']);
-    return {
-      alcance: (ALCANCES as readonly string[]).includes(alcance) ? (alcance as Alcance) : null,
-      validoAte: txt(json['valido_ate']).slice(0, 10),
-      confira: txt(json['confira']),
-      bruta: json,
-    };
+    return status === 200 ? leituraDaResposta(json) : null;
   } catch {
     return null;
   }
+}
+
+/** A resposta da `ler-documento` (origem `registro-ecr`) → a leitura da tela, com a resposta inteira em `bruta`. */
+export function leituraDaResposta(json: Record<string, unknown>): LeituraDoRegistro {
+  const alcance = txt(json['alcance']);
+  return {
+    alcance: (ALCANCES as readonly string[]).includes(alcance) ? (alcance as Alcance) : null,
+    validoAte: txt(json['valido_ate']).slice(0, 10),
+    confira: txt(json['confira']),
+    bruta: json,
+  };
 }
 
 // ---------------------------------------------------------------------------

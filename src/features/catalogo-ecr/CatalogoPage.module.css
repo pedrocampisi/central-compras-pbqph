@@ -104,6 +104,18 @@
 }
 .semTexto { margin: 0; font-size: 13px; color: var(--text-muted); }
 
+/* A marca "a cada entrega" (CTO-D812): do Banco, fora do texto da ECR. */
+.marca {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--marca);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto);
+}
+
 .materiais { margin-bottom: 16px; }
 .materiais ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-mid); }
 .materiais li { margin-bottom: 3px; }

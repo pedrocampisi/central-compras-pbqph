@@ -46,6 +46,9 @@ import type { AvaliacaoGravada } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
 import { ultimaEntregaPorOc } from '../../domain/recebimento';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
+import { ecrsNaOrdemDosItens } from '../../domain/qualidadeNaOc';
+import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
+import { useRegistrosStore } from '../../stores/useRegistrosStore';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -65,6 +68,8 @@ export function HistoricoPage() {
   const showToast = useUiStore((s) => s.showToast);
   /** A OC cuja entrega está sendo registrada (PS.02, CTO-D604 §3.2). */
   const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
+  /** A OC em que o comprador anexa o papel do fornecedor que chegou por e-mail (CTO-D811 §4.3). */
+  const [anexando, setAnexando] = useState<OrdemCompra | null>(null);
   /** O ✓ de cada OC (D685); `null` enquanto não leu, ou se a leitura falhou: aí a coluna não aparece. */
   const [naPasta, setNaPasta] = useState<Map<string, PdfNaPasta> | null>(null);
   /** A OC que está indo para a pasta agora: o botão dela espera. */
@@ -537,6 +542,12 @@ export function HistoricoPage() {
                   {o.status === 'emitida' ? 'Entregue' : 'Outra entrega'}
                 </Button>
               )}
+              {/* O papel deste lote que chegou por e-mail entra pela OC (CTO-D811 §4.3, D812 §2). */}
+              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && ecrsNaOrdemDosItens(o.itens).length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => setAnexando(o)}>
+                  Anexar papel
+                </Button>
+              )}
               {o.status !== 'cancelada' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
                   Cancelar
@@ -553,6 +564,21 @@ export function HistoricoPage() {
           fornecedor={fornecedorNome.get(entregando.fornecedor_id) ?? ''}
           obra={obraNome.get(entregando.obra_id) ?? ''}
           aoFechar={() => setEntregando(null)}
+        />
+      )}
+
+      {anexando && (
+        <AnexarPapelDialogo
+          quem={`OC ${anexando.numero || '(sem número)'} · ${fornecedorNome.get(anexando.fornecedor_id) ?? ''}`}
+          naOc
+          ecrs={ecrsNaOrdemDosItens(anexando.itens).map((id) => {
+            const e = data?.ecrs.find((x) => x.id === id);
+            return { id, rotulo: e ? `${e.codigo} — ${e.nome}` : `ECR ${id}` };
+          })}
+          // As posições ficam com o banco: por padrão, os itens desta OC com a ECR.
+          onde={() => ({ ocId: anexando.id, fornecedorId: anexando.fornecedor_id })}
+          aoFechar={() => setAnexando(null)}
+          aoGuardar={() => void useRegistrosStore.getState().carregar(true)}
         />
       )}
     </div>
