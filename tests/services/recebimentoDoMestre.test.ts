@@ -413,7 +413,7 @@ describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a lei
   it('a linha traz o registro de cada ECR pelo contrato do Banco: o `o_que_pede` com a revisão e os itens (D813 §2)', () => {
     const c = linhaComRegistros([
       {
-        ecr_id: 2, ecr: 'ECR 02', nome: 'Madeira (teste)', regra: 2, pede: true, porque: 'a cada entrega', posicoes: [1, 'x', 0],
+        ecr_id: 2, ecr: 'ECR 02', nome: 'Madeira (teste)', regra: 2, pede: true, a_cada_entrega: true, porque: 'a cada entrega', posicoes: [1, 'x', 0],
         o_que_pede: {
           ecr: 'ECR 02', revisao: '01', emitida_em: '2026-04-20',
           itens: [
@@ -431,14 +431,14 @@ describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a lei
     ]);
     expect(c.registros).toEqual([
       {
-        ecrId: 2, pede: true, porque: 'a cada entrega', revisao: '01', posicoes: [1],
+        ecrId: 2, pede: true, aCadaEntrega: true, porque: 'a cada entrega', revisao: '01', posicoes: [1],
         linhas: [
           { rotulo: 'GCA', texto: 'a guia (teste)', numerado: true },
           { rotulo: null, texto: 'a nota (teste)', numerado: false },
         ],
       },
-      { ecrId: 4, pede: true, porque: 'sem texto', revisao: '00', linhas: [], posicoes: [2] },
-      { ecrId: 15, pede: false, porque: 'Não aplicável', revisao: '', linhas: [], posicoes: [2] },
+      { ecrId: 4, pede: true, aCadaEntrega: false, porque: 'sem texto', revisao: '00', linhas: [], posicoes: [2] },
+      { ecrId: 15, pede: false, aCadaEntrega: false, porque: 'Não aplicável', revisao: '', linhas: [], posicoes: [2] },
     ]);
   });
 
@@ -449,6 +449,7 @@ describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a lei
 
   it('"pede" só com verdadeiro de fato', () => {
     expect(linhaComRegistros([{ ecr_id: 1, pede: 'true' }]).registros![0]!.pede).toBe(false);
+    expect(linhaComRegistros([{ ecr_id: 1, pede: true, a_cada_entrega: 'true' }]).registros![0]!.aCadaEntrega).toBe(false);
   });
 
   it('a leitura do papel vai à ler-documento com a origem `registro-ecr`, e devolve o alcance', async () => {
@@ -480,8 +481,6 @@ describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a lei
           ecrId: 6, resposta: 'veio', alcance: 'vale_ate', validoAte: '2027-06-30', foto: FOTO(),
           lido: { alcance: 'vale_ate', validoAte: '2027-06-30', confira: '', bruta: { legivel: true, alcance: 'vale_ate', valido_ate: '2027-06-30' } },
         },
-        { ecrId: 2, resposta: 'nao_se_aplica', motivo: '  é compensado  ' },
-        { ecrId: 19, resposta: 'nao_veio' },
       ],
     });
     await registrarEntregaDoMestre(e);
@@ -492,9 +491,15 @@ describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a lei
     });
     expect((banco.rpc[0]!.args['p'] as Record<string, unknown>)['registros']).toEqual([
       { ecr_id: 6, resposta: 'veio', documento_id: 'doc-papel', alcance: 'vale_ate', valido_ate: '2027-06-30' },
-      { ecr_id: 2, resposta: 'nao_se_aplica', motivo: 'é compensado' },
-      { ecr_id: 19, resposta: 'nao_veio' },
     ]);
+  });
+
+  it('o papel sem foto não vai: só sobe o que veio (Banco-D840)', async () => {
+    await registrarEntregaDoMestre(entrega({
+      registros: [{ ecrId: 6, resposta: 'veio', alcance: 'lote', foto: null, lido: null }],
+    }));
+    expect(funcao.chamadas).toHaveLength(0);
+    expect(banco.rpc[0]!.args['p']).not.toHaveProperty('registros');
   });
 
   it('o alcance que ele conferiu vai, mesmo diferente da leitura (D812 §2, ajuste 3); sem leitura, o papel sobe sem `extracao`', async () => {

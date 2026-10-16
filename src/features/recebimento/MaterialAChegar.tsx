@@ -29,9 +29,9 @@ import {
   type CartaoAChegar, type ContagemDoMestre, type ObraDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
 import {
-  ALCANCES, SEM_REGISTRO, alcanceDaLeitura, fraseDaLeitura, materialDoRegistro, perguntaDoRegistro, problemaDoRegistro,
-  registrosDoEnvio, registrosPedidos, textoDoAlcance,
-  type Alcance, type LeituraDoRegistro, type RegistroPedido, type RegistroRespondido, type RespostaDoRegistro,
+  ALCANCES, SEM_REGISTRO, VALE_PARA_ESTA_ENTREGA, alcanceDaLeitura, fraseDaLeitura, materialDoRegistro, problemaDoRegistro,
+  registrosDoEnvio, registrosPedidos, textoDoAlcance, tituloDoRegistro,
+  type Alcance, type LeituraDoRegistro, type RegistroPedido, type RegistroRespondido,
 } from '../../domain/registroDoFornecedor';
 import { useUltimaEscolha } from '../../hooks/useUltimaEscolha';
 import { guardaDoAparelho, type GuardaDoAparelho } from '../../services/guardaDoAparelho';
@@ -509,7 +509,7 @@ function Receber({
   const [numero, setNumero] = useState(rascunho?.numero ?? '');
   const [texto, setTexto] = useState(rascunho?.texto ?? '');
   const [contagem, setContagem] = useState<ContagemDoMestre>(rascunho?.contagem ?? {});
-  // O papel do fornecedor: só das ECRs em que o banco manda perguntar (D811 §3).
+  // O papel do fornecedor: só nas ECRs em que o banco diz que pede (D811 §3), e só se ele anexar (D840).
   const pedidos = useMemo(() => registrosPedidos(cartao.registros), [cartao.registros]);
   const [registros, setRegistros] = useState<Record<number, RegistroRespondido>>(rascunho?.registros ?? {});
   const [fotosDosPapeis, setFotosDosPapeis] = useState<Record<number, File>>(fotosGuardadas ?? {});
@@ -556,10 +556,7 @@ function Receber({
         soUmaParte: r.tudo === false,
         foto,
         itens: itensDoEnvio(cartao, r.tudo, contagem),
-        registros: registrosDoEnvio(pedidos, registros).map((x) => ({
-          ...x,
-          foto: x.resposta === 'veio' ? (fotosDosPapeis[x.ecrId] ?? null) : null,
-        })),
+        registros: registrosDoEnvio(pedidos, registros).map((x) => ({ ...x, foto: fotosDosPapeis[x.ecrId] ?? null })),
       };
       const d = await mandar(envio);
       if (!d.foi && d.motivo) {
@@ -667,16 +664,12 @@ function Receber({
 
 const semLeitura = async (): Promise<LeituraDoRegistro | null> => null;
 
-const RESPOSTAS_DO_PAPEL: { valor: RespostaDoRegistro; texto: string }[] = [
-  { valor: 'veio', texto: 'Veio' },
-  { valor: 'nao_veio', texto: 'Não veio' },
-  { valor: 'nao_se_aplica', texto: 'Não se aplica a esta entrega' },
-];
-
 /**
- * O papel do fornecedor de uma ECR (D811 §3): o que a ECR pede, com as
- * palavras dela, e as três respostas. Veio: a foto, a leitura do alcance, e
- * ele confere (D812 §2, ajuste 3). Não se aplica: a frase do porquê.
+ * O papel do fornecedor de uma ECR (D811 §3, D840 §2): o que a ECR pede, com as
+ * palavras dela, e o "Anexar papel do fornecedor", que é opcional — o papel que
+ * viaja com o caminhão. Anexou: a foto, a leitura do alcance, e ele confere
+ * (D812 §2, ajuste 3); na ECR com a marca "a cada entrega", é deste lote, sem
+ * escolha. "Tirar" volta ao começo.
  */
 function PapelDoFornecedor({
   pedido, material, registro: g, foto, lerRegistro, aoMudar, aoMudarFoto,
@@ -703,15 +696,24 @@ function PapelDoFornecedor({
     aoMudarFoto(f);
     setEscolhendo(false);
     // Foto nova, conferência nova: o que ele conferiu era da foto de antes.
-    aoMudar({ lido: null, alcance: 'lote', validoAte: '', conferido: false });
+    aoMudar({ resposta: 'veio', lido: null, alcance: 'lote', validoAte: '', conferido: false });
     setLendo(true);
     try {
       const lido = await lerRegistro(f).catch(() => null);
-      // A leitura de uma foto trocada no meio não cai em cima da foto nova.
-      if (daVez()) aoMudar({ lido, ...alcanceDaLeitura(lido) });
+      // A leitura de uma foto trocada no meio não cai em cima da foto nova. Na marca, o lote não muda.
+      if (daVez()) aoMudar({ lido, ...(pedido.aCadaEntrega ? {} : alcanceDaLeitura(lido)) });
     } finally {
       if (daVez()) setLendo(false);
     }
+  }
+
+  /** De volta ao começo: sem foto, e a leitura que ainda vinha não cai mais. */
+  function tirar() {
+    novaEscolha();
+    setLendo(false);
+    setEscolhendo(false);
+    aoMudarFoto(null);
+    aoMudar(SEM_REGISTRO);
   }
 
   function escolher(alcance: Alcance) {
@@ -719,9 +721,22 @@ function PapelDoFornecedor({
     if (alcance !== 'vale_ate') setEscolhendo(false);
   }
 
+  const campoDaFoto = (texto: string) => (
+    <label className={styles.secundario}>
+      <Icon name="camera" size={22} /> {texto}
+      <input
+        className={styles.escondido}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={(e) => void escolheu(e.target.files?.[0])}
+      />
+    </label>
+  );
+
   return (
     <fieldset className={styles.pergunta} data-papel-da-ecr={pedido.ecrId}>
-      <legend className={styles.perguntaTexto}>{perguntaDoRegistro(material)}</legend>
+      <legend className={styles.perguntaTexto}>{tituloDoRegistro(material)}</legend>
       {/* As linhas como na ECR: a numerada na lista, a sem número como nota. Sem texto no sistema, sem caixa. */}
       {pedido.linhas.length > 0 && (
         <div className={styles.palavrasDaEcr} data-palavras-da-ecr="">
@@ -741,50 +756,28 @@ function PapelDoFornecedor({
           )}
         </div>
       )}
-      <div className={styles.botoesDoPapel}>
-        {RESPOSTAS_DO_PAPEL.map((b) => (
-          <button
-            key={b.valor}
-            type="button"
-            aria-pressed={g.resposta === b.valor}
-            className={`${styles.resposta} ${g.resposta === b.valor ? (b.valor === 'veio' ? styles.sim : styles.marcado) : ''}`}
-            onClick={() => aoMudar({ resposta: b.valor })}
-          >
-            {b.texto}
-          </button>
-        ))}
-      </div>
 
-      {g.resposta === 'nao_veio' && <p className={styles.dica}>Fica anotado, e o escritório vê.</p>}
-
-      {g.resposta === 'nao_se_aplica' && (
-        <label className={styles.campo}>
-          <span className={styles.dica}>Por quê?</span>
-          <textarea
-            className={styles.caixa}
-            rows={2}
-            value={g.motivo}
-            onChange={(e) => aoMudar({ motivo: e.target.value })}
-            placeholder="Ex.: é compensado. Ou: este material não está na lista."
-          />
-        </label>
-      )}
-
-      {g.resposta === 'veio' && (
+      {g.resposta !== 'veio' ? (
+        <div className={styles.foto}>
+          <p className={styles.dica}>Se o papel veio com o caminhão, anexe. Se não veio, não precisa fazer nada: o escritório cuida.</p>
+          {campoDaFoto('Anexar papel do fornecedor')}
+        </div>
+      ) : (
         <div className={styles.foto}>
           {miniatura && <img className={styles.miniatura} src={miniatura} alt={`A foto do papel de ${material}`} />}
-          <label className={styles.secundario}>
-            <Icon name="camera" size={22} /> {foto ? 'Tirar outra foto' : 'Tirar foto do papel'}
-            <input
-              className={styles.escondido}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={(e) => void escolheu(e.target.files?.[0])}
-            />
-          </label>
+          {campoDaFoto(foto ? 'Tirar outra foto' : 'Tirar foto do papel')}
+          <button type="button" className={styles.link} onClick={tirar}>
+            Tirar
+          </button>
           {lendo && <p className={styles.dica}>Lendo o papel…</p>}
-          {foto && !lendo && (
+          {foto && !lendo && pedido.aCadaEntrega && (
+            <div className={styles.alcance} data-alcance="lote">
+              <p className={styles.dica}>
+                <strong>{VALE_PARA_ESTA_ENTREGA}</strong>
+              </p>
+            </div>
+          )}
+          {foto && !lendo && !pedido.aCadaEntrega && (
             <div className={styles.alcance} data-alcance={g.alcance}>
               {g.conferido && !escolhendo ? (
                 <p className={styles.dica}>

@@ -667,17 +667,6 @@
   gap: 6px;
 }
 
-.botoesDoPapel {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-/* "Não se aplica a esta entrega" é comprido: a linha inteira, embaixo. */
-.botoesDoPapel > :last-child {
-  grid-column: 1 / -1;
-}
-
 .marcado {
   border-color: var(--marca);
   background: var(--marca-fraca);

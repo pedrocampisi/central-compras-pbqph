@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ALCANCES, SEM_REGISTRO, alcanceDaLeitura, fraseDaLeitura, materialDoRegistro, perguntaDoRegistro, problemaDoRegistro,
-  registrosDoEnvio, registrosPedidos, textoDoAlcance, type RegistroPedido, type RegistroRespondido,
+  ALCANCES, SEM_REGISTRO, alcanceDaLeitura, alcanceDoEnvio, fraseDaLeitura, materialDoRegistro, problemaDoRegistro,
+  registrosDoEnvio, registrosPedidos, textoDoAlcance, tituloDoRegistro, type RegistroPedido, type RegistroRespondido,
 } from '../../src/domain/registroDoFornecedor';
 
 /**
- * CTO-D811 §3 e D812 §2: o papel do fornecedor no carimbo, a lógica pura. Quem
- * decide se pergunta é o banco; aqui, a leitura, o que falta e o envio.
+ * CTO-D811 §3, D812 §2 e D840: o papel do fornecedor no carimbo, a lógica pura.
+ * Quem decide se a ECR pede é o banco; anexar é opcional. Aqui, a leitura, o que
+ * falta no papel anexado e o envio.
  */
 
-const pedido = (ecrId: number, posicoes: number[], pede = true): RegistroPedido => ({
-  ecrId, pede, porque: '', revisao: '00', linhas: [{ rotulo: null, texto: 'O papel (teste)', numerado: true }], posicoes,
+const pedido = (ecrId: number, posicoes: number[], pede = true, aCadaEntrega = false): RegistroPedido => ({
+  ecrId, pede, aCadaEntrega, porque: '', revisao: '00', linhas: [{ rotulo: null, texto: 'O papel (teste)', numerado: true }], posicoes,
 });
 const ITENS = [
   { posicao: 1, descricao: 'Tubo de teste' },
@@ -42,16 +43,16 @@ describe('o alcance (D811 §3: três valores; na dúvida, deste lote)', () => {
   });
 });
 
-describe('a pergunta, sem a palavra do escritório', () => {
+describe('o título, sem a palavra do escritório', () => {
   it('nomeia o material pelos itens da ECR; com mais de um, "e mais"', () => {
     expect(materialDoRegistro(pedido(19, [3]), ITENS)).toBe('Cimento de teste');
     expect(materialDoRegistro(pedido(12, [1, 2]), ITENS)).toBe('Tubo de teste e mais 1');
     expect(materialDoRegistro(pedido(12, [9]), ITENS)).toBe('este material');
-    expect(perguntaDoRegistro('Cimento de teste')).toBe('Veio o papel do fornecedor para Cimento de teste?');
-    expect(perguntaDoRegistro('x')).not.toMatch(/ecr|conforme|certificado/i);
+    expect(tituloDoRegistro('Cimento de teste')).toBe('Papel do fornecedor para Cimento de teste');
+    expect(tituloDoRegistro('x')).not.toMatch(/ecr|conforme|certificado|\?/i);
   });
 
-  it('só as ECRs em que o banco manda perguntar', () => {
+  it('só as ECRs em que o banco diz que pede', () => {
     expect(registrosPedidos([pedido(15, [1], false), pedido(19, [3])]).map((r) => r.ecrId)).toEqual([19]);
     expect(registrosPedidos(undefined)).toEqual([]);
   });
@@ -62,20 +63,13 @@ describe('o que falta para o "Pronto"', () => {
   const falta = (r: RegistroRespondido, temFoto = true) =>
     problemaDoRegistro(P, { 19: r }, () => temFoto, (p) => materialDoRegistro(p, ITENS));
 
-  it('sem resposta: pergunta de novo', () => {
-    expect(problemaDoRegistro(P, {}, () => true, () => 'Cimento de teste')).toBe(
-      'Falta responder: Veio o papel do fornecedor para Cimento de teste?',
-    );
+  it('sem papel anexado, nada falta: o papel não segura a entrega (D840 §2)', () => {
+    expect(problemaDoRegistro(P, {}, () => false, () => 'Cimento de teste')).toBe('');
+    expect(falta(SEM_REGISTRO, false)).toBe('');
   });
 
-  it('"Não se aplica" pede o porquê; "Não veio" não pede nada', () => {
-    expect(falta(resp({ resposta: 'nao_se_aplica', motivo: '  ' }))).toBe('Diga por que o papel de Cimento de teste não se aplica.');
-    expect(falta(resp({ resposta: 'nao_se_aplica', motivo: 'é compensado' }))).toBe('');
-    expect(falta(resp({ resposta: 'nao_veio' }))).toBe('');
-  });
-
-  it('"Veio" pede a foto, a conferência, e a data no "vale até"', () => {
-    expect(falta(resp({ resposta: 'veio', conferido: true }), false)).toBe('Tire a foto do papel de Cimento de teste.');
+  it('o papel anexado pede a foto, a conferência, e a data no "vale até"', () => {
+    expect(falta(resp({ resposta: 'veio', conferido: true }), false)).toBe('Tire a foto do papel de Cimento de teste, ou toque em "Tirar".');
     expect(falta(resp({ resposta: 'veio' }))).toBe(
       'Confira o que o papel de Cimento de teste diz: toque em "Está certo", ou escolha o certo.',
     );
@@ -85,22 +79,34 @@ describe('o que falta para o "Pronto"', () => {
     expect(falta(resp({ resposta: 'veio', conferido: true, alcance: 'vale_ate', validoAte: '2027-06-30' }))).toBe('');
     expect(falta(resp({ resposta: 'veio', conferido: true }))).toBe('');
   });
+
+  it('na ECR com a marca "a cada entrega", não há o que conferir: é deste lote; a foto ainda falta', () => {
+    const M = [pedido(2, [3], true, true)];
+    const m = (r: RegistroRespondido, temFoto = true) => problemaDoRegistro(M, { 2: r }, () => temFoto, () => 'Cimento de teste');
+    expect(m(resp({ resposta: 'veio' }))).toBe('');
+    expect(m(resp({ resposta: 'veio', alcance: 'vale_ate', validoAte: '' }))).toBe('');
+    expect(m(resp({ resposta: 'veio' }), false)).toBe('Tire a foto do papel de Cimento de teste, ou toque em "Tirar".');
+  });
 });
 
 describe('o envio', () => {
-  it('só as ECRs pedidas e respondidas; cada resposta com o que é dela', () => {
+  it('só os papéis anexados, nas ECRs que o banco pede; o que não veio não vai (Banco-D840)', () => {
     const lido = { alcance: 'vale_ate' as const, validoAte: '2027-06-30', confira: '' };
-    const r = registrosDoEnvio([pedido(6, [1]), pedido(2, [2]), pedido(19, [3]), pedido(8, [1])], {
+    const r = registrosDoEnvio([pedido(6, [1]), pedido(2, [2]), pedido(8, [1])], {
       6: resp({ resposta: 'veio', conferido: true, alcance: 'vale_ate', validoAte: '2027-06-30', lido }),
-      2: resp({ resposta: 'nao_se_aplica', motivo: ' é compensado ' }),
-      19: resp({ resposta: 'nao_veio', motivo: 'sobrou de antes' }),
-      15: resp({ resposta: 'nao_veio' }),
+      2: SEM_REGISTRO,
+      15: resp({ resposta: 'veio' }),
     });
-    expect(r).toEqual([
-      { ecrId: 6, resposta: 'veio', alcance: 'vale_ate', validoAte: '2027-06-30', lido },
-      { ecrId: 2, resposta: 'nao_se_aplica', motivo: 'é compensado' },
-      { ecrId: 19, resposta: 'nao_veio' },
-    ]);
+    expect(r).toEqual([{ ecrId: 6, resposta: 'veio', alcance: 'vale_ate', validoAte: '2027-06-30', lido }]);
+    expect(r.map((x) => x.resposta)).toEqual(['veio']);
+  });
+
+  it('na ECR com a marca, vai deste lote, seja o que for que o rascunho tenha', () => {
+    expect(registrosDoEnvio([pedido(17, [1], true, true)], {
+      17: resp({ resposta: 'veio', conferido: true, alcance: 'vale_ate', validoAte: '2027-06-30' }),
+    })).toEqual([{ ecrId: 17, resposta: 'veio', alcance: 'lote', lido: null }]);
+    expect(alcanceDoEnvio({ aCadaEntrega: true }, { alcance: 'produto', validoAte: '' })).toEqual({ alcance: 'lote', validoAte: '' });
+    expect(alcanceDoEnvio({ aCadaEntrega: false }, { alcance: 'produto', validoAte: '' })).toEqual({ alcance: 'produto', validoAte: '' });
   });
 
   it('o "veio" que não é "vale até" não leva data', () => {

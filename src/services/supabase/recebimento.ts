@@ -43,7 +43,8 @@ const objeto = (v: unknown): Record<string, unknown> =>
 /**
  * O registro do fornecedor de uma ECR da entrega, como a `material_a_chegar` o
  * manda (o contrato do Banco, D813 §2): o `o_que_pede` é `{ecr, revisao,
- * emitida_em, itens}`, e `itens` é nulo quando a revisão não tem o texto.
+ * emitida_em, itens}`, e `itens` é nulo quando a revisão não tem o texto. A
+ * marca `a_cada_entrega` é das ECRs 01, 02 e 17 (o pedido 2 da D840 ao Banco).
  */
 function registroDaLinha(r: Record<string, unknown>): RegistroPedido {
   const oQuePede = objeto(r['o_que_pede']);
@@ -52,6 +53,7 @@ function registroDaLinha(r: Record<string, unknown>): RegistroPedido {
   return {
     ecrId: num(r['ecr_id']),
     pede: r['pede'] === true,
+    aCadaEntrega: r['a_cada_entrega'] === true,
     porque: txt(r['porque']),
     revisao: txt(oQuePede['revisao']),
     linhas: itens
@@ -339,7 +341,7 @@ export interface EntregaDoMestre {
   foto: Blob | null;
   /** Quanto veio de cada item (D794). Vazio, ou ausente no envio guardado por uma versão antiga: grava como antes. */
   itens?: ItemRecebido[];
-  /** O registro do fornecedor de cada ECR que o banco pediu (D811), com a foto do papel quando veio. */
+  /** O papel do fornecedor que o encarregado anexou, por ECR que o banco pede (D811, D840), com a foto. */
   registros?: (RegistroNoEnvio & { foto?: Blob | null })[];
 }
 
@@ -347,24 +349,22 @@ const doisDigitos = (n: number) => String(n).padStart(2, '0');
 
 /**
  * Cada papel sobe com a chave dele e a leitura como veio; o envio leva o
- * documento, a resposta e o alcance conferido. A leitura não vai na entrega:
- * mora no documento (Banco-D812 §4).
+ * documento e o alcance conferido. A leitura não vai na entrega: mora no
+ * documento (Banco-D812 §4). Só vai o papel que veio, com a foto (Banco-D840):
+ * o que não veio, a lista do escritório cuida.
  */
 async function registrosParaGravar(e: EntregaDoMestre): Promise<Record<string, unknown>[]> {
   const out: Record<string, unknown>[] = [];
   for (const r of e.registros ?? []) {
+    if (r.resposta !== 'veio' || !r.foto) continue;
     const ecr = doisDigitos(r.ecrId);
-    const documentoId =
-      r.resposta === 'veio' && r.foto
-        ? await arquivarFotoDoRecebimento(r.foto, e.intervencaoId, `${e.chave}-ecr-${ecr}`, `registro-ecr-${ecr}`, r.lido?.bruta)
-        : '';
+    const documentoId = await arquivarFotoDoRecebimento(r.foto, e.intervencaoId, `${e.chave}-ecr-${ecr}`, `registro-ecr-${ecr}`, r.lido?.bruta);
     out.push({
       ecr_id: r.ecrId,
-      resposta: r.resposta,
-      ...(r.motivo?.trim() ? { motivo: r.motivo.trim() } : {}),
-      ...(documentoId ? { documento_id: documentoId } : {}),
-      ...(r.resposta === 'veio' && r.alcance ? { alcance: r.alcance } : {}),
-      ...(r.resposta === 'veio' && r.alcance === 'vale_ate' && r.validoAte ? { valido_ate: r.validoAte } : {}),
+      resposta: 'veio',
+      documento_id: documentoId,
+      ...(r.alcance ? { alcance: r.alcance } : {}),
+      ...(r.alcance === 'vale_ate' && r.validoAte ? { valido_ate: r.validoAte } : {}),
     });
   }
   return out;

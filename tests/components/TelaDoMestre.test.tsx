@@ -161,12 +161,12 @@ describe('a tela do mestre, ligada ao banco', () => {
     await waitFor(() => expect(servico.lerMaterialAChegar.mock.calls.length).toBeGreaterThan(leituras));
   });
 
-  it('o papel do fornecedor que o banco pede vai ao banco com a entrega (D811 §3)', async () => {
+  it('a ECR pede o papel, e ele não veio: o "Pronto" grava sem perguntar, e a entrega vai sem `registros` (D840 §2)', async () => {
     servico.lerMaterialAChegar.mockResolvedValue({
       cartoes: [{
         ...CARTAO,
         registros: [{
-          ecrId: 19, pede: true, porque: '', revisao: '00', posicoes: [1], linhas: [{ rotulo: null, texto: 'FISPQ (teste)', numerado: true }],
+          ecrId: 19, pede: true, aCadaEntrega: false, porque: '', revisao: '00', posicoes: [1], linhas: [{ rotulo: null, texto: 'FISPQ (teste)', numerado: true }],
         }],
       }],
       obras: [{ id: 'obra-1', nome: 'Obra de Teste' }],
@@ -181,13 +181,12 @@ describe('a tela do mestre, ligada ao banco', () => {
     }
     await userEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
     await userEvent.type(screen.getByRole('textbox'), '4567');
-    const papel = screen.getByRole('group', { name: 'Veio o papel do fornecedor para Cimento de teste?' });
-    await userEvent.click(within(papel).getByRole('button', { name: 'Não se aplica a esta entrega' }));
-    await userEvent.type(within(papel).getByRole('textbox'), 'é compensado');
+    const papel = screen.getByRole('group', { name: 'Papel do fornecedor para Cimento de teste' });
+    expect(within(papel).getByText('Anexar papel do fornecedor')).toBeTruthy();
     await userEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     expect(await screen.findByText('Recebido.')).toBeTruthy();
     expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(
-      expect.objectContaining({ registros: [{ ecrId: 19, resposta: 'nao_se_aplica', motivo: 'é compensado', foto: null }] }),
+      expect.objectContaining({ registros: [] }),
     );
   });
 });
