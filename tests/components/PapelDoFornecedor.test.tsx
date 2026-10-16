@@ -249,15 +249,20 @@ describe('o papel do fornecedor no carimbo (D811 §3, D840 §2)', () => {
     expect(registrosEnviados(p)).toEqual([]);
   });
 
-  it('"Tirar" no meio da leitura: a leitura que chega depois não traz o papel de volta', async () => {
+  it('"Tirar" no meio da leitura: a leitura que chega depois não traz o papel de volta, nem ao rascunho do celular', async () => {
     const respostas: ((l: LeituraDoRegistro | null) => void)[] = [];
-    const p = montar({ lerRegistro: vi.fn(() => new Promise<LeituraDoRegistro | null>((r) => respostas.push(r))) });
+    const guarda = guardaNaMemoria(true);
+    const p = montar({ guarda, lerRegistro: vi.fn(() => new Promise<LeituraDoRegistro | null>((r) => respostas.push(r))) });
     await chegarAoPapel();
     escolherFoto(FOTO);
     await waitFor(() => expect(respostas).toHaveLength(1));
     fireEvent.click(within(papel()).getByRole('button', { name: 'Tirar' }));
     act(() => respostas[0]!({ alcance: 'produto', validoAte: '', confira: '' }));
-    await new Promise((r) => setTimeout(r, 0));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+    const rascunho = await guarda.ler<{ registros?: Record<number, { resposta: unknown; lido: unknown }> }>(CHAVES.receber('oc-1'));
+    expect(rascunho?.registros?.[19]).toMatchObject({ resposta: null, lido: null });
     expect(within(papel()).getByText(ANEXAR)).toBeTruthy();
     expect(within(papel()).queryByText('Lendo o papel…')).toBeNull();
     pronto();
