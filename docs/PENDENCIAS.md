@@ -148,7 +148,35 @@ Meta: 23/10.
 **Falta, fora desta casa:**
 1. o Pedro ler o rascunho e apertar "Gravar a Rev. 01". Só ele aperta;
 2. o Banco trocar as recusas do banco que dizem "mestre" (CTO-D800 ao Banco);
-3. o Pedro decidir o que fazer com o papel `encarregado` do banco.
+3. ~~o Pedro decidir o que fazer com o papel `encarregado` do banco~~: aposentado (CTO-D837, decisão 127).
+
+---
+
+### 42. ~~A D819: quando a qualificação foi lançada no sistema~~ — no ar
+
+*Aberta em 15/10/2026, na decisão 125.*
+- **O ramo:** `d819-qualificacao-lancada` (`566bae5`), **sem publicar**.
+  - A tela mostra "lançada no sistema em DD/MM/AAAA" na linha aberta e no Histórico, quando o lançamento é depois da
+    data. Não trava, e o PDF não muda.
+- **No ar desde as 22h49 de 15/10** (decisão 126): está em `2e116146`, versão `20261016014924-5a07ec2`, pelo `main`
+  `5a07ec2`, com a medida por fora. O desfazer é `9178a00a`.
+- **Na junção com o ramo 2 da parte C,** o conflito na `.rolagem` do CSS se resolve com uma regra só.
+- A D819 e a D822 foram ao arquivo morto.
+
+### 41. ~~A D814: o perfil sem a Ordem de Compra~~ — no ar
+
+*Aberta em 15/10/2026, na decisão 119.* Decisão do Pedro: uma pessoa do financeiro entra na Central de Dados, e não
+precisa da Ordem de Compra.
+- **A trava é do banco:** a marca `core.perfis.sem_ordem_de_compra`, e a recusa "Seu acesso não inclui a Ordem de
+  Compra.".
+- **A tela só avisa:** ela lê a marca na `perfilAtual`, e com a marca não entra, com a frase e o "Sair". Sem a marca,
+  fica tudo como hoje.
+- **Os testes:** com a marca, o aviso; sem a marca, como hoje; e uma sabotagem que deixa entrar.
+- ~~**Num ramo, contra o banco falso, sem publicar.**~~ **Feito** no ramo `d814-perfil-sem-oc` (`b4128df`, decisão
+  120), com o CI verde, 8 sabotagens vermelhas e 3 fotos.
+- ~~**A conferência e a ordem de publicar do CTO.**~~ **No ar** em `9178a00a`, versão `20261016001818-b3e7722`, pelo
+  `main` `b3e7722` (D816, decisão 122), com a medida por fora; o desfazer é `f47f687c`.
+- **Fechada para esta casa.** A marca no banco é do Banco; até ela chegar, todos entram como antes.
 
 ---
 
@@ -158,14 +186,31 @@ Meta: 23/10.
 1. ~~**a parte A**~~ **no ar** em `6547e313`, versão `20261015191902-1f530e7`, pelo `main` `1f530e7` (decisão 112),
    com a medida por fora; o desfazer é `ea46638b`;
 2. ~~**a trava da Data**~~ **no ar** em `f47f687c`, versão `20261015210401-3e09378`, pelo `main` `3e09378`
-   (decisões 115 e 117), com a medida por fora; o desfazer é `6547e313`;
+   (decisões 115 e 117), com a medida por fora; o desfazer é `6547e313`. Desde as 21h18 de 15/10, o no ar é o
+   `9178a00a` (o aviso da D814, item 41);
 3. **a parte C** (o registro do fornecedor por ECR): **o desenho está aprovado** (D812 §2), com três ajustes:
    - o comprador corrige o alcance, com registro;
    - a marca "a cada entrega" nas ECRs 01, 02 e 17;
    - o alcance que o encarregado conferiu.
 
-   O primeiro ramo é o recebimento, contra o banco falso, enquanto o Banco faz o contrato. Constrói-se com a
-   recomendação até a resposta do Pedro (o item 24 dele);
+   - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
+     119), **sem publicar**, conferido pelo CTO (D815). A gravação de uma entrega é medida pelo Banco no ensaio,
+     com o corpo que mandei (decisão 121): **deu 11 de 11.** O conserto da D818 está em `39c594e` (decisão 124);
+   - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
+     conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
+   - **congelados até a triagem da perícia** (D821): o ramo 1 em `39c594e`, o ramo 2 em `87f991b` (decisão 125).
+   - **a parte C vai ser refeita** (CTO-D840, decisão 127): o papel entra pelo escritório, e o carimbo só tem um
+     botão opcional. O plano das telas foi ao CTO e ao Banco em 16/10, e **não há código antes da aprovação**. Os dois
+     ramos ficam congelados.
+   - **daqui em diante, a ordem é:**
+     1. a aprovação do plano;
+     2. o ramo novo;
+     3. a medida no ensaio;
+     4. a perícia, uma só, sobre o código final;
+     5. o contrato do Banco na produção;
+     6. publicar.
+
+   Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
    computador, pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
    - falta o teste do Pedro com um orçamento real;
@@ -176,7 +221,9 @@ Meta: 23/10.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805, a D811 e a D812 ficam na `Devolucoes` até lá. A D806, a D808, a D809 e a D810 foram ao arquivo morto.
+A D805, a D816 e as duas D840 (a do CTO e a do Banco) ficam na `Devolucoes` até lá. A D806, e da D808 à D814, foram ao arquivo morto.
+**A D815 §3 foi decidida pelo Pedro** (CTO-D840): ninguém pergunta o papel na entrega, e a pergunta do escritório
+morreu. O papel entra pelo escritório.
 
 ---
 

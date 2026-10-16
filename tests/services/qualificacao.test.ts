@@ -148,6 +148,12 @@ describe('D604 — a carga das qualificações', () => {
     });
   });
 
+  it('quando foi lançada: o criado_em da vista vem junto (CTO-D819)', async () => {
+    banco.TABELAS['qualificacoes_situacao'] = [linha({ criado_em: '2026-09-28T13:00:00+00:00' })];
+    const q = await carregarQualificacoes();
+    expect(q.linhas[0]!.lancadaEm).toBe('2026-09-28T13:00:00+00:00');
+  });
+
   it('as categorias na ordem das abas da planilha, com os critérios do banco na ordem deles', async () => {
     const q = await carregarQualificacoes();
     expect(q.categorias.map((c) => c.categoria)).toEqual(['material', 'controle_tecnologico', 'locacao']);

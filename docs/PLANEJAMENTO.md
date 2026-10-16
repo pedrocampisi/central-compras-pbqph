@@ -3980,3 +3980,242 @@ agora" abria e o banco recusava depois.
 - a parte B espera o teste do Pedro, e junta o `main` antes de ir ao ar.
 
 **O banco não mudou por esta casa.**
+
+## Decisão 118 — a parte C, primeiro ramo: o papel do fornecedor no carimbo, no ramo `69e92d7` · 15/10/2026
+
+**POR QUÊ (CTO-D812 §2 e §3.2):** o desenho da parte C está aprovado, com três ajustes. O primeiro ramo é o
+recebimento, contra o banco falso, enquanto o Banco faz o contrato no ensaio.
+
+**O QUE MUDOU** (ramo `d812-c1-registro-no-recebimento`, `69e92d7`, sobre o `main` `ae2d93d`, numa cópia própria):
+- o carimbo do encarregado pergunta, por ECR em que a `material_a_chegar` diz `pede`, se veio o papel do fornecedor,
+  com as linhas do "REGISTRO DO FORNECEDOR" como o banco mandar;
+- três respostas: veio (com a foto), não veio, e não se aplica a esta entrega (com a frase);
+- no "veio", a leitura pela `ler-documento` (origem `registro-ecr`), e o encarregado confere o alcance: deste lote,
+  vale até uma data, ou vale para o produto (ajuste 3). Na dúvida, deste lote;
+- a `registrar_entrega` leva `p.registros` só quando há o que levar; o papel sobe pela `arquivar-documento` com
+  `origem_item` `registro-ecr-NN`;
+- sem `registros` na lista, o carimbo fica igual ao de hoje.
+
+**A PROVA:**
+- 1141 testes (31 novos), tipos e lint limpos;
+- 31 sabotagens vermelhas;
+- 4 fotos em `docs/Capturas/2026-10-15_D812_C1/`;
+- +568 e −14 linhas em `src`, e +473 em testes.
+
+**O banco não mudou. Não publiquei.** O ramo vai ao ar depois da medida no ensaio, com o contrato do Banco.
+
+## Decisão 119 — o ramo 1 da parte C segue o contrato do Banco, medido no ensaio · 15/10/2026
+
+**POR QUÊ (CTO-D813 §2 e §3):** o Banco fez o contrato no ensaio (`0e1b3a9`), e duas chaves eram diferentes das que a
+tela esperava. Vale o do Banco: ele já está no ensaio e guarda a leitura da IA junto do papel, uma vez só.
+
+**O QUE MUDOU** (ramo `d812-c1-registro-no-recebimento`, `3204be1`):
+- o `o_que_pede` é objeto: a tela lê `itens` e `revisao` dele;
+- as linhas saem como na ECR, com as peças do catálogo: a numerada na lista, com o rótulo, e a sem número como nota em
+  destaque. Sem linhas, sem a caixa;
+- a leitura sobe com o papel, no `extracao` da `arquivar-documento`; a `registrar_entrega` não leva mais a leitura.
+
+**A MEDIDA NO ENSAIO, só lendo:**
+- a `compras.registro_pede` (que não grava) nas 20 ECRs: as 20 vieram na forma do contrato;
+- nove casos reais passados pelo leitor e pela tela, todos certos (a nota da CDL na 02, os rótulos da 12, a nota no
+  meio da 13, a 15 que não pergunta, a 04 sem texto);
+- não medi a gravação de uma entrega, que pede login e grava: proposta ao CTO como parte do teste do Pedro.
+
+**A PROVA:**
+- 1143 testes, tipos e lint limpos;
+- 40 sabotagens vermelhas;
+- 3 fotos com o texto real das ECRs em `docs/Capturas/2026-10-15_D813_C1/`;
+- o ramo inteiro com +627 e −14 linhas em `src`.
+
+**O banco não mudou. Não publiquei.**
+
+## Decisão 120 — o perfil sem a Ordem de Compra avisa e não entra, no ramo `d814-perfil-sem-oc` · 15/10/2026
+
+**POR QUÊ (CTO-D814, decisão do Pedro):** uma pessoa do financeiro entra na Central de Dados com o papel
+`engenharia`, e não precisa da Ordem de Compra. A trava é do banco (`core.perfis.sem_ordem_de_compra`); a tela só
+avisa.
+
+**O QUE MUDOU** (ramo `d814-perfil-sem-oc`, `b4128df`, sobre o `main` `49d4a6b`):
+- a `perfilAtual` lê a marca; só o `true` barra;
+- com a marca: "Seu acesso não inclui a Ordem de Compra.", com o "Sair", no cartão de quem entrou sem perfil. Nada é
+  lido do banco. Vale para todo papel, o do encarregado também;
+- sem a marca, como hoje;
+- **o banco sem a coluna (42703) lê o perfil como antes**: a tela pode ir ao ar antes da marca, e ninguém fica de fora.
+
+**A PROVA:**
+- o CI verde;
+- 1119 testes (9 novos), tipos e lint limpos;
+- 8 sabotagens vermelhas;
+- 3 fotos em `docs/Capturas/2026-10-15_D814/`;
+- +71 e −10 linhas em `src`.
+
+Um teste mentia: o perfil do teste anterior ficava guardado e respondia pelo seguinte. Consertado antes da carta.
+
+**O banco não mudou. Não publiquei.** Publicar é pela emenda 3, depois da conferência do CTO.
+
+## Decisão 121 — o corpo do carimbo vai ao Banco, que mede a gravação no ensaio · 15/10/2026
+
+**POR QUÊ (CTO-D815 §2):** o teste do Pedro não chega ao carimbo, que só abre para o papel `mestre`, e o login dele
+é `admin`. O Banco tem a ferramenta da D710: um encarregado temporário, que entra pelo código do QR e é apagado no fim.
+
+**O QUE FOI:** uma carta ao Banco, com cópia ao CTO, com o corpo que a `registrarEntregaDoMestre` do `3204be1` monta.
+- Saiu do caminho de verdade, contra o banco falso dos testes.
+- Os ids vão como marcadores, e a foto não vai.
+- As três chamadas: a foto da nota, o papel da ECR 06 com o `extracao`, e a `registrar_entrega` com uma ECR de cada
+  resposta.
+
+**O RAMO 1 VAI AO AR SÓ DEPOIS DE TRÊS COISAS**, nesta ordem: a medida do Banco, a conferência do CTO, e o contrato do
+Banco na produção.
+
+**O banco não mudou.**
+
+## Decisão 122 — no ar: o perfil sem a Ordem de Compra vê o aviso e não entra · 15/10/2026
+
+**POR QUÊ (CTO-D816):** o CTO conferiu o CI, o código e as 3 fotos do `b4128df`, e mandou publicar depois de um retoque
+de comentário, sem outra conferência. A publicação não espera a marca do Banco: o `42703` cobre a ordem.
+
+**O QUE MUDOU:**
+- **o retoque:** o comentário da `SemAcessoPage` voltou para cima dela (`14fe8a4`, CI verde);
+- **a junção:** `d814-perfil-sem-oc` (`14fe8a4`) no `main` em `b3e7722`, sem conflito;
+- **a bateria:** 1119 testes, tipos e lint limpos;
+- **o desfazer**, anotado antes: `f47f687c`, com 100% do tráfego;
+- **publicado pelo PowerShell às 21h18 de 15/10:** `9178a00a-4913-4a4d-8f34-f7b707af2d11`, versão
+  `20261016001818-b3e7722`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` servido é o novo;
+- os dois pedaços que mudaram têm a mesma impressão SHA-256 do pacote gerado;
+- no servido está a frase "Seu acesso não inclui a Ordem de Compra.";
+- ninguém marcado foi usado para medir: a marca é do Banco, e até ela chegar todos entram como antes.
+
+**A parte C e a parte B não foram junto.**
+
+**O banco não mudou por esta casa.**
+
+## Decisão 123 — a parte C, segundo ramo: os papéis do fornecedor na qualificação, no ramo `dbdeb58` · 15/10/2026
+
+**POR QUÊ (CTO-D815 §4.3 e §3):** o ramo 2 vinha contra o banco falso, com os nomes do Banco (`0e1b3a9`); e o CTO
+pediu a medida do "Registrar entrega" do escritório, sem construir.
+
+**O QUE FOI:** o ramo `d815-c2-registro-na-qualificacao`, em `dbdeb58`, sobre o ramo 1. **Não está publicado.**
+- a qualificação ganhou o botão "Papéis": por ECR, o que a revisão pede ao lado do que está guardado, com a vigência,
+  o aviso de 30 dias, o vencido, as correções e o "Abrir";
+- o "Anexar papel" na qualificação (sem o lote) e na OC (os três alcances), com a leitura da IA;
+- o "Corrigir" do alcance, com o motivo;
+- a marca "a cada entrega" na qualificação e no catálogo de ECRs;
+- o papel anexado na OC vai pela origem `qualificacao-fornecedor`: é uma escolha minha, que mandei ao CTO conferir;
+- a leitura dos registros fica fora da carga da qualificação: um registro que falha não trava a OC.
+
+**A PROVA:** CI verde; 1182 testes (39 novos); 28 sabotagens vermelhas; 7 fotos em `docs/Capturas/2026-10-15_D815_C2/`.
+
+**O TAMANHO:** +1183 em `src`, sem os testes. **A perícia vem antes da produção** (D812 §3).
+
+**A D815 §3, medida só lendo:** a janela do escritório grava a entrega sem `registros`, e o banco aceita. Recomendei
+que ela pergunte, como o carimbo, sem mudar o banco (cerca de 200 a 250 linhas, num ramo 3). **Não construí.**
+
+**O banco não mudou.**
+
+## Decisão 124 — os três consertos da D818, nos dois ramos da parte C · 15/10/2026
+
+**POR QUÊ (CTO-D818 §2):** o CTO conferiu o ramo 2 e pediu três consertos antes da perícia. O Banco mediu a gravação
+do ramo 1 no ensaio: 11 de 11.
+
+**O QUE MUDOU** (nada publicado):
+- **vale só o último arquivo escolhido** (`useUltimaEscolha`): no papel do carimbo e na foto da nota (ramo 1, `39c594e`)
+  e no "Anexar papel" (ramo 2). A foto da nota, que já está no ar, vai junto com o ramo 1;
+- **o aviso da ECR segue as regras do banco, na ordem:** "Não aplicável" não pede; a marca fala pela caixa dela; o lote
+  pede mesmo com um "vale até" valendo; o vencido; o nada guardado;
+- **"Tentar de novo"** quando a leitura dos papéis falha.
+
+**OS COMMITS:**
+- o ramo 2 recebeu o ramo 1 por junção (`6ab6b25`), não por rebase;
+- os consertos do ramo 2 estão em `4d949e2`.
+
+**A PROVA:** 1192 testes (10 novos); 12 sabotagens dos consertos, todas vermelhas; as 28 do ramo 2, de novo vermelhas.
+
+**O TAMANHO:** os dois ramos sobre o `main` dão +1865 e −19 em `src`.
+
+**A pasta do papel anexado na OC fica a da qualificação** (D818 §3).
+
+**A pergunta do escritório é do Pedro** (D818 §4), e o CTO leva a ele.
+
+**A perícia vem depois da conferência dos consertos.** É uma só para a parte C, e quem dispara é o Pedro.
+
+**O banco não mudou.**
+
+## Decisão 125 — os ramos da parte C congelados; a data do lançamento da qualificação, num ramo próprio · 15/10/2026
+
+**POR QUÊ (CTO-D821 e D819):** o CTO aceitou os três consertos e pediu mais um ajuste antes da perícia. Na D819, ele
+mediu que a tela não mostra quando a qualificação foi lançada no sistema.
+
+**A PARTE C:**
+- **o ajuste:** no "Anexar papel", a escolha vazia no meio da leitura deixava o "Lendo" preso. Agora não deixa
+  (`87f991b`, com teste e sabotagem vermelha, CI verde);
+- **congelados até a triagem da perícia**, salvo carta do CTO: o ramo 1 em `39c594e` e o ramo 2 em `87f991b`;
+- **a foto da nota vai com o ramo 1**, e não sozinha.
+
+**A D819:** o ramo `d819-qualificacao-lancada` (`566bae5`), a partir do `main`, **sem publicar**.
+- **O que a tela mostra:** "lançada no sistema em DD/MM/AAAA", na linha aberta e no Histórico, quando o lançamento
+  (dia de São Paulo) é depois da data da qualificação. Não trava nada.
+- **O PDF dos qualificados não muda.**
+- **A medida, só lendo, na produção:**
+  - a vista já tem o `criado_em`, com leitura para quem entra;
+  - as 21 qualificações foram lançadas em 28/09, depois da data delas.
+- **O retoque das fotos:** no celular, a linha aberta cabe na largura que se vê.
+- **A prova:** 7 testes novos; 7 sabotagens vermelhas; +33 −3 em `src`.
+- **A junção com o ramo 2 da parte C** dá um conflito, só na regra `.rolagem` do CSS, e o conserto é simples.
+
+**O banco não mudou.**
+
+## Decisão 126 — no ar: a data em que a qualificação foi lançada · 15/10/2026
+
+**POR QUÊ (CTO-D822):** o CTO conferiu o código, a medida na produção e as quatro fotos do `566bae5`, e mandou
+publicar pela emenda 3.
+
+**O QUE MUDOU:**
+- **a junção:** `d819-qualificacao-lancada` (`566bae5`) no `main` em `5a07ec2`, sem conflito;
+- **a bateria:** 1126 testes, com tipos e lint limpos; o CI verde;
+- **o desfazer**, anotado antes: `9178a00a`, que tinha 100% do tráfego;
+- **publicado pelo PowerShell às 22h49 de 15/10:** `2e116146-9349-4e08-8864-356fc01aa116`, versão
+  `20261016014924-5a07ec2`.
+
+**A MEDIDA POR FORA:**
+- o `versao.txt` servido é o novo;
+- o código e o estilo que mudaram têm a mesma impressão SHA-256 do pacote;
+- a frase "lançada no sistema em" está no código servido.
+
+**A parte C e a parte B não foram junto.**
+
+**O banco não mudou por esta casa.**
+
+## Decisão 127 — a parte C refeita: o papel do fornecedor entra pelo escritório; o plano das telas · 16/10/2026
+
+**POR QUÊ (CTO-D840):** a palavra do Pedro em 16/10: "esse papel seria ideal eles enviarem o digital. E não na hora
+da entrega." Depois do desenho do CTO, ele respondeu "ok, pode ser". O Banco mandou o plano dele, e o CTO aprovou
+(D842).
+
+**O QUE FOI:** só o plano, sem código, numa carta ao CTO com cópia ao Banco.
+- **o carimbo** deixa de perguntar o papel e ganha o botão opcional "Anexar papel do fornecedor". Nas ECRs "a cada
+  entrega", fica "deste lote", sem escolha;
+- **o "Entregue" do escritório** não muda;
+- **na OC,** o lote sai das ECRs com a marca;
+- **na qualificação,** o papel de lote diz a entrega que cobre;
+- **a lista "Entregas sem papel do fornecedor"** fica em Recebimentos, com "Anexar papel" e "Não se aplica a esta
+  entrega";
+- **o auditor** vê a cobertura na linha da última entrega da OC e numa coluna nova do PDF das avaliações;
+- **o tamanho:** perto de −150 e +610 em `src`. Os dois ramos ficam perto de +2300, então a perícia vem antes da
+  produção;
+- **ao Banco, quatro pedidos:**
+  - a cobertura de muitas entregas numa chamada;
+  - a marca "a cada entrega" no cartão e na lista;
+  - a entrega que o papel cobre, na leitura;
+  - o arquivo pela `qualificacao-fornecedor`;
+- **ao CTO, quatro escolhas:**
+  - onde a lista mora;
+  - o número no menu;
+  - a coluna no PDF;
+  - um ramo novo, `d840-parte-c-refeita`, a partir do `87f991b`, com o `main` junto.
+
+**A D837:** o papel `encarregado` foi aposentado pelo Pedro. Nada muda nas telas, e o item 39.3 fecha.
+
+**O banco não mudou.**
