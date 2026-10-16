@@ -229,9 +229,17 @@ describe('o arquivo e a leitura', () => {
       arquivo_base64: 'JVBERg==', nome_arquivo: 'licenca.pdf', mime: 'application/pdf',
       origem: 'qualificacao-fornecedor', origem_id: 'forn-1', fornecedor_id: 'forn-1', extracao: { alcance: 'vale_ate' },
     });
-    // O item distingue a licença renovada com o mesmo nome: a ECR com dois dígitos, a hora e o nome.
-    expect(String(c.corpo['origem_item'])).toMatch(/^registro-ecr-06-\d{4}-\d{2}-\d{2}T.+-licenca\.pdf$/);
+    // O item distingue a licença renovada com o mesmo nome pela ECR, com dois dígitos, e pela hora; o nome do arquivo não entra.
+    expect(String(c.corpo['origem_item'])).toMatch(/^registro-ecr-06-\d{4}-\d{2}-\d{2}T[\d:.]+Z$/);
     expect(c.corpo).not.toHaveProperty('intervencao_id');
+  });
+
+  it('o nome do arquivo, que pode trazer dado de pessoa, não vai ao origem_item (perícia de 16/10, achado 4)', async () => {
+    funcao.responde = { status: 200, corpo: { desfecho: 'arquivado', documento: { id: 'doc-9' } } };
+    const MARCA = 'MARCA-DE-PESSOA-TESTE';
+    await arquivarPapelDoFornecedor({ base64: 'x', mime: 'image/jpeg' }, `licenca ${MARCA}.jpg`, 6, { fornecedorId: 'forn-1' });
+    await arquivarPapelDoFornecedor({ base64: 'x', mime: 'image/jpeg' }, `gca-${MARCA}.jpg`, 2, { ocId: 'oc-1', fornecedorId: 'forn-1', avaliacaoId: 31 });
+    for (const c of funcao.chamadas) expect(String(c.corpo['origem_item'])).not.toContain(MARCA);
   });
 
   it('pela OC, o envelope é a OC, e a empresa é a da OC; sem leitura, sem `extracao`', async () => {

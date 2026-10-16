@@ -16,6 +16,7 @@ vi.mock('../../src/services/supabase/client', () => ({
 }));
 const banco = vi.hoisted(() => ({}) as {
   carregar: Mock; preparar: Mock; ler: Mock; arquivar: Mock; guardar: Mock; corrigir: Mock; avaliacoes: Mock;
+  pendencias: Mock;
 });
 vi.mock('../../src/services/supabase/registrosDoFornecedor', () => ({
   carregarRegistrosDoFornecedor: () => banco.carregar(),
@@ -43,6 +44,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useQualificacaoStore } from '../../src/stores/useQualificacaoStore';
 import { useRegistrosStore } from '../../src/stores/useRegistrosStore';
+import { useEntregasSemPapelStore } from '../../src/stores/useEntregasSemPapelStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { RegistroGuardado, RegistrosDoFornecedor } from '../../src/domain/registrosGuardados';
 import type { Data, Fornecedor } from '../../src/domain/types';
@@ -132,6 +134,9 @@ beforeEach(() => {
   useUiStore.setState({ toasts: [] });
   useQualificacaoStore.getState().definir(qualificacoes());
   useRegistrosStore.setState({ dados: null, erro: '', carregando: false });
+  // A lista das entregas sem papel e o número do menu (perícia de 16/10, achado 7).
+  banco.pendencias = vi.fn(async () => {});
+  useEntregasSemPapelStore.setState({ carregar: banco.pendencias });
 });
 
 async function abrirPapeis() {
@@ -276,9 +281,10 @@ describe('"Anexar papel" na qualificação', () => {
     expect(banco.guardar).toHaveBeenCalledWith({
       documentoId: 'doc-novo', ecrId: 12, alcance: 'vale_ate', validoAte: '2027-06-30', onde: { fornecedorId: 'a1' },
     });
-    // Guardou: a janela fecha e a lista lê de novo.
+    // Guardou: a janela fecha e a lista lê de novo; e as entregas sem papel também (achado 7).
     await waitFor(() => expect(document.querySelector('[data-dialogo-anexar]')).toBeNull());
     expect(banco.carregar).toHaveBeenCalledTimes(2);
+    expect(banco.pendencias).toHaveBeenCalledTimes(1);
   });
 
   it('a leitura diz "deste lote": ninguém escolhe pelo comprador, e sem escolha nada sobe', async () => {
@@ -405,6 +411,8 @@ describe('"Corrigir" o alcance', () => {
     await waitFor(() => expect(banco.corrigir).toHaveBeenCalledWith(2, 'produto', '', 'é a FISPQ (teste)'));
     await waitFor(() => expect(document.querySelector('[data-dialogo-corrigir]')).toBeNull());
     expect(banco.carregar).toHaveBeenCalledTimes(2);
+    // A correção muda a cobertura: as entregas sem papel leem de novo (achado 7).
+    expect(banco.pendencias).toHaveBeenCalledTimes(1);
   });
 
   it('o papel da qualificação não vira lote: a escolha nem aparece', async () => {

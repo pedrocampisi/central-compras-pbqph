@@ -125,8 +125,9 @@ const nn = (ecrId: number) => String(ecrId).padStart(2, '0');
 
 /**
  * Guarda o arquivo pela origem `qualificacao-fornecedor`, com a leitura em
- * `extracao`; devolve o id do documento. O item leva a hora e o nome do
- * arquivo: a licença renovada, com o mesmo nome, é outro papel.
+ * `extracao`; devolve o id do documento. O item leva a ECR e a hora: a licença
+ * renovada, com o mesmo nome, é outro papel. O nome do arquivo não entra nele,
+ * porque pode trazer dado de pessoa (perícia de 16/10, achado 4).
  */
 export async function arquivarPapelDoFornecedor(
   papel: { base64: string; mime: string },
@@ -143,7 +144,7 @@ export async function arquivarPapelDoFornecedor(
       mime: papel.mime,
       origem: 'qualificacao-fornecedor',
       origem_id: 'ocId' in onde ? onde.ocId : onde.fornecedorId,
-      origem_item: `registro-ecr-${nn(ecrId)}-${new Date().toISOString()}-${nomeArquivo}`,
+      origem_item: `registro-ecr-${nn(ecrId)}-${new Date().toISOString()}`,
       fornecedor_id: onde.fornecedorId,
       ...(extracao ? { extracao } : {}),
     },

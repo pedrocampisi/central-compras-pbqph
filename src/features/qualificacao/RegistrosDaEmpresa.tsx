@@ -28,6 +28,7 @@ import { lerAvaliacoesDeEntrega } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
 import { useDataStore } from '../../stores/useDataStore';
 import { useRegistrosStore } from '../../stores/useRegistrosStore';
+import { useEntregasSemPapelStore } from '../../stores/useEntregasSemPapelStore';
 import { AnexarPapelDialogo, CorrigirAlcanceDialogo } from './DialogosDoRegistro';
 import styles from './RegistrosDaEmpresa.module.css';
 
@@ -77,6 +78,11 @@ export function RegistrosDaEmpresa({
   const hoje = useHojeEmSaoPaulo();
   const [anexando, setAnexando] = useState<number | null>(null);
   const [corrigindo, setCorrigindo] = useState<RegistroGuardado | null>(null);
+  /** O papel guardado ou corrigido muda a cobertura: os papéis e as entregas sem papel leem de novo (perícia de 16/10, achado 7). */
+  const depoisDoPapel = () => {
+    void carregar(true);
+    void useEntregasSemPapelStore.getState().carregar();
+  };
   const [links, setLinks] = useState<Map<string, string>>(new Map());
   const ordens = useDataStore((s) => s.data?.ordens_compra);
   /** O dia de cada entrega que um papel de lote nomeia (D840 §2.4); lido só quando há um. */
@@ -202,7 +208,7 @@ export function RegistrosDaEmpresa({
           ecrs={[{ id: anexando, rotulo: rotuloDaEcr(ecrs, anexando), aCadaEntrega: !!dados?.marcas.some((m) => m.ecrId === anexando) }]}
           onde={() => ({ fornecedorId: filial.id })}
           aoFechar={() => setAnexando(null)}
-          aoGuardar={() => void carregar(true)}
+          aoGuardar={depoisDoPapel}
         />
       )}
       {corrigindo && (
@@ -211,7 +217,7 @@ export function RegistrosDaEmpresa({
           ecr={`${nome} · ${rotuloDaEcr(ecrs, corrigindo.ecrId)}`}
           hoje={hoje}
           aoFechar={() => setCorrigindo(null)}
-          aoCorrigir={() => void carregar(true)}
+          aoCorrigir={depoisDoPapel}
         />
       )}
     </div>

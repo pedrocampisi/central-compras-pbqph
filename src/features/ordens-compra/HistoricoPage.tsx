@@ -51,6 +51,7 @@ import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObr
 import { ecrsNaOrdemDosItens } from '../../domain/qualidadeNaOc';
 import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
 import { useRegistrosStore } from '../../stores/useRegistrosStore';
+import { useEntregasSemPapelStore } from '../../stores/useEntregasSemPapelStore';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -107,6 +108,8 @@ export function HistoricoPage() {
    */
   const [cobertura, setCobertura] = useState<Map<number, CoberturaDaEntrega[]>>(new Map());
   const [linksDosPapeis, setLinksDosPapeis] = useState<Map<string, string>>(new Map());
+  /** O papel guardado aqui muda a cobertura sem mudar os dados: a leitura volta por esta vez (perícia de 16/10, achado 7). */
+  const [vezDaCobertura, setVezDaCobertura] = useState(0);
   useEffect(() => {
     let vivo = true;
     void (async () => {
@@ -124,7 +127,7 @@ export function HistoricoPage() {
     return () => {
       vivo = false;
     };
-  }, [data]);
+  }, [data, vezDaCobertura]);
   useEffect(() => {
     let vivo = true;
     void (async () => {
@@ -634,7 +637,12 @@ export function HistoricoPage() {
           // As posições ficam com o banco: por padrão, os itens desta OC com a ECR.
           onde={() => ({ ocId: anexando.id, fornecedorId: anexando.fornecedor_id })}
           aoFechar={() => setAnexando(null)}
-          aoGuardar={() => void useRegistrosStore.getState().carregar(true)}
+          aoGuardar={() => {
+            // O papel pode resolver a cobrança: os papéis, a cobertura desta lista e as entregas sem papel leem de novo.
+            void useRegistrosStore.getState().carregar(true);
+            setVezDaCobertura((v) => v + 1);
+            void useEntregasSemPapelStore.getState().carregar();
+          }}
         />
       )}
     </div>

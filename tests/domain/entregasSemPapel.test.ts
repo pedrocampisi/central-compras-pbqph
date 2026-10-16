@@ -16,9 +16,17 @@ vi.mock('../../src/services/supabase/client', () => ({
   supabase: {},
   core: () => ({}),
   compras: () => ({
-    rpc: async (nome: string, args: Record<string, unknown>) => {
+    // Como a API: a lista e a cobertura vêm por páginas, com a contagem; o "não se aplica" responde direto.
+    rpc: (nome: string, args: Record<string, unknown>) => {
       banco.chamadas.push({ nome, args });
-      return banco.resposta;
+      const r = banco.resposta;
+      const q = {
+        order: () => q,
+        range: () => q,
+        then: (ok: (v: unknown) => unknown, falha?: (e: unknown) => unknown) =>
+          Promise.resolve({ ...r, count: Array.isArray(r.data) ? r.data.length : 0 }).then(ok, falha),
+      };
+      return q;
     },
   }),
 }));

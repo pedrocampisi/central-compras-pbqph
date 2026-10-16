@@ -9,9 +9,14 @@
  * O papel anexado pela lista entra pela guardar_registro_do_fornecedor, com o
  * `avaliacao_id` (`registrosDoFornecedor.ts`). A obra da máscara vai na busca.
  * A recusa do banco já vem em frase de gente, e sobe como veio.
+ *
+ * As duas leituras vêm por páginas, com a contagem e numa ordem fixa: a API
+ * corta em 1.000 linhas sem erro, e a lista pela metade acusa, nunca passa
+ * por inteira (perícia de 16/10, achado 5).
  */
 
 import { compras } from './client';
+import { todasAsLinhas } from './dados';
 import { linhasDoOQuePede, posicoesDaLinha } from './recebimento';
 import { obraDaMascara } from '../storage/umaObra';
 import { ALCANCES, type Alcance } from '../../domain/registroDoFornecedor';
@@ -21,6 +26,15 @@ const num = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 const txt = (v: unknown) => (v === null || v === undefined ? '' : String(v));
 const dia = (v: unknown) => txt(v).slice(0, 10);
 const SITUACOES: readonly SituacaoDaCobertura[] = ['nao_exige', 'coberta', 'nao_se_aplica', 'sem_papel'];
+
+/** Uma página de uma das duas leituras: a ordem das funções do banco, com o desempate até a ECR. */
+const pagina = (funcao: string, obra: string | null) => (de: number, ate: number) =>
+  compras()
+    .rpc(funcao, { p_obra: obra }, { count: 'exact' })
+    .order('recebido_em')
+    .order('avaliacao_id')
+    .order('ecr_id')
+    .range(de, ate);
 
 /** Uma linha da `entregas_sem_papel` → a linha da tela. */
 export function entregaDaLinha(l: Record<string, unknown>): EntregaSemPapel {
@@ -47,7 +61,7 @@ export function entregaDaLinha(l: Record<string, unknown>): EntregaSemPapel {
 
 /** A lista das entregas sem papel; com a máscara, só as da obra dela. Falha sobe: quem chama decide. */
 export async function lerEntregasSemPapel(obra: string | null = obraDaMascara()): Promise<EntregaSemPapel[]> {
-  const { data, error } = await compras().rpc('entregas_sem_papel', { p_obra: obra });
+  const { data, error } = await todasAsLinhas('entregas sem papel', pagina('entregas_sem_papel', obra));
   if (error) throw new Error(`Falha ao ler as entregas sem papel: ${error.message}`);
   return ((data ?? []) as Record<string, unknown>[]).map(entregaDaLinha).filter((l) => l.avaliacaoId > 0 && l.ecrId > 0);
 }
@@ -80,7 +94,7 @@ export function coberturaDaLinha(l: Record<string, unknown>): CoberturaDaEntrega
 
 /** A cobertura de todas as entregas, numa chamada só; com a máscara, só as da obra dela. */
 export async function lerCoberturaDasEntregas(obra: string | null = obraDaMascara()): Promise<CoberturaDaEntrega[]> {
-  const { data, error } = await compras().rpc('cobertura_das_entregas', { p_obra: obra });
+  const { data, error } = await todasAsLinhas('cobertura das entregas', pagina('cobertura_das_entregas', obra));
   if (error) throw new Error(`Falha ao ler o papel das entregas: ${error.message}`);
   return ((data ?? []) as Record<string, unknown>[]).map(coberturaDaLinha).filter((c) => c.avaliacaoId > 0 && c.ecrId > 0);
 }
