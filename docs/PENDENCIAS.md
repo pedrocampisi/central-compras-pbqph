@@ -238,7 +238,8 @@ precisa da Ordem de Compra.
    pelo `main` `7460451` (o ramo `d805b-ia-monta-a-oc` em `2e82f99`, decisão 136), com a medida por fora; o desfazer é
    `109f5e71`. O Pedro mandou tirar o ensaio do caminho (CTO-D865): o teste dele passa a ser na produção. A 5174
    caiu, e o `launch.json` voltou ao do repositório.
-   - **falta:** a conferência do CTO por fora; depois, a versão 24 da `extrair-itens` pelo Banco (com a carta do
+   - ~~a conferência do CTO por fora~~ (D866, 13h4x: só a parte B mudou em `src`, +463 e −11);
+   - **falta:** a versão 24 da `extrair-itens` pelo Banco (com a carta do
      CTO); com os dois no ar, o teste do Pedro com um orçamento real;
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
