@@ -197,6 +197,22 @@ precisa da Ordem de Compra.
 
 ---
 
+### 43. O cadastro novo de fornecedor pela regra única do Banco (D877b): plano mandado, esperando a aprovação
+
+*Aberta em 17/10/2026, na decisão 137.* O MCP da Central vai cadastrar prestador, e o Pedro quer que a tela e a IA
+cadastrem pelo mesmo caminho. O plano foi ao CTO, com cópia ao Banco e à Central: só o cadastro novo da gaveta do
+fornecedor troca o `upsert` (`dados.ts:337`) pela função do Banco; a edição fica. A função vai à produção antes da tela,
+e o `insert` direto só fecha quando o Banco medir que nada entrou por fora. São cerca de 40 linhas de produto e 80 de
+teste, e vai perito.
+
+**Falta, nesta ordem:**
+1. a aprovação do CTO, junto com o plano do Banco (o nome e o contrato da função);
+2. a função na produção;
+3. o ramo, o perito e a publicação;
+4. o teste na produção.
+
+---
+
 ### 40. A D805: a política e o registro por ECR no PDF, a tela da qualificação, e a IA que monta a OC
 
 *Aberta em 15/10/2026, na decisão 110.*

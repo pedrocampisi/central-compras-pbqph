@@ -4392,3 +4392,24 @@ produção, depois do ar. O CTO já tinha conferido o ramo (D809) e o ensaio (D8
 
 **Falta:** a conferência do CTO; a versão 24 pelo Banco, depois dela; o teste do Pedro. **Nada foi gravado. O banco
 não mudou.**
+
+---
+
+## Decisão 137 — o plano do cadastro à mão, para o MCP cadastrar prestador · 17/10/2026
+
+**POR QUÊ (CTO-D877b, palavra do Pedro na janela do CTO):** "Prefiro pelo MCP: quero a IA de fora lendo as pastas e
+cadastrando o prestador", e "não é para o MCP deixar a IA mexer em nada que o usuario não conseguiria manualmente". A
+Central mediu que o cadastro à mão é desta casa, e a tela e a IA têm de cadastrar pelo mesmo caminho.
+
+**O QUE FOI (só o plano, sem código):**
+- **a medida, só lendo:** a OC não tem tela de prestador desde 27/09 (D585). A gaveta do fornecedor é de material, sem
+  Pix, sem banco e sem função, e a OC nem lê essas colunas. Gravam `admin`, `engenharia` e `financeiro`, na tela e na
+  regra do banco (`fornecedores_escrita`). A tela confere só a razão social. O banco recusa o documento repetido (pelo
+  índice único, com a frase crua) e o CNPJ de empresa desconhecida (pela trava, com a frase traduzida). No cadastro
+  novo, a empresa-mãe aprende numa escrita à parte;
+- **o plano:** só o cadastro novo passa para a função do Banco, e a edição fica. A função vai à produção antes da tela,
+  e o `insert` direto só fecha depois da medida pelo `core.auditar`. A tela velha em cache dura até o vigia da versão
+  recarregar, e, depois do fecho, falha sem gravar. Para quem usa, nada muda. São cerca de 40 linhas de produto e 80 de
+  teste, e vai perito.
+
+**Espera a aprovação do CTO, junto com o plano do Banco.** **Nada foi gravado. O banco não mudou.**
