@@ -1,6 +1,6 @@
 {
   "revisao_de": "00",
-  "descricao": "O procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.",
+  "descricao": "O procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado, a tratativa no Dashboard e o papel do fornecedor que a ECR pede (o registro do fornecedor) entram no texto.",
   "mudancas": [
     {
       "id": "M01",
@@ -60,7 +60,7 @@
       "id": "M10",
       "item": "Fluxo, passo \"5 · Recebimento\"",
       "ancora": "fluxo.s5",
-      "motivo": "O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799)."
+      "motivo": "O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799). E o papel do fornecedor que a ECR pede entra pelo escritório (a parte C, D840 e D857)."
     },
     {
       "id": "M11",
@@ -78,7 +78,7 @@
       "id": "M13",
       "item": "1, quadro \"Administrativo / Compras\"",
       "ancora": "objetivo.q1.i2",
-      "motivo": "As telas de quem compra."
+      "motivo": "As telas de quem compra. As entregas sem papel do fornecedor são de quem emite as OCs (a parte C, D840 e D857)."
     },
     {
       "id": "M14",
@@ -90,7 +90,7 @@
       "id": "M15",
       "item": "1, quadro novo \"Encarregado de obra\"",
       "ancora": "objetivo.q1.i4",
-      "motivo": "O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no \"Só uma parte\" (D797). O papel não estava no PS.02."
+      "motivo": "O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no \"Só uma parte\" (D797). O papel não estava no PS.02. O botão do papel do fornecedor é opcional (a parte C, D840 e D857)."
     },
     {
       "id": "M16",
@@ -165,6 +165,18 @@
       "motivo": "O \"comunicar o responsável\" virou a tratativa aberta no Dashboard, com a ciência dele."
     },
     {
+      "id": "M35",
+      "item": "4, parágrafo novo: o registro do fornecedor",
+      "ancora": "avaliacao.p1",
+      "motivo": "A parte C (D840, no ar desde a D852) pôs o papel do fornecedor no sistema, e o PS.02 não dizia nada dele. É o ponto da avaliação no recebimento (SiAC 8.4.1.2) que o auditor mais olha (D857)."
+    },
+    {
+      "id": "M36",
+      "item": "4, parágrafo novo: o alcance do papel e o PDF das avaliações",
+      "ancora": "avaliacao.p2",
+      "motivo": "Como o sistema decide se uma entrega tem o papel (a cobertura do Banco, D840), e onde o auditor lê isso."
+    },
+    {
       "id": "M28",
       "item": "6, quadro \"FO 8.4.1.1\"",
       "ancora": "registros.q1.i1",
@@ -195,6 +207,12 @@
       "motivo": "Onde a avaliação fica no sistema. O texto de antes fica, para o que é avaliado fora dele."
     },
     {
+      "id": "M37",
+      "item": "6, quadro novo \"Registro do fornecedor\"",
+      "ancora": "registros.q1.i6",
+      "motivo": "O papel do fornecedor passou a ser um registro do sistema (a parte C, D840 e D857)."
+    },
+    {
       "id": "M33",
       "item": "7, o \"?\" do item",
       "ancora": "revisoes",
@@ -204,7 +222,7 @@
       "id": "M34",
       "item": "7, o quadro \"Conteúdo preparado para a próxima revisão formal\"",
       "ancora": "revisoes.a1",
-      "motivo": "O quadro descrevia a migração para o HTML, que a página já é (D732 §4)."
+      "motivo": "O quadro descrevia a migração para o HTML, que a página já é (D732 §4). O papel do fornecedor entrou na D857."
     }
   ]
 }

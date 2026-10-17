@@ -40,10 +40,10 @@ describe('o rascunho da Rev. 01 na forma do Banco (D739 §4: passa no verificado
     expect(foraDaForma(rev00())).toBeNull();
   });
 
-  it('o rascunho passa: 61 âncoras, as 11 do documento lá, nenhuma repetida', () => {
+  it('o rascunho passa: 64 âncoras, as 11 do documento lá, nenhuma repetida', () => {
     const doc = rascunho();
     expect(foraDaForma(doc)).toBeNull();
-    expect(ancorasDoDocumento(doc)).toHaveLength(61);
+    expect(ancorasDoDocumento(doc)).toHaveLength(64);
   });
 
   it('o verificador reprova: âncora do documento sumida, tom errado, célula a mais, âncora repetida, destino falso', () => {
@@ -130,6 +130,19 @@ describe('o que mudou, por âncora (D739 §4.1)', () => {
     const { mudaram } = oQueMudou(vigente(), proposto());
     expect(mudaram).toContain('objetivo.q1.i4');
     expect(mudaram).toContain('qualificacao.p3');
+  });
+
+  it('o papel do fornecedor entra marcado, com as palavras da tela (CTO-D857)', () => {
+    const { mudaram } = oQueMudou(vigente(), proposto());
+    for (const a of ['avaliacao.p1', 'avaliacao.p2', 'registros.q1.i6', 'fluxo.s5', 'objetivo.q1.i2', 'objetivo.q1.i4']) {
+      expect(mudaram).toContain(a);
+    }
+    const texto = JSON.stringify(rascunho());
+    for (const f of ['Entregas sem papel do fornecedor', 'Não se aplica a esta entrega', 'Registro do fornecedor',
+      'PDF das avaliações', 'deste lote', 'vale até', 'vale para o produto', 'a 01, a 02 e a 17']) {
+      expect(texto).toContain(f);
+    }
+    expect(mudancas().descricao).toMatch(/o papel do fornecedor/);
   });
 
   it('a vigente contra ela mesma: nada mudou', () => {

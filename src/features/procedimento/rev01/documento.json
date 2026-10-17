@@ -205,7 +205,7 @@
           "rotulo": "5 · Recebimento",
           "texto": [
             {
-              "texto": "Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado.",
+              "texto": "Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado; o papel do fornecedor que a ECR pede, o escritório anexa, em Recebimentos.",
               "negrito": false
             }
           ]
@@ -265,7 +265,7 @@
               "titulo": "Administrativo / Compras",
               "texto": [
                 {
-                  "texto": "Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e resolve o que chegou sem pedido, na tela Recebimentos.",
+                  "texto": "Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e, na tela Recebimentos, resolve o que chegou sem pedido e as entregas sem papel do fornecedor.",
                   "negrito": false
                 }
               ]
@@ -285,7 +285,7 @@
               "titulo": "Encarregado de obra",
               "texto": [
                 {
-                  "texto": "Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere).",
+                  "texto": "Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere). Se o papel do fornecedor que a ECR pede veio com o caminhão, ele pode anexar no app; se não veio, não precisa fazer nada.",
                   "negrito": false
                 }
               ]
@@ -682,6 +682,84 @@
           ]
         },
         {
+          "tipo": "paragrafo",
+          "ancora": "avaliacao.p1",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "O registro do fornecedor:",
+              "negrito": true
+            },
+            {
+              "texto": " a ECR diz, na seção \"Registro do fornecedor\" da revisão vigente na Data da OC, o papel que o fornecedor tem de mandar; quando ela diz \"Não aplicável\", nenhum papel é pedido. O papel chega ao escritório, e quem emite as OCs o anexa: em ",
+              "negrito": false
+            },
+            {
+              "texto": "Recebimentos",
+              "negrito": true
+            },
+            {
+              "texto": ", na lista \"Entregas sem papel do fornecedor\"; pela OC, no ",
+              "negrito": false
+            },
+            {
+              "texto": "Histórico",
+              "negrito": true
+            },
+            {
+              "texto": "; ou pela empresa, na tela ",
+              "negrito": false
+            },
+            {
+              "texto": "Qualificação",
+              "negrito": true
+            },
+            {
+              "texto": ". A IA lê o papel e sugere o alcance, e quem anexa confere. Quando o papel não cabe numa entrega, quem emite as OCs marca \"Não se aplica a esta entrega\", com o motivo: a marca não se desfaz e guarda quem marcou e quando. A entrega fica na lista até o papel ser anexado ou a marca ser feita. O encarregado de obra pode anexar o papel pelo app do encarregado, se ele veio com o caminhão; se não veio, não precisa fazer nada: o escritório cuida.",
+              "negrito": false
+            }
+          ]
+        },
+        {
+          "tipo": "paragrafo",
+          "ancora": "avaliacao.p2",
+          "miudo": false,
+          "texto": [
+            {
+              "texto": "O alcance do papel:",
+              "negrito": true
+            },
+            {
+              "texto": " cada papel guardado diz até onde vale: ",
+              "negrito": false
+            },
+            {
+              "texto": "deste lote",
+              "negrito": true
+            },
+            {
+              "texto": " (as entregas da OC em que chegou), ",
+              "negrito": false
+            },
+            {
+              "texto": "vale até",
+              "negrito": true
+            },
+            {
+              "texto": " uma data (as entregas da mesma empresa recebidas até ela) ou ",
+              "negrito": false
+            },
+            {
+              "texto": "vale para o produto",
+              "negrito": true
+            },
+            {
+              "texto": ", sem prazo. Nas ECRs que pedem o papel a cada entrega (marcadas no Catálogo de ECRs; hoje, a 01, a 02 e a 17), só vale o papel da própria entrega. Quem emite as OCs pode corrigir o alcance depois, com o motivo, e a correção fica registrada. No \"PDF das avaliações\" do Histórico, a coluna \"Registro do fornecedor\" diz, para cada ECR da entrega, se o papel veio e com que alcance, se não se aplica (com o motivo) ou se falta; ela traz \"—\" quando nenhuma ECR da entrega pede papel.",
+              "negrito": false
+            }
+          ]
+        },
+        {
           "tipo": "aviso",
           "ancora": "avaliacao.a1",
           "tom": "info",
@@ -850,6 +928,16 @@
                   "negrito": false
                 }
               ]
+            },
+            {
+              "ancora": "registros.q1.i6",
+              "titulo": "Registro do fornecedor",
+              "texto": [
+                {
+                  "texto": "O papel que a ECR pede, guardado por ECR e por empresa, com o alcance, quem conferiu e quando; as correções do alcance e as marcas de \"não se aplica\" ficam registradas. No sistema: na tela Qualificação, na empresa, e no Histórico, na linha de cada entrega; para o auditor, a coluna \"Registro do fornecedor\" do \"PDF das avaliações\".",
+                  "negrito": false
+                }
+              ]
             }
           ]
         }
@@ -883,7 +971,7 @@
               "negrito": true
             },
             {
-              "texto": " o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.",
+              "texto": " o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado, a tratativa no Dashboard e o papel do fornecedor que a ECR pede (o registro do fornecedor) entram no texto.",
               "negrito": false
             }
           ]
