@@ -197,19 +197,11 @@ precisa da Ordem de Compra.
 
 ---
 
-### 43. O cadastro novo de fornecedor pela regra única do Banco (D877b): plano mandado, esperando a aprovação
+### 43. ~~O cadastro novo de fornecedor pela regra única do Banco (D877b)~~ — fechada, não entra nesta volta
 
-*Aberta em 17/10/2026, na decisão 137.* O MCP da Central vai cadastrar prestador, e o Pedro quer que a tela e a IA
-cadastrem pelo mesmo caminho. O plano foi ao CTO, com cópia ao Banco e à Central: só o cadastro novo da gaveta do
-fornecedor troca o `upsert` (`dados.ts:337`) pela função do Banco; a edição fica. A função vai à produção antes da tela,
-e o `insert` direto só fecha quando o Banco medir que nada entrou por fora. São cerca de 40 linhas de produto e 80 de
-teste, e vai perito.
-
-**Falta, nesta ordem:**
-1. a aprovação do CTO, junto com o plano do Banco (o nome e o contrato da função);
-2. a função na produção;
-3. o ramo, o perito e a publicação;
-4. o teste na produção.
+*Aberta e fechada em 17/10/2026 (decisões 137 e 138).* A medida mostrou que nenhuma tela cadastra prestador com Pix.
+Por isso, pela CTO-D878, o "Novo prestador" nasce na Central, pela mesma função da IA. A gaveta do fornecedor de
+material fica como está. Passá-la para uma função é melhoria à parte, fora desta volta.
 
 ---
 

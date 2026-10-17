@@ -4413,3 +4413,15 @@ Central mediu que o cadastro à mão é desta casa, e a tela e a IA têm de cada
   teste, e vai perito.
 
 **Espera a aprovação do CTO, junto com o plano do Banco.** **Nada foi gravado. O banco não mudou.**
+
+---
+
+## Decisão 138 — o plano do cadastro à mão não entra nesta volta · 17/10/2026
+
+**POR QUÊ (CTO-D878):** a medida da decisão 137 mostrou que a gaveta da OC é de fornecedor de material, e o Banco
+confirmou que nenhuma tela cadastra prestador com Pix. Então o "Novo prestador" nasce na Central, pela mesma função da
+IA.
+
+**O QUE FICA:** a gaveta do fornecedor fica como está, com o `upsert` de `dados.ts:337`. Passá-la para uma função é
+melhoria à parte, e não entra nesta volta. Fecham a D877b e o meu plano (pendência 43). **Nada foi gravado. O banco não
+mudou.**
