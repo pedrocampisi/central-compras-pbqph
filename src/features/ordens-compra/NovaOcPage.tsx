@@ -85,6 +85,9 @@ function buildNewOc(
   defaultObraId: string,
   defaultCondicao: string,
 ): OrdemCompra {
+  // Uma leitura só do relógio: com duas, as horas podiam cair em milissegundos
+  // diferentes, e o título dizia "Editar OC" numa OC em branco (pendência 30).
+  const agora = nowIso();
   return {
     id: uid('oc'),
     numero: '',
@@ -105,8 +108,8 @@ function buildNewOc(
     outras_despesas: 0,
     desconto_material: 0,
     observacoes: '',
-    criado_em: nowIso(),
-    atualizado_em: nowIso(),
+    criado_em: agora,
+    atualizado_em: agora,
     pdf_gerado_em: '',
   };
 }
