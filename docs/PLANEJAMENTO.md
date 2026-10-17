@@ -4353,3 +4353,21 @@ do papel do fornecedor que a ECR pede. A parte C está no ar desde 16/10. Gravad
   PDF do rascunho em `docs/Capturas/2026-10-17_D857/`. A prova da página foi apagada depois.
 
 **Não publicado.** Espera a aprovação do CTO. **Nada foi gravado. O banco não mudou.**
+
+---
+
+## Decisão 135 — o rascunho da Rev. 01 com o papel do fornecedor, no ar em `109f5e71` · 17/10/2026
+
+**POR QUÊ (CTO-D857b):** o CTO conferiu as fotos, o texto do PDF e a tabela frase por frase, e aprovou, com o acréscimo
+do encarregado (M15). Mandou publicar.
+
+**O QUE FOI:**
+- **a junção:** o `d857-rev01-com-a-parte-c` (`a937762`) no `main` em `9fac9f5`; a bateria no `main` juntado, 1.260
+  testes, `tsc` e `eslint` limpos; o CI verde;
+- **a publicação:** pelo PowerShell, em `109f5e71-5a58-4bb8-a970-a66c3b26ef79`, versão `20261017141917-9fac9f5`;
+  **o desfazer é `10f05c50`**;
+- **a medida por fora, sem login:** a versão, e os trechos novos (o registro do fornecedor, o alcance do papel, o
+  "Não se aplica a esta entrega", as âncoras `avaliacao.p2` e `registros.q1.i6`, as M35 a M37) nos pedaços servidos
+  do rascunho.
+
+**A vez é do Pedro:** ler e gravar a Rev. 01, com a mão dele. **Nada foi gravado. O banco não mudou.**

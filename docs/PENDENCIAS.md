@@ -113,6 +113,10 @@ A Rev. 01 **não foi gravada**: a vigente no banco é a Rev. 00.
 (a parte C). Ele está no ramo `d857-rev01-com-a-parte-c` (`a937762`), **sem publicar**, com 37 mudanças, 64 âncoras e o CI
 verde. Espera a aprovação do CTO; depois, publicar (emenda 3), e só então a sentada.
 
+**17/10, decisão 135 (CTO-D857b):** aprovado, com o acréscimo do encarregado. O rascunho com o papel do fornecedor
+está **no ar** em `109f5e71`, versão `20261017141917-9fac9f5`, pelo `main` `9fac9f5`; o desfazer é `10f05c50`. Medido por
+fora. Agora, só falta a sentada.
+
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
    pelo script e volta a ele);
