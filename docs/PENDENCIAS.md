@@ -58,12 +58,17 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 
 ---
 
-### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
+### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha — a causa achada (decisão 132)
 
 *Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
 no ramo do mestre (a última em 05/10), sempre no meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
 regra. **Falta:** achar a espera que está curta (`tests/components/TituloUmaVez.test.tsx`) e prová-la com a bateria
 rodando várias vezes seguidas.
+
+**16/10, decisão 132 (CTO-D853):** a causa foi achada, e não é espera nem é do teste. A OC nova nasce em `buildNewOc` com duas
+chamadas de `nowIso()`. Quando elas caem em milissegundos diferentes, o título diz "Editar OC" numa OC em branco. As
+duas linhas são de 06/05/2026 (`aff88db`). Medido: 1 queda em 20 rodadas da bateria, e 1 em 630 no experimento com 30
+cópias do teste. **Falta:** o sim do CTO para o conserto de uma linha, com teste do relógio e sabotagem.
 
 ---
 

@@ -4304,3 +4304,19 @@ pelo CTO. A ordem: medir a produção só lendo, juntar no `main`, esperar o CI,
   iguais ao pacote.
 
 **Nada foi gravado. O banco não mudou.**
+
+## Decisão 132 — o teste que caiu: o título da OC nova, de maio · 16/10/2026
+
+**POR QUÊ (CTO-D853):** um teste caiu uma vez na bateria do `main` junto (decisão 131), sem o nome guardado. Teste que
+cai de vez em quando pode esconder uma corrida, e o código novo da parte C é assíncrono.
+
+**O QUE FOI:**
+- **a bateria em laço:** 20 rodadas no `main` `d8be3ef`, com cada queda gravada. 19 limpas, e 1 queda: o caso
+  `nova-oc` do `TituloUmaVez.test.tsx` (CTO-D643), a pendência 30;
+- **a causa, medida:** com 30 cópias do teste rodando juntas, caiu 1 em 630, e a página dizia "Editar OC" numa OC em
+  branco. A `buildNewOc` chama `nowIso()` duas vezes, e o título compara `criado_em` com `atualizado_em`. As linhas
+  são de 06/05/2026 (`aff88db`). Não é a parte C, e a comparação só decide o título;
+- **o conserto:** uma linha, com teste do relógio e sabotagem. Não feito, porque a D853 manda consertar só o que fosse
+  da parte C. Proposto ao CTO, com a recomendação de consertar.
+
+**Nada foi gravado. O banco não mudou.** O experimento foi desfeito, e a cópia de trabalho ficou limpa.
