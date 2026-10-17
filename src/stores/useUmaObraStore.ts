@@ -14,6 +14,7 @@ import { type MascaraDeObra, ligadaAgora, soDaObra } from '../domain/umaObra';
 import type { OrdemCompra } from '../domain/types';
 import { apagarMascara, gravarMascara, lerMascara } from '../services/storage/umaObra';
 import { useDataStore } from './useDataStore';
+import { useEntregasSemPapelStore } from './useEntregasSemPapelStore';
 import { useOcEditingStore } from './useOcEditingStore';
 import { useQualificacaoStore } from './useQualificacaoStore';
 import { useUiStore } from './useUiStore';
@@ -53,6 +54,8 @@ export const useUmaObraStore = create<UmaObraState>((set, get) => ({
         const tratativas = q.tratativas.filter((t) => t.intervencaoId === novo.obraAtiva);
         useQualificacaoStore.getState().definir({ ...q, tratativas });
       }
+      // E as entregas sem papel, da lista e do número do menu (perícia de 16/10, achado 2).
+      useEntregasSemPapelStore.getState().soDaObra(novo.obraAtiva);
     }
     if (novo.obraAtiva !== s.obraAtiva || JSON.stringify(novo.armada) !== JSON.stringify(s.armada)) set(novo);
     guardarOuDevolverRascunho(get().obraAtiva);

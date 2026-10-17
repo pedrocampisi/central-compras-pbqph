@@ -23,6 +23,7 @@
  */
 
 import { pedeTratativa, type Avaliacao } from './qualificacao';
+import type { RegistroPedido } from './registroDoFornecedor';
 
 export interface RespostasDoMestre {
   noDia: boolean | null;
@@ -153,6 +154,12 @@ export interface CartaoAChegar {
    */
   itens: { posicao?: number; descricao: string; quantidade: number; unidade: string }[];
   total: number;
+  /**
+   * O registro do fornecedor de cada ECR da entrega, com o `pede` do banco
+   * (D811 §3). Falta no cartão guardado por uma versão antiga, e no banco que
+   * ainda não manda: aí o carimbo não pergunta, como antes.
+   */
+  registros?: RegistroPedido[];
 }
 
 const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];

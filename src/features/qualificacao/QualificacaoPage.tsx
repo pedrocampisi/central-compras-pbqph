@@ -59,6 +59,7 @@ import { FornecedorDrawer } from '../fornecedores/FornecedorDrawer';
 import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
 import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
+import { RegistrosDaEmpresa } from './RegistrosDaEmpresa';
 import styles from './QualificacaoPage.module.css';
 
 /** O nome da aba quando o banco não mandou a categoria (não deve acontecer; a aba não some por isso). */
@@ -265,6 +266,12 @@ export function QualificacaoPage() {
                                 fora do cadastro
                               </span>
                             )}
+                            {/* Os papéis do fornecedor moram na linha aberta, junto dos critérios (CTO-D812). */}
+                            {material && v.ecrs.length > 0 && (
+                              <Button variant="ghost" size="sm" onClick={alternar} aria-expanded={aberto}>
+                                Papéis
+                              </Button>
+                            )}
                           </div>
                         </td>
                         {comTipo && (
@@ -339,6 +346,18 @@ export function QualificacaoPage() {
                               .filter(Boolean)
                               .join(' · ')}
                           </p>
+                          {/* Os papéis que cada ECR pede, ao lado do que está guardado (CTO-D812, parte C). */}
+                          {material && (
+                            <RegistrosDaEmpresa
+                              chave={l.chave}
+                              nome={l.nome}
+                              ecrIds={v.ecrs}
+                              filial={l.filial}
+                              ecrs={data.ecrs}
+                              fornecedores={data.fornecedores}
+                              podeEmitir={podeQualificar}
+                            />
+                          )}
                         </td>
                       </tr>,
                     ];

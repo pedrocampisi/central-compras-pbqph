@@ -45,7 +45,13 @@ import { entregarPdfDaOc, lerPdfsNaPasta } from '../../services/supabase/pastaDa
 import type { AvaliacaoGravada } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
 import { ultimaEntregaPorOc } from '../../domain/recebimento';
+import { coberturaPorEntrega, textoDaCobertura, type CoberturaDaEntrega } from '../../domain/entregasSemPapel';
+import { lerCoberturaDasEntregas } from '../../services/supabase/entregasSemPapel';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
+import { ecrsNaOrdemDosItens } from '../../domain/qualidadeNaOc';
+import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
+import { useRegistrosStore } from '../../stores/useRegistrosStore';
+import { useEntregasSemPapelStore } from '../../stores/useEntregasSemPapelStore';
 
 export function HistoricoPage() {
   const data = useDataStore((s) => s.data);
@@ -65,6 +71,13 @@ export function HistoricoPage() {
   const showToast = useUiStore((s) => s.showToast);
   /** A OC cuja entrega está sendo registrada (PS.02, CTO-D604 §3.2). */
   const [entregando, setEntregando] = useState<OrdemCompra | null>(null);
+  /** A OC em que o comprador anexa o papel do fornecedor que chegou por e-mail (CTO-D811 §4.3). */
+  const [anexando, setAnexando] = useState<OrdemCompra | null>(null);
+  // As marcas "a cada entrega", para a janela do "Anexar papel" (D840 §2.3): lidas quando ela abre.
+  const marcas = useRegistrosStore((s) => s.dados?.marcas);
+  useEffect(() => {
+    if (anexando) void useRegistrosStore.getState().carregar();
+  }, [anexando]);
   /** O ✓ de cada OC (D685); `null` enquanto não leu, ou se a leitura falhou: aí a coluna não aparece. */
   const [naPasta, setNaPasta] = useState<Map<string, PdfNaPasta> | null>(null);
   /** A OC que está indo para a pasta agora: o botão dela espera. */
@@ -88,6 +101,33 @@ export function HistoricoPage() {
    */
   const [entregas, setEntregas] = useState<Map<string, AvaliacaoGravada>>(new Map());
   const [fotosDasEntregas, setFotosDasEntregas] = useState<Map<string, string>>(new Map());
+  /**
+   * O papel do fornecedor de cada entrega, por ECR (CTO-D840 §2.6): o que cobre,
+   * o "não se aplica", ou a falta. Uma chamada só para todas; sem leitura, a
+   * linha da entrega fica como era, sem dizer nada do papel.
+   */
+  const [cobertura, setCobertura] = useState<Map<number, CoberturaDaEntrega[]>>(new Map());
+  const [linksDosPapeis, setLinksDosPapeis] = useState<Map<string, string>>(new Map());
+  /** O papel guardado aqui muda a cobertura sem mudar os dados: a leitura volta por esta vez (perícia de 16/10, achado 7). */
+  const [vezDaCobertura, setVezDaCobertura] = useState(0);
+  useEffect(() => {
+    let vivo = true;
+    void (async () => {
+      try {
+        const c = coberturaPorEntrega(await lerCoberturaDasEntregas());
+        if (!vivo) return;
+        setCobertura(c);
+        const docs = [...c.values()].flat().filter((x) => x.situacao === 'coberta').map((x) => x.documentoId);
+        const links = await lerLinksDasFotos(docs);
+        if (vivo) setLinksDosPapeis(links);
+      } catch {
+        /* sem a cobertura: a linha da entrega segue sem o papel */
+      }
+    })();
+    return () => {
+      vivo = false;
+    };
+  }, [data, vezDaCobertura]);
   useEffect(() => {
     let vivo = true;
     void (async () => {
@@ -260,13 +300,14 @@ export function HistoricoPage() {
   async function handlePdfDasAvaliacoes() {
     try {
       const mascara = obraDaMascara();
-      const avaliacoes = await lerAvaliacoesDeEntrega(mascara);
+      // Sem a cobertura, não há folha: a coluna em branco diria ao auditor que nenhuma ECR pedia o papel.
+      const [avaliacoes, papeis] = await Promise.all([lerAvaliacoesDeEntrega(mascara), lerCoberturaDasEntregas(mascara)]);
       if (obraDaMascara() !== mascara) {
         showToast('A opção "mostrar só uma obra" ligou ou desligou enquanto o PDF era preparado. Gere o PDF de novo.', 'warning');
         return;
       }
       await baixarPdfDasAvaliacoes(
-        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras),
+        linhasDasAvaliacoes(avaliacoes, data!.ordens_compra, data!.fornecedores, data!.obras, coberturaPorEntrega(papeis)),
         mascara ? (obraNome.get(mascara) ?? 'Obra da auditoria') : null,
         hojeEmSaoPaulo(),
       );
@@ -326,7 +367,7 @@ export function HistoricoPage() {
     );
   }
 
-  /** A última entrega: o dia, quem recebeu, "só uma parte" e a foto da nota. */
+  /** A última entrega: o dia, quem recebeu, "só uma parte", a foto da nota, e o papel do fornecedor por ECR. */
   function recebimentoDaOc(o: OrdemCompra) {
     const a = entregas.get(o.id);
     if (!a) return null;
@@ -345,6 +386,27 @@ export function HistoricoPage() {
             Foto da nota
           </a>
         )}
+        {(cobertura.get(a.id) ?? []).map((c) => {
+          const papel = c.situacao === 'coberta' ? linkSeguro(linksDosPapeis.get(c.documentoId) ?? '') : '';
+          return (
+            <span
+              key={c.ecrId}
+              data-cobertura={c.ecrId}
+              data-situacao={c.situacao}
+              style={c.situacao === 'sem_papel' ? { color: 'var(--aviso)', fontWeight: 600 } : undefined}
+            >
+              {textoDaCobertura(c)}
+              {papel && (
+                <>
+                  {' · '}
+                  <a href={papel} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+                    Abrir
+                  </a>
+                </>
+              )}
+            </span>
+          );
+        })}
       </div>
     );
   }
@@ -537,6 +599,12 @@ export function HistoricoPage() {
                   {o.status === 'emitida' ? 'Entregue' : 'Outra entrega'}
                 </Button>
               )}
+              {/* O papel deste lote que chegou por e-mail entra pela OC (CTO-D811 §4.3, D812 §2). */}
+              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && ecrsNaOrdemDosItens(o.itens).length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => setAnexando(o)}>
+                  Anexar papel
+                </Button>
+              )}
               {o.status !== 'cancelada' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
                   Cancelar
@@ -553,6 +621,28 @@ export function HistoricoPage() {
           fornecedor={fornecedorNome.get(entregando.fornecedor_id) ?? ''}
           obra={obraNome.get(entregando.obra_id) ?? ''}
           aoFechar={() => setEntregando(null)}
+        />
+      )}
+
+      {anexando && (
+        <AnexarPapelDialogo
+          quem={`OC ${anexando.numero || '(sem número)'} · ${fornecedorNome.get(anexando.fornecedor_id) ?? ''}`}
+          porOnde="oc"
+          ecrs={ecrsNaOrdemDosItens(anexando.itens).map((id) => {
+            const e = data?.ecrs.find((x) => x.id === id);
+            // A marca "a cada entrega" tira o lote daqui (D840 §2.3); o banco recusa o lote sem entrega do mesmo jeito.
+            const aCadaEntrega = !!marcas?.some((m) => m.ecrId === id);
+            return { id, rotulo: e ? `${e.codigo} — ${e.nome}` : `ECR ${id}`, aCadaEntrega };
+          })}
+          // As posições ficam com o banco: por padrão, os itens desta OC com a ECR.
+          onde={() => ({ ocId: anexando.id, fornecedorId: anexando.fornecedor_id })}
+          aoFechar={() => setAnexando(null)}
+          aoGuardar={() => {
+            // O papel pode resolver a cobrança: os papéis, a cobertura desta lista e as entregas sem papel leem de novo.
+            void useRegistrosStore.getState().carregar(true);
+            setVezDaCobertura((v) => v + 1);
+            void useEntregasSemPapelStore.getState().carregar();
+          }}
         />
       )}
     </div>

@@ -20,9 +20,10 @@ import { esquecerRascunhoGuardado, useUmaObraStore } from './stores/useUmaObraSt
 import { proximaVirada } from './domain/umaObra';
 import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
 import { useQualificacaoStore } from './stores/useQualificacaoStore';
+import { useEntregasSemPapelStore } from './stores/useEntregasSemPapelStore';
 
 // Services
-import { sessaoAtual, perfilAtual, sair, podeGerirMestre, type Papel } from './services/supabase/auth';
+import { sessaoAtual, perfilAtual, sair, podeEmitirOc, podeGerirMestre, type Papel } from './services/supabase/auth';
 import { supabase } from './services/supabase/client';
 import { assinarMudancas } from './services/supabase/dados';
 import { recarregarDados } from './services/supabase/sync';
@@ -140,6 +141,16 @@ export default function App() {
 
   const { escuro, alternar } = useTema();
 
+  // O número no item Recebimentos (CTO-D845 §2): as entregas sem papel do fornecedor. Só para
+  // quem emite OC (a régua da lista no banco), e lido de novo quando os dados mudam.
+  const podeEmitir = podeEmitirOc(perfil?.papel);
+  const semPapel = useEntregasSemPapelStore((s) => (podeEmitir ? (s.linhas?.length ?? 0) : 0));
+  useEffect(() => {
+    if (!podeEmitir || !data) return;
+    const t = setTimeout(() => void useEntregasSemPapelStore.getState().carregar(), 0);
+    return () => clearTimeout(t);
+  }, [podeEmitir, data]);
+
   // ── "Mostrar só uma obra" (CTO-D599): o relógio da máscara ─────────────────
   // Ela liga e desliga sozinha: a tela confere de tempos em tempos, e quando a
   // pessoa volta à janela. Quando uma borda da janela está a menos de uma volta
@@ -218,6 +229,7 @@ export default function App() {
     if (!userId) {
       setPerfil(null);
       useDataStore.setState({ data: null, dirty: false, dirtySince: null });
+      useEntregasSemPapelStore.setState({ linhas: null, erro: '' });
       // O rascunho de OC aberto também é dado de quem estava logado: sem isto,
       // quem entra depois no mesmo computador encontra a OC do colega no editor.
       useOcEditingStore.getState().stopEditing();
@@ -403,6 +415,12 @@ export default function App() {
               onClick={() => setTab(item.id)}
             >
               <Icon name={item.icon} />
+              {/* Antes do nome, de propósito: no menu estreito o nome some, e o número fica sobre o ícone. */}
+              {item.id === 'recebimentos' && semPapel > 0 && (
+                <b className={styles.contador} data-contador-sem-papel="" title={`${semPapel} sem papel do fornecedor`}>
+                  {semPapel}
+                </b>
+              )}
               <span>{item.label}</span>
             </button>
           ))}
