@@ -4320,3 +4320,19 @@ cai de vez em quando pode esconder uma corrida, e o código novo da parte C é a
   da parte C. Proposto ao CTO, com a recomendação de consertar.
 
 **Nada foi gravado. O banco não mudou.** O experimento foi desfeito, e a cópia de trabalho ficou limpa.
+
+## Decisão 133 — o título da OC nova no ar em `10f05c50` · 16/10/2026
+
+**POR QUÊ (CTO-D855):** o CTO disse sim ao conserto da decisão 132, com publicação pela emenda 3 depois do CI verde.
+
+**O QUE FOI:**
+- **o conserto:** a `buildNewOc` lê o relógio uma vez e usa a mesma hora no `criado_em` e no `atualizado_em`
+  (`d855-titulo-da-oc-nova` `63b15fa`). O teste `TituloDaOcNova` faz o relógio andar 1 ms a cada leitura: ele ficava
+  vermelho antes e fica verde agora, e a sabotagem fica vermelha. As 30 cópias do `TituloUmaVez` deram 1.050 casos
+  sem queda. 1259 testes, e o CI verde no ramo e no `main` `48ff24c`;
+- **a publicação:** às 22h23, versão `10f05c50-f264-43d7-984e-04aeb057a283`, pacote `20261017012248-48ff24c`; o
+  desfazer é `41898c74`. Por fora, o `versao.txt`, o `.js` e o `.css` servidos são iguais ao pacote;
+- **o "ver como" (D854):** nada na OC depende de o Pedro ser `admin` o tempo todo. Mas a OC lê o perfil uma vez, ao
+  entrar: depois de trocar, ou de o papel voltar sozinho, é preciso recarregar a página. Contado ao CTO, sem construir.
+
+**Nada foi gravado. O banco não mudou.**

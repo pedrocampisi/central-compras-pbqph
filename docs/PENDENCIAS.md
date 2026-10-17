@@ -58,7 +58,7 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 
 ---
 
-### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha — a causa achada (decisão 132)
+### 30. ~~O teste do título uma vez só (D643, a Nova OC) às vezes falha~~ — consertado e no ar (decisão 133)
 
 *Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
 no ramo do mestre (a última em 05/10), sempre no meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
@@ -68,7 +68,11 @@ rodando várias vezes seguidas.
 **16/10, decisão 132 (CTO-D853):** a causa foi achada, e não é espera nem é do teste. A OC nova nasce em `buildNewOc` com duas
 chamadas de `nowIso()`. Quando elas caem em milissegundos diferentes, o título diz "Editar OC" numa OC em branco. As
 duas linhas são de 06/05/2026 (`aff88db`). Medido: 1 queda em 20 rodadas da bateria, e 1 em 630 no experimento com 30
-cópias do teste. **Falta:** o sim do CTO para o conserto de uma linha, com teste do relógio e sabotagem.
+cópias do teste.
+
+**16/10, decisão 133 (CTO-D855):** consertado. A OC nova lê o relógio uma vez só. O teste do relógio
+(`TituloDaOcNova`) e a sabotagem ficaram vermelhos antes e verdes depois. **No ar em `10f05c50`**, pacote `20261017012248-48ff24c`,
+pelo `main` `48ff24c`; o desfazer é `41898c74`.
 
 ---
 
