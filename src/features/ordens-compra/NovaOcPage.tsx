@@ -36,6 +36,8 @@ import {
   type Leitor,
 } from '../../domain/leitor';
 import { CampoDeImportacao } from './CampoDeImportacao';
+import { ConferenciaDoTotal, ConfiraDoCampo, ResumoDoAlto, type ResumoDoAltoProps } from './AltoDaLeitura';
+import { preencherDoCabecalho, type CabecalhoLido, type CampoDoAlto } from '../../domain/cabecalhoLido';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import { entregarPdfDaOc } from '../../services/supabase/pastaDaObra';
 import { avisoDoPdf } from '../../domain/pastaDaObra';
@@ -291,10 +293,16 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
 interface TotalsPanelProps {
   oc: OrdemCompra;
   onChangeField: (field: 'frete' | 'outras_despesas' | 'desconto_material', value: number) => void;
+  /** O "confira" do que a leitura do orçamento preencheu (CTO-D805 §2). */
+  confira?: Partial<Record<CampoDoAlto, string>>;
+  onConfirmar?: (c: CampoDoAlto) => void;
+  /** O total impresso no orçamento, para a conferência; `null` sem leitura. */
+  totalDoOrcamento?: number | null;
 }
 
-function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
+function TotalsPanel({ oc, onChangeField, confira = {}, onConfirmar = () => {}, totalDoOrcamento = null }: TotalsPanelProps) {
   const t = computeOcTotals(oc);
+  const aviso = (c: CampoDoAlto) => <ConfiraDoCampo campo={c} texto={confira[c]} onConfirmar={onConfirmar} comNome />;
   return (
     <div className={styles.totalsPanel}>
       <div className={styles.totalsGrid} data-tutorial="totais">
@@ -338,6 +346,15 @@ function TotalsPanel({ oc, onChangeField }: TotalsPanelProps) {
         <span className={styles.totalsGeralLabel}>TOTAL GERAL:</span>
         <span className={styles.totalsGeralValue}>{formatBrl(t.total_geral)}</span>
       </div>
+      {/* Fora da grade: a grade alterna rótulo e valor pela posição. */}
+      {(confira.frete || confira.outras || confira.desconto) && (
+        <div className={styles.totalsConfiras}>
+          {aviso('frete')}
+          {aviso('outras')}
+          {aviso('desconto')}
+        </div>
+      )}
+      <ConferenciaDoTotal totalDoOrcamento={totalDoOrcamento} totalDaOc={t.total_geral} />
     </div>
   );
 }
@@ -400,6 +417,13 @@ export function NovaOcPage() {
   // O "confira" da IA, por id do item. Fica AQUI, fora do item: o item vai ao
   // banco e ao PDF, a dúvida não. Some ao editar a linha e ao salvar.
   const [confira, setConfira] = useState<Record<string, string>>({});
+  // O alto da OC lido do orçamento (CTO-D805 §2): o "confira" de cada campo, o
+  // resumo e o total do papel. Como o dos itens, é da tela e some ao salvar.
+  // `tocados` são os campos que a pessoa mexeu ou confirmou: a leitura não pisa neles.
+  const [confiraDoAlto, setConfiraDoAlto] = useState<Partial<Record<CampoDoAlto, string>>>({});
+  const [resumoDoAlto, setResumoDoAlto] = useState<ResumoDoAltoProps | null>(null);
+  const [totalDoOrcamento, setTotalDoOrcamento] = useState<number | null>(null);
+  const tocadosRef = useRef(new Set<CampoDoAlto>());
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -492,6 +516,8 @@ export function NovaOcPage() {
       );
       tentativaRef.current = null;
       setConfira({}); // salvo: o "confira" era da tela, e some
+      setConfiraDoAlto({});
+      setResumoDoAlto(null);
       await recarregarDados();
       stopEditing();
       showToast(
@@ -555,6 +581,8 @@ export function NovaOcPage() {
       );
       tentativaRef.current = null;
       setConfira({}); // salvo: o "confira" era da tela, e some
+      setConfiraDoAlto({});
+      setResumoDoAlto(null);
 
       // O número e a versão vêm do banco — é lá que eles nascem.
       const emitida: OrdemCompra = {
@@ -647,6 +675,47 @@ export function NovaOcPage() {
     setPortasAbertas(false);
   }, []);
 
+  // ── O alto da OC lido do orçamento (CTO-D805 §2) ───────────────────────────
+  // O campo está livre para a leitura quando ninguém mexeu nele e ele está
+  // vazio, no automático, ou com o que a própria leitura pôs. O que a pessoa
+  // preencheu à mão fica, e o resumo diz o que o papel dizia (regra 4).
+  const campoLivre = useCallback((c: CampoDoAlto, oc: OrdemCompra): boolean => {
+    if (tocadosRef.current.has(c)) return false;
+    if (c in confiraDoAlto) return true;
+    switch (c) {
+      case 'fornecedor': return oc.fornecedor_id === '';
+      // O "À vista" com que a OC nova nasce é automático; o de um rascunho salvo, não.
+      case 'condicao': return oc.condicao_pagamento === '' || (oc.versao === 0 && oc.condicao_pagamento === (data?.config.condicoes_pagamento[0] ?? ''));
+      case 'entrega': return !oc.entrega_prevista || useOcEditingStore.getState().entregaAcompanha;
+      case 'frete': return oc.frete === 0;
+      case 'outras': return oc.outras_despesas === 0;
+      case 'desconto': return oc.desconto_material === 0;
+    }
+  }, [confiraDoAlto, data]);
+
+  // Só propõe: nada grava e nada emite sem o clique da pessoa (regra 2).
+  const aplicarCabecalho = useCallback((cab: CabecalhoLido) => {
+    const oc = useOcEditingStore.getState().ocEditing;
+    if (!oc || !data) return;
+    const p = preencherDoCabecalho(oc, cab, data.fornecedores, (c) => campoLivre(c, oc));
+    for (const [campo, valor] of Object.entries(p.mudancas)) updateField(campo as keyof OrdemCompra, valor as never);
+    setConfiraDoAlto((antes) => ({ ...antes, ...p.confira }));
+    setResumoDoAlto({ semFornecedor: p.semFornecedor, naoPisou: p.naoPisou, duvida: cab.confira });
+    setTotalDoOrcamento(cab.total);
+  }, [data, campoLivre, updateField]);
+
+  // Mexer no campo ou dizer "Está certo" é conferir: o aviso some, e a leitura não pisa mais nele.
+  const mexeuNoAlto = useCallback((c: CampoDoAlto) => {
+    tocadosRef.current.add(c);
+    setConfiraDoAlto((antes) => {
+      if (!(c in antes)) return antes;
+      const resto = { ...antes };
+      delete resto[c];
+      return resto;
+    });
+    if (c === 'fornecedor') setResumoDoAlto((r) => (r?.semFornecedor ? { ...r, semFornecedor: '' } : r));
+  }, []);
+
   // UMA leitura, de arquivo ou de texto, por um dos dois leitores (D567).
   //   somar ... os itens entram SOMADOS ao que a OC já tem (D554/D557)
   //   trocar .. os itens da leitura anterior saem e os novos entram no lugar;
@@ -717,6 +786,7 @@ export function NovaOcPage() {
         appendItems(r.itens);
         setConfira((antes) => ({ ...antes, ...r.confira }));
       }
+      if (r.cabecalho) aplicarCabecalho(r.cabecalho);
       setResultado({ leitor: quemLeu(r.leitor), itens: r.itens });
       setPortasAbertas(false);
       setLeiturasFeitas((n) => n + 1);
@@ -735,7 +805,7 @@ export function NovaOcPage() {
     } finally {
       setImporting(false);
     }
-  }, [data, importing, appendItems, replaceItems, showToast]);
+  }, [data, importing, appendItems, replaceItems, showToast, aplicarCabecalho]);
 
   // Os arquivos que entraram de uma vez viram UMA leitura (lerPedido): tipo
   // errado e página demais param antes do servidor, e o aviso fica no campo.
@@ -838,7 +908,10 @@ export function NovaOcPage() {
     if (!ocEditing) return;
     const id = escolherEmpresa(empresas.find((g) => g.chave === chave), ocEditing.fornecedor_id);
     if (id !== ocEditing.fornecedor_id) updateField('fornecedor_id', id);
+    mexeuNoAlto('fornecedor');
   }
+  const condicoes = data.config.condicoes_pagamento;
+  const avisoDoAlto = (c: CampoDoAlto) => <ConfiraDoCampo campo={c} texto={confiraDoAlto[c]} onConfirmar={mexeuNoAlto} />;
   const obrasAtivas = data.obras.filter((o) => o.ativa);
   // O destinatário da nota é da obra: a tela mostra em leitura, não escolhe.
   const obraEscolhida = data.obras.find((o) => o.id === ocEditing.obra_id);
@@ -933,13 +1006,15 @@ export function NovaOcPage() {
         </div>
       )}
 
+      {resumoDoAlto && <ResumoDoAlto {...resumoDoAlto} />}
+
       {/* ── Identificação ────────────────────────────────────────────────── */}
       <FieldGroup title="Identificação da OC">
         {/* Fornecedor e Obra aceitam texto (CTO-D541): são as duas listas longas.
             O Fornecedor é a EMPRESA (D542); a filial não se escolhe — quem decide
             a loja é o vendedor, e a OC grava a principal (D549). */}
         <FieldShell label="Fornecedor" required htmlFor="oc-fornecedor" hint={pistaDoFornecedor} marca="fornecedor"
-          ajuda={<AjudaDoCampo ajuda={AJUDA_DO_FORNECEDOR} />}>
+          ajuda={<AjudaDoCampo ajuda={AJUDA_DO_FORNECEDOR} />} aviso={avisoDoAlto('fornecedor')}>
           <CampoPesquisavel
             id="oc-fornecedor"
             required
@@ -999,19 +1074,25 @@ export function NovaOcPage() {
           hint={DICA_DA_ENTREGA}
           marca="entrega"
           value={ocEditing.entrega_prevista ?? ''}
-          onChange={(e) => updateField('entrega_prevista', e.target.value)}
+          onChange={(e) => { updateField('entrega_prevista', e.target.value); mexeuNoAlto('entrega'); }}
+          aviso={avisoDoAlto('entrega')}
         />
 
         <Field
           as="select"
           label="Condição de Pagamento"
           value={ocEditing.condicao_pagamento}
-          onChange={(e) => updateField('condicao_pagamento', e.target.value)}
+          onChange={(e) => { updateField('condicao_pagamento', e.target.value); mexeuNoAlto('condicao'); }}
+          aviso={avisoDoAlto('condicao')}
         >
           <option value="">Selecione…</option>
-          {data.config.condicoes_pagamento.map((c) => (
+          {condicoes.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
+          {/* A condição como o orçamento a escreve, ou a de um rascunho antigo, entra na lista (D805 §2). */}
+          {ocEditing.condicao_pagamento && !condicoes.includes(ocEditing.condicao_pagamento) && (
+            <option value={ocEditing.condicao_pagamento}>{ocEditing.condicao_pagamento}</option>
+          )}
         </Field>
 
         <Field
@@ -1089,7 +1170,13 @@ export function NovaOcPage() {
         <div style={{ gridColumn: '1 / -1' }}>
           <TotalsPanel
             oc={ocEditing}
-            onChangeField={(field, value) => updateField(field, value)}
+            onChangeField={(field, value) => {
+              updateField(field, value);
+              mexeuNoAlto(field === 'frete' ? 'frete' : field === 'outras_despesas' ? 'outras' : 'desconto');
+            }}
+            confira={confiraDoAlto}
+            onConfirmar={mexeuNoAlto}
+            totalDoOrcamento={totalDoOrcamento}
           />
         </div>
       </FieldGroup>

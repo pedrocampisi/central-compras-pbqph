@@ -247,3 +247,64 @@
   margin-top: 6px;
 }
 .ecrsDoSelo { font-size: 11px; color: var(--text-muted); }
+
+/* ── O alto da OC lido do orçamento (CTO-D805 §2) ────────────────────────────
+   O "confira" de cada campo que a IA preencheu, com o "Está certo"; o resumo
+   do que ficou de fora; e o total do papel ao lado do total da OC. É aviso da
+   TELA: não vai ao banco nem ao PDF. */
+.confiraDoAlto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2px 6px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--aviso);
+}
+/* O ícone fica na linha da frase; o "Está certo" desce quando não cabe. */
+.confiraDoAlto svg { flex: none; margin-top: 2px; }
+.confiraDoAlto > span { flex: 1 1 12em; min-width: 0; }
+.estaCerto {
+  padding: 1px 8px;
+  border: 1px solid var(--aviso);
+  border-radius: var(--raio-pill);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  color: var(--aviso);
+  cursor: pointer;
+}
+.estaCerto:hover { background: var(--aviso-bg); }
+.resumoDoAlto {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--aviso);
+  border-radius: var(--raio-pequeno);
+  background: var(--aviso-bg);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto);
+}
+.resumoDoAlto p { margin: 0; }
+.resumoDoAlto p + p { margin-top: 4px; }
+.totalsConfiras {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  justify-items: end;
+}
+.conferenciaDoTotal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 18px;
+  width: 100%;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 13px;
+  color: var(--text-mid);
+}
+.conferenciaDoTotal[data-conferencia-do-total='difere'] [data-diferenca] { color: var(--aviso); font-weight: 600; }

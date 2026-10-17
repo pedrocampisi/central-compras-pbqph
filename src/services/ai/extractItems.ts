@@ -19,6 +19,7 @@ import { supabase } from '../supabase/client';
 import { MAX_PAGINAS, erroDaImagem, mensagemDePaginas } from '../../domain/importacao';
 import { ErroDaImportacao } from './lerPedido';
 import { LEITOR_PADRAO, leitorDaResposta, type Leitor } from '../../domain/leitor';
+import { cabecalhoDoServidor, type CabecalhoLido } from '../../domain/cabecalhoLido';
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -73,11 +74,16 @@ export interface ResultadoDaLeitura {
   ignoradas: string[];
   /** Quem o servidor diz que leu (`_meta.leitor`, D567); a v4 não diz: `null`. */
   leitor: Leitor | null;
+  /**
+   * O alto da OC lido do orçamento (CTO-D805 §2): fornecedor pelo CNPJ,
+   * condição, entrega e totais. Ausente quando o servidor não manda.
+   */
+  cabecalho?: CabecalhoLido;
 }
 
 /** A resposta do servidor → o resultado da tela. Pura, para o teste. */
 export function paraResultado(payload: unknown): ResultadoDaLeitura {
-  const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown; _meta?: unknown };
+  const p = (payload ?? {}) as { itens?: unknown; ignoradas?: unknown; _meta?: unknown; cabecalho?: unknown };
   const rawItems = (Array.isArray(p.itens) ? p.itens : []) as RawExtractedItem[];
   const confira: Record<string, string> = {};
   // A leitura às vezes devolve "&#x3D;" no lugar de "=" (D680): desfaz aqui, na entrada.
@@ -100,7 +106,8 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
   const ignoradas = (Array.isArray(p.ignoradas) ? p.ignoradas : [])
     .filter((l): l is string => typeof l === 'string' && l.trim() !== '')
     .map(desfazerEntidades);
-  return { itens, confira, ignoradas, leitor: leitorDaResposta(p._meta) };
+  const cabecalho = cabecalhoDoServidor(p.cabecalho);
+  return { itens, confira, ignoradas, leitor: leitorDaResposta(p._meta), ...(cabecalho && { cabecalho }) };
 }
 
 // ── Erros da função do servidor, em português ─────────────────────────────────
