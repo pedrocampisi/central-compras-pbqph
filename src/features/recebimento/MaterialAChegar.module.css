@@ -632,3 +632,49 @@
   background: var(--aviso-bg);
   color: var(--aviso);
 }
+
+/* O papel do fornecedor (D811): a lista da ECR como está, e as três respostas. */
+.palavrasDaEcr {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* A nota da ECR (fora da lista) sai em destaque, como no documento e no catálogo. */
+.notaDaEcr {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--erro);
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  color: var(--texto);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.oQuePede {
+  margin: 0;
+  padding: 12px 12px 12px 32px;
+  border-left: 4px solid var(--marca-media);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  color: var(--texto);
+  font-size: 17px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.marcado {
+  border-color: var(--marca);
+  background: var(--marca-fraca);
+  color: var(--texto);
+}
+
+.alcance {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

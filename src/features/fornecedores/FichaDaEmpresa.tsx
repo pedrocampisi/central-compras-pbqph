@@ -22,6 +22,7 @@ import {
   nomeDasEcrs,
   seloDaFilial,
   textoDoDesempenho,
+  textoDoLancamento,
 } from '../../domain/qualificacao';
 import { podeEmitirOc } from '../../services/supabase/auth';
 import type { CategoriaDaQualificacao, QualificacaoGravada } from '../../services/supabase/qualificacao';
@@ -129,7 +130,7 @@ export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFec
                               ))}
                             </ul>
                             <span className={styles.origem}>
-                              {[l.qualificadoPorNome, l.origem].filter(Boolean).join(' · ')}
+                              {[l.qualificadoPorNome, l.origem, textoDoLancamento(l)].filter(Boolean).join(' · ')}
                             </span>
                           </li>
                         ))}

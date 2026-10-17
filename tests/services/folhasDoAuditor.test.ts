@@ -107,6 +107,15 @@ describe('D604 §3.5 — a lista de qualificados, no desenho da FO 8.4.1.1', () 
     expect(t).toContain('Página 1 de');
     expect(t).not.toContain('01/01/2025'); // a linha velha não vai
   });
+
+  it('CTO-D819: o PDF não muda com o lançamento no sistema; a data é a da qualificação', () => {
+    const lancadas = LINHAS.map((l) => ({ ...l, lancadaEm: '2026-09-28T13:00:00+00:00' }));
+    const comLancamento = secoesDosQualificados(lancadas, CATEGORIAS, FORNECEDORES);
+    expect(comLancamento).toEqual(secoes);
+    const t = textoTodo(pdfDosQualificados(comLancamento, '2026-10-16', null));
+    expect(t).not.toContain('sistema em');
+    expect(t).not.toContain('28/09/2026');
+  });
 });
 
 describe('D604 §3.5 — as avaliações de entrega', () => {
@@ -133,12 +142,12 @@ describe('D604 §3.5 — as avaliações de entrega', () => {
     { id: 'oc-3', numero: '2026/003', fornecedor_id: 'f3' },
   ];
   const OBRAS = [{ id: 'obra-1', nome: 'Obra de teste' }];
-  const linhas = linhasDasAvaliacoes(AVALIACOES, OCS, FORNECEDORES, OBRAS);
+  const linhas = linhasDasAvaliacoes(AVALIACOES, OCS, FORNECEDORES, OBRAS, new Map());
 
   it('uma linha por entrega: C/NC nas três, a tratativa junto da observação, a ciência aberta ou dada', () => {
     expect(linhas[0]).toEqual([
       '2026/001', 'Beta Materiais Ltda (teste)', 'Obra de teste', '1234', '20/09/2026', 'NC', 'C', 'NC',
-      'chegou tarde · Tratativa: devolvido', 'Pessoa A', 'Aberta',
+      '—', 'chegou tarde · Tratativa: devolvido', 'Pessoa A', 'Aberta',
     ]);
     expect(linhas[1]!.slice(-3)).toEqual(['—', 'Pessoa B', '—']);
     expect(linhas[2]!.at(-1)).toBe('Revisor, 23/09/2026');
@@ -151,6 +160,27 @@ describe('D604 §3.5 — as avaliações de entrega', () => {
     expect(comMascara).toContain('Tratativa: devolvido');
     expect(textoTodo(pdfDasAvaliacoes(linhas, null, '2026-09-28', null))).toContain('Todas as obras');
     expect(textoTodo(pdfDasAvaliacoes([], null, '2026-09-28', null))).toContain('Nenhuma entrega avaliada.');
+  });
+
+  it('CTO-D845 §2, escolha 3: a coluna "Registro do fornecedor", uma linha curta por ECR que pede o papel', () => {
+    const comId = AVALIACOES.map((a, i) => ({ ...a, id: 31 + i }));
+    const cobertura = new Map([
+      [31, [
+        { avaliacaoId: 31, ecrId: 2, situacao: 'coberta' as const, documentoId: 'doc-1', alcance: 'lote' as const, validoAte: '', motivo: '' },
+        { avaliacaoId: 31, ecrId: 19, situacao: 'sem_papel' as const, documentoId: '', alcance: null, validoAte: '', motivo: '' },
+      ]],
+      [32, [{ avaliacaoId: 32, ecrId: 6, situacao: 'nao_se_aplica' as const, documentoId: '', alcance: null, validoAte: '', motivo: 'é compensado' }]],
+    ]);
+    const l = linhasDasAvaliacoes(comId, OCS, FORNECEDORES, OBRAS, cobertura);
+    expect(l.map((x) => x[8])).toEqual([
+      ['ECR 02: deste lote', 'ECR 19: sem papel'].join(String.fromCharCode(10)),
+      'ECR 06: não se aplica — é compensado',
+      '—',
+    ]);
+    const t = textoTodo(pdfDasAvaliacoes(l, null, '2026-10-16', null));
+    expect(t).toContain('Registro do');
+    expect(t).toContain('ECR 02: deste lote');
+    expect(t).toContain('ECR 19: sem papel');
   });
 
   it('D614 §2.3 — a legenda C/NC em toda página, para quem lê a folha sem a tela', () => {
@@ -178,7 +208,7 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
   it('achado 4: "≥" e "≤" da observação não saem como "?" no gerador real', () => {
     const linhas = linhasDasAvaliacoes(
       [avaliacao({ observacao: 'medida ≥ 30 mm' }), avaliacao({ observacao: 'medida ≤ 10 mm' })],
-      OCS, FORNECEDORES, OBRAS,
+      OCS, FORNECEDORES, OBRAS, new Map(),
     );
     const texto = textoTodo(pdfDasAvaliacoes(linhas, null, '2026-09-28', null));
     expect(texto).toContain('2026/001'); // a folha saiu com as linhas
@@ -189,7 +219,7 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
   it('achado 4, a trava: o "≥" e o "≤" saem na Symbol, lidos de dentro do PDF, e a folha diz de que obra é', () => {
     const linhas = linhasDasAvaliacoes(
       [avaliacao({ observacao: 'medida ≥ 30 mm' }), avaliacao({ observacao: 'medida ≤ 10 mm' })],
-      OCS, FORNECEDORES, OBRAS,
+      OCS, FORNECEDORES, OBRAS, new Map(),
     );
     const texto = textoComSinais(pdfDasAvaliacoes(linhas, 'Obra → teste', '2026-09-28', null));
     expect(texto).toContain('medida |≥| 30 mm');
@@ -199,7 +229,7 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
 
   it('achado 4: a observação longa com sinal quebra em linhas, sem perder letra nem sinal', () => {
     const longa = 'o lote veio com resistência ≥ 30 MPa em todos os corpos de prova, e o abatimento ≤ 10 cm em todas as betoneiras do dia';
-    const linhas = linhasDasAvaliacoes([avaliacao({ observacao: longa })], OCS, FORNECEDORES, OBRAS);
+    const linhas = linhasDasAvaliacoes([avaliacao({ observacao: longa })], OCS, FORNECEDORES, OBRAS, new Map());
     const texto = textoComSinais(pdfDasAvaliacoes(linhas, null, '2026-09-28', null));
     const semCortes = texto.replace(/\|/g, ' ').replace(/ +/g, ' ');
     for (const palavra of longa.split(' ')) expect(semCortes, palavra).toContain(palavra);
@@ -215,7 +245,7 @@ describe('Perícia 28/09 (fornecedores), achados 4 e 7 — o que o PDF das avali
   const ciencia = (cienciaEm: string) =>
     linhasDasAvaliacoes(
       [avaliacao({ prazoConforme: false, integridadeConforme: false, tratativa: 'trocado', cienciaPorNome: 'Revisor', cienciaEm })],
-      OCS, FORNECEDORES, OBRAS,
+      OCS, FORNECEDORES, OBRAS, new Map(),
     )[0]!.at(-1);
 
   it('achado 7: a ciência às 21:30 de 28/09 em Brasília, escrita em UTC, sai 28/09', () => {

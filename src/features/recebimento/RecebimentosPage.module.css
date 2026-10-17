@@ -73,6 +73,47 @@
   font-weight: 600;
 }
 
+/* As entregas sem papel do fornecedor (CTO-D840 §2.5), acima do "chegou sem pedido". */
+.semPapel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.tituloDaSecao {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-size: 18px;
+  color: var(--marca);
+}
+
+.subDaSecao,
+.nada {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.oQuePede {
+  padding: 8px 12px;
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 13px;
+  color: var(--texto);
+}
+.oQuePede ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+.oQuePede p {
+  margin: 4px 0 0;
+}
+
+.rotuloDoQuePede {
+  color: var(--texto-suave);
+}
+
 @media (max-width: 700px) {
   .dados {
     grid-template-columns: 1fr;

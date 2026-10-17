@@ -20,9 +20,10 @@ import { esquecerRascunhoGuardado, useUmaObraStore } from './stores/useUmaObraSt
 import { proximaVirada } from './domain/umaObra';
 import { useRevisaoEcrStore } from './stores/useRevisaoEcrStore';
 import { useQualificacaoStore } from './stores/useQualificacaoStore';
+import { useEntregasSemPapelStore } from './stores/useEntregasSemPapelStore';
 
 // Services
-import { sessaoAtual, perfilAtual, sair, podeGerirMestre, type Papel } from './services/supabase/auth';
+import { sessaoAtual, perfilAtual, sair, podeEmitirOc, podeGerirMestre, type Papel } from './services/supabase/auth';
 import { supabase } from './services/supabase/client';
 import { assinarMudancas } from './services/supabase/dados';
 import { recarregarDados } from './services/supabase/sync';
@@ -38,7 +39,7 @@ import { Loader } from './components/Loader/Loader';
 import { Icon, type IconName } from './components/Icon/Icon';
 
 // Feature pages
-import { LoginPage, SemAcessoPage, DefinirSenhaPage } from './features/auth/LoginPage';
+import { LoginPage, SemAcessoPage, SemOrdemDeCompraPage, DefinirSenhaPage } from './features/auth/LoginPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { NovaOcPage } from './features/ordens-compra/NovaOcPage';
 import { HistoricoPage } from './features/ordens-compra/HistoricoPage';
@@ -140,6 +141,16 @@ export default function App() {
 
   const { escuro, alternar } = useTema();
 
+  // O número no item Recebimentos (CTO-D845 §2): as entregas sem papel do fornecedor. Só para
+  // quem emite OC (a régua da lista no banco), e lido de novo quando os dados mudam.
+  const podeEmitir = podeEmitirOc(perfil?.papel);
+  const semPapel = useEntregasSemPapelStore((s) => (podeEmitir ? (s.linhas?.length ?? 0) : 0));
+  useEffect(() => {
+    if (!podeEmitir || !data) return;
+    const t = setTimeout(() => void useEntregasSemPapelStore.getState().carregar(), 0);
+    return () => clearTimeout(t);
+  }, [podeEmitir, data]);
+
   // ── "Mostrar só uma obra" (CTO-D599): o relógio da máscara ─────────────────
   // Ela liga e desliga sozinha: a tela confere de tempos em tempos, e quando a
   // pessoa volta à janela. Quando uma borda da janela está a menos de uma volta
@@ -218,6 +229,7 @@ export default function App() {
     if (!userId) {
       setPerfil(null);
       useDataStore.setState({ data: null, dirty: false, dirtySince: null });
+      useEntregasSemPapelStore.setState({ linhas: null, erro: '' });
       // O rascunho de OC aberto também é dado de quem estava logado: sem isto,
       // quem entra depois no mesmo computador encontra a OC do colega no editor.
       useOcEditingStore.getState().stopEditing();
@@ -243,7 +255,8 @@ export default function App() {
         if (!ativo) return;
         setPerfil(p);
         // O mestre não lê o cadastro nem as OCs (CTO-D693): a tela dele busca a própria lista.
-        if (p && p.papel !== 'mestre') await recarregarDados();
+        // O perfil sem a Ordem de Compra (CTO-D814) não lê nada: o banco recusaria.
+        if (p && p.papel !== 'mestre' && !p.sem_ordem_de_compra) await recarregarDados();
       } catch (err) {
         if (ativo) {
           setErroDados(err instanceof Error ? err.message : 'Falha ao carregar dados.');
@@ -257,7 +270,8 @@ export default function App() {
     // vários eventos seguidos (cabeçalho + itens) e uma recarga basta.
     let timer: ReturnType<typeof setTimeout> | null = null;
     const cancelarRealtime = assinarMudancas(() => {
-      if (useAuthStore.getState().perfil?.papel === 'mestre') return;
+      const quem = useAuthStore.getState().perfil;
+      if (quem?.papel === 'mestre' || quem?.sem_ordem_de_compra) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         void recarregarDados().catch(() => {
@@ -344,6 +358,17 @@ export default function App() {
     );
   }
 
+  // O perfil com a Ordem de Compra barrada (CTO-D814): avisa, e não entra. Vale
+  // para todo papel, o do mestre também: a trava do banco é dos atos da OC.
+  if (perfil?.sem_ordem_de_compra) {
+    return (
+      <>
+        <SemOrdemDeCompraPage email={sessao.user.email ?? ''} onSair={() => void handleSair()} />
+        <ToastContainer />
+      </>
+    );
+  }
+
   // O mestre de obra: a tela dele, sem menu, e só ela (CTO-D693, D696).
   if (perfil?.papel === 'mestre') {
     return (
@@ -390,6 +415,12 @@ export default function App() {
               onClick={() => setTab(item.id)}
             >
               <Icon name={item.icon} />
+              {/* Antes do nome, de propósito: no menu estreito o nome some, e o número fica sobre o ícone. */}
+              {item.id === 'recebimentos' && semPapel > 0 && (
+                <b className={styles.contador} data-contador-sem-papel="" title={`${semPapel} sem papel do fornecedor`}>
+                  {semPapel}
+                </b>
+              )}
               <span>{item.label}</span>
             </button>
           ))}

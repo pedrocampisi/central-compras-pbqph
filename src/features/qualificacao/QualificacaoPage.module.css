@@ -210,6 +210,15 @@
 .detalhe td {
   background: var(--fundo);
 }
+/* A largura que se vê da tabela: no celular ela rola de lado, e a linha aberta (os critérios, quem qualificou e os
+   papéis) cabe no que se vê (`cqw`), não na tabela inteira (CTO-D819, D815). */
+.rolagem { container-type: inline-size; }
+.criterios,
+.quem {
+  position: sticky;
+  left: 8px;
+  max-width: calc(100cqw - 32px);
+}
 .criterios {
   margin: 0;
   padding-left: 18px;

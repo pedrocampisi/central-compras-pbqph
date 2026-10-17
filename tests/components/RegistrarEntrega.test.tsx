@@ -14,13 +14,17 @@ vi.mock('../../src/services/supabase/client', () => ({
 }));
 const banco = vi.hoisted(
   () => ({ mascara: null as string | null, pdfs: [] as unknown[][] }) as {
-    registrar: Mock; status: Mock; recarregar: Mock; avaliacoes: Mock; mascara: string | null; pdfs: unknown[][];
+    registrar: Mock; status: Mock; recarregar: Mock; avaliacoes: Mock; cobertura: Mock; mascara: string | null; pdfs: unknown[][];
   },
 );
 vi.mock('../../src/services/supabase/qualificacao', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/qualificacao')>()),
   registrarEntrega: (...a: unknown[]) => banco.registrar(...a),
   lerAvaliacoesDeEntrega: () => banco.avaliacoes(),
+}));
+vi.mock('../../src/services/supabase/entregasSemPapel', async (original) => ({
+  ...(await original<typeof import('../../src/services/supabase/entregasSemPapel')>()),
+  lerCoberturaDasEntregas: (...a: unknown[]) => banco.cobertura(...a),
 }));
 vi.mock('../../src/services/storage/umaObra', async (original) => ({
   ...(await original<typeof import('../../src/services/storage/umaObra')>()),
@@ -82,6 +86,7 @@ beforeEach(() => {
   });
   banco.recarregar = vi.fn(async () => {});
   banco.avaliacoes = vi.fn(async () => []);
+  banco.cobertura = vi.fn(async () => []);
   banco.mascara = null;
   banco.pdfs = [];
   useDataStore.setState({ data: dados() });
@@ -259,6 +264,28 @@ describe('D604 §3.5 — o PDF das avaliações, pelo Histórico', () => {
     expect((banco.pdfs[0]! as [string[][], string | null])[1]).toBe('Obra de teste');
   });
 
+  it('a coluna "Registro do fornecedor" vem da cobertura da mesma máscara (CTO-D845 §2, escolha 3)', async () => {
+    banco.mascara = OBRA.id;
+    banco.avaliacoes = vi.fn(async () => [AVALIACAO]);
+    banco.cobertura = vi.fn(async () => [
+      { avaliacaoId: 1, ecrId: 2, situacao: 'sem_papel', documentoId: '', alcance: null, validoAte: '', motivo: '' },
+    ]);
+    await gerar();
+    expect(banco.cobertura).toHaveBeenCalledWith(OBRA.id);
+    const [linhas] = banco.pdfs[0]! as [string[][], string | null];
+    expect(linhas[0]![8]).toBe('ECR 02: sem papel');
+  });
+
+  it('a leitura da cobertura falhou: nenhum PDF, porque a coluna em branco diria que nenhuma ECR pedia o papel', async () => {
+    banco.avaliacoes = vi.fn(async () => [AVALIACAO]);
+    banco.cobertura = vi.fn(async () => {
+      throw new Error('Falha ao ler o papel das entregas: rede');
+    });
+    await gerar();
+    expect(banco.pdfs).toHaveLength(0);
+    expect(avisos()).toContain('Erro ao gerar o PDF: Falha ao ler o papel das entregas: rede');
+  });
+
   it('a leitura falhou: aviso de erro, nenhum PDF', async () => {
     banco.avaliacoes = vi.fn(async () => {
       throw new Error('Falha ao ler as avaliações de entrega: rede');
@@ -340,7 +367,7 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
     const enviado = await registrarComUmaSoNc();
     const [linha] = linhasDasAvaliacoes(
       [{ ocId: '001', intervencaoId: OBRA.id, avaliadoPorNome: 'Pessoa de teste', cienciaPorNome: '', cienciaEm: '', ...(enviado as object) } as never],
-      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA],
+      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA], new Map(),
     );
     expect(linha!.at(-1)).not.toBe('Aberta');
   });
@@ -366,7 +393,7 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
         integridadeConforme: true, ocEcrConforme: false, observacao: '', tratativa: 'sobrou', avaliadoPorNome: 'Pessoa de teste',
         cienciaPorNome: '', cienciaEm: '',
       }],
-      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA],
+      useDataStore.getState().data!.ordens_compra, [FORNECEDOR], [OBRA], new Map(),
     );
     expect(linha!.at(-1)).toBe('—');
   });

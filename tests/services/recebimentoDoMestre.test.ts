@@ -54,6 +54,7 @@ vi.mock('../../src/services/supabase/client', () => ({
 
 import {
   arquivarFotoDoRecebimento, cartaoDaLinha, descartarSemPedido, lerLinksDasFotos, ligarSemPedido, lerMaterialAChegar, lerNumeroDaNotaNaFoto,
+  lerRegistroNaFoto,
   registrarEntregaDoMestre, registrarSemPedidoDoMestre, semPedidoDaLinha,
 } from '../../src/services/supabase/recebimento';
 
@@ -401,5 +402,127 @@ describe('a quantidade por item no envio (CTO-D794; Banco-D794 §3)', () => {
   it('o item recusado pelo banco (23514: posição fora da OC ou negativa) para a fila e mostra o motivo', async () => {
     banco.respostas = [recusa('23514', 'O item 9 não é desta OC.')];
     await expect(registrarEntregaDoMestre(entrega({ itens: [{ posicao: 9, quantidade: 1 }] }))).rejects.toBeInstanceOf(RecusaDefinitiva);
+  });
+});
+
+describe('o papel do fornecedor por ECR (CTO-D811 §3, D812 §2): a lista, a leitura e o envio', () => {
+  const linhaComRegistros = (registros: unknown) => cartaoDaLinha({
+    oc_id: 'oc-1', itens: [{ posicao: 1, descricao: 'Cimento de teste', quantidade: 40, unidade: 'sc' }], registros,
+  });
+
+  it('a linha traz o registro de cada ECR pelo contrato do Banco: o `o_que_pede` com a revisão e os itens (D813 §2)', () => {
+    const c = linhaComRegistros([
+      {
+        ecr_id: 2, ecr: 'ECR 02', nome: 'Madeira (teste)', regra: 2, pede: true, a_cada_entrega: true, porque: 'a cada entrega', posicoes: [1, 'x', 0],
+        o_que_pede: {
+          ecr: 'ECR 02', revisao: '01', emitida_em: '2026-04-20',
+          itens: [
+            { rotulo: 'GCA', texto: 'a guia (teste)', numerado: true },
+            { rotulo: '  ', texto: 'a nota (teste)', numerado: false },
+            { rotulo: null, texto: '  ', numerado: true },
+            null,
+          ],
+        },
+      },
+      // A revisão sem o texto no sistema: `itens` nulo.
+      { ecr_id: 4, pede: true, porque: 'sem texto', posicoes: [2], o_que_pede: { ecr: 'ECR 04', revisao: '00', emitida_em: '2026-04-15', itens: null } },
+      // Sem revisão nenhuma: `o_que_pede` nulo.
+      { ecr_id: 15, pede: false, porque: 'Não aplicável', posicoes: [2], o_que_pede: null },
+    ]);
+    expect(c.registros).toEqual([
+      {
+        ecrId: 2, pede: true, aCadaEntrega: true, porque: 'a cada entrega', revisao: '01', posicoes: [1],
+        linhas: [
+          { rotulo: 'GCA', texto: 'a guia (teste)', numerado: true },
+          { rotulo: null, texto: 'a nota (teste)', numerado: false },
+        ],
+      },
+      { ecrId: 4, pede: true, aCadaEntrega: false, porque: 'sem texto', revisao: '00', linhas: [], posicoes: [2] },
+      { ecrId: 15, pede: false, aCadaEntrega: false, porque: 'Não aplicável', revisao: '', linhas: [], posicoes: [2] },
+    ]);
+  });
+
+  it('o banco que ainda não manda `registros`: o cartão fica sem a chave, e o carimbo não pergunta', () => {
+    expect(linhaComRegistros(undefined)).not.toHaveProperty('registros');
+    expect(linhaComRegistros(null)).not.toHaveProperty('registros');
+  });
+
+  it('"pede" só com verdadeiro de fato', () => {
+    expect(linhaComRegistros([{ ecr_id: 1, pede: 'true' }]).registros![0]!.pede).toBe(false);
+    expect(linhaComRegistros([{ ecr_id: 1, pede: true, a_cada_entrega: 'true' }]).registros![0]!.aCadaEntrega).toBe(false);
+  });
+
+  it('a leitura do papel vai à ler-documento com a origem `registro-ecr`, e devolve o alcance', async () => {
+    const corpo = { legivel: true, tipo_registro: 'licença', alcance: 'vale_ate', valido_ate: '2027-06-30', confira: 'a data está no rodapé' };
+    funcao.responde = [{ status: 200, corpo }];
+    expect(await lerRegistroNaFoto(FOTO())).toEqual({
+      alcance: 'vale_ate', validoAte: '2027-06-30', confira: 'a data está no rodapé', bruta: corpo,
+    });
+    expect(funcao.chamadas[0]!.url).toBe(`${ENDERECO}/functions/v1/ler-documento`);
+    expect(funcao.chamadas[0]!.corpo).toMatchObject({ origem: 'registro-ecr', mime: 'image/jpeg' });
+  });
+
+  it('a leitura que não conhece o alcance, que falha, ou sem rede: não lança, e não inventa', async () => {
+    funcao.responde = [{ status: 200, corpo: { alcance: 'talvez', valido_ate: '' } }];
+    expect((await lerRegistroNaFoto(FOTO()))!.alcance).toBeNull();
+    funcao.responde = [{ status: 500, corpo: {} }];
+    expect(await lerRegistroNaFoto(FOTO())).toBeNull();
+    funcao.responde = ['cai'];
+    expect(await lerRegistroNaFoto(FOTO())).toBeNull();
+  });
+
+  it('o papel que veio sobe com a chave, o `origem_item` da ECR e a leitura como veio; o envio leva o documento e o alcance conferido (D813 §2)', async () => {
+    funcao.responde = [
+      { status: 200, corpo: { desfecho: 'arquivado', documento: { id: 'doc-papel' } } },
+    ];
+    const e = entrega({
+      registros: [
+        {
+          ecrId: 6, resposta: 'veio', alcance: 'vale_ate', validoAte: '2027-06-30', foto: FOTO(),
+          lido: { alcance: 'vale_ate', validoAte: '2027-06-30', confira: '', bruta: { legivel: true, alcance: 'vale_ate', valido_ate: '2027-06-30' } },
+        },
+      ],
+    });
+    await registrarEntregaDoMestre(e);
+    expect(funcao.chamadas).toHaveLength(1);
+    expect(funcao.chamadas[0]!.corpo).toMatchObject({
+      origem: 'recebimento-obra', origem_item: 'registro-ecr-06', origem_id: `${e.chave}-ecr-06`, intervencao_id: 'obra-1',
+      extracao: { legivel: true, alcance: 'vale_ate', valido_ate: '2027-06-30' },
+    });
+    expect((banco.rpc[0]!.args['p'] as Record<string, unknown>)['registros']).toEqual([
+      { ecr_id: 6, resposta: 'veio', documento_id: 'doc-papel', alcance: 'vale_ate', valido_ate: '2027-06-30' },
+    ]);
+  });
+
+  it('o papel sem foto não vai: só sobe o que veio (Banco-D840)', async () => {
+    await registrarEntregaDoMestre(entrega({
+      registros: [{ ecrId: 6, resposta: 'veio', alcance: 'lote', foto: null, lido: null }],
+    }));
+    expect(funcao.chamadas).toHaveLength(0);
+    expect(banco.rpc[0]!.args['p']).not.toHaveProperty('registros');
+  });
+
+  it('o alcance que ele conferiu vai, mesmo diferente da leitura (D812 §2, ajuste 3); sem leitura, o papel sobe sem `extracao`', async () => {
+    await registrarEntregaDoMestre(entrega({
+      registros: [{ ecrId: 19, resposta: 'veio', alcance: 'produto', foto: FOTO(), lido: null }],
+    }));
+    expect(funcao.chamadas.at(-1)!.corpo).not.toHaveProperty('extracao');
+    expect((banco.rpc[0]!.args['p'] as Record<string, unknown>)['registros']).toEqual([
+      { ecr_id: 19, resposta: 'veio', documento_id: 'doc-1', alcance: 'produto' },
+    ]);
+  });
+
+  it('sem ECR pedida (o envio antigo da fila, ou a lista vazia): `p` não leva `registros`, e grava como antes', async () => {
+    await registrarEntregaDoMestre(entrega());
+    await registrarEntregaDoMestre(entrega({ registros: [] }));
+    for (const c of banco.rpc) expect(c.args['p']).not.toHaveProperty('registros');
+  });
+
+  it('a foto do papel recusada pela pasta (403): para, com a frase do papel, e a entrega não vai', async () => {
+    funcao.responde = [{ status: 403, corpo: {} }];
+    await expect(registrarEntregaDoMestre(entrega({
+      registros: [{ ecrId: 6, resposta: 'veio', alcance: 'lote', foto: FOTO(), lido: null }],
+    }))).rejects.toThrow('A foto do papel não foi aceita.');
+    expect(banco.rpc).toHaveLength(0);
   });
 });

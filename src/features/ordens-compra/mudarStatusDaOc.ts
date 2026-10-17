@@ -11,7 +11,7 @@ import type { StatusOc } from '../../domain/constants';
 import { travaDaFilial } from '../../domain/fornecedores';
 import { travaDaQuantidade } from '../../domain/itensDaEmissao';
 import { definirStatusOc, ConflitoDeVersao, TravaDoBanco } from '../../services/supabase/dados';
-import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
+import { qualificacaoParaEmitir, travaDaDataParaEmitir } from './qualificacaoParaEmitir';
 import { recarregarDados } from '../../services/supabase/sync';
 
 export const ENTREGUE_SO_COM_AVALIACAO =
@@ -34,6 +34,9 @@ export async function mudarStatusDaOc(
     if (trava) { avisar(trava, 'warning'); return; }
     // Material controlado só com empresa qualificada para as ECRs dele (CTO-D605).
     const q = qualificacaoParaEmitir(oc, fornecedores);
+    // E a que valia na Data da OC, perguntada ao banco (D810).
+    const naData = await travaDaDataParaEmitir(oc, q);
+    if (naData) { avisar(naData, 'warning'); return; }
     if (q.trava) { avisar(q.trava, 'warning'); return; }
     // Nem com quantidade 0: o status muda sozinho, e a linha iria junto (D680).
     const quantidade = travaDaQuantidade(oc.itens, 'historico');

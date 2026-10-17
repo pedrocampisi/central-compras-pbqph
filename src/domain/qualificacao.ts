@@ -13,6 +13,8 @@
  * O "hoje" é o de São Paulo, o mesmo do banco: `hojeEmSaoPaulo`, de `ecr.ts`.
  */
 
+import { todayIso } from './format';
+
 export type Categoria = 'material' | 'servico' | 'controle_tecnologico' | 'projeto' | 'locacao';
 
 export const CATEGORIAS: readonly Categoria[] = ['material', 'servico', 'controle_tecnologico', 'projeto', 'locacao'];
@@ -73,6 +75,21 @@ export interface LinhaDeQualificacao {
   ecrs: number[];
   /** A última do mesmo sujeito e categoria: é a que vale. */
   vigente: boolean;
+  /** Quando foi lançada no sistema (`criado_em`, instante ISO); ausente quando não se sabe. */
+  lancadaEm?: string;
+}
+
+/**
+ * "lançada no sistema em DD/MM/AAAA", quando o lançamento, no dia de São
+ * Paulo, é depois da data da qualificação; '' quando é no mesmo dia, ou não se
+ * sabe (CTO-D819). Não trava nada: a qualificação feita no papel e lançada
+ * depois é legítima. Só não pode parecer feita no sistema naquele dia.
+ */
+export function textoDoLancamento(l: Pick<LinhaDeQualificacao, 'qualificadaEm' | 'lancadaEm'>): string {
+  const quando = l.lancadaEm ? new Date(l.lancadaEm) : null;
+  if (!quando || Number.isNaN(quando.getTime())) return '';
+  const dia = todayIso(quando);
+  return dia > l.qualificadaEm ? `lançada no sistema em ${dataBr(dia)}` : '';
 }
 
 /** De quem é a qualificação que uma filial mostra: a da empresa dela, ou a dela mesma. */
@@ -426,6 +443,29 @@ export interface ErroDoBanco {
 export function fraseDaTravaDoBanco(e: ErroDoBanco): string {
   const dica = e.hint?.trim() ? ` ${e.hint.trim()}` : '';
   return `${e.message.trim().replace(/\.$/, '')}.${dica}`;
+}
+
+/**
+ * A trava da Data (CTO-D808, D810): quando a OC sai do rascunho, ou quando a
+ * Data de uma OC já emitida muda. As duas dicas são as do gatilho do banco.
+ */
+export type OcasiaoDaData = 'emissao' | 'data_mudou';
+
+export const DICA_DA_DATA: Record<OcasiaoDaData, string> = {
+  emissao: 'A qualificação vem antes da compra (PS.02): confira a Data da OC, ou salve como rascunho.',
+  data_mudou: 'A qualificação vem antes da compra (PS.02): confira a Data da OC.',
+};
+
+/**
+ * A recusa da Data, na forma da recusa da emissão. O motivo é o que a
+ * `compras.qualificacao_na_data` devolveu, como veio: a regra mora no banco,
+ * e a tela só põe a moldura e a dica (D810). Sem número, como o banco escreve.
+ */
+export function fraseDaTravaDaData(numero: string, motivo: string, ocasiao: OcasiaoDaData): string {
+  return fraseDaTravaDoBanco({
+    message: `A OC ${numero.trim() || '(sem número)'} não pode ser emitida: ${motivo.trim()}`,
+    hint: DICA_DA_DATA[ocasiao],
+  });
 }
 
 export function fraseDaRecusaDaQualificacao(e: ErroDoBanco): string {

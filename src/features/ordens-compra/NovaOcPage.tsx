@@ -47,7 +47,7 @@ import { useQualificacaoStore, useQualificacoesDoDia } from '../../stores/useQua
 import {
   desempenhoDaFilial, ecrsDoQualificarAgora, nomeDasEcrs, seloDaFilial, textoDoDesempenho,
 } from '../../domain/qualificacao';
-import { qualificacaoParaEmitir } from './qualificacaoParaEmitir';
+import { qualificacaoParaEmitir, travaDaDataParaEmitir } from './qualificacaoParaEmitir';
 import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
 import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
 import { recarregarDados } from '../../services/supabase/sync';
@@ -87,6 +87,9 @@ function buildNewOc(
   defaultObraId: string,
   defaultCondicao: string,
 ): OrdemCompra {
+  // Uma leitura só do relógio: com duas, as horas podiam cair em milissegundos
+  // diferentes, e o título dizia "Editar OC" numa OC em branco (pendência 30).
+  const agora = nowIso();
   return {
     id: uid('oc'),
     numero: '',
@@ -107,8 +110,8 @@ function buildNewOc(
     outras_despesas: 0,
     desconto_material: 0,
     observacoes: '',
-    criado_em: nowIso(),
-    atualizado_em: nowIso(),
+    criado_em: agora,
+    atualizado_em: agora,
     pdf_gerado_em: '',
   };
 }
@@ -542,6 +545,11 @@ export function NovaOcPage() {
       // (CTO-D605). Recusou: abre o "Qualificar agora" na mesma tela. Sem o
       // store carregado não há critério para mostrar — fica só o aviso.
       const q = qualificacaoParaEmitir(ocEditing, data.fornecedores);
+      // E a qualificação que valia na Data da OC, perguntada ao banco (D810).
+      // Essa recusa não abre o "Qualificar agora": a saída é mudar a Data.
+      setSavingPdf(true);
+      const naData = await travaDaDataParaEmitir(ocEditing, q).finally(() => setSavingPdf(false));
+      if (naData) { showToast(naData, 'warning'); return; }
       if (q.trava) {
         const material = useQualificacaoStore.getState().dados?.categorias.find((c) => c.categoria === 'material');
         if (q.selo && material) {

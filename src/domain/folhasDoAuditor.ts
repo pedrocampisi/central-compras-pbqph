@@ -11,6 +11,7 @@
  *   máscara da D599 ligada, a carga já trouxe só as da obra.
  */
 
+import { colunaDoRegistro, type CoberturaDaEntrega } from './entregasSemPapel';
 import { hojeEmSaoPaulo } from './ecr';
 import { agruparPorEmpresa } from './fornecedores';
 import { dataBr, nomeDasEcrs, pedeTratativa, type Categoria, type LinhaDeQualificacao, type Situacao } from './qualificacao';
@@ -69,6 +70,8 @@ export function secoesDosQualificados(
 }
 
 export interface AvaliacaoParaFolha {
+  /** A entrega; é por ela que a cobertura do papel do fornecedor chega. */
+  id?: number;
   ocId: string;
   intervencaoId: string;
   notaFiscal: string;
@@ -102,12 +105,17 @@ function diaEmBrasilia(instante: string): string {
   return Number.isNaN(t) ? instante.slice(0, 10) : hojeEmSaoPaulo(new Date(t));
 }
 
-/** OC, fornecedor, obra, NF, recebida em, prazo, integridade, OC/ECR, observação e tratativa, avaliada por, ciência. */
+/**
+ * OC, fornecedor, obra, NF, recebida em, prazo, integridade, OC/ECR, o registro
+ * do fornecedor (CTO-D845 §2, escolha 3: uma linha curta por ECR que pede o
+ * papel), observação e tratativa, avaliada por, ciência.
+ */
 export function linhasDasAvaliacoes(
   avaliacoes: readonly AvaliacaoParaFolha[],
   ocs: readonly Pick<OrdemCompra, 'id' | 'numero' | 'fornecedor_id'>[],
   fornecedores: readonly Pick<Fornecedor, 'id' | 'razao_social'>[],
   obras: readonly Pick<Obra, 'id' | 'nome'>[],
+  cobertura: ReadonlyMap<number, readonly CoberturaDaEntrega[]>,
 ): string[][] {
   const oc = new Map(ocs.map((o) => [o.id, o]));
   const forn = new Map(fornecedores.map((f) => [f.id, f.razao_social]));
@@ -123,6 +131,7 @@ export function linhasDasAvaliacoes(
       C(a.prazoConforme),
       C(a.integridadeConforme),
       C(a.ocEcrConforme),
+      colunaDoRegistro(cobertura.get(a.id ?? 0)),
       [a.observacao, a.tratativa && `Tratativa: ${a.tratativa}`].filter(Boolean).join(' · ') || '—',
       a.avaliadoPorNome || '—',
       cienciaDaFolha(a),

@@ -58,12 +58,21 @@ em `73d2b3db`** (decisão 88): a tela do mestre ligada ao contrato do Banco, o l
 
 ---
 
-### 30. O teste do título uma vez só (D643, a Nova OC) às vezes falha
+### 30. ~~O teste do título uma vez só (D643, a Nova OC) às vezes falha~~ — consertado e no ar (decisão 133)
 
 *Aberta em 04/10/2026, na decisão 84; atualizada na decisão 87.* Falhou uma vez na `main` (decisão 83) e duas vezes
 no ramo do mestre (a última em 05/10), sempre no meio da bateria inteira; sozinho e nas rodadas seguintes, passou. O código não mudou entre as rodadas: é tempo, não
 regra. **Falta:** achar a espera que está curta (`tests/components/TituloUmaVez.test.tsx`) e prová-la com a bateria
 rodando várias vezes seguidas.
+
+**16/10, decisão 132 (CTO-D853):** a causa foi achada, e não é espera nem é do teste. A OC nova nasce em `buildNewOc` com duas
+chamadas de `nowIso()`. Quando elas caem em milissegundos diferentes, o título diz "Editar OC" numa OC em branco. As
+duas linhas são de 06/05/2026 (`aff88db`). Medido: 1 queda em 20 rodadas da bateria, e 1 em 630 no experimento com 30
+cópias do teste.
+
+**16/10, decisão 133 (CTO-D855):** consertado. A OC nova lê o relógio uma vez só. O teste do relógio
+(`TituloDaOcNova`) e a sabotagem ficaram vermelhos antes e verdes depois. **No ar em `10f05c50`**, pacote `20261017012248-48ff24c`,
+pelo `main` `48ff24c`; o desfazer é `41898c74`.
 
 ---
 
@@ -99,6 +108,14 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 - **conferida por fora pelo CTO** (D741, só registro, CTO `b17f501`).
 
 A Rev. 01 **não foi gravada**: a vigente no banco é a Rev. 00.
+
+**17/10, decisão 134 (CTO-D857, palavra do Pedro: "Pode"):** antes da sentada, o rascunho ganha o papel do fornecedor
+(a parte C). Ele está no ramo `d857-rev01-com-a-parte-c` (`a937762`), **sem publicar**, com 37 mudanças, 64 âncoras e o CI
+verde. Espera a aprovação do CTO; depois, publicar (emenda 3), e só então a sentada.
+
+**17/10, decisão 135 (CTO-D857b):** aprovado, com o acréscimo do encarregado. O rascunho com o papel do fornecedor
+está **no ar** em `109f5e71`, versão `20261017141917-9fac9f5`, pelo `main` `9fac9f5`; o desfazer é `10f05c50`. Medido por
+fora. Agora, só falta a sentada.
 
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
@@ -148,7 +165,35 @@ Meta: 23/10.
 **Falta, fora desta casa:**
 1. o Pedro ler o rascunho e apertar "Gravar a Rev. 01". Só ele aperta;
 2. o Banco trocar as recusas do banco que dizem "mestre" (CTO-D800 ao Banco);
-3. o Pedro decidir o que fazer com o papel `encarregado` do banco.
+3. ~~o Pedro decidir o que fazer com o papel `encarregado` do banco~~: aposentado (CTO-D837, decisão 127).
+
+---
+
+### 42. ~~A D819: quando a qualificação foi lançada no sistema~~ — no ar
+
+*Aberta em 15/10/2026, na decisão 125.*
+- **O ramo:** `d819-qualificacao-lancada` (`566bae5`), **sem publicar**.
+  - A tela mostra "lançada no sistema em DD/MM/AAAA" na linha aberta e no Histórico, quando o lançamento é depois da
+    data. Não trava, e o PDF não muda.
+- **No ar desde as 22h49 de 15/10** (decisão 126): está em `2e116146`, versão `20261016014924-5a07ec2`, pelo `main`
+  `5a07ec2`, com a medida por fora. O desfazer é `9178a00a`.
+- **Na junção com o ramo 2 da parte C,** o conflito na `.rolagem` do CSS se resolve com uma regra só.
+- A D819 e a D822 foram ao arquivo morto.
+
+### 41. ~~A D814: o perfil sem a Ordem de Compra~~ — no ar
+
+*Aberta em 15/10/2026, na decisão 119.* Decisão do Pedro: uma pessoa do financeiro entra na Central de Dados, e não
+precisa da Ordem de Compra.
+- **A trava é do banco:** a marca `core.perfis.sem_ordem_de_compra`, e a recusa "Seu acesso não inclui a Ordem de
+  Compra.".
+- **A tela só avisa:** ela lê a marca na `perfilAtual`, e com a marca não entra, com a frase e o "Sair". Sem a marca,
+  fica tudo como hoje.
+- **Os testes:** com a marca, o aviso; sem a marca, como hoje; e uma sabotagem que deixa entrar.
+- ~~**Num ramo, contra o banco falso, sem publicar.**~~ **Feito** no ramo `d814-perfil-sem-oc` (`b4128df`, decisão
+  120), com o CI verde, 8 sabotagens vermelhas e 3 fotos.
+- ~~**A conferência e a ordem de publicar do CTO.**~~ **No ar** em `9178a00a`, versão `20261016001818-b3e7722`, pelo
+  `main` `b3e7722` (D816, decisão 122), com a medida por fora; o desfazer é `f47f687c`.
+- **Fechada para esta casa.** A marca no banco é do Banco; até ela chegar, todos entram como antes.
 
 ---
 
@@ -157,19 +202,51 @@ Meta: 23/10.
 *Aberta em 15/10/2026, na decisão 110.*
 1. ~~**a parte A**~~ **no ar** em `6547e313`, versão `20261015191902-1f530e7`, pelo `main` `1f530e7` (decisão 112),
    com a medida por fora; o desfazer é `ea46638b`;
-2. **a trava da Data:** o CTO disse sim (D808 §2). O Banco faz primeiro; a tela desta casa vem depois da parte B e
-   quando a parte do Banco estiver no ensaio, nas duas portas de emissão, com o teste de que tela e banco dão a mesma
-   resposta;
-3. **a parte C** (os certificados por ECR) é só proposta, e espera a palavra do Pedro;
-4. **a parte B** (a IA monta o alto e os totais da OC) está pronta no ramo `d805b-ia-monta-a-oc` (`01e8900`,
-   decisão 111), **sem publicar**. Ela liga de verdade quando o Banco publicar o `cabecalho` da `extrair-itens` no
-   ensaio, e o Pedro testa com um orçamento real antes de publicar;
+2. ~~**a trava da Data**~~ **no ar** em `f47f687c`, versão `20261015210401-3e09378`, pelo `main` `3e09378`
+   (decisões 115 e 117), com a medida por fora; o desfazer é `6547e313`. Desde as 21h18 de 15/10, o no ar é o
+   `9178a00a` (o aviso da D814, item 41);
+3. **a parte C** (o registro do fornecedor por ECR): **o desenho está aprovado** (D812 §2), com três ajustes:
+   - o comprador corrige o alcance, com registro;
+   - a marca "a cada entrega" nas ECRs 01, 02 e 17;
+   - o alcance que o encarregado conferiu.
+
+   - **o primeiro ramo, o recebimento,** está no ramo `d812-c1-registro-no-recebimento` (`3204be1`, decisões 118 e
+     119), **sem publicar**, conferido pelo CTO (D815). A gravação de uma entrega é medida pelo Banco no ensaio,
+     com o corpo que mandei (decisão 121): **deu 11 de 11.** O conserto da D818 está em `39c594e` (decisão 124);
+   - **o segundo ramo, a qualificação,** está no ramo `d815-c2-registro-na-qualificacao`, **sem publicar**. Ele foi
+     conferido pelo CTO (D818), e os três consertos estão em `4d949e2` (decisões 123 e 124).
+   - **congelados até a triagem da perícia** (D821): o ramo 1 em `39c594e`, o ramo 2 em `87f991b` (decisão 125).
+   - **a parte C foi refeita** (CTO-D840, decisão 127): o papel entra pelo escritório, e o carimbo só tem um
+     botão opcional. O plano foi aprovado pela D845, e **o ramo novo é o `d840-parte-c-refeita` (`07f3835`)**, sem
+     publicar, com 1250 testes, 97 de 98 sabotagens vermelhas e 11 fotos (decisão 128). O Banco já construiu a parte
+     dele no ensaio (a D842 dele). Os dois ramos velhos seguem congelados;
+   - **daqui em diante, a ordem é:**
+     1. ~~a aprovação do plano~~ (D845);
+     2. ~~o ramo novo~~ (decisão 128);
+     3. ~~a medida no ensaio, só lendo~~ (decisão 129): a forma bate; o ensaio não tem entrega, e uma linha de
+        verdade pede gravar, o que fica com o CTO;
+     4. ~~a perícia, uma só, sobre o código final~~ (CTO-D850, decisão 130): os meus achados 2, 5, 7 e a metade
+        do 4 eram verdadeiros e estão consertados em **`a986686`**, com 1258 testes, 11 de 11 sabotagens vermelhas e
+        o CI verde. O CTO conferiu (D852): 7 de 7;
+     5. ~~o contrato do Banco na produção~~ (D852): conferido pelo CTO e medido por mim, só lendo (decisão 131);
+     6. ~~publicar~~: **no ar em `41898c74`**, pacote `20261017004648-68a1b39`, pelo `main` `68a1b39` (decisão 131),
+        com a medida por fora; o desfazer é `2e116146`. Os dois ramos velhos ficam no repositório (apagar é com o
+        sim do Pedro).
+
+   Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
+4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
+   computador (de pé às 21h47 de 16/10, pela D852; ela cai quando a sessão que a subiu fecha), pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
+   - falta o teste do Pedro com um orçamento real;
+   - depois, a aprovação do CTO. Na produção, a parte B vai primeiro e a versão 24 do Banco depois;
+   - depois do teste, desligar o servidor e devolver o `launch.json` (a cópia está no rascunho da sessão);
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D808 ficam na `Devolucoes` até lá. A D806 foi ao arquivo morto.
+A D805 e a D816 ficam na `Devolucoes` até lá. As D840, a D845, a D842 do Banco, a D848, as D850 e a D852 foram ao arquivo morto (decisões 128 a 131). A D806, e da D808 à D814, foram ao arquivo morto.
+**A D815 §3 foi decidida pelo Pedro** (CTO-D840): ninguém pergunta o papel na entrega, e a pergunta do escritório
+morreu. O papel entra pelo escritório.
 
 ---
 

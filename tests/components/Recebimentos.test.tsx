@@ -15,7 +15,8 @@ vi.mock('../../src/services/supabase/client', () => ({
 }));
 const banco = vi.hoisted(
   () => ({ mascara: null as string | null }) as {
-    fila: Mock; links: Mock; ligar: Mock; descartar: Mock; recarregar: Mock; avaliacoes: Mock; mascara: string | null;
+    fila: Mock; links: Mock; ligar: Mock; descartar: Mock; recarregar: Mock; avaliacoes: Mock; cobertura: Mock;
+    mascara: string | null;
   },
 );
 vi.mock('../../src/services/supabase/recebimento', async (original) => ({
@@ -28,6 +29,11 @@ vi.mock('../../src/services/supabase/recebimento', async (original) => ({
 vi.mock('../../src/services/supabase/qualificacao', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/qualificacao')>()),
   lerAvaliacoesDeEntrega: () => banco.avaliacoes(),
+}));
+vi.mock('../../src/services/supabase/entregasSemPapel', async (original) => ({
+  ...(await original<typeof import('../../src/services/supabase/entregasSemPapel')>()),
+  lerCoberturaDasEntregas: () => banco.cobertura(),
+  lerEntregasSemPapel: async () => [],
 }));
 vi.mock('../../src/services/supabase/pastaDaObra', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/pastaDaObra')>()),
@@ -94,6 +100,7 @@ beforeEach(() => {
   banco.descartar = vi.fn(async () => undefined);
   banco.recarregar = vi.fn(async () => {});
   banco.avaliacoes = vi.fn(async () => []);
+  banco.cobertura = vi.fn(async () => []);
   banco.mascara = null;
   useDataStore.setState({ data: dados() });
   useAuthStore.setState({ perfil: { papel: 'admin' } as never });
@@ -289,6 +296,40 @@ describe('o Histórico: a última entrega de cada OC', () => {
     const linha = (await screen.findByText(/Recebido 02\/10\/2026/)).closest('[data-recebimento-da-oc]') as HTMLElement;
     expect(within(linha).queryByText(/Só uma parte/)).toBeNull();
     expect(within(linha).queryByRole('link')).toBeNull();
+  });
+
+  it('o papel do fornecedor por ECR: o que cobre, com "Abrir"; o que falta; o "não se aplica" com o motivo (CTO-D840 §2.6)', async () => {
+    banco.avaliacoes = vi.fn(async () => [avaliacao({ id: 7 })]);
+    banco.links = vi.fn(async () => new Map([['doc-papel', 'https://pasta-de-teste.invalid/gca.pdf']]));
+    banco.cobertura = vi.fn(async () => [
+      { avaliacaoId: 7, ecrId: 19, situacao: 'sem_papel', documentoId: '', alcance: null, validoAte: '', motivo: '' },
+      { avaliacaoId: 7, ecrId: 2, situacao: 'coberta', documentoId: 'doc-papel', alcance: 'lote', validoAte: '', motivo: '' },
+      { avaliacaoId: 7, ecrId: 6, situacao: 'nao_se_aplica', documentoId: '', alcance: null, validoAte: '', motivo: 'é compensado' },
+      { avaliacaoId: 7, ecrId: 12, situacao: 'nao_exige', documentoId: '', alcance: null, validoAte: '', motivo: '' },
+      // De outra entrega, que não é a última: não aparece.
+      { avaliacaoId: 99, ecrId: 2, situacao: 'sem_papel', documentoId: '', alcance: null, validoAte: '', motivo: '' },
+    ]);
+    render(<HistoricoPage />);
+    const linha = (await screen.findByText(/Recebido 02\/10\/2026/)).closest('[data-recebimento-da-oc]') as HTMLElement;
+    await waitFor(() => expect(linha.querySelectorAll('[data-cobertura]')).toHaveLength(3));
+    const textos = [...linha.querySelectorAll<HTMLElement>('[data-cobertura]')].map((s) => s.textContent);
+    expect(textos).toEqual(['ECR 02: deste lote · Abrir', 'ECR 06: não se aplica — é compensado', 'ECR 19: sem papel']);
+    expect(within(linha.querySelector<HTMLElement>('[data-cobertura="2"]')!).getByRole('link', { name: 'Abrir' }).getAttribute('href'))
+      .toBe('https://pasta-de-teste.invalid/gca.pdf');
+    expect(linha.textContent).not.toContain('ECR 02: sem papel');
+    expect(linha.textContent).not.toContain('ECR 12');
+  });
+
+  it('a leitura da cobertura falhou: a linha da entrega fica como era, sem dizer nada do papel', async () => {
+    banco.avaliacoes = vi.fn(async () => [avaliacao({})]);
+    banco.cobertura = vi.fn(async () => {
+      throw new Error('sem rede');
+    });
+    render(<HistoricoPage />);
+    const linha = (await screen.findByText(/Recebido 02\/10\/2026/)).closest('[data-recebimento-da-oc]') as HTMLElement;
+    await waitFor(() => expect(banco.cobertura).toHaveBeenCalled());
+    expect(linha.querySelector('[data-cobertura]')).toBeNull();
+    expect(linha.textContent).not.toMatch(/sem papel/);
   });
 
   it('a leitura das avaliações falhou: o Histórico segue, sem a linha', async () => {

@@ -98,7 +98,8 @@ export function revisaoNaData(revisoes: readonly TextoDaRevisao[], dataDaOc: str
     .pop();
 }
 
-function itensDoRegistro(secoes: readonly EcrSecao[]): EcrItem[] | null {
+/** As linhas da seção "REGISTRO DO FORNECEDOR"; `null` quando o texto não tem a seção. */
+export function itensDoRegistro(secoes: readonly EcrSecao[]): EcrItem[] | null {
   return secoes.find((s) => s.titulo === REGISTRO_DO_FORNECEDOR)?.itens ?? null;
 }
 

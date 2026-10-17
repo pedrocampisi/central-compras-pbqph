@@ -571,6 +571,24 @@ describe('o número da nota vai só com os dígitos (D792 §4, a D768)', () => {
     await waitFor(() => expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('000123'));
   });
 
+  it('trocou a foto da nota no meio da leitura: vale o número da última (D818 §2)', async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:teste');
+    URL.revokeObjectURL = vi.fn();
+    const respostas: ((n: string) => void)[] = [];
+    montar({ lerNumeroDaNota: vi.fn(() => new Promise<string>((r) => respostas.push(r))) });
+    await abrirEResponder(tudoSim);
+    const campo = () => document.querySelector('input[type=file]')!;
+    fireEvent.change(campo(), { target: { files: [new File(['x'], 'nota-1.jpg', { type: 'image/jpeg' })] } });
+    fireEvent.change(campo(), { target: { files: [new File(['y'], 'nota-2.jpg', { type: 'image/jpeg' })] } });
+    await waitFor(() => expect(respostas).toHaveLength(2));
+    act(() => respostas[1]!('000222'));
+    await waitFor(() => expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('000222'));
+    act(() => respostas[0]!('000111'));
+    await new Promise((r) => setTimeout(r, 0));
+    expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('000222');
+    expect(screen.getByText('Confira o número da nota:')).toBeTruthy();
+  });
+
   it('no sem pedido, a mesma régua: no campo e no rascunho que a versão de antes deixou no celular', async () => {
     const guarda = guardaNaMemoria(true);
     const deAntes: RascunhoSemPedido = { numero: 'nº 12.345', deQuem: '', oQueChegou: 'areia', semEstrago: true };

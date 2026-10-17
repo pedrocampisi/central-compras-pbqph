@@ -1,0 +1,141 @@
+/* Os papéis do fornecedor, por ECR, embaixo dos critérios (CTO-D812). */
+
+.registros {
+  /* Na tabela que rola de lado (o celular), a caixa fica na parte que se vê. */
+  position: sticky;
+  left: 8px;
+  max-width: calc(100cqw - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borda);
+}
+.titulo {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.ecr {
+  padding: 10px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--painel);
+}
+.ecr h5 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto);
+}
+.ecr h6 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+/* Lado a lado no computador; um embaixo do outro no celular. */
+.lados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.lados > div { min-width: 0; }
+
+.pede {
+  margin: 0;
+  padding-left: 18px;
+  list-style: square;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto);
+}
+.nota {
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border-left: 3px solid var(--erro);
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.marca {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--marca);
+  border-radius: var(--raio-pequeno);
+  background: var(--marca-fraca);
+  font-size: 13px;
+  color: var(--texto);
+}
+
+.aviso {
+  margin: 0 0 6px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--aviso);
+  border-radius: var(--raio-pequeno);
+  background: var(--aviso-bg);
+  font-size: 13px;
+  color: var(--texto);
+}
+
+.guardados {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.guardados li {
+  padding: 6px 8px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.guardados li[data-vigencia='vencido'],
+.guardados li[data-vigencia='vence_em_30_dias'] {
+  border-color: var(--aviso);
+  background: var(--aviso-bg);
+}
+.linhaDoPapel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.linhaDoPapel strong { margin-right: auto; color: var(--texto); }
+.abrir {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--marca);
+}
+.quem,
+.correcao {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+.correcao { font-style: italic; }
+
+.vazio {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.erro {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: var(--raio-pequeno);
+  background: var(--erro-bg);
+  color: var(--erro);
+  font-size: 13px;
+}
