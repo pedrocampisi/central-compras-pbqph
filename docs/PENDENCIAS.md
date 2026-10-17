@@ -234,11 +234,12 @@ precisa da Ordem de Compra.
         sim do Pedro).
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
-4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
-   computador (de pé às 21h47 de 16/10, pela D852; ela cai quando a sessão que a subiu fecha), pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
-   - falta o teste do Pedro com um orçamento real;
-   - depois, a aprovação do CTO. Na produção, a parte B vai primeiro e a versão 24 do Banco depois;
-   - depois do teste, desligar o servidor e devolver o `launch.json` (a cópia está no rascunho da sessão);
+4. **a parte B** (a IA monta o alto e os totais da OC): **no ar** em `af74b1e7`, versão `20261017163659-7460451`,
+   pelo `main` `7460451` (o ramo `d805b-ia-monta-a-oc` em `2e82f99`, decisão 136), com a medida por fora; o desfazer é
+   `109f5e71`. O Pedro mandou tirar o ensaio do caminho (CTO-D865): o teste dele passa a ser na produção. A 5174
+   caiu, e o `launch.json` voltou ao do repositório.
+   - **falta:** a conferência do CTO por fora; depois, a versão 24 da `extrair-itens` pelo Banco (com a carta do
+     CTO); com os dois no ar, o teste do Pedro com um orçamento real;
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de

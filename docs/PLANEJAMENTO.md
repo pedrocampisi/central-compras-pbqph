@@ -4371,3 +4371,24 @@ do encarregado (M15). Mandou publicar.
   do rascunho.
 
 **A vez é do Pedro:** ler e gravar a Rev. 01, com a mão dele. **Nada foi gravado. O banco não mudou.**
+
+---
+
+## Decisão 136 — a parte B, a IA monta a OC, no ar em `af74b1e7` · 17/10/2026
+
+**POR QUÊ (CTO-D865, palavra do Pedro às 13h2x na janela do CTO):** "Pode tirar o banco de testes do caminho: a IA da OC
+vai direto para a produção e eu testo lá". O teste dele, que era no ensaio antes de publicar (D805), passa a ser na
+produção, depois do ar. O CTO já tinha conferido o ramo (D809) e o ensaio (D811).
+
+**O QUE FOI:**
+- **o `main` no ramo:** 52 commits desde `5c63e34`, só o `NovaOcPage.tsx` mudou dos dois lados, e a junção não teve
+  conflito; o ramo `d805b-ia-monta-a-oc` em `2e82f99`. Depois, o ramo no `main` em `7460451`, só os 8 arquivos da parte B;
+- **a prova:** 1287 testes, `tsc` e `eslint` limpos, o CI verde. A versão 8 da `extrair-itens`, que está na produção
+  e não manda o `cabecalho`, é coberta por dois testes, um na leitura e um na tela. As 2 sabotagens deram vermelho;
+- **a publicação:** pelo PowerShell, em `af74b1e7-df16-40af-ab9c-37988b312091`, versão `20261017163659-7460451`;
+  **o desfazer é `109f5e71`**. A medida por fora, sem login: a versão, e as marcas, as chaves e as frases da parte B no
+  código servido;
+- **a 5174 caiu,** e o `launch.json` voltou ao do repositório.
+
+**Falta:** a conferência do CTO; a versão 24 pelo Banco, depois dela; o teste do Pedro. **Nada foi gravado. O banco
+não mudou.**
