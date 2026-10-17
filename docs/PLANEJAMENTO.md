@@ -4336,3 +4336,20 @@ cai de vez em quando pode esconder uma corrida, e o código novo da parte C é a
   entrar: depois de trocar, ou de o papel voltar sozinho, é preciso recarregar a página. Contado ao CTO, sem construir.
 
 **Nada foi gravado. O banco não mudou.**
+
+## Decisão 134 — a Rev. 01 do PS.02 com o papel do fornecedor, no ramo `a937762` · 17/10/2026
+
+**POR QUÊ (CTO-D857, palavra do Pedro na janela do CTO: "Pode"):** o rascunho da Rev. 01 é de 13/10 e não dizia nada
+do papel do fornecedor que a ECR pede. A parte C está no ar desde 16/10. Gravada hoje, a Rev. 01 nasceria atrasada.
+
+**O QUE FOI:**
+- **pelo roteiro** (`scripts/rascunho-rev01-ps02.py`, que antes reproduziu o `main`): no item 4, dois parágrafos novos
+  (M35, o registro do fornecedor; M36, o alcance do papel e a coluna do PDF); no item 6, o quadro "Registro do
+  fornecedor" (M37); e acréscimos no passo 5 do fluxo (M10), no quadro de quem compra (M13), no do encarregado (M15,
+  além do pedido, dito ao CTO) e no resumo da revisão (M34). 37 mudanças, 64 âncoras, nenhum requisito do SiAC sai;
+- **cada frase conferida:** no código do `main` e, para a regra de quem cobre o quê, nas funções do banco na produção,
+  só lendo (`registro_pede`, `cobertura_da_entrega`, as marcas 1, 2 e 17);
+- **a prova:** 1260 testes, `tsc` e `eslint` limpos, o CI verde; 2 sabotagens vermelhas; 12 fotos a 375 e a 1280 e o
+  PDF do rascunho em `docs/Capturas/2026-10-17_D857/`. A prova da página foi apagada depois.
+
+**Não publicado.** Espera a aprovação do CTO. **Nada foi gravado. O banco não mudou.**

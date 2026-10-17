@@ -109,6 +109,10 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 A Rev. 01 **não foi gravada**: a vigente no banco é a Rev. 00.
 
+**17/10, decisão 134 (CTO-D857, palavra do Pedro: "Pode"):** antes da sentada, o rascunho ganha o papel do fornecedor
+(a parte C). Ele está no ramo `d857-rev01-com-a-parte-c` (`a937762`), **sem publicar**, com 37 mudanças, 64 âncoras e o CI
+verde. Espera a aprovação do CTO; depois, publicar (emenda 3), e só então a sentada.
+
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
    pelo script e volta a ele);
