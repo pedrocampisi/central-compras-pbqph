@@ -4285,3 +4285,22 @@ do 4. O CTO só aceita achado com a medida: verdadeiro ou falso, com o teste, e 
 - **a porta 5174:** de pé às 20h37, com a parte B em `1647826`, sem mudança.
 
 **Nada foi gravado. O banco não mudou.** A produção sai pela carta do CTO.
+
+## Decisão 131 — a parte C no ar em `41898c74` · 16/10/2026
+
+**POR QUÊ (CTO-D852):** a triagem da perícia fechou em 7 de 7, e o Banco subiu a parte dele à produção, conferida
+pelo CTO. A ordem: medir a produção só lendo, juntar no `main`, esperar o CI, publicar e medir o que foi ao ar.
+
+**O QUE FOI:**
+- **a medida na produção:** as sete funções que o ramo chama, com os direitos (`authenticated` executa, `anon` não);
+  as três tabelas novas com RLS e `SELECT` só do `authenticated`; a `arquivar-documento` v22, com a origem
+  `qualificacao-fornecedor` e a recusa nova `409 arquivo_de_outra_origem`, que a tela já mostra pelo `erro`; a
+  `ler-documento` v18, com a origem `registro-ecr`. O mapa de tipos do Banco bate; esta casa não o importa;
+- **a junção:** o `d840-parte-c-refeita` (`a986686`) no `main` em `68a1b39`, sem conflito. A parte B ficou no ramo
+  dela. 1258 testes; um caiu uma vez sem o nome ficar guardado, e cinco rodadas seguidas deram 1258 de 1258. O CI
+  ficou verde;
+- **a publicação:** pelo PowerShell às 21h47, versão `41898c74-39d7-475f-8d99-0cd9b7ece3fc`, pacote
+  `20261017004648-68a1b39`; o desfazer é `2e116146`. Por fora, o `versao.txt`, o `.js` e o `.css` servidos são
+  iguais ao pacote.
+
+**Nada foi gravado. O banco não mudou.**

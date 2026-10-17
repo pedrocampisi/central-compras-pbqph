@@ -210,13 +210,15 @@ precisa da Ordem de Compra.
         verdade pede gravar, o que fica com o CTO;
      4. ~~a perícia, uma só, sobre o código final~~ (CTO-D850, decisão 130): os meus achados 2, 5, 7 e a metade
         do 4 eram verdadeiros e estão consertados em **`a986686`**, com 1258 testes, 11 de 11 sabotagens vermelhas e
-        o CI verde. Falta a conferência do CTO dos consertos das duas casas;
-     5. o contrato do Banco na produção;
-     6. publicar.
+        o CI verde. O CTO conferiu (D852): 7 de 7;
+     5. ~~o contrato do Banco na produção~~ (D852): conferido pelo CTO e medido por mim, só lendo (decisão 131);
+     6. ~~publicar~~: **no ar em `41898c74`**, pacote `20261017004648-68a1b39`, pelo `main` `68a1b39` (decisão 131),
+        com a medida por fora; o desfazer é `2e116146`. Os dois ramos velhos ficam no repositório (apagar é com o
+        sim do Pedro).
 
    Constrói-se com a recomendação até a resposta do Pedro (o item 24 dele);
 4. **a parte B** (a IA monta o alto e os totais da OC) está **ligada no ensaio**, em http://localhost:5174 neste
-   computador (de pé às 20h37 de 16/10, pela D850; ela cai quando a sessão que a subiu fecha), pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
+   computador (de pé às 21h47 de 16/10, pela D852; ela cai quando a sessão que a subiu fecha), pelo ramo `d805b-ia-monta-a-oc` (`1647826`, decisões 111 e 113), **sem publicar**:
    - falta o teste do Pedro com um orçamento real;
    - depois, a aprovação do CTO. Na produção, a parte B vai primeiro e a versão 24 do Banco depois;
    - depois do teste, desligar o servidor e devolver o `launch.json` (a cópia está no rascunho da sessão);
@@ -225,7 +227,7 @@ precisa da Ordem de Compra.
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
 publicar; a trava da Data é sim, com o banco primeiro e a tela desta casa depois da parte B.
 
-A D805 e a D816 ficam na `Devolucoes` até lá. As D840, a D845, a D842 do Banco, a D848 e as D850 foram ao arquivo morto (decisões 128 a 130). A D806, e da D808 à D814, foram ao arquivo morto.
+A D805 e a D816 ficam na `Devolucoes` até lá. As D840, a D845, a D842 do Banco, a D848, as D850 e a D852 foram ao arquivo morto (decisões 128 a 131). A D806, e da D808 à D814, foram ao arquivo morto.
 **A D815 §3 foi decidida pelo Pedro** (CTO-D840): ninguém pergunta o papel na entrega, e a pergunta do escritório
 morreu. O papel entra pelo escritório.
 
