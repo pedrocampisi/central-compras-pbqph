@@ -1,6 +1,6 @@
 # PS.02 Rev. 01 — o rascunho, mudança por mudança
 
-> **Data:** 06/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)
+> **Data:** 17/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)
 > **Estado:** PROPOSTA — aguardando o Pedro
 > **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738, D739). **NÃO** é o procedimento: o texto inteiro está em `src/features/procedimento/rev01/documento.json`, na forma que o banco guarda, e é o que a página mostra a quem revisa e o que o botão "Gravar a Rev. 01" grava.
 
@@ -8,12 +8,12 @@
 
 ## Em uma olhada
 
-- **34 mudanças.** Quase todas acrescentam a tela do sistema ao que o PS.02 já dizia.
+- **37 mudanças.** Quase todas acrescentam a tela do sistema ao que o PS.02 já dizia.
 - **Requisitos do SiAC que saem: 0.** Nenhum requisito da Rev. 00 sai nem se estreita. Cada mudança foi conferida uma a uma (coluna "SiAC").
-- **Pontos já decididos: 7.** Foram decididos antes do rascunho, e a decisão de cada um está na seção seguinte (CTO-D739 §3). Na sentada, o Pedro lê o texto inteiro e pode recusar qualquer frase.
+- **Pontos já decididos: 9.** Foram decididos antes do rascunho, e a decisão de cada um está na seção seguinte (CTO-D739 §3). Na sentada, o Pedro lê o texto inteiro e pode recusar qualquer frase.
 - **Nada inventado:** cada frase sobre o sistema foi medida no código ou no banco. O que o sistema não faz (contratos, PES, avaliação de serviço, projeto e laboratório, o PSQ), o texto não diz que ele faz.
 - **O que não muda:** o item 5 (laboratórios) inteiro, o aviso do PSQ/SiMaC, o escopo, a referência, o sumário e o rodapé.
-- **A forma:** a do contrato do Banco. As 11 âncoras do documento continuam; são 61 âncoras, nenhuma repetida, e todo cartão e item do sumário apontam para uma que existe.
+- **A forma:** a do contrato do Banco. As 11 âncoras do documento continuam; são 64 âncoras, nenhuma repetida, e todo cartão e item do sumário apontam para uma que existe.
 
 ## Os pontos já decididos
 
@@ -23,6 +23,8 @@
 - **M19 — 2, tabela, linha "Projetos / engenharia".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 - **M20 — 2, tabela, linha "Locação".** D729 e D730: as perguntas da tela são as da própria planilha FO 8.4.1.1 (D604), e o Pedro as pôs na Rev. 01 ("pode mandar").
 - **M21 — 2, tabela, linha "Controle tecnológico".** D606 §2: o laboratório segue o PS.02, basta um enquadramento (o mínimo do banco é 1).
+- **M35 — 4, parágrafo novo: o registro do fornecedor.** D840: o papel entra pelo escritório, e o carimbo do app só tem um botão opcional. A D815 §3 foi decidida pelo Pedro: ninguém pergunta o papel na entrega.
+- **M36 — 4, parágrafo novo: o alcance do papel e o PDF das avaliações.** D812 §2: o desenho dos três alcances, com a correção registrada e a marca "a cada entrega" nas ECRs 01, 02 e 17.
 - **M29 — 6, quadro "FO 8.4.1.1", o link da planilha.** D604: a planilha FO 8.4.1.1 foi aposentada; o registro é a tela Qualificação.
 
 ## Todas as mudanças
@@ -103,8 +105,8 @@
 
 - **Âncora:** `fluxo.s5`
 - **Antes:** Conferir o que foi entregue/executado.
-- **Depois:** Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado.
-- **Por quê:** O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799).
+- **Depois:** Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado; o papel do fornecedor que a ECR pede, o escritório anexa, em Recebimentos.
+- **Por quê:** O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799). E o papel do fornecedor que a ECR pede entra pelo escritório (a parte C, D840 e D857).
 - **SiAC:** Nenhum requisito sai.
 
 ### M11 — Fluxo, passo "6 · Avaliação"
@@ -128,8 +130,8 @@
 
 - **Âncora:** `objetivo.q1.i2`
 - **Antes:** Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais.
-- **Depois:** Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e resolve o que chegou sem pedido, na tela Recebimentos.
-- **Por quê:** As telas de quem compra.
+- **Depois:** Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e, na tela Recebimentos, resolve o que chegou sem pedido e as entregas sem papel do fornecedor.
+- **Por quê:** As telas de quem compra. As entregas sem papel do fornecedor são de quem emite as OCs (a parte C, D840 e D857).
 - **SiAC:** Nenhum requisito sai.
 
 ### M14 — 1, quadro "Obra / Engenharia"
@@ -144,8 +146,8 @@
 
 - **Âncora:** `objetivo.q1`
 - **Antes:** não existia.
-- **Depois (novo):** **Encarregado de obra**: Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere).
-- **Por quê:** O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O papel não estava no PS.02.
+- **Depois (novo):** **Encarregado de obra**: Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere). Se o papel do fornecedor que a ECR pede veio com o caminhão, ele pode anexar no app; se não veio, não precisa fazer nada.
+- **Por quê:** O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O papel não estava no PS.02. O botão do papel do fornecedor é opcional (a parte C, D840 e D857).
 - **SiAC:** Nenhum requisito sai.
 
 ### M16 — 2, primeiro parágrafo
@@ -249,6 +251,24 @@
 - **Por quê:** O "comunicar o responsável" virou a tratativa aberta no Dashboard, com a ciência dele.
 - **SiAC:** Nenhum requisito sai.
 
+### M35 — 4, parágrafo novo: o registro do fornecedor
+
+- **Âncora:** `avaliacao.q1`
+- **Antes:** não existia.
+- **Depois (novo):** **O registro do fornecedor:** a ECR diz, na seção "Registro do fornecedor" da revisão vigente na Data da OC, o papel que o fornecedor tem de mandar; quando ela diz "Não aplicável", nenhum papel é pedido. O papel chega ao escritório, e quem emite as OCs o anexa: em **Recebimentos**, na lista "Entregas sem papel do fornecedor"; pela OC, no **Histórico**; ou pela empresa, na tela **Qualificação**. A IA lê o papel e sugere o alcance, e quem anexa confere. Quando o papel não cabe numa entrega, quem emite as OCs marca "Não se aplica a esta entrega", com o motivo: a marca não se desfaz e guarda quem marcou e quando. A entrega fica na lista até o papel ser anexado ou a marca ser feita. O encarregado de obra pode anexar o papel pelo app do encarregado, se ele veio com o caminhão; se não veio, não precisa fazer nada: o escritório cuida.
+- **Por quê:** A parte C (D840, no ar desde a D852) pôs o papel do fornecedor no sistema, e o PS.02 não dizia nada dele. É o ponto da avaliação no recebimento (SiAC 8.4.1.2) que o auditor mais olha (D857).
+- **SiAC:** Nenhum requisito sai.
+- **Já decidido:** D840: o papel entra pelo escritório, e o carimbo do app só tem um botão opcional. A D815 §3 foi decidida pelo Pedro: ninguém pergunta o papel na entrega.
+
+### M36 — 4, parágrafo novo: o alcance do papel e o PDF das avaliações
+
+- **Âncora:** `avaliacao.p1`
+- **Antes:** não existia.
+- **Depois (novo):** **O alcance do papel:** cada papel guardado diz até onde vale: **deste lote** (as entregas da OC em que chegou), **vale até** uma data (as entregas da mesma empresa recebidas até ela) ou **vale para o produto**, sem prazo. Nas ECRs que pedem o papel a cada entrega (marcadas no Catálogo de ECRs; hoje, a 01, a 02 e a 17), só vale o papel da própria entrega. Quem emite as OCs pode corrigir o alcance depois, com o motivo, e a correção fica registrada. No "PDF das avaliações" do Histórico, a coluna "Registro do fornecedor" diz, para cada ECR da entrega, se o papel veio e com que alcance, se não se aplica (com o motivo) ou se falta; ela traz "—" quando nenhuma ECR da entrega pede papel.
+- **Por quê:** Como o sistema decide se uma entrega tem o papel (a cobertura do Banco, D840), e onde o auditor lê isso.
+- **SiAC:** Nenhum requisito sai.
+- **Já decidido:** D812 §2: o desenho dos três alcances, com a correção registrada e a marca "a cada entrega" nas ECRs 01, 02 e 17.
+
 ### M28 — 6, quadro "FO 8.4.1.1"
 
 - **Âncora:** `registros.q1.i1`
@@ -290,6 +310,14 @@
 - **Por quê:** Onde a avaliação fica no sistema. O texto de antes fica, para o que é avaliado fora dele.
 - **SiAC:** Nenhum requisito sai.
 
+### M37 — 6, quadro novo "Registro do fornecedor"
+
+- **Âncora:** `registros.q1`
+- **Antes:** não existia.
+- **Depois (novo):** **Registro do fornecedor**: O papel que a ECR pede, guardado por ECR e por empresa, com o alcance, quem conferiu e quando; as correções do alcance e as marcas de "não se aplica" ficam registradas. No sistema: na tela Qualificação, na empresa, e no Histórico, na linha de cada entrega; para o auditor, a coluna "Registro do fornecedor" do "PDF das avaliações".
+- **Por quê:** O papel do fornecedor passou a ser um registro do sistema (a parte C, D840 e D857).
+- **SiAC:** Nenhum requisito sai.
+
 ### M33 — 7, o "?" do item
 
 - **Âncora:** `revisoes`
@@ -302,7 +330,7 @@
 
 - **Âncora:** `revisoes.a1`
 - **Antes:** Conteúdo preparado para a próxima revisão formal: migração para o padrão HTML oficial, consolidação do fluxo de aquisição e correções de interpretação do SiAC 8.4.
-- **Depois:** **Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.
-- **Por quê:** O quadro descrevia a migração para o HTML, que a página já é (D732 §4).
+- **Depois:** **Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado, a tratativa no Dashboard e o papel do fornecedor que a ECR pede (o registro do fornecedor) entram no texto.
+- **Por quê:** O quadro descrevia a migração para o HTML, que a página já é (D732 §4). O papel do fornecedor entrou na D857.
 - **SiAC:** Nenhum requisito sai.
 

@@ -122,8 +122,8 @@ MUDANCAS = [
      'A tela de cada passo, para material.', MANTIDO, None),
     ('M10', 'Fluxo, passo "5 · Recebimento"', 'fluxo.s5', 'texto',
      'Conferir o que foi entregue/executado.',
-     'Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado.',
-     'O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799).', MANTIDO, None),
+     'Conferir o que foi entregue/executado. Material: o encarregado registra no app do encarregado; o papel do fornecedor que a ECR pede, o escritório anexa, em Recebimentos.',
+     'O recebimento de material virou o app do encarregado (D730 §4.2; na tela, “encarregado” desde a D799). E o papel do fornecedor que a ECR pede entra pelo escritório (a parte C, D840 e D857).', MANTIDO, None),
     ('M11', 'Fluxo, passo "6 · Avaliação"', 'fluxo.s6', 'texto',
      'Registrar desempenho e tratar desvios.',
      'Registrar desempenho e tratar desvios. Material: a avaliação da OC; a tratativa fica no Dashboard até a ciência.',
@@ -138,8 +138,8 @@ MUDANCAS = [
      'D589: só o Pedro revisa as ECRs, e a D730 estendeu a regra ao procedimento. Gravar a Rev. 01 pela mão dele, na página (D739 §4), torna a frase verdade.'),
     ('M13', '1, quadro "Administrativo / Compras"', 'objetivo.q1.i2', 'texto',
      'Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais.',
-     'Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e resolve o que chegou sem pedido, na tela Recebimentos.',
-     'As telas de quem compra.', MANTIDO, None),
+     'Realiza cotações, compras, formalizações e organização dos registros financeiros/documentais. No sistema, emite as OCs na Nova OC, registra as entregas no Histórico e, na tela Recebimentos, resolve o que chegou sem pedido e as entregas sem papel do fornecedor.',
+     'As telas de quem compra. As entregas sem papel do fornecedor são de quem emite as OCs (a parte C, D840 e D857).', MANTIDO, None),
     ('M14', '1, quadro "Obra / Engenharia"', 'objetivo.q1.i3', 'texto',
      'Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação.',
      'Levanta quantitativos, solicita compras, define requisitos técnicos, recebe, armazena, identifica e apoia a avaliação. No sistema, a engenharia cadastra o encarregado de obra, põe na obra e gera o QR de entrada dele, na tela Acesso dos encarregados.',
@@ -147,8 +147,8 @@ MUDANCAS = [
     ('M15', '1, quadro novo "Encarregado de obra"', 'objetivo.q1', 'novo_item',
      None,
      {'ancora': 'objetivo.q1.i4', 'titulo': 'Encarregado de obra',
-      'texto': rico('Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere).')},
-     'O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O papel não estava no PS.02.', MANTIDO, None),
+      'texto': rico('Recebe o material na obra pelo app do encarregado: responde “Chegou no dia combinado?”, “Chegou sem estrago?”, “Veio o material certo?” e “Veio a quantidade toda?”; quando veio só uma parte, ele diz quanto veio de cada item; e registra o número da nota (o app pode ler o número na foto da nota, e o encarregado confere). Se o papel do fornecedor que a ECR pede veio com o caminhão, ele pode anexar no app; se não veio, não precisa fazer nada.')},
+     'O encarregado passou a receber pelo sistema (o app do encarregado, D693 e D696), com as perguntas da tela (D792) e a quantidade por item no "Só uma parte" (D797). O papel não estava no PS.02. O botão do papel do fornecedor é opcional (a parte C, D840 e D857).', MANTIDO, None),
 
     # ── 2. Qualificação ──
     ('M16', '2, primeiro parágrafo', 'qualificacao.p1', 'texto',
@@ -213,6 +213,20 @@ MUDANCAS = [
      'Regra operacional do controle digital: quando houver duas ou mais respostas “Não Conforme”, registrar a tratativa e comunicar o responsável definido pela Campisi. A abertura de RNC/FO 10.2 ocorre quando o desvio se enquadrar no processo de não conformidade da empresa; não deve ser gerada automaticamente apenas pelo número de respostas.',
      '**Regra operacional do controle digital:** quando houver duas ou mais respostas “Não Conforme”, o sistema exige a tratativa por escrito e a mantém em "Tratativas abertas", no Dashboard, até o responsável pelas ECRs dar ciência. A abertura de RNC/FO 10.2 ocorre quando o desvio se enquadrar no processo de não conformidade da empresa; não deve ser gerada automaticamente apenas pelo número de respostas.',
      'O "comunicar o responsável" virou a tratativa aberta no Dashboard, com a ciência dele.', MANTIDO, None),
+    ('M35', '4, parágrafo novo: o registro do fornecedor', 'avaliacao.q1', 'novo_bloco_depois',
+     None,
+     {'tipo': 'paragrafo', 'ancora': 'avaliacao.p1', 'miudo': False,
+      'texto': rico('**O registro do fornecedor:** a ECR diz, na seção "Registro do fornecedor" da revisão vigente na Data da OC, o papel que o fornecedor tem de mandar; quando ela diz "Não aplicável", nenhum papel é pedido. O papel chega ao escritório, e quem emite as OCs o anexa: em **Recebimentos**, na lista "Entregas sem papel do fornecedor"; pela OC, no **Histórico**; ou pela empresa, na tela **Qualificação**. A IA lê o papel e sugere o alcance, e quem anexa confere. Quando o papel não cabe numa entrega, quem emite as OCs marca "Não se aplica a esta entrega", com o motivo: a marca não se desfaz e guarda quem marcou e quando. A entrega fica na lista até o papel ser anexado ou a marca ser feita. O encarregado de obra pode anexar o papel pelo app do encarregado, se ele veio com o caminhão; se não veio, não precisa fazer nada: o escritório cuida.')},
+     'A parte C (D840, no ar desde a D852) pôs o papel do fornecedor no sistema, e o PS.02 não dizia nada dele. É o ponto da avaliação no recebimento (SiAC 8.4.1.2) que o auditor mais olha (D857).',
+     MANTIDO,
+     'D840: o papel entra pelo escritório, e o carimbo do app só tem um botão opcional. A D815 §3 foi decidida pelo Pedro: ninguém pergunta o papel na entrega.'),
+    ('M36', '4, parágrafo novo: o alcance do papel e o PDF das avaliações', 'avaliacao.p1', 'novo_bloco_depois',
+     None,
+     {'tipo': 'paragrafo', 'ancora': 'avaliacao.p2', 'miudo': False,
+      'texto': rico('**O alcance do papel:** cada papel guardado diz até onde vale: **deste lote** (as entregas da OC em que chegou), **vale até** uma data (as entregas da mesma empresa recebidas até ela) ou **vale para o produto**, sem prazo. Nas ECRs que pedem o papel a cada entrega (marcadas no Catálogo de ECRs; hoje, a 01, a 02 e a 17), só vale o papel da própria entrega. Quem emite as OCs pode corrigir o alcance depois, com o motivo, e a correção fica registrada. No "PDF das avaliações" do Histórico, a coluna "Registro do fornecedor" diz, para cada ECR da entrega, se o papel veio e com que alcance, se não se aplica (com o motivo) ou se falta; ela traz "—" quando nenhuma ECR da entrega pede papel.')},
+     'Como o sistema decide se uma entrega tem o papel (a cobertura do Banco, D840), e onde o auditor lê isso.',
+     MANTIDO,
+     'D812 §2: o desenho dos três alcances, com a correção registrada e a marca "a cada entrega" nas ECRs 01, 02 e 17.'),
 
     # ── 6. Registros e evidências ──
     ('M28', '6, quadro "FO 8.4.1.1"', 'registros.q1.i1', 'texto',
@@ -237,6 +251,11 @@ MUDANCAS = [
      'NF, formulário digital, bot ou planilha rastreável',
      'As avaliações de cada OC, no sistema; para o auditor, o "PDF das avaliações" do Histórico. Fora do sistema: NF, formulário digital, bot ou planilha rastreável.',
      'Onde a avaliação fica no sistema. O texto de antes fica, para o que é avaliado fora dele.', MANTIDO, None),
+    ('M37', '6, quadro novo "Registro do fornecedor"', 'registros.q1', 'novo_item',
+     None,
+     {'ancora': 'registros.q1.i6', 'titulo': 'Registro do fornecedor',
+      'texto': rico('O papel que a ECR pede, guardado por ECR e por empresa, com o alcance, quem conferiu e quando; as correções do alcance e as marcas de "não se aplica" ficam registradas. No sistema: na tela Qualificação, na empresa, e no Histórico, na linha de cada entrega; para o auditor, a coluna "Registro do fornecedor" do "PDF das avaliações".')},
+     'O papel do fornecedor passou a ser um registro do sistema (a parte C, D840 e D857).', MANTIDO, None),
 
     # ── 7. Histórico e controle de revisão ──
     ('M33', '7, o "?" do item', 'revisoes', 'ajuda',
@@ -245,8 +264,8 @@ MUDANCAS = [
      'O "autosave do navegador" era do HTML, e no sistema não existe (D732 §4).', MANTIDO, None),
     ('M34', '7, o quadro "Conteúdo preparado para a próxima revisão formal"', 'revisoes.a1', 'texto',
      'Conteúdo preparado para a próxima revisão formal: migração para o padrão HTML oficial, consolidação do fluxo de aquisição e correções de interpretação do SiAC 8.4.',
-     '**Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado e a tratativa no Dashboard entram no texto.',
-     'O quadro descrevia a migração para o HTML, que a página já é (D732 §4).', MANTIDO, None),
+     '**Conteúdo desta revisão (Rev. 01):** o procedimento passa a dizer em que tela do sistema de compras cada passo é feito; o item 2 passa a remeter os laboratórios ao item 5; e a trava da emissão, o app do encarregado, a tratativa no Dashboard e o papel do fornecedor que a ECR pede (o registro do fornecedor) entram no texto.',
+     'O quadro descrevia a migração para o HTML, que a página já é (D732 §4). O papel do fornecedor entrou na D857.', MANTIDO, None),
 ]
 
 
@@ -346,7 +365,7 @@ def leitura(rev00, rev01, n_ancoras):
     vermelhos = [m for m in MUDANCAS if m[7] == VERMELHO]
     L = []
     L += ['# PS.02 Rev. 01 — o rascunho, mudança por mudança', '',
-          '> **Data:** 06/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)',
+          '> **Data:** 17/10/2026 (gerado por `scripts/rascunho-rev01-ps02.py`; não edite à mão)',
           '> **Estado:** PROPOSTA — aguardando o Pedro',
           '> **Escopo:** o que muda da Rev. 00 para a Rev. 01 do PS.02, com o motivo de cada mudança (CTO-D730 §4, D738, '
           'D739). **NÃO** é o procedimento: o texto inteiro está em `src/features/procedimento/rev01/documento.json`, na '
