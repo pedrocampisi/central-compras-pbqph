@@ -4454,3 +4454,33 @@ Sobre a filial: "Ela tem que escolher a matriz".
   forma do preço.
 
 **Espera a aprovação do CTO e o plano do Banco.** **Nada foi gravado. O banco não mudou.**
+
+---
+
+## Decisão 140 — o ramo do total ao centavo e do fornecedor pelo nome, sem publicar · 23/10/2026
+
+**POR QUÊ (CTO-D889, com a D890 e a D892 em cópia):** o plano da decisão 139 foi aprovado com as duas escolhas: o
+arredondamento nos campos de hoje (A) e o preço da TABELA com o desconto de 4 casas. Nas palavras do CTO: "Construa o
+ramo já, sem publicar." A D892 inverteu a ordem: a tela desta casa sobe primeiro, e a função do Banco logo depois.
+
+**O QUE FOI (o ramo `d889-total-ao-centavo`, `8a0f08e`, sobre o `main` `10f5e8c`, CI verde):**
+- **a linha** fecha no `total_linha` impresso (`src/domain/linhaDoPapel.ts`): a linha como veio, a tabela com o
+  desconto de 4 casas, ou o total ÷ QTD; se nada fechar, fica como veio, com o "Confira";
+- **o rodapé** (`contaDoRodape`):
+  - com o total de cada linha, a conta decide se o desconto entra, e declara o "arredondamento do orçamento" até
+    1 centavo por linha;
+  - sem ele, vale a marca `desconto_nas_linhas`, e o `null` não preenche o desconto: a tela pergunta (D890);
+- **o fornecedor** sai pelo `nome_emitente` quando o papel não traz CNPJ, só se uma empresa só casar, e na matriz;
+- **o cartão** "Total lido" mostra o que o orçamento diz e o que a OC soma, e o alto ganha a frase "Total:";
+- **o rascunho da Rev. 01 saiu do código** (D887, D739 §4.3). Os JSON viraram amostra de teste, e `carregarRascunho()`
+  devolve `null`;
+- **de carona,** a bomba de data do `FichaDaEmpresa.test.tsx` (já falhava no `main`) agora segue o relógio;
+- **as provas:**
+  - 1317 testes;
+  - 9 de 9 sabotagens vermelhas;
+  - o caso da D892 (a função de hoje: o "Desconto material" fica vazio);
+  - 12 fotos em `docs/Capturas/2026-10-23_D889/`;
+- **um achado foi ao CTO:** o número grande do cartão (456,01, a soma das linhas) ao lado dos dois 456,00. A minha
+  recomendação é deixar.
+
+**Espera a conferência do CTO e a ordem de publicar.** **Nada foi publicado. O banco não mudou.**

@@ -121,6 +121,9 @@ fora. Agora, só falta a sentada.
 continua no histórico. Os passos 1 e 2 fecharam, e a meta de 23/10 foi cumprida. Falta só o passo 3: o rascunho sai do
 código na próxima publicação, que será a da D888 (decisão 139). Não se publica só para isso.
 
+**23/10, decisão 140:** o rascunho já saiu do código no ramo `d889-total-ao-centavo` (`8a0f08e`), sem publicar.
+O passo 3 fecha quando esse ramo subir.
+
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
    pelo script e volta a ele);
@@ -259,6 +262,14 @@ material fica como está. Passá-la para uma função é melhoria à parte, fora
      lido" mostra os dois números, e sem CNPJ o fornecedor sai pelo nome, na matriz. **Falta:** a aprovação (com as
      duas escolhas: onde mora o arredondamento e a forma do preço), o plano do Banco, os ramos, a `extrair-itens`
      primeiro e a tela depois, e a nova leitura do Pedro;
+   - **a D889 aprovou o plano** (o arredondamento nos campos de hoje; a tabela com o desconto de 4 casas), e **a D892
+     inverteu a ordem:** a tela sobe primeiro, e a função do Banco logo depois. **O ramo está pronto, sem
+     publicar:** `d889-total-ao-centavo`, `8a0f08e`, com o CI verde, 1317 testes, 9 de 9 sabotagens e 12 fotos
+     (decisão 140). **Falta:**
+     1. a conferência do CTO e a ordem;
+     2. publicar, com o desfazer `af74b1e7`, e medir por fora;
+     3. a função do Banco logo depois;
+     4. a nova leitura do Pedro;
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
