@@ -4484,3 +4484,25 @@ ramo já, sem publicar." A D892 inverteu a ordem: a tela desta casa sobe primeir
   recomendação é deixar.
 
 **Espera a conferência do CTO e a ordem de publicar.** **Nada foi publicado. O banco não mudou.**
+
+---
+
+## Decisão 141 — no ar em 680ee679: o total ao centavo, o fornecedor pelo nome e o número grande da OC · 23/10/2026
+
+**POR QUÊ (CTO-D893):** o ramo da decisão 140 foi conferido e aprovado, com uma troca no cartão. Nas palavras do CTO:
+"O número grande do cartão passa a ser o total da OC". O motivo é a queixa do Pedro: "o valor não bateu".
+
+**O QUE FOI:**
+- **a troca:** com o TOTAL no papel, o número grande do cartão é o que a OC soma, e o texto de baixo manda conferir com
+  o TOTAL do papel. Sem TOTAL, o cartão fica como era. O teste cobre o 456,00 e o 455,96, e a sabotagem ficou
+  vermelha (`cea9027`, +10 −3);
+- **a subida:**
+  - 1318 testes verdes;
+  - o `main` em `1afc8e0` (merge do ramo), com o CI verde;
+  - publicado pelo PowerShell: **no ar em `680ee679`**, pacote `20261023192757-1afc8e0`; o desfazer é `af74b1e7`;
+- **a medida por fora:** a versão, as frases novas no código servido, a leitura do `total_linha`, e nenhum pedaço do
+  rascunho no pacote;
+- **o rascunho da Rev. 01 saiu do código** com esta subida, e a pendência 36 fecha (D887, D739 §4.3).
+
+**Falta:** a conferência do CTO, a função do Banco logo depois e a nova leitura do Pedro (pendência 40).
+**O banco não mudou.**

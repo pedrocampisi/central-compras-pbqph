@@ -99,7 +99,7 @@ foto do Pedro a 1366. Já era assim antes do ramo da D728. **Para depois:** não
 
 ---
 
-### 36. A Rev. 01 do PS.02 (D738 a D741): no ar e conferida, esperando a sentada do Pedro
+### 36. ~~A Rev. 01 do PS.02 (D738 a D741)~~ — gravada pelo Pedro, e o rascunho fora do código (decisão 141)
 
 *Aberta em 06/10/2026, na decisão 96.* A página com o rascunho e o "Gravar a Rev. 01", só para quem revisa ECR, está
 **no ar** desde 17h23 de 06/10:
@@ -123,6 +123,9 @@ código na próxima publicação, que será a da D888 (decisão 139). Não se pu
 
 **23/10, decisão 140:** o rascunho já saiu do código no ramo `d889-total-ao-centavo` (`8a0f08e`), sem publicar.
 O passo 3 fecha quando esse ramo subir.
+
+**23/10, decisão 141:** o ramo subiu em `680ee679`, e a medida por fora não acha pedaço do rascunho no pacote.
+**Fechada.**
 
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
@@ -266,9 +269,10 @@ material fica como está. Passá-la para uma função é melhoria à parte, fora
      inverteu a ordem:** a tela sobe primeiro, e a função do Banco logo depois. **O ramo está pronto, sem
      publicar:** `d889-total-ao-centavo`, `8a0f08e`, com o CI verde, 1317 testes, 9 de 9 sabotagens e 12 fotos
      (decisão 140). **Falta:**
-     1. a conferência do CTO e a ordem;
-     2. publicar, com o desfazer `af74b1e7`, e medir por fora;
-     3. a função do Banco logo depois;
+     1. ~~a conferência do CTO e a ordem~~ (D893: aprovado, com o número grande do cartão trocado pelo total da OC);
+     2. ~~publicar~~: **no ar em `680ee679`**, pacote `20261023192757-1afc8e0`, pelo `main` `1afc8e0`, medido por fora;
+        o desfazer é `af74b1e7` (decisão 141);
+     3. a conferência do CTO por fora, e a função do Banco logo depois;
      4. a nova leitura do Pedro;
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
