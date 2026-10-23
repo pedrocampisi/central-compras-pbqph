@@ -4425,3 +4425,32 @@ IA.
 **O QUE FICA:** a gaveta do fornecedor fica como está, com o `upsert` de `dados.ts:337`. Passá-la para uma função é
 melhoria à parte, e não entra nesta volta. Fecham a D877b e o meu plano (pendência 43). **Nada foi gravado. O banco não
 mudou.**
+
+---
+
+## Decisão 139 — o plano do total ao centavo e do fornecedor pelo nome · 23/10/2026
+
+**POR QUÊ (CTO-D888 e D888b, o teste do Pedro na produção):** um orçamento real de 11 itens. Nas palavras dele: "O valor
+não bateu exatamente, o ideal seria bater os centavos, para ligar com a nf no futuro", e "O fornecedor ele não detectou".
+Sobre a filial: "Ela tem que escolher a matriz".
+
+**O QUE FOI (só o plano, sem código):**
+- **a medida, só lendo, no código desta casa e no da `extrair-itens`:**
+  - a tela põe o `cabecalho.desconto` no "Desconto material" sem mais nada, e o prompt pede o desconto do rodapé
+    e o das linhas em dois lugares. Neste papel, os dois são o mesmo desconto, e só a linha 530 diz se ele entrou duas
+    vezes;
+  - o cartão "Total lido" não mostra o total do papel. A conferência fica embaixo e depende do `cabecalho.total`;
+  - a linha 530 não foi lida, porque o conector desta sessão não enxerga a produção;
+- **o plano:**
+  - a linha fecha no `total_linha` impresso: a tabela com um `desc_pct` de 4 casas e, se não fechar, total ÷ QTD;
+  - o desconto do rodapé só entra quando as linhas não o têm (a tela faz a conta);
+  - a OC fecha no rodapé, com o "arredondamento do orçamento" declarado até 1 centavo por linha;
+  - o cartão mostra o total do orçamento e o da OC;
+  - sem CNPJ, o fornecedor sai pelo `nome_emitente`, pela busca do campo e só se uma empresa casar, na matriz
+    (`escolherEmpresa`), com "Escolhido pelo nome do orçamento. Confira.";
+  - de carona, o rascunho da Rev. 01 sai do código (D887);
+- **o contrato proposto ao Banco:** `total_linha`, `subtotal`, `desconto_nas_linhas` e `nome_emitente`;
+- **duas escolhas ficam com o CTO:** onde mora o arredondamento (A: nos campos de hoje; B: uma coluna própria) e a
+  forma do preço.
+
+**Espera a aprovação do CTO e o plano do Banco.** **Nada foi gravado. O banco não mudou.**

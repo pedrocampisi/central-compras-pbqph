@@ -117,6 +117,10 @@ verde. Espera a aprovação do CTO; depois, publicar (emenda 3), e só então a 
 está **no ar** em `109f5e71`, versão `20261017141917-9fac9f5`, pelo `main` `9fac9f5`; o desfazer é `10f05c50`. Medido por
 fora. Agora, só falta a sentada.
 
+**23/10, CTO-D887:** o Pedro gravou a Rev. 01 às 15h12 (linha 266 de `core.procedimento_revisoes`), e a Rev. 00
+continua no histórico. Os passos 1 e 2 fecharam, e a meta de 23/10 foi cumprida. Falta só o passo 3: o rascunho sai do
+código na próxima publicação, que será a da D888 (decisão 139). Não se publica só para isso.
+
 **Falta, nesta ordem:**
 1. a sentada do Pedro, que lê o que mudou e grava com a mão dele, ou recusa uma frase (aí o CTO escreve, ela muda
    pelo script e volta a ele);
@@ -247,8 +251,14 @@ material fica como está. Passá-la para uma função é melhoria à parte, fora
    `109f5e71`. O Pedro mandou tirar o ensaio do caminho (CTO-D865): o teste dele passa a ser na produção. A 5174
    caiu, e o `launch.json` voltou ao do repositório.
    - ~~a conferência do CTO por fora~~ (D866, 13h4x: só a parte B mudou em `src`, +463 e −11);
-   - **falta:** a versão 24 da `extrair-itens` pelo Banco (com a carta do
-     CTO); com os dois no ar, o teste do Pedro com um orçamento real;
+   - ~~a versão 24 pelo Banco e o teste do Pedro~~: o Pedro testou em 23/10 um orçamento real de 11 itens. Os itens,
+     as quantidades, a ECR e a condição vieram certos. Ele achou dois defeitos: o total não bateu ao centavo (455,96
+     contra 456,00), e o fornecedor não saiu, porque o papel não traz CNPJ;
+   - **a D888 (e a D888b, a matriz):** o plano foi ao CTO, com cópia ao Banco (decisão 139). Cada linha fecha no total
+     impresso, a OC fecha no rodapé com o arredondamento declarado, o desconto entra uma vez só, o cartão do "Total
+     lido" mostra os dois números, e sem CNPJ o fornecedor sai pelo nome, na matriz. **Falta:** a aprovação (com as
+     duas escolhas: onde mora o arredondamento e a forma do preço), o plano do Banco, os ramos, a `extrair-itens`
+     primeiro e a tela depois, e a nova leitura do Pedro;
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de
