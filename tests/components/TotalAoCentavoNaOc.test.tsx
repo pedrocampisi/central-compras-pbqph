@@ -117,6 +117,9 @@ describe('D888 — o papel de 23/10 na Nova OC', () => {
     expect(dois).toHaveTextContent(/O orçamento diz R\$\s456,00/);
     expect(dois).toHaveTextContent(/A OC soma R\$\s456,00/);
     expect(dois).toHaveTextContent('Os dois batem.');
+    // O número grande é o da OC, não a soma das linhas lidas (456,01): a queixa foi "o valor não bateu" (D893).
+    expect(document.querySelector('[data-total-lido]')).toHaveTextContent(/^R\$\s456,00$/);
+    expect(document.querySelector('[data-resultado]')).toHaveTextContent('Confira com o TOTAL do papel.');
   });
 
   it('sem CNPJ, o fornecedor sai pelo nome impresso, e entra a matriz', async () => {
@@ -138,6 +141,7 @@ describe('D888 — o papel de 23/10 na Nova OC', () => {
     expect(confira('desconto')).toBeNull();
     expect(oc().itens.every((it) => it.desc_pct > 15)).toBe(true);
     expect(document.querySelector('[data-conta-do-papel]')).toHaveTextContent(/desconto de R\$\s81,38, e a leitura não soube/);
+    expect(document.querySelector('[data-total-lido]')).toHaveTextContent(/^R\$\s455,96$/);
   });
 
   it('a leitura que não sabe se o desconto está nas linhas (`null`): ele não entra, e a tela pede à pessoa', async () => {

@@ -264,8 +264,10 @@ export function CampoDeImportacao({
                   o jeito mais rápido de pegar o erro. Se não bater, leia de novo com o certeiro.
                 </Ajuda>
               </div>
+              {/* Com o TOTAL do papel, o número grande é o que a OC soma: é ele que se compara com o
+                  papel (CTO-D893). A soma das linhas lidas fica na frase do arredondamento. */}
               <strong className={styles.totalLido} data-total-lido="">
-                {formatBrl(resultado.total)}
+                {formatBrl(resultado.orcamento != null ? (resultado.daOc ?? 0) : resultado.total)}
               </strong>
               <span className={styles.subtitulo}>
                 Lido pelo <strong>{LEITORES[resultado.leitor].nome.toLowerCase()}</strong> ·{' '}
@@ -273,8 +275,9 @@ export function CampoDeImportacao({
               </span>
               <DoisTotais orcamento={resultado.orcamento ?? null} daOc={resultado.daOc ?? 0} />
               <span className={styles.contexto}>
-                Confira com a soma dos itens no papel, sem o frete. Se não bater, algum preço ou
-                quantidade saiu errado.
+                {resultado.orcamento != null
+                  ? 'Confira com o TOTAL do papel. Se não bater, algum preço ou quantidade saiu errado.'
+                  : 'Confira com a soma dos itens no papel, sem o frete. Se não bater, algum preço ou quantidade saiu errado.'}
               </span>
               {resultado.leitor === 'rapido' && onLerDeNovoComCerteiro && (
                 <div className={styles.acaoDoResultado}>
