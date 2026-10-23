@@ -215,7 +215,7 @@ material fica como está. Passá-la para uma função é melhoria à parte, fora
 
 ---
 
-### 40. A D805: a política e o registro por ECR no PDF, a tela da qualificação, e a IA que monta a OC
+### 40. ~~A D805: a política e o registro por ECR no PDF, a tela da qualificação, e a IA que monta a OC~~ — tudo no ar, e o teste do Pedro deu certo (decisão 142)
 
 *Aberta em 15/10/2026, na decisão 110.*
 1. ~~**a parte A**~~ **no ar** em `6547e313`, versão `20261015191902-1f530e7`, pelo `main` `1f530e7` (decisão 112),
@@ -272,8 +272,10 @@ material fica como está. Passá-la para uma função é melhoria à parte, fora
      1. ~~a conferência do CTO e a ordem~~ (D893: aprovado, com o número grande do cartão trocado pelo total da OC);
      2. ~~publicar~~: **no ar em `680ee679`**, pacote `20261023192757-1afc8e0`, pelo `main` `1afc8e0`, medido por fora;
         o desfazer é `af74b1e7` (decisão 141);
-     3. a conferência do CTO por fora, e a função do Banco logo depois;
-     4. a nova leitura do Pedro;
+     3. ~~a conferência do CTO por fora, e a função do Banco logo depois~~ (a `extrair-itens` versão 11, D894 do Banco);
+     4. ~~a nova leitura do Pedro~~: "deu certinho" (a leitura 578, pela D900 do CTO).
+
+     **Fechada a D888.** De carona, a D900 tirou a coluna PRAZO dos itens (decisão 142);
 5. ~~**a sobra:** o campo "Requisito de Qualidade" da Configuração~~ saiu, com a parte A (decisão 112).
 
 **A D808 chegou às 16h0x:** a parte A está aprovada; o campo "Requisito de Qualidade" sai da tela antes de

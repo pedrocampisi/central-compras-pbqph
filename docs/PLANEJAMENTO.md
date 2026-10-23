@@ -4506,3 +4506,30 @@ ramo já, sem publicar." A D892 inverteu a ordem: a tela desta casa sobe primeir
 
 **Falta:** a conferência do CTO, a função do Banco logo depois e a nova leitura do Pedro (pendência 40).
 **O banco não mudou.**
+
+---
+
+## Decisão 142 — no ar em d4960d22: a coluna PRAZO dos itens saiu da Nova OC e do PDF · 23/10/2026
+
+**POR QUÊ (CTO-D900, palavra do Pedro):** "Pode tirar a coluna PRAZO dos itens, da tela e do PDF." O CTO mediu que o
+campo era texto livre, que 0 de 25 itens na produção o tinham preenchido, e que o PDF o formatava como data. O prazo
+que vale é a "Entrega prevista" do alto da OC. O segundo teste do Pedro com o orçamento de 11 itens deu certo (a
+leitura 578).
+
+**O QUE FOI:**
+- **saiu:**
+  - a coluna e o campo da tabela de itens da Nova OC;
+  - a coluna "Prazo" da tabela de itens do PDF (a Descrição ficou com os 19 mm dela);
+  - o `prazo_entrega` da gravação (`linhasDosItens`);
+- **ficou:**
+  - o prazo da avaliação (Conforme / Não Conforme);
+  - a "Entrega prevista";
+  - a leitura do campo antigo, para a OC antiga abrir e gerar PDF;
+- **as provas:**
+  - 4 testes novos, e 4 de 4 sabotagens vermelhas;
+  - 1322 testes verdes;
+  - 3 fotos em `docs/Capturas/2026-10-23_D900/`;
+- **a subida:** pelo emenda 3, sem a conferência do ramo, como a D900 mandou. O `main` `9993fe6` passou no CI. **No
+  ar em `d4960d22`**, pacote `20261023212630-9993fe6`. O desfazer é `680ee679`. Medido por fora.
+
+**O banco não mudou.**
