@@ -112,7 +112,8 @@ export function cabecalhoDaOc(oc: OrdemCompra): Record<string, unknown> {
 /**
  * Os itens como `compras.salvar_oc` recebe: campo por campo, NUNCA o item
  * espalhado. É o que garante que nada além do contrato vai ao banco — em
- * especial o "confira" da leitura de texto (CTO-D557), que é da tela.
+ * especial o "confira" da leitura de texto (CTO-D557), que é da tela. O prazo
+ * por item também não vai (CTO-D900): a coluna fica no banco, vazia.
  */
 export function linhasDosItens(itens: readonly Item[]): Record<string, unknown>[] {
   return itens.map((i, idx) => ({
@@ -126,7 +127,6 @@ export function linhasDosItens(itens: readonly Item[]): Record<string, unknown>[
     preco_unit: i.preco_unit ?? 0,
     ipi_pct: i.ipi_pct ?? 0,
     desc_pct: i.desc_pct ?? 0,
-    prazo_entrega: i.prazo_entrega || null,
   }));
 }
 

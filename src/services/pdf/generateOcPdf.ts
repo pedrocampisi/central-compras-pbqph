@@ -354,7 +354,7 @@ export function desenhaPdfDaOc(
   // competindo, CTO-D655 §4.3.)
 
   // ── Tabela de itens ────────────────────────────────────────────────────────
-  const head = [['Item', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit', 'IPI%', 'Desc%', 'Total', 'Prazo']];
+  const head = [['Item', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit', 'IPI%', 'Desc%', 'Total']];
   const body = corpoDaTabelaDeItens(oc.itens ?? []);
 
   autoTable(doc, {
@@ -366,7 +366,7 @@ export function desenhaPdfDaOc(
     headStyles: { fillColor: [11, 105, 183], textColor: 255, fontStyle: 'bold', halign: 'center' },
     columnStyles: {
       0: { cellWidth: 9, halign: 'center' },
-      1: { cellWidth: 56 },
+      1: { cellWidth: 75 },
       2: { cellWidth: 24 },
       3: { cellWidth: 12, halign: 'right' },
       4: { cellWidth: 9, halign: 'center' },
@@ -374,7 +374,6 @@ export function desenhaPdfDaOc(
       6: { cellWidth: 10, halign: 'right' },
       7: { cellWidth: 10, halign: 'right' },
       8: { cellWidth: 22, halign: 'right' },
-      9: { cellWidth: 19, halign: 'center' },
     },
     // Descrição e observação com "≥" ou "≤" saem pelos trechos, os sinais na
     // Symbol; sem sinal, a célula é a de sempre (CTO-D620 §2).

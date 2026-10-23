@@ -162,7 +162,6 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
             <th style={{ width: 90 }}>Preço Unit.</th>
             <th style={{ width: 60 }}>IPI%</th>
             <th style={{ width: 60 }}>Desc%</th>
-            <th style={{ width: 80 }}>Prazo</th>
             <th style={{ width: 90, textAlign: 'right' }}>Total</th>
             <th style={{ width: 36 }} />
           </tr>
@@ -257,14 +256,6 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
                     step="any"
                     value={it.desc_pct === 0 ? '' : it.desc_pct}
                     onChange={(e) => onUpdate(it.id, { desc_pct: Number(e.target.value) || 0 })}
-                  />
-                </td>
-                <td>
-                  <input
-                    className={styles.cellInput}
-                    value={it.prazo_entrega}
-                    placeholder="Ex: 7 dias"
-                    onChange={(e) => onUpdate(it.id, { prazo_entrega: e.target.value })}
                   />
                 </td>
                 <td style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--navy)', whiteSpace: 'nowrap' }}>

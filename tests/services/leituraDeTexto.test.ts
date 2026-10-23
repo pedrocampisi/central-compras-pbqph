@@ -77,7 +77,7 @@ describe('D557 — o "confira" não chega ao banco nem ao PDF', () => {
   it('salvar_oc: as linhas dos itens têm só as colunas do contrato', () => {
     const [linha] = linhasDosItens([item]);
     expect(Object.keys(linha!).sort()).toEqual(
-      ['desc_pct', 'descricao', 'ecr_id', 'ipi_pct', 'material_id', 'observacao', 'posicao', 'prazo_entrega', 'preco_unit', 'quantidade', 'unidade'],
+      ['desc_pct', 'descricao', 'ecr_id', 'ipi_pct', 'material_id', 'observacao', 'posicao', 'preco_unit', 'quantidade', 'unidade'],
     );
     expect(JSON.stringify(linha)).not.toContain('bitola');
   });
