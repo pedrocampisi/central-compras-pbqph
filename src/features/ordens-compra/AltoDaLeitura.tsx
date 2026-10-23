@@ -38,11 +38,13 @@ export interface ResumoDoAltoProps {
   semFornecedor: string;
   naoPisou: Partial<Record<CampoDoAlto, string>>;
   duvida: string;
+  /** O que a conta do papel decidiu: o desconto que já está nas linhas, o arredondamento (D888 §1). */
+  contaDoPapel?: string;
 }
 
-export function ResumoDoAlto({ semFornecedor, naoPisou, duvida }: ResumoDoAltoProps) {
+export function ResumoDoAlto({ semFornecedor, naoPisou, duvida, contaDoPapel = '' }: ResumoDoAltoProps) {
   const ficou = Object.entries(naoPisou) as [CampoDoAlto, string][];
-  if (!semFornecedor && ficou.length === 0 && !duvida) return null;
+  if (!semFornecedor && ficou.length === 0 && !duvida && !contaDoPapel) return null;
   return (
     <div className={styles.resumoDoAlto} role="status" data-resumo-do-alto="">
       {semFornecedor && (
@@ -55,6 +57,11 @@ export function ResumoDoAlto({ semFornecedor, naoPisou, duvida }: ResumoDoAltoPr
           <strong>{NOME_DO_CAMPO[c]}:</strong> ficou o que você já tinha posto. O orçamento diz {papel}.
         </p>
       ))}
+      {contaDoPapel && (
+        <p data-conta-do-papel="">
+          <strong>Total:</strong> {contaDoPapel}
+        </p>
+      )}
       {duvida && (
         <p data-duvida-do-alto="">
           <strong>A leitura pede:</strong> {duvida}

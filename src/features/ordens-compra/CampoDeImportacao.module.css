@@ -309,6 +309,21 @@
   font-size: 12.5px;
   line-height: 1.45;
 }
+.doisTotais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  color: var(--texto);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+.bateOuNao {
+  color: var(--texto-suave);
+}
+.doisTotais[data-dois-totais='difere'] .bateOuNao {
+  color: var(--aviso);
+  font-weight: 600;
+}
 .acaoDoResultado {
   display: flex;
   flex-wrap: wrap;

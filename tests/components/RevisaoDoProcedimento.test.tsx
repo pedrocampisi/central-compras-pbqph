@@ -29,15 +29,15 @@ vi.mock('../../src/services/supabase/procedimento', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/procedimento')>()),
   lerProcedimento: (c: string) => ler(c),
 }));
-vi.mock('../../src/features/procedimento/rev01', async (original) => {
-  const real = await original<typeof import('../../src/features/procedimento/rev01')>();
-  return {
-    carregarRascunho: () => {
-      carregou();
-      return real.carregarRascunho();
-    },
-  };
-});
+// O rascunho saiu do código com a Rev. 01 gravada (D887, D739 §4.3). O "Gravar"
+// fica para a Rev. 02, e é provado com a Rev. 01 como amostra (`tests/fixtures/ps02Rev01`).
+vi.mock('../../src/features/procedimento/rascunho', () => ({
+  carregarRascunho: async () => {
+    carregou();
+    const ler = (n: string) => JSON.parse(readFileSync(join(__dirname, '../fixtures/ps02Rev01', n), 'utf-8'));
+    return { documento: ler('documento.json'), mudancas: ler('mudancas.json') };
+  },
+}));
 
 import { ProcedimentoPage } from '../../src/features/procedimento/ProcedimentoPage';
 import { useUiStore } from '../../src/stores/useUiStore';
@@ -46,8 +46,8 @@ import type { Procedimento } from '../../src/domain/procedimento';
 import { ps02Rev00 } from '../fixtures/ps02Rev00';
 
 const json = (caminho: string): unknown => JSON.parse(readFileSync(join(__dirname, caminho), 'utf-8'));
-const DOCUMENTO = json('../../src/features/procedimento/rev01/documento.json');
-const MUDANCAS = json('../../src/features/procedimento/rev01/mudancas.json') as {
+const DOCUMENTO = json('../fixtures/ps02Rev01/documento.json');
+const MUDANCAS = json('../fixtures/ps02Rev01/mudancas.json') as {
   descricao: string;
   mudancas: { ancora: string; motivo: string }[];
 };

@@ -7,9 +7,10 @@ import ts from 'typescript';
  * "Encarregado" em todas as telas (CTO-D799, palavra do Pedro). Varre todo texto
  * literal do código (aspas, crase e o texto do JSX): nenhum diz "mestre", a não
  * ser os nomes de dentro, que ninguém lê e que o banco conhece por esse nome.
- * O rascunho da Rev. 01 do PS.02 (`procedimento/rev01/*.json`) também é lido
- * (CTO-D800 §2). A revisão gravada é a 00, que não diz "mestre"; o rascunho
- * espera o "Gravar" do Pedro, que lê os trechos marcados antes.
+ * O rascunho da Rev. 01 do PS.02 também era lido (CTO-D800 §2), enquanto
+ * esperava o "Gravar". O Pedro gravou em 23/10 (D887), o texto mora no banco,
+ * e o rascunho saiu do código (D739 §4.3). A varredura do JSON fica, para o
+ * rascunho da Rev. 02.
  */
 
 /** Os nomes de dentro: o papel, as tabelas, as funções do banco, a guarda do celular e o id da tela. */
@@ -35,6 +36,15 @@ function arquivos(pasta: string): string[] {
     const p = join(pasta, e.name);
     if (e.isDirectory()) return arquivos(p);
     return /\.tsx?$/.test(e.name) ? [p] : [];
+  });
+}
+
+/** Os JSON de uma pasta, por toda a árvore: um rascunho de revisão é um par de JSON. */
+function arquivosJson(pasta: string): string[] {
+  return readdirSync(pasta, { withFileTypes: true }).flatMap((e) => {
+    const p = join(pasta, e.name);
+    if (e.isDirectory()) return arquivosJson(p);
+    return e.name.endsWith('.json') ? [p] : [];
   });
 }
 
@@ -73,11 +83,9 @@ describe('"encarregado" em todas as telas (CTO-D799)', () => {
     expect(achados).toEqual([]);
   });
 
-  it('o rascunho da Rev. 01 do PS.02 (os dois JSON) também diz "encarregado" (CTO-D800 §2)', () => {
-    const pasta = join(RAIZ, 'src', 'features', 'procedimento', 'rev01');
-    const arquivosJson = readdirSync(pasta).filter((n) => n.endsWith('.json'));
-    expect(arquivosJson.sort()).toEqual(['documento.json', 'mudancas.json']);
-    const achados = arquivosJson.flatMap((n) => textosDoJsonComMestre(n, JSON.parse(readFileSync(join(pasta, n), 'utf8'))));
+  it('nenhum rascunho de revisão em `src/` diz "mestre" (CTO-D800 §2; hoje não há rascunho, D887)', () => {
+    const jsons = arquivosJson(join(RAIZ, 'src', 'features', 'procedimento'));
+    const achados = jsons.flatMap((f) => textosDoJsonComMestre(relative(RAIZ, f), JSON.parse(readFileSync(f, 'utf8'))));
     expect(achados).toEqual([]);
   });
 

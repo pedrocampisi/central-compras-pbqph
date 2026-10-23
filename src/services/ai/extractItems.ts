@@ -20,6 +20,7 @@ import { MAX_PAGINAS, erroDaImagem, mensagemDePaginas } from '../../domain/impor
 import { ErroDaImportacao } from './lerPedido';
 import { LEITOR_PADRAO, leitorDaResposta, type Leitor } from '../../domain/leitor';
 import { cabecalhoDoServidor, type CabecalhoLido } from '../../domain/cabecalhoLido';
+import { fecharLinha, linhasDoPapel, type LinhasDoPapel } from '../../domain/linhaDoPapel';
 
 // ── Normalização de unidade ───────────────────────────────────────────────────
 
@@ -55,6 +56,8 @@ interface RawExtractedItem {
   preco_unit?: unknown;
   ipi_pct?: unknown;
   desc_pct?: unknown;
+  /** O TOTAL da linha como o papel imprime (CTO-D888 §1); a leitura antiga não manda. */
+  total_linha?: unknown;
   ecr_id?: unknown;
   /** Só na leitura de texto (D557): a dúvida da IA sobre esta linha. */
   confira?: unknown;
@@ -79,6 +82,11 @@ export interface ResultadoDaLeitura {
    * condição, entrega e totais. Ausente quando o servidor não manda.
    */
   cabecalho?: CabecalhoLido;
+  /**
+   * A soma dos totais impressos das linhas, quando TODAS os trazem (D888 §1):
+   * é com ela que a OC fecha no rodapé. Ausente na leitura que não manda.
+   */
+  papel?: LinhasDoPapel;
 }
 
 /** A resposta do servidor → o resultado da tela. Pura, para o teste. */
@@ -88,8 +96,9 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
   const confira: Record<string, string> = {};
   // A leitura às vezes devolve "&#x3D;" no lugar de "=" (D680): desfaz aqui, na entrada.
   const texto = (v: unknown) => desfazerEntidades(String(v ?? '')).trim();
+  const totais: (number | null)[] = [];
   const itens = rawItems.map((it) => {
-    const item = normalizeItem({
+    const lido = normalizeItem({
       ecr_id: it.ecr_id != null && Number(it.ecr_id) ? Number(it.ecr_id) : null,
       descricao: texto(it.descricao),
       observacao: texto(it.observacao),
@@ -99,15 +108,30 @@ export function paraResultado(payload: unknown): ResultadoDaLeitura {
       ipi_pct: Number(it.ipi_pct) || 0,
       desc_pct: Number(it.desc_pct) || 0,
     });
-    const duvida = typeof it.confira === 'string' ? texto(it.confira) : '';
-    if (duvida) confira[item.id] = duvida;
+    // A linha fecha no TOTAL impresso dela; sem ele, fica como veio, como sempre.
+    const total = typeof it.total_linha === 'number' && Number.isFinite(it.total_linha) && it.total_linha >= 0
+      ? it.total_linha
+      : null;
+    totais.push(total);
+    const fechada = total != null && lido.quantidade > 0 ? fecharLinha(lido, total) : null;
+    const item = fechada ? fechada.item : lido;
+    const duvidas = [
+      typeof it.confira === 'string' ? texto(it.confira) : '',
+      fechada && !fechada.fechou ? fechada.confira : '',
+    ].filter(Boolean);
+    if (duvidas.length) confira[item.id] = duvidas.join(' ');
     return item;
   });
   const ignoradas = (Array.isArray(p.ignoradas) ? p.ignoradas : [])
     .filter((l): l is string => typeof l === 'string' && l.trim() !== '')
     .map(desfazerEntidades);
   const cabecalho = cabecalhoDoServidor(p.cabecalho);
-  return { itens, confira, ignoradas, leitor: leitorDaResposta(p._meta), ...(cabecalho && { cabecalho }) };
+  const papel = linhasDoPapel(totais);
+  return {
+    itens, confira, ignoradas, leitor: leitorDaResposta(p._meta),
+    ...(cabecalho && { cabecalho }),
+    ...(papel && { papel }),
+  };
 }
 
 // ── Erros da função do servidor, em português ─────────────────────────────────

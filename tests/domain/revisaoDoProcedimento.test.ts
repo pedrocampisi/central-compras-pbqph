@@ -3,7 +3,7 @@
  * gera, a comparação por âncora que marca o que mudou, e as frases da porta.
  * Nada aqui fala com o banco.
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { procedimentoDoBanco } from '../../src/domain/procedimentoDoBanco';
@@ -18,11 +18,13 @@ import {
 import { letrasQueOPdfNaoImprime } from '../../src/domain/letrasDoPdf';
 import { PERGUNTAS_DO_MESTRE } from '../../src/domain/recebimento';
 import { ancorasDoDocumento, foraDaForma } from './formaDoProcedimento';
+import { carregarRascunho } from '../../src/features/procedimento/rascunho';
 
 const ler = (caminho: string): unknown => JSON.parse(readFileSync(join(__dirname, caminho), 'utf-8'));
 const rev00 = () => ler('../fixtures/ps02Rev00DoBanco.json') as Record<string, unknown>;
-const rascunho = () => ler('../../src/features/procedimento/rev01/documento.json') as Record<string, unknown>;
-const mudancas = () => ler('../../src/features/procedimento/rev01/mudancas.json') as MudancasDoRascunho;
+// A Rev. 01 como foi gravada em 23/10 (D887): o rascunho saiu do código e ficou aqui, de amostra.
+const rascunho = () => ler('../fixtures/ps02Rev01/documento.json') as Record<string, unknown>;
+const mudancas = () => ler('../fixtures/ps02Rev01/mudancas.json') as MudancasDoRascunho;
 
 /** O documento solto, para sabotar: só o que as sabotagens mexem. */
 interface BlocoSolto { tipo: string; ancora: string; tom?: string; linhas?: { celulas: unknown[] }[]; itens?: unknown[] }
@@ -161,6 +163,13 @@ describe('o que mudou, por âncora (D739 §4.1)', () => {
     const motivos = motivosPorAncora(mudancas().mudancas);
     expect(motivos.get('contratacao.t1.l1')).toHaveLength(2);
     expect(motivos.get('registros.q1.i1')).toHaveLength(2);
+  });
+});
+
+describe('a Rev. 01 gravada (CTO-D887): o rascunho saiu do código (D739 §4.3)', () => {
+  it('a pasta do rascunho não existe mais, e o carregador devolve "sem rascunho"', async () => {
+    expect(existsSync(join(__dirname, '../../src/features/procedimento/rev01'))).toBe(false);
+    expect(await carregarRascunho()).toBeNull();
   });
 });
 

@@ -10,7 +10,12 @@
  * As regras:
  * - **O fornecedor sai do CNPJ do emitente,** só entre os cadastrados. A IA
  *   nunca cadastra e nunca muda cadastro: sem cadastro, o campo fica vazio e a
- *   tela diz por quê.
+ *   tela diz por quê. **Sem CNPJ, sai pelo nome impresso** (CTO-D888 §2,
+ *   D888b): a mesma busca do campo Fornecedor, e a matriz, como na escolha à mão.
+ * - **O desconto nunca entra duas vezes, e a OC fecha no rodapé** (CTO-D888 §1):
+ *   quando as linhas trazem o total impresso, a conta delas decide se o
+ *   desconto do rodapé já está nelas, e a diferença de arredondamento do papel
+ *   entra declarada, nunca calada e nunca espalhada pelas linhas.
  * - **A IA não pisa no que a pessoa pôs.** O campo que ela já preencheu à mão
  *   fica como está, e a tela diz o que o papel dizia. Quem decide se o campo
  *   está livre é a tela (`livre`); aqui só se obedece.
@@ -19,7 +24,9 @@
 
 import { somaDias } from './qualificacao';
 import { formatDate } from './format';
-import { entraNaOc, motivoForaDaOc, agruparPorEmpresa, escolherEmpresa } from './fornecedores';
+import { entraNaOc, motivoForaDaOc, agruparPorEmpresa, escolherEmpresa, opcoesDeEmpresa } from './fornecedores';
+import { filtrarOpcoes } from './pesquisa';
+import type { LinhasDoPapel } from './linhaDoPapel';
 import type { Fornecedor, OrdemCompra } from './types';
 
 /** Os campos do alto que a leitura pode preencher. */
@@ -38,6 +45,12 @@ export interface CabecalhoLido {
   outras_despesas: number | null;
   desconto: number | null;
   total: number | null;
+  /** O SUB-TOTAL do rodapé, como impresso. */
+  subtotal: number | null;
+  /** A leitura diz que o desconto do rodapé é a soma dos das linhas; `null`: não diz. */
+  desconto_nas_linhas: boolean | null;
+  /** A razão social ou a fantasia de quem emitiu, como impressa; `''` se o papel não diz. */
+  nome_emitente: string;
   /** A dúvida da leitura sobre o cabeçalho. */
   confira: string;
 }
@@ -45,6 +58,9 @@ export interface CabecalhoLido {
 export const SEM_CADASTRO = 'o CNPJ do orçamento não está no cadastro';
 export const SEM_CNPJ = 'o orçamento não traz o CNPJ de quem o emitiu';
 export const DOIS_CADASTROS = 'o CNPJ do orçamento está em mais de uma empresa do cadastro';
+export const NOME_SEM_CADASTRO = 'o orçamento não traz CNPJ, e o nome de quem o emitiu não está no cadastro';
+export const NOME_EM_VARIAS = 'o orçamento não traz CNPJ, e o nome de quem o emitiu casa com mais de uma empresa do cadastro';
+export const NOME_SEM_FILIAL = 'o orçamento não traz CNPJ, e a empresa do nome dele não tem filial que receba OC';
 
 const texto = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
 const reais = (v: unknown): number | null =>
@@ -76,9 +92,14 @@ export function cabecalhoDoServidor(v: unknown): CabecalhoLido | null {
     outras_despesas: reais(c['outras_despesas']),
     desconto: reais(c['desconto']),
     total: reais(c['total']),
+    subtotal: reais(c['subtotal']),
+    desconto_nas_linhas: typeof c['desconto_nas_linhas'] === 'boolean' ? c['desconto_nas_linhas'] : null,
+    nome_emitente: texto(c['nome_emitente']).slice(0, 160),
     confira: texto(c['confira']),
   };
-  return Object.values(lido).some((x) => x !== '' && x !== null) ? lido : null;
+  // A marca sozinha não é papel: um `false` com tudo vazio continua "não veio".
+  const campos: unknown[] = Object.entries(lido).filter(([k]) => k !== 'desconto_nas_linhas').map(([, v]) => v);
+  return campos.some((x) => x !== '' && x !== null) ? lido : null;
 }
 
 export type FornecedorDoCnpj =
@@ -101,6 +122,33 @@ export function fornecedorDoCnpj(cnpj: string, todos: readonly Fornecedor[]): Fo
   const f = iguais.find((x) => x.id === id) ?? iguais[0]!;
   if (!entraNaOc(f)) return { tipo: 'nao_achou', porque: `o fornecedor do CNPJ do orçamento está ${motivoForaDaOc(f)}` };
   return { tipo: 'achou', id: f.id };
+}
+
+/** As palavras do nome que não dizem a empresa: a forma jurídica. */
+const FORMA_JURIDICA = new Set(['ltda', 'me', 'epp', 'eireli', 'sa', 'mei', 'cia']);
+const semAcento = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/**
+ * A empresa do cadastro pelo nome impresso no orçamento, quando ele não traz
+ * CNPJ (CTO-D888 §2). A busca é a do campo Fornecedor (`opcoesDeEmpresa` e
+ * `filtrarOpcoes`: o apelido, a razão social e a fantasia de qualquer filial,
+ * com todas as palavras); a pontuação e a forma jurídica ("LTDA", "ME") saem
+ * do nome antes. Uma empresa só casa: entra a matriz, pela `escolherEmpresa`,
+ * como na escolha à mão (D549; a palavra do Pedro na D888b: "Ela tem que
+ * escolher a matriz"). Nenhuma, ou mais de uma: vazio, com o porquê.
+ */
+export function fornecedorDoNome(nome: string, todos: readonly Fornecedor[]): FornecedorDoCnpj {
+  const palavras = nome
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter((p) => p && !FORMA_JURIDICA.has(semAcento(p)));
+  if (palavras.length === 0) return { tipo: 'nao_achou', porque: SEM_CNPJ };
+  const empresas = agruparPorEmpresa([...todos]);
+  const casaram = filtrarOpcoes(opcoesDeEmpresa(empresas), palavras.join(' '));
+  if (casaram.length === 0) return { tipo: 'nao_achou', porque: NOME_SEM_CADASTRO };
+  if (casaram.length > 1) return { tipo: 'nao_achou', porque: NOME_EM_VARIAS };
+  const id = escolherEmpresa(empresas.find((g) => g.chave === casaram[0]!.valor), '');
+  return id ? { tipo: 'achou', id } : { tipo: 'nao_achou', porque: NOME_SEM_FILIAL };
 }
 
 /** Dia da semana de AAAA-MM-DD: 0 domingo, 6 sábado. */
@@ -147,17 +195,81 @@ export interface Preenchimento {
   naoPisou: Partial<Record<CampoDoAlto, string>>;
   /** Por que o fornecedor ficou vazio; `''` quando entrou ou já estava escolhido. */
   semFornecedor: string;
+  /** O que a conta do papel decidiu sobre o desconto e o total, em frase; `''` sem nada a dizer. */
+  contaDoPapel: string;
 }
 
 const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+/** O desconto do rodapé e o arredondamento do papel, decididos pela conta (CTO-D888 §1, D889). */
+export interface ContaDoRodape {
+  /** O que vai ao "Desconto material" pelo desconto do papel; `null`: nada. */
+  desconto: number | null;
+  /** O rodapé menos as linhas, em reais: negativo, o rodapé é menor. 0 quando fecha. */
+  arredondamento: number;
+  /** A frase para a pessoa; `''` quando não há o que dizer. */
+  frase: string;
+}
+
+/**
+ * Com as linhas do papel (todas com o total impresso) e o TOTAL do rodapé:
+ *   - as linhas já dão o total → o desconto do rodapé já está nelas, e não
+ *     entra de novo;
+ *   - as linhas menos o desconto dão o total → o desconto entra;
+ *   - nenhuma das duas → o desconto não entra, e a frase diz que a conta não
+ *     fecha (a conferência do total mostra a diferença).
+ * "Dar o total" admite 1 centavo por linha (o arredondamento do papel), e essa
+ * diferença entra declarada. Sem as linhas do papel, vale a marca da leitura
+ * (`desconto_nas_linhas`): `true` não entra, `false` entra, e `null` (a leitura
+ * não soube, ou é a leitura antiga, sem a marca) não preenche sozinha e pede à
+ * pessoa (D890, a regra do Banco na D888 §4).
+ */
+export function contaDoRodape(cab: CabecalhoLido, papel: LinhasDoPapel | null): ContaDoRodape {
+  const desc = cab.desconto && cab.desconto > 0 ? cab.desconto : null;
+  const jaNasLinhas = desc != null ? `O desconto do orçamento (${brl(desc)}) já está nos preços das linhas.` : '';
+  if (!papel || cab.total == null) {
+    if (desc == null || cab.desconto_nas_linhas === false) return { desconto: desc, arredondamento: 0, frase: '' };
+    if (cab.desconto_nas_linhas === true) return { desconto: null, arredondamento: 0, frase: jaNasLinhas };
+    return {
+      desconto: null,
+      arredondamento: 0,
+      frase: `O orçamento diz um desconto de ${brl(desc)}, e a leitura não soube se ele já está nos preços das linhas. Se não estiver, ponha no "Desconto material".`,
+    };
+  }
+  const c = (v: number | null) => Math.round((v ?? 0) * 100);
+  const linhas = c(papel.soma) + c(cab.frete) + c(cab.outras_despesas);
+  const total = c(cab.total);
+  const cabe = (diferenca: number) => Math.abs(diferenca) <= papel.linhas;
+  const declara = (diferenca: number, antes: string) =>
+    (diferenca === 0
+      ? antes
+      : `${antes} As linhas do orçamento somam ${brl(papel.soma)} e o total dele diz ${brl(cab.total!)}: a diferença de ${brl(Math.abs(diferenca) / 100)} entra como arredondamento do orçamento.`
+    ).trim();
+
+  if (cabe(total - linhas)) {
+    return { desconto: null, arredondamento: (total - linhas) / 100, frase: declara(total - linhas, jaNasLinhas) };
+  }
+  if (desc != null && cabe(total - (linhas - c(desc)))) {
+    const d = total - (linhas - c(desc));
+    return { desconto: desc, arredondamento: d / 100, frase: declara(d, '') };
+  }
+  return {
+    desconto: null,
+    arredondamento: 0,
+    frase: desc != null
+      ? `As linhas do orçamento somam ${brl(papel.soma)}, e a conta não chega ao total dele (${brl(cab.total)}) nem com o desconto de ${brl(desc)}, nem sem ele. O desconto não entrou: confira.`
+      : '',
+  };
+}
 
 export function preencherDoCabecalho(
   oc: Pick<OrdemCompra, 'data'>,
   cab: CabecalhoLido,
   todos: readonly Fornecedor[],
   livre: (c: CampoDoAlto) => boolean,
+  papel: LinhasDoPapel | null = null,
 ): Preenchimento {
-  const p: Preenchimento = { mudancas: {}, confira: {}, naoPisou: {}, semFornecedor: '' };
+  const p: Preenchimento = { mudancas: {}, confira: {}, naoPisou: {}, semFornecedor: '', contaDoPapel: '' };
   const propoe = (c: CampoDoAlto, aplica: () => void, confira: string, oPapelDiz: string) => {
     if (livre(c)) {
       aplica();
@@ -167,10 +279,17 @@ export function preencherDoCabecalho(
     }
   };
 
-  const f = fornecedorDoCnpj(cab.cnpj_emitente, todos);
+  // Com CNPJ, vale o CNPJ, como sempre; sem ele, o nome impresso (D888 §2).
+  const peloNome = !cab.cnpj_emitente && !!cab.nome_emitente;
+  const f = peloNome ? fornecedorDoNome(cab.nome_emitente, todos) : fornecedorDoCnpj(cab.cnpj_emitente, todos);
   if (f.tipo === 'achou') {
     const id = f.id;
-    propoe('fornecedor', () => (p.mudancas.fornecedor_id = id), 'Escolhido pelo CNPJ do orçamento. Confira.', 'outro fornecedor, pelo CNPJ');
+    propoe(
+      'fornecedor',
+      () => (p.mudancas.fornecedor_id = id),
+      peloNome ? 'Escolhido pelo nome do orçamento. Confira.' : 'Escolhido pelo CNPJ do orçamento. Confira.',
+      peloNome ? 'outro fornecedor, pelo nome' : 'outro fornecedor, pelo CNPJ',
+    );
   } else if (livre('fornecedor')) {
     p.semFornecedor = f.porque;
   }
@@ -183,14 +302,22 @@ export function preencherDoCabecalho(
     propoe('entrega', () => (p.mudancas.entrega_prevista = entrega.data), `Do orçamento — ${entrega.como}. Confira.`, entrega.como);
   }
 
-  const valores: [CampoDoAlto, number | null, 'frete' | 'outras_despesas' | 'desconto_material'][] = [
-    ['frete', cab.frete, 'frete'],
-    ['outras', cab.outras_despesas, 'outras_despesas'],
-    ['desconto', cab.desconto, 'desconto_material'],
+  // O arredondamento mora nos campos de hoje (a escolha A da D889): para
+  // menos, no "Desconto material"; para mais, em "Outras despesas".
+  const conta = contaDoRodape(cab, papel);
+  p.contaDoPapel = conta.frase;
+  const arred = conta.arredondamento;
+  const mais = (a: number | null, b: number) => (a == null && b === 0 ? null : Math.round(((a ?? 0) + b) * 100) / 100);
+  const LIDO = 'Lido do orçamento. Confira.';
+  const ARREDONDADO = 'Com o arredondamento do orçamento (veja acima). Confira.';
+  const valores: [CampoDoAlto, number | null, 'frete' | 'outras_despesas' | 'desconto_material', string][] = [
+    ['frete', cab.frete, 'frete', LIDO],
+    ['outras', mais(cab.outras_despesas, Math.max(arred, 0)), 'outras_despesas', arred > 0 ? ARREDONDADO : LIDO],
+    ['desconto', mais(conta.desconto, Math.max(-arred, 0)), 'desconto_material', arred < 0 ? ARREDONDADO : LIDO],
   ];
-  for (const [c, v, campo] of valores) {
+  for (const [c, v, campo, confira] of valores) {
     if (v == null) continue;
-    propoe(c, () => (p.mudancas[campo] = v), 'Lido do orçamento. Confira.', brl(v));
+    propoe(c, () => (p.mudancas[campo] = v), confira, brl(v));
   }
   return p;
 }

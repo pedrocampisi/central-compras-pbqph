@@ -34,6 +34,8 @@ import { useUiStore } from '../../src/stores/useUiStore';
 import type { DadosDaQualificacao } from '../../src/services/supabase/qualificacao';
 import type { LinhaDeQualificacao } from '../../src/domain/qualificacao';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { formatDate, todayIso } from '../../src/domain/format';
+import { somaDias } from '../../src/domain/qualificacao';
 
 const MATERIAL: Fornecedor = {
   ...normalizeFornecedor({ id: 'filial-a', razao_social: 'Filial A (teste)' }),
@@ -141,18 +143,20 @@ describe('D604 §3.4 — o selo', () => {
   });
 
   it('na lista, quem só presta serviço mostra a categoria em que tem qualificação (o laboratório, por exemplo)', () => {
+    // A data anda com o relógio: o 20/10/2026 fixo virou "Vencida desde" em 23/10 (D889).
+    const venceEm = somaDias(todayIso(), 10);
     useQualificacaoStore.getState().definir(
       qualificacoes([
         ...HISTORICO,
         linha({
           id: 9, empresaRaizId: null, fornecedorId: 'prestador-b', categoria: 'controle_tecnologico', minimo: 1,
-          situacao: 'vence_em_30_dias', venceEm: '2026-10-20', ecrs: [],
+          situacao: 'vence_em_30_dias', venceEm, ecrs: [],
         }),
       ]),
     );
     render(<FornecedoresPage />);
     expect(screen.getByText('Prestador B (teste)').closest('tr')!.textContent).toContain(
-      'Controle tecnológico: Vence em 20/10/2026',
+      `Controle tecnológico: Vence em ${formatDate(venceEm)}`,
     );
   });
 
