@@ -48,11 +48,13 @@ const ITEM = { id: 'i1', descricao: 'Cimento (teste)', observacao: '', quantidad
 
 const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({
   cnpj_emitente: '', condicao_pagamento: '', entrega_texto: '', entrega_dias: null, entrega_data: '',
-  frete: null, outras_despesas: null, desconto: null, total: null, confira: '', ...c,
+  frete: null, outras_despesas: null, desconto: null, total: null,
+  subtotal: null, desconto_nas_linhas: null, nome_emitente: '', confira: '', ...c,
 });
+/** O desconto do rodapé é do orçamento inteiro, não está nas linhas: a leitura diz `false` (D890). */
 const ORCAMENTO = cab({
   cnpj_emitente: '22222222000100', condicao_pagamento: '28 dias', entrega_texto: '3 dias', entrega_dias: 3,
-  frete: 80, desconto: 12.5, total: 1000,
+  frete: 80, desconto: 12.5, desconto_nas_linhas: false, total: 1000,
 });
 
 const png = () => new File(['png'], 'orcamento.png', { type: 'image/png' });

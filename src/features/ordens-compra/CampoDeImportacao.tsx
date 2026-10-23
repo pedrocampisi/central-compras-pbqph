@@ -40,12 +40,17 @@ import {
 } from '../../domain/importacao';
 import { CERTEIRO_INDISPONIVEL, DICA_DO_LEITOR, LEITORES, type Leitor } from '../../domain/leitor';
 import { formatBrl } from '../../domain/format';
+import { conferenciaDoTotal } from '../../domain/cabecalhoLido';
 import styles from './CampoDeImportacao.module.css';
 
 export interface ResultadoNaTela {
   leitor: Leitor;
   itens: number;
   total: number;
+  /** O TOTAL que o orçamento imprime; `null` quando o papel não traz (D888 §1). */
+  orcamento?: number | null;
+  /** O que a OC soma agora, com o frete, as despesas e o desconto. */
+  daOc?: number;
 }
 
 interface Props {
@@ -259,16 +264,20 @@ export function CampoDeImportacao({
                   o jeito mais rápido de pegar o erro. Se não bater, leia de novo com o certeiro.
                 </Ajuda>
               </div>
+              {/* Com o TOTAL do papel, o número grande é o que a OC soma: é ele que se compara com o
+                  papel (CTO-D893). A soma das linhas lidas fica na frase do arredondamento. */}
               <strong className={styles.totalLido} data-total-lido="">
-                {formatBrl(resultado.total)}
+                {formatBrl(resultado.orcamento != null ? (resultado.daOc ?? 0) : resultado.total)}
               </strong>
               <span className={styles.subtitulo}>
                 Lido pelo <strong>{LEITORES[resultado.leitor].nome.toLowerCase()}</strong> ·{' '}
                 {contarItens(resultado.itens)}
               </span>
+              <DoisTotais orcamento={resultado.orcamento ?? null} daOc={resultado.daOc ?? 0} />
               <span className={styles.contexto}>
-                Confira com a soma dos itens no papel, sem o frete. Se não bater, algum preço ou
-                quantidade saiu errado.
+                {resultado.orcamento != null
+                  ? 'Confira com o TOTAL do papel. Se não bater, algum preço ou quantidade saiu errado.'
+                  : 'Confira com a soma dos itens no papel, sem o frete. Se não bater, algum preço ou quantidade saiu errado.'}
               </span>
               {resultado.leitor === 'rapido' && onLerDeNovoComCerteiro && (
                 <div className={styles.acaoDoResultado}>
@@ -430,6 +439,23 @@ export function CampoDeImportacao({
           )}
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * O que o orçamento diz e o que a OC soma, lado a lado, logo abaixo do total
+ * lido (CTO-D888 §1: o Pedro olhava este cartão, e o total do papel só
+ * aparecia embaixo, na caixa dos totais). Sem total no papel, nada aparece.
+ */
+function DoisTotais({ orcamento, daOc }: { orcamento: number | null; daOc: number }) {
+  const c = conferenciaDoTotal(orcamento, daOc);
+  if (!c) return null;
+  return (
+    <div className={styles.doisTotais} data-dois-totais={c.bate ? 'bate' : 'difere'}>
+      <span>O orçamento diz <strong>{formatBrl(c.orcamento)}</strong></span>
+      <span>A OC soma <strong>{formatBrl(c.oc)}</strong></span>
+      <span className={styles.bateOuNao}>{c.bate ? 'Os dois batem.' : `Diferença de ${formatBrl(Math.abs(c.diferenca))}.`}</span>
     </div>
   );
 }

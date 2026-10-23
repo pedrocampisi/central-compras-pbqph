@@ -38,6 +38,7 @@ import {
 import { CampoDeImportacao } from './CampoDeImportacao';
 import { ConferenciaDoTotal, ConfiraDoCampo, ResumoDoAlto, type ResumoDoAltoProps } from './AltoDaLeitura';
 import { preencherDoCabecalho, type CabecalhoLido, type CampoDoAlto } from '../../domain/cabecalhoLido';
+import type { LinhasDoPapel } from '../../domain/linhaDoPapel';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import { entregarPdfDaOc } from '../../services/supabase/pastaDaObra';
 import { avisoDoPdf } from '../../domain/pastaDaObra';
@@ -694,13 +695,13 @@ export function NovaOcPage() {
   }, [confiraDoAlto, data]);
 
   // Só propõe: nada grava e nada emite sem o clique da pessoa (regra 2).
-  const aplicarCabecalho = useCallback((cab: CabecalhoLido) => {
+  const aplicarCabecalho = useCallback((cab: CabecalhoLido, papel: LinhasDoPapel | null) => {
     const oc = useOcEditingStore.getState().ocEditing;
     if (!oc || !data) return;
-    const p = preencherDoCabecalho(oc, cab, data.fornecedores, (c) => campoLivre(c, oc));
+    const p = preencherDoCabecalho(oc, cab, data.fornecedores, (c) => campoLivre(c, oc), papel);
     for (const [campo, valor] of Object.entries(p.mudancas)) updateField(campo as keyof OrdemCompra, valor as never);
     setConfiraDoAlto((antes) => ({ ...antes, ...p.confira }));
-    setResumoDoAlto({ semFornecedor: p.semFornecedor, naoPisou: p.naoPisou, duvida: cab.confira });
+    setResumoDoAlto({ semFornecedor: p.semFornecedor, naoPisou: p.naoPisou, duvida: cab.confira, contaDoPapel: p.contaDoPapel });
     setTotalDoOrcamento(cab.total);
   }, [data, campoLivre, updateField]);
 
@@ -786,7 +787,7 @@ export function NovaOcPage() {
         appendItems(r.itens);
         setConfira((antes) => ({ ...antes, ...r.confira }));
       }
-      if (r.cabecalho) aplicarCabecalho(r.cabecalho);
+      if (r.cabecalho) aplicarCabecalho(r.cabecalho, r.papel ?? null);
       setResultado({ leitor: quemLeu(r.leitor), itens: r.itens });
       setPortasAbertas(false);
       setLeiturasFeitas((n) => n + 1);
@@ -1138,6 +1139,9 @@ export function NovaOcPage() {
                   leitor: resultado.leitor,
                   itens: resultado.itens.length,
                   total: totalLido(resultado.itens),
+                  // O que o papel diz e o que a OC soma, lado a lado (D888 §1).
+                  orcamento: totalDoOrcamento,
+                  daOc: ocEditing ? computeOcTotals(ocEditing).total_geral : 0,
                 }}
                 onLerDeNovoComCerteiro={() => void lerDeNovoComCerteiro()}
                 oferecerCerteiro={oferecerCerteiro}

@@ -68,7 +68,7 @@ import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
 import { Loader } from '../../components/Loader/Loader';
-import { carregarRascunho, type RascunhoDoProcedimento } from './rev01';
+import { carregarRascunho, type RascunhoDoProcedimento } from './rascunho';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import styles from './ProcedimentoPage.module.css';
 
@@ -536,7 +536,8 @@ export function ProcedimentoPage() {
     };
   }, [meuId]);
 
-  // O rascunho só desce para quem revisa.
+  // O rascunho só desce para quem revisa. Sem rascunho no código, vem `null`
+  // e fica só a vigente (a Rev. 01 foi gravada, D887).
   useEffect(() => {
     if (!podeRevisar || rascunho) return;
     let vivo = true;

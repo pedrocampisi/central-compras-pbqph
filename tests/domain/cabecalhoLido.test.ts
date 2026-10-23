@@ -38,7 +38,8 @@ const TODOS = [ALFA_MATRIZ, ALFA_FILIAL, BETA];
 
 const VAZIO: CabecalhoLido = {
   cnpj_emitente: '', condicao_pagamento: '', entrega_texto: '', entrega_dias: null, entrega_data: '',
-  frete: null, outras_despesas: null, desconto: null, total: null, confira: '',
+  frete: null, outras_despesas: null, desconto: null, total: null,
+  subtotal: null, desconto_nas_linhas: null, nome_emitente: '', confira: '',
 };
 const cab = (c: Partial<CabecalhoLido> = {}): CabecalhoLido => ({ ...VAZIO, ...c });
 
@@ -58,6 +59,8 @@ describe('o contrato do cabeçalho', () => {
     expect(c).toEqual({
       cnpj_emitente: '22222222000100', condicao_pagamento: '28/35 dias', entrega_texto: '5 dias úteis',
       entrega_dias: 5, entrega_data: '', frete: 80, outras_despesas: null, desconto: 12.5, total: 1067.5, confira: '',
+      // A leitura de antes da D888 não manda as chaves novas: é "o papel não disse" (D890).
+      subtotal: null, desconto_nas_linhas: null, nome_emitente: '',
     });
   });
 
@@ -132,7 +135,7 @@ describe('o prazo vira data, a partir da Data da OC', () => {
 describe('o que a leitura preenche, e o que não pisa', () => {
   const tudo = cab({
     cnpj_emitente: '22222222000100', condicao_pagamento: '28 dias', entrega_texto: '3 dias', entrega_dias: 3,
-    frete: 80, outras_despesas: 0, desconto: 12.5, total: 1000,
+    frete: 80, outras_despesas: 0, desconto: 12.5, desconto_nas_linhas: false, total: 1000,
   });
 
   it('com tudo livre: fornecedor, condição, entrega, frete, outras e desconto, cada um com o confira', () => {
