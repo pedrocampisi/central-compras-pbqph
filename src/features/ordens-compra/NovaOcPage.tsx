@@ -73,6 +73,7 @@ import {
 import {
   MENSAGEM_OBRA_SEM_DESTINATARIO, destinatarioDaObra, rotuloFaturarPara,
 } from '../../domain/destinatario';
+import { avisoDaIa } from '../../domain/montadaPelaIa';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -982,6 +983,13 @@ export function NovaOcPage() {
           </Button>
         </div>
       </div>
+
+      {/* O rascunho que a IA montou pelo MCP (CTO-D954): a pessoa confere e emite. */}
+      {avisoDaIa(ocEditing) && (
+        <div className={styles.avisoDaIa} data-montada-pela-ia="">
+          <Icon name="alerta" size={14} /> <span>{avisoDaIa(ocEditing)}</span>
+        </div>
+      )}
 
       {oferecerTutorial && passoDoTutorial === null && (
         <div className={tutorialStyles.oferta} data-oferta-do-tutorial="">

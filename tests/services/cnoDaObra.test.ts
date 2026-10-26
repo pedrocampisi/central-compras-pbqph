@@ -32,7 +32,7 @@ function consulta(tabela: string) {
 vi.mock('../../src/services/supabase/client', () => ({
   supabase: {},
   core: () => ({ from: (t: string) => consulta(t) }),
-  compras: () => ({ from: (t: string) => consulta(t) }),
+  compras: () => ({ from: (t: string) => consulta(t), rpc: (f: string) => consulta(f) }),
 }));
 
 import { carregarDados } from '../../src/services/supabase/dados';

@@ -56,6 +56,13 @@ export interface Fornecedor {
   empresa_id?: string;
   /** Filial que não pode receber OC nova (BAIXADA na Receita, por exemplo). */
   bloqueado_para_compra_nova?: boolean;
+  /** A regra única da OC, do banco (`compras.regra_da_oc`, CTO-D954): se a
+   *  filial entra na lista da Nova OC. Ausente no formato antigo de arquivo:
+   *  aí vale a regra escrita aqui (`entraNaOc`). */
+  entra_na_oc?: boolean;
+  /** A filial que a OC grava quando se escolhe a empresa desta filial, pela
+   *  mesma regra do banco; `null` quando nenhuma filial da empresa pode. */
+  filial_da_oc?: string | null;
   criado_em: string;
   atualizado_em: string;
 }
@@ -203,6 +210,13 @@ export interface OrdemCompra {
   criado_em: string;
   atualizado_em: string;
   pdf_gerado_em: string;
+  /**
+   * O nome da IA que montou o rascunho pelo MCP da Central (CTO-D954): a OC
+   * com `origem_sistema = 'ia'`, e o nome vem do `origem_id`. Ausente na OC
+   * feita na tela. É marca de leitura: a tela não a grava, e o banco não a
+   * muda depois do primeiro registro.
+   */
+  montada_pela_ia?: string;
   /**
    * Versão que o banco tem desta OC. Sobe a cada gravação e é o que impede
    * duas pessoas de se sobrescreverem em silêncio: mandamos a versão que

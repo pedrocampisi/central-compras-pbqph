@@ -39,6 +39,10 @@ export function fornecedoresParaOc(todos: Fornecedor[], manter = ''): Fornecedor
  * sozinho de fornecedor — e o rótulo dela diz que está fora.
  */
 export function entraNaOc(f: Fornecedor): boolean {
+  // A regra é do banco desde a CTO-D954 (`compras.regra_da_oc`): a tela lê. A
+  // conta de baixo fica como a do formato antigo de arquivo e como a régua do
+  // teste do Banco (`teste_regra_unica_da_oc.py`), que compara as duas.
+  if (typeof f.entra_na_oc === 'boolean') return f.entra_na_oc;
   return f.ativo && f.fornece_material === true && f.bloqueado_para_compra_nova !== true;
 }
 
@@ -73,6 +77,8 @@ export function motivoForaDaOc(f: Fornecedor): string {
   if (f.bloqueado_para_compra_nova === true) return 'bloqueada para compra nova';
   if (!f.ativo) return 'inativa';
   if (f.fornece_material !== true) return 'fora da lista de material';
+  // O banco disse que não entra, e nenhum dos motivos acima explica (CTO-D954).
+  if (f.entra_na_oc === false) return 'fora da lista da OC';
   return '';
 }
 
@@ -404,6 +410,10 @@ export function localDaFilial(f: Fornecedor, irmas: Fornecedor[]): string {
  * endereçada à matriz vale para a empresa. Nenhuma que possa: `undefined`.
  */
 export function filialPrincipal(grupo: EmpresaDaLista): Fornecedor | undefined {
+  // Com a regra do banco na carga (CTO-D954), a filial é a que ele diz; a que
+  // não está nesta lista não se grava, e a conta de baixo não desempata.
+  const daRegra = grupo.filiais.find((f) => f.filial_da_oc !== undefined);
+  if (daRegra) return grupo.filiais.find((f) => f.id === daRegra.filial_da_oc);
   const ordem = (f: Fornecedor) => ordemDoCnpj(f.cnpj) ?? Number.POSITIVE_INFINITY;
   return grupo.filiais
     .filter(entraNaOc)

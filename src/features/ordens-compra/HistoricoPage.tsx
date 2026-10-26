@@ -49,6 +49,7 @@ import { coberturaPorEntrega, textoDaCobertura, type CoberturaDaEntrega } from '
 import { lerCoberturaDasEntregas } from '../../services/supabase/entregasSemPapel';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
 import { ecrsNaOrdemDosItens } from '../../domain/qualidadeNaOc';
+import { avisoDaIa } from '../../domain/montadaPelaIa';
 import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
 import { useRegistrosStore } from '../../stores/useRegistrosStore';
 import { useEntregasSemPapelStore } from '../../stores/useEntregasSemPapelStore';
@@ -229,6 +230,8 @@ export function HistoricoPage() {
     // existe no banco) e sempre como rascunho.
     const duplicated: OrdemCompra = {
       ...structuredClone(oc),
+      // A cópia é da pessoa: a marca da IA não vai junto (CTO-D954).
+      montada_pela_ia: undefined,
       id: uid('oc'),
       numero: '',
       sequencial: 0,
@@ -489,6 +492,18 @@ export function HistoricoPage() {
       render: (o) => (
         <>
           <Pill status={o.status} />
+          {avisoDaIa(o) && (
+            <div
+              data-montada-pela-ia=""
+              style={{
+                marginTop: 6, fontSize: 12, maxWidth: 220,
+                color: o.status === 'rascunho' ? 'var(--aviso)' : 'var(--text-muted)',
+                fontWeight: o.status === 'rascunho' ? 600 : undefined,
+              }}
+            >
+              {avisoDaIa(o)}
+            </div>
+          )}
           {recebimentoDaOc(o)}
           {pastaDaOc(o)}
         </>

@@ -151,6 +151,22 @@
   .confiraTexto { display: inline; }
 }
 
+/* ── O rascunho que a IA montou (CTO-D954) ────────────────────────────────── */
+.avisoDaIa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--aviso-bg);
+  box-shadow: inset 3px 0 0 var(--aviso);
+  color: var(--aviso);
+  font-size: 13px;
+  font-weight: 600;
+}
+.avisoDaIa svg { flex-shrink: 0; }
+
 /* ── Totals panel ──────────────────────────────────────────────────────────── */
 
 .totalsPanel {
