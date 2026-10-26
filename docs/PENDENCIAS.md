@@ -45,6 +45,23 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
+### 44. A OC no mesmo MCP (CTO-D953): o plano mandado, esperando a aprovação
+
+*Aberta em 26/10/2026, na decisão 143.* O Pedro quer o Antigravity na OC pelo MCP da Central, sem conector novo. O
+plano foi ao CTO, com cópia ao Banco e à Central:
+- quatro ferramentas, que só montam um **rascunho**: a IA não emite;
+- a regra de quem entra na OC e da matriz vai para o banco antes;
+- a prova é no ensaio, e o perito vem antes da produção.
+
+**Falta, nesta ordem:**
+1. a aprovação do CTO (as escolhas A, B e C) e os nomes do Banco;
+2. o lado do Banco: a regra única e as funções `ia_*`, no ensaio;
+3. o meu ramo: o aviso "Montado pela IA" e a carga lendo a regra do banco, sem publicar;
+4. o perito;
+5. a produção, na ordem do §12.8, e o teste de gente.
+
+---
+
 ### 28. O app do mestre de obra (D693, D696): no ar, esperando o primeiro uso
 
 *Aberta em 04/10/2026, na decisão 80; atualizada nas decisões 81, 84, 85, 86, 87 e 88.* **No ar desde 05/10, 10h53,

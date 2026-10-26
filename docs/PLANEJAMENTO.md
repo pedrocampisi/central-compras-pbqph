@@ -4533,3 +4533,37 @@ leitura 578).
   ar em `d4960d22`**, pacote `20261023212630-9993fe6`. O desfazer é `680ee679`. Medido por fora.
 
 **O banco não mudou.**
+
+---
+
+## Decisão 143 — o plano da OC no mesmo MCP: a IA monta o rascunho, a pessoa emite na tela · 26/10/2026
+
+**POR QUÊ (CTO-D953, o pedido do Pedro):** "Queria ligar o antigravity via MCP ao ordem de compra também. E queria
+fazer isso sem ter que concectar outro MCP, tudo ficar no mesmo". É a lei 4, §12: um MCP só (a função `mcp` do
+Banco), e cada casa é dona das ferramentas que espelham as telas dela. A Central foi a primeira.
+
+**O QUE FOI (só o plano, sem código; medido lendo o código desta casa e as migrations do Banco):**
+- **quatro ferramentas**, cada uma espelhando um botão:
+  - `buscar_fornecedor_e_obra_da_oc` (os campos da Nova OC);
+  - `buscar_ordens_de_compra` (a busca do Histórico);
+  - `propor_rascunho_de_oc` (o "Salvar Rascunho", que não grava);
+  - a `confirmar` de sempre;
+
+  A gravação é pela `compras.salvar_oc`, com o status preso em "rascunho", e marcada em `origem_sistema = 'ia'`;
+- **a IA nunca emite:** o número do PBQP-H, a fotografia, as travas e o PDF ficam na tela;
+- **o achado:** `entraNaOc` e `filialPrincipal` moram só na tela, e a `salvar_oc` não as conhece. A proposta é a regra
+  única no banco antes da ferramenta (escolha A);
+- **o que fica fora:** a gaveta do fornecedor, que grava direto em `core.fornecedores` e `core.empresa_raiz`,
+  segue como está (D878), e nenhuma ferramenta cadastra fornecedor;
+- **a marca `sem_ordem_de_compra`** barra pela `pode_emitir_oc`, já dentro da `salvar_oc`; as buscas perguntam a ela
+  também;
+- **a proposta mostra:**
+  - o total da OC ao lado do total do papel;
+  - cada linha pela conta do banco;
+  - o selo da qualificação na Data;
+  - o teto de 60 itens, a confirmar pela medida do Banco;
+- **duas correções ao pedido:** a D797 é do recebimento (a da OC é a D683); "o papel no nome do cliente" li como o
+  destinatário da nota;
+- **o risco do §12.6:** o Antigravity pode confirmar sozinho. O pior caso é um rascunho, e a emissão é de gente.
+
+**Espera a aprovação do CTO (as escolhas A, B e C) e os nomes do Banco.** **O banco não mudou.**
