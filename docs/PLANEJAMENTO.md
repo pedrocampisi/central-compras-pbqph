@@ -4590,3 +4590,29 @@ Banco), e cada casa é dona das ferramentas que espelham as telas dela. A Centra
   4. a produção.
 
 **Esta casa espera a carta do Banco.** Nada de código antes. **O banco não mudou.**
+---
+
+## Decisão 145 — a tela da OC no MCP, no ramo, sem publicar · 26/10/2026
+
+**POR QUÊ (CTO-D954 e a carta do Banco da D954):** o Banco mandou as funções para o ensaio, e a D954 diz "Comece a
+tela quando o Banco mandar as funções".
+
+**O QUE FOI** (ramo `d954-a-oc-no-mcp`, commit `e88d33d`):
+- **a carga lê a `compras.regra_da_oc()`:**
+  - em páginas e com a contagem;
+  - o `entraNaOc` e o `filialPrincipal` leem a resposta do banco;
+  - a conta daqui fica para o formato antigo e como a régua do teste do Banco;
+  - a filial que não veio na regra não entra (falha fechada);
+- **o aviso "Montado pela IA (nome). Confira antes de emitir.":**
+  - aparece no Histórico e na Nova OC, lido de `origem_sistema = 'ia'` e do `origem_id`;
+  - depois de emitida, diz só de onde a OC veio;
+  - a cópia sai sem a marca;
+- **o teste que prende a conta da tela à da `oc_totais`:** o papel de 23/10 dá 455,9972 no banco e 455,9971 na
+  tela, e as duas fecham em 456,00;
+- **as provas:** 16 testes novos, 1338 na bateria, 10 de 10 sabotagens vermelhas, e as fotos em
+  `docs/Capturas/2026-10-26_D954/`;
+- **o que não fiz:**
+  - não rodei o teste do Banco, porque ele grava no ensaio (com rollback) e lê a pasta principal;
+  - não abri a tela no ensaio com login.
+
+**Na produção, o banco sobe antes da tela.** No desfazer, a tela volta antes do banco. **O banco não mudou.**
