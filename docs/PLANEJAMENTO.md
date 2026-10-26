@@ -4567,3 +4567,26 @@ Banco), e cada casa é dona das ferramentas que espelham as telas dela. A Centra
 - **o risco do §12.6:** o Antigravity pode confirmar sozinho. O pior caso é um rascunho, e a emissão é de gente.
 
 **Espera a aprovação do CTO (as escolhas A, B e C) e os nomes do Banco.** **O banco não mudou.**
+
+---
+
+## Decisão 144 — o plano da OC no mesmo MCP aprovado; a vez é do Banco · 26/10/2026
+
+**POR QUÊ (CTO-D954):** "O plano está aprovado como está".
+
+**O QUE FOI:**
+- **as três escolhas:**
+  - **A:** a regra única no banco (`compras.entra_na_oc` e `compras.filial_da_oc`) antes da ferramenta, com o teste
+    que compara as duas regras com os mesmos cadastros;
+  - **B:** a busca de OCs entra já;
+  - **C:** o teto de 60 itens fica até a medida do Banco;
+- **as duas correções foram aceitas:** a D683, e o destinatário da nota, que a emissão resolve;
+- **o §8 não é exceção:** o Antigravity segue a D915 (nunca no Turbo nem no "Always Proceed", e a pessoa confirma
+  cada gravação);
+- **a ordem:**
+  1. o Banco (a regra única, as funções `ia_*`, a auditoria `pela_ia`, a medida do teto), no ensaio;
+  2. a tela desta casa, no ensaio, **quando o Banco mandar as funções**;
+  3. o perito nas duas casas;
+  4. a produção.
+
+**Esta casa espera a carta do Banco.** Nada de código antes. **O banco não mudou.**

@@ -45,7 +45,7 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 44. A OC no mesmo MCP (CTO-D953): o plano mandado, esperando a aprovação
+### 44. A OC no mesmo MCP (CTO-D953, D954): o plano aprovado, esperando as funções do Banco
 
 *Aberta em 26/10/2026, na decisão 143.* O Pedro quer o Antigravity na OC pelo MCP da Central, sem conector novo. O
 plano foi ao CTO, com cópia ao Banco e à Central:
@@ -54,7 +54,7 @@ plano foi ao CTO, com cópia ao Banco e à Central:
 - a prova é no ensaio, e o perito vem antes da produção.
 
 **Falta, nesta ordem:**
-1. a aprovação do CTO (as escolhas A, B e C) e os nomes do Banco;
+1. ~~a aprovação do CTO~~ (D954: A, B e C, decisão 144), e os nomes do Banco;
 2. o lado do Banco: a regra única e as funções `ia_*`, no ensaio;
 3. o meu ramo: o aviso "Montado pela IA" e a carga lendo a regra do banco, sem publicar;
 4. o perito;
