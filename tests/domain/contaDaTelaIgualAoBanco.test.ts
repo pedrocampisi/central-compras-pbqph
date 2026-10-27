@@ -93,6 +93,13 @@ describe('D954 e D960 — a conta da tela é a conta do banco, às quatro casas'
     expect(computeOcTotals(oc)).toMatchObject({ sub_total: 537.35, desc_itens: 81.3428, total_ipi: 0, total_geral: 455.9972 });
   });
 
+  it('frete, outras despesas e desconto material entram como a coluna de duas casas os guarda', () => {
+    // numeric(14,2): 10,005 vira 10,01; 0,004 vira 0; 0,005 vira 0,01.
+    expect(computeOcTotals(ocCom(PERITO, 10.005, 0.004, 0.005))).toMatchObject({
+      total_frete: 10.01, total_outras: 0, total_desc_mat: 0.01, total_geral: 295.015,
+    });
+  });
+
   it('com IPI, quantidade quebrada, frete, outras despesas e desconto material', () => {
     const oc = ocCom([[3, 19.99, 7.5, 10], [12.5, 4.333, 0, 5], [1, 1234.56, 2.25, 3.25]], 35.5, 12.3, 4.2);
     expect(computeOcTotals(oc)).toMatchObject({

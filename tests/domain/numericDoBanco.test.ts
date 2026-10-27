@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
  * contra o banco está em `contaDaTelaIgualAoBanco.test.ts`.
  */
 import {
-  arredondar, deNumero, dividido, emCentavos, emNumero, inteiro, naColuna,
+  arredondar, deNumero, dividido, emCentavos, emNumero, emReaisNoTexto, inteiro, naColuna,
 } from '../../src/domain/numericDoBanco';
 import { conferenciaDoTotal } from '../../src/domain/cabecalhoLido';
 
@@ -40,6 +40,13 @@ describe('D960 — o numeric do banco na tela', () => {
     expect(Math.round(1.005 * 100)).toBe(100);
     expect(emCentavos(-285.015)).toBe(-28502);
     expect(emCentavos(456)).toBe(45600);
+  });
+
+  it('o CSV do Histórico escreve o centavo do banco, e não o do toFixed', () => {
+    expect(emReaisNoTexto(285.015)).toBe('285,02');
+    expect((285.015).toFixed(2)).toBe('285.01');
+    expect(emReaisNoTexto(456)).toBe('456,00');
+    expect(emReaisNoTexto(1407.4929)).toBe('1407,49');
   });
 
   it('a conferência com o total do papel usa o centavo do banco', () => {

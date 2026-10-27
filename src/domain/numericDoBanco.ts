@@ -132,3 +132,8 @@ export function emNumero(n: Numeric): number {
 export function emCentavos(v: number): number {
   return Number(arredondar(deNumero(v), 2).v);
 }
+
+/** O valor em reais com vírgula, para o CSV: `toFixed(2)` arredonda 285,015 para baixo. */
+export function emReaisNoTexto(v: number): string {
+  return (emCentavos(v) / 100).toFixed(2).replace('.', ',');
+}

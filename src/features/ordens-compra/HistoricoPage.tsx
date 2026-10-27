@@ -19,7 +19,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl, formatDate, nowIso, todayIso } from '../../domain/format';
 import { computeOcTotals } from '../../domain/compute';
-import { emCentavos } from '../../domain/numericDoBanco';
+import { emReaisNoTexto } from '../../domain/numericDoBanco';
 import { uid } from '../../domain/id';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
@@ -330,8 +330,8 @@ export function HistoricoPage() {
       obraNome.get(o.obra_id) ?? '',
       o.status,
       String(o.itens.length),
-      // O `toFixed` arredonda 285,015 para baixo; o banco e a tela, para cima (CTO-D960).
-      (emCentavos(computeOcTotals(o).total_geral) / 100).toFixed(2).replace('.', ','),
+      // O centavo do banco e da tela, e não o do `toFixed` (CTO-D960).
+      emReaisNoTexto(computeOcTotals(o).total_geral),
     ]);
     const escape = (c: string) => `"${c.replace(/"/g, '""')}"`;
     // BOM + separador ';' → abre direto no Excel brasileiro com acentos corretos.
