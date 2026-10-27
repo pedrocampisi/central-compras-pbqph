@@ -91,7 +91,12 @@ vi.mock('../../src/services/supabase/client', () => ({
     from: (t: string) => banco.consulta(`core.${t}`),
     rpc: async () => ({ data: banco.estado.pode, error: null }),
   }),
-  compras: () => ({ from: (t: string) => banco.consulta(`compras.${t}`) }),
+  compras: () => ({
+    from: (t: string) => banco.consulta(`compras.${t}`),
+    // A regra única da OC (CTO-D954) é função: pede a contagem no próprio `rpc`.
+    rpc: (f: string, _args: unknown, opcoes?: { count?: string }) =>
+      (banco.consulta(`compras.${f}`)['select'] as (c: string, o?: { count?: string }) => unknown)('*', opcoes),
+  }),
 }));
 vi.mock('../../src/services/supabase/auth', async (original) => ({
   ...(await original<typeof import('../../src/services/supabase/auth')>()),
@@ -182,7 +187,7 @@ describe('D599 §4.1 — com a máscara ligada, cada busca pede só a obra, e ca
 
     expect(ultimaBusca('core.intervencoes').filtros).toEqual([['id', 'obra-a']]);
     expect(ultimaBusca('compras.ordens_compra').filtros).toEqual([['intervencao_id', 'obra-a']]);
-    for (const outra of ['core.fornecedores', 'core.fornecedor_resolvido', 'compras.ecrs', 'compras.numeracao', 'compras.fornecedor_ecrs']) {
+    for (const outra of ['core.fornecedores', 'core.fornecedor_resolvido', 'compras.regra_da_oc', 'compras.ecrs', 'compras.numeracao', 'compras.fornecedor_ecrs']) {
       expect(ultimaBusca(outra).filtros, outra).toEqual([]);
     }
     const avisoDasOcs = banco.estado.avisos.find((a) => a['table'] === 'ordens_compra')!;

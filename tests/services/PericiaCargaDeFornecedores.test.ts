@@ -40,6 +40,11 @@ const RESOLVIDAS = ['f5', 'f4', 'f3', 'f2', 'f1'].map((id) => ({
 const TABELAS: Record<string, Record<string, unknown>[]> = {
   fornecedores: [...CRUAS].sort((a, b) => a.razao_social.localeCompare(b.razao_social, 'pt-BR')),
   fornecedor_resolvido: RESOLVIDAS,
+  // A regra única da OC (CTO-D954), também em páginas: a bloqueada não entra.
+  regra_da_oc: RESOLVIDAS.map((r) => ({
+    fornecedor_id: r.id, empresa: r.empresa_id, entra_na_oc: !r.bloqueado_para_compra_nova,
+    filial_da_oc: r.bloqueado_para_compra_nova ? null : r.id,
+  })),
 };
 
 function consulta(tabela: string) {
@@ -71,7 +76,12 @@ function consulta(tabela: string) {
 vi.mock('../../src/services/supabase/client', () => ({
   supabase: {},
   core: () => ({ from: (t: string) => consulta(t) }),
-  compras: () => ({ from: (t: string) => consulta(t) }),
+  compras: () => ({
+    from: (t: string) => consulta(t),
+    // A função pede a contagem como a tabela: no `rpc`, e não no `select`.
+    rpc: (f: string, _args: unknown, opcoes?: { count?: string }) =>
+      (consulta(f)['select'] as (c: string, o?: { count?: string }) => unknown)('*', opcoes),
+  }),
 }));
 
 import { carregarDados } from '../../src/services/supabase/dados';
@@ -106,6 +116,11 @@ describe('Perícia 27/09, achado 5 — a página incompleta de fornecedores', ()
     expect(medida.fornecedoresNaTela).toEqual(['f1', 'f2', 'f3', 'f5', 'f4']); // pela razão social: Épsilon antes de Gama
     expect(dados!.fornecedores.every((f) => typeof f.bloqueado_para_compra_nova === 'boolean')).toBe(true);
     expect(pedidos.range).toContain('fornecedor_resolvido 3-1002');
+    // A regra do banco também veio inteira, e a bloqueada não entra na Nova OC.
+    expect(pedidos.range).toContain('regra_da_oc 3-1002');
+    expect(dados!.fornecedores.map((f) => [f.id, f.entra_na_oc])).toEqual([
+      ['f1', false], ['f2', true], ['f3', true], ['f5', true], ['f4', true],
+    ]);
   });
 
   it('o banco que para de mandar linhas antes da contagem: a carga acusa, não segue pela metade', async () => {

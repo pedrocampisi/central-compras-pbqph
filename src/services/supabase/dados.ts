@@ -111,7 +111,7 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
       { count: 'exact' },
     );
   const todasAsOcs = () => compras().from('ordens_compra').select('*, itens:oc_itens(*)', { count: 'exact' });
-  const [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
+  const [forn, fornResolvido, regra, obras, ecrs, ocs, cfgNum, fornEcrs] = await Promise.all([
     // Só as colunas que a OC usa, nunca o `*` (CTO-D551): a classificação e o
     // costume vêm da resolvida, logo abaixo.
     todasAsLinhas('fornecedores', (de, ate) =>
@@ -124,6 +124,10 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
       core().from('fornecedor_resolvido')
         .select('id, fornece_material, presta_servico, empresa_apelido, empresa_id, bloqueado_para_compra_nova', { count: 'exact' })
         .order('id').range(de, ate)),
+    // A regra única da OC (CTO-D954): quem entra na lista e que filial a OC
+    // grava ao escolher a empresa. É a mesma que a IA usa pelo MCP; a tela lê.
+    todasAsLinhas('regras da OC', (de, ate) =>
+      compras().rpc('regra_da_oc', {}, { count: 'exact' }).order('fornecedor_id').range(de, ate)),
     // "Obra" na tela é a INTERVENÇÃO: é o serviço que consome material. O
     // imóvel vem junto porque é dele que saem endereço e responsável; o
     // destinatário da nota (empresa OU cliente, trava do banco) vem junto
@@ -142,7 +146,7 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
         .order('fornecedor_id').order('ecr_id').range(de, ate)),
   ]);
 
-  for (const r of [forn, fornResolvido, obras, ecrs, ocs, cfgNum, fornEcrs]) {
+  for (const r of [forn, fornResolvido, regra, obras, ecrs, ocs, cfgNum, fornEcrs]) {
     if (r.error) throw new Error(`Falha ao carregar dados: ${r.error.message}`);
   }
 
@@ -159,6 +163,10 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
   const resolvidoPorId = new Map<string, Record<string, unknown>>();
   for (const l of (fornResolvido.data ?? []) as Record<string, unknown>[]) {
     resolvidoPorId.set(String(l['id']), l);
+  }
+  const regraPorId = new Map<string, Record<string, unknown>>();
+  for (const l of (regra.data ?? []) as Record<string, unknown>[]) {
+    regraPorId.set(String(l['fornecedor_id']), l);
   }
 
   const anoCorrente = new Date().getFullYear();
@@ -190,7 +198,7 @@ export async function carregarDados(obra: string | null = obraDaMascara()): Prom
     // leitor de tipos do cliente só entende texto escrito no lugar. O pedido é
     // o mesmo; só o tipo é dito.
     fornecedores: ((forn.data ?? []) as unknown as Record<string, unknown>[]).map((l) =>
-      paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? [], resolvidoPorId),
+      paraFornecedor(l, ecrsPorFornecedor.get(String(l['id'])) ?? [], resolvidoPorId, regraPorId),
     ),
     // O `as`: o leitor de tipos do cliente não entende a dica de chave
     // estrangeira (`empresas!intervencoes_nf_empresa_id_fkey`) e devolve um
@@ -205,7 +213,9 @@ function paraFornecedor(
   l: Record<string, unknown>,
   ecrsAtende: number[] = [],
   resolvidoPorId: ReadonlyMap<string, Record<string, unknown>> = new Map(),
+  regraPorId: ReadonlyMap<string, Record<string, unknown>> = new Map(),
 ): Fornecedor {
+  const regra = regraPorId.get(String(l['id']));
   return {
     id: String(l['id']),
     razao_social: vazio(l['razao_social']),
@@ -227,6 +237,10 @@ function paraFornecedor(
     empresa_apelido: vazio(resolvidoPorId.get(String(l['id']))?.['empresa_apelido']) || undefined,
     // A empresa e o bloqueio, para a lista da OC agrupar e filtrar (D542).
     ...empresaResolvida(l, resolvidoPorId),
+    // A regra do banco (CTO-D954), uma linha por filial visível. A filial que
+    // não veio nela não entra na Nova OC: falha fechada, como a trava (D607).
+    entra_na_oc: regra?.['entra_na_oc'] === true,
+    ...(regra ? { filial_da_oc: regra['filial_da_oc'] == null ? null : String(regra['filial_da_oc']) } : {}),
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
   };
@@ -312,6 +326,9 @@ export function paraOc(l: Record<string, unknown>): OrdemCompra {
     criado_em: vazio(l['criado_em']),
     atualizado_em: vazio(l['atualizado_em']),
     pdf_gerado_em: vazio(l['pdf_gerado_em']),
+    // O rascunho que a IA montou pelo MCP (CTO-D954): o banco carimba a origem
+    // na primeira gravação, e a tela só lê.
+    ...(l['origem_sistema'] === 'ia' ? { montada_pela_ia: vazio(l['origem_id']) } : {}),
     versao: Number(l['versao']) || 0,
   };
 }

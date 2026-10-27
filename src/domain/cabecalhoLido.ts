@@ -26,6 +26,7 @@ import { somaDias } from './qualificacao';
 import { formatDate } from './format';
 import { entraNaOc, motivoForaDaOc, agruparPorEmpresa, escolherEmpresa, opcoesDeEmpresa } from './fornecedores';
 import { filtrarOpcoes } from './pesquisa';
+import { emCentavos } from './numericDoBanco';
 import type { LinhasDoPapel } from './linhaDoPapel';
 import type { Fornecedor, OrdemCompra } from './types';
 
@@ -325,7 +326,8 @@ export function preencherDoCabecalho(
 /** O total do orçamento ao lado do da OC; `null` quando o papel não traz total. */
 export function conferenciaDoTotal(totalDoOrcamento: number | null, totalDaOc: number) {
   if (totalDoOrcamento == null) return null;
-  const centavos = Math.round(totalDaOc * 100) - Math.round(totalDoOrcamento * 100);
+  // O centavo da OC como o banco o arredonda (CTO-D960): 285,015 é 285,02.
+  const centavos = emCentavos(totalDaOc) - emCentavos(totalDoOrcamento);
   return { orcamento: totalDoOrcamento, oc: totalDaOc, diferenca: centavos / 100, bate: centavos === 0 };
 }
 
