@@ -4651,3 +4651,22 @@ produção, e o CTO chamou esta casa para o passo 2.
 
 **O que falta:** a Nova OC logada. Não tenho sessão e não faço login; o CTO pede a olhada de 1 minuto ao Pedro (a
 primeira deste processo). Não chamei o Banco (D961b). **O banco não mudou** por esta casa.
+---
+
+## Decisão 148 — a lista de Fornecedores abre com quem fornece material · 27/10/2026
+
+**POR QUÊ (CTO-D964, a foto e a palavra do Pedro):** "tem alguns fornecedores que são prestadores de serviço e não
+fornecedores de material". Os dados estavam certos; a lista é que mostrava todas as empresas.
+
+**O QUE FOI** (main `ee5d6c9`):
+- **um filtro novo, ao lado de Todos, Ativos e Inativos:** "Material" (a lista abre aqui), "Serviço" e "Todas as
+  empresas", pela marca do banco (`fornece_material` e `presta_servico`, resolvidos por filial);
+  - a empresa tem a marca quando alguma filial a tem; quem faz os dois aparece nos dois;
+  - a empresa sem marca só aparece em "Todas as empresas";
+  - os dois grupos valem juntos: "Material" com "Inativos" dá os de material inativos;
+- **as provas:** 5 testes novos com a isca ("material é quem não presta serviço"), 1353 na bateria, 8 de 8
+  sabotagens vermelhas numa pasta temporária (D963, prática 1), e 6 fotos em `docs/Capturas/2026-10-27_D964/`;
+- **a subida:** pela emenda 3, às 11h22, pelo PowerShell. **No ar em `81e82d7b`**, pacote `20261027142216-ee5d6c9`. O
+  desfazer é `6bb4a34d`. Medido por fora, byte a byte.
+
+**O banco não mudou.**
