@@ -45,7 +45,7 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 44. A OC no mesmo MCP (CTO-D953, D954, D960): o perito passou e o achado 2 está consertado; falta a produção
+### 44. A OC no mesmo MCP (CTO-D953 a D961): a tela no ar; falta a olhada do Pedro na Nova OC e o resto da subida
 
 *Aberta em 26/10/2026, na decisão 143.* O Pedro quer o Antigravity na OC pelo MCP da Central, sem conector novo. O
 plano foi ao CTO, com cópia ao Banco e à Central:
@@ -60,7 +60,9 @@ plano foi ao CTO, com cópia ao Banco e à Central:
    `e88d33d`, decisão 145);
 4. ~~o perito~~ (D960: nenhum caminho para a IA emitir; o achado 2, a conta da tela às quatro casas, consertado
    em `5758872`, decisão 146);
-5. a produção, na ordem do §12.8, e o teste de gente.
+5. a produção, na ordem do §12.8 (D961): ~~o banco~~ (Banco); ~~a tela~~ (`6bb4a34d`, decisão 147), falta a
+   olhada do Pedro na Nova OC logada; depois a `mcp` (Banco) e a página (Central);
+6. o teste de gente no Antigravity.
 
 ---
 

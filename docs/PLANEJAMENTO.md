@@ -4635,3 +4635,19 @@ de R$ 100,01 com 5,0045% de desconto davam R$ 285,02 no banco (o número que a I
 
 **O que não fiz:** a trava do total negativo na Nova OC (carta do Banco da D960, §2) espera a palavra do CTO.
 **O banco não mudou.**
+---
+
+## Decisão 147 — a tela da OC no MCP no ar (passo 2 da D961) · 27/10/2026
+
+**POR QUÊ (CTO-D961, D961b e a campainha das 08h3x):** a perícia fechou em 5 de 5, o Banco subiu a migration na
+produção, e o CTO chamou esta casa para o passo 2.
+
+**O QUE FOI:**
+- **o `main` `c901fe4`** junta o `d954-a-oc-no-mcp` (`5758872`) sem conflito; 1348 testes, CI verde;
+- **no ar em `6bb4a34d`**, pacote `20261027114403-c901fe4`, às 08h43, pelo PowerShell. **O desfazer é `d4960d22`;**
+- **medido por fora, sem login:** o `versao.txt`, a página, os `.js`, o `.css` e o `sw.js` servidos iguais ao pacote;
+- **a `regra_da_oc` na produção, só lendo:** 223 linhas, 136 entram na OC (113 empresas), nenhuma sem filial; só o
+  `authenticated` executa.
+
+**O que falta:** a Nova OC logada. Não tenho sessão e não faço login; o CTO pede a olhada de 1 minuto ao Pedro (a
+primeira deste processo). Não chamei o Banco (D961b). **O banco não mudou** por esta casa.
