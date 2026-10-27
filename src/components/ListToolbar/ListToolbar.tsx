@@ -49,19 +49,24 @@ interface ToggleGroupProps<T extends string> {
   options: readonly T[];
   value: T;
   onChange: (value: T) => void;
+  /** O texto do botão, quando não é o próprio valor com a primeira letra maiúscula. */
+  labels?: Partial<Record<T, string>>;
+  /** O nome do grupo para o leitor de tela, quando há mais de um na barra. */
+  label?: string;
 }
 
-export function ToggleGroup<T extends string>({ options, value, onChange }: ToggleGroupProps<T>) {
+export function ToggleGroup<T extends string>({ options, value, onChange, labels, label }: ToggleGroupProps<T>) {
   return (
-    <div className={styles.toggleGroup}>
+    <div className={styles.toggleGroup} role={label ? 'group' : undefined} aria-label={label}>
       {options.map((v) => (
         <button
           key={v}
           type="button"
           className={[styles.toggleBtn, value === v ? styles.toggleActive : ''].join(' ')}
+          aria-pressed={value === v}
           onClick={() => onChange(v)}
         >
-          {v.charAt(0).toUpperCase() + v.slice(1)}
+          {labels?.[v] ?? v.charAt(0).toUpperCase() + v.slice(1)}
         </button>
       ))}
     </div>

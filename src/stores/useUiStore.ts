@@ -46,9 +46,13 @@ export interface HistFilter {
 export type AtivoFilter = 'todos' | 'ativos' | 'inativos';
 export type AtivaFilter = 'todas' | 'ativas' | 'inativas';
 
+/** O que a empresa fornece (CTO-D964): a lista abre em "material". */
+export type TipoFilter = 'material' | 'servico' | 'todas';
+
 export interface FornFilter {
   search: string;
   status: AtivoFilter;
+  tipo: TipoFilter;
 }
 
 export interface ObraFilter {
@@ -91,7 +95,7 @@ let toastSeq = 0;
 export const useUiStore = create<UiState>((set) => ({
   activeTab: ABA_INICIAL,
   histFilter: { search: '', status: '', fornecedor: '', obra: '' },
-  fornFilter: { search: '', status: 'todos' },
+  fornFilter: { search: '', status: 'todos', tipo: 'material' },
   obraFilter: { search: '', status: 'todas' },
   catalogoFilter: { search: '' },
   ancoraDoProcedimento: null,

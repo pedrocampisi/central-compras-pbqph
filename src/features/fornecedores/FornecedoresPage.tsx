@@ -59,7 +59,7 @@ export function FornecedoresPage() {
   const data = useDataStore((s) => s.data);
   const qualificacoes = useQualificacoesDoDia();
   // Filtro no uiStore: persiste ao trocar de aba (mesmo padrão do Histórico).
-  const { search, status: showAtivos } = useUiStore((s) => s.fornFilter);
+  const { search, status: showAtivos, tipo = 'material' } = useUiStore((s) => s.fornFilter);
   const setFornFilter = useUiStore((s) => s.setFornFilter);
 
   const showToast = useUiStore((s) => s.showToast);
@@ -71,7 +71,7 @@ export function FornecedoresPage() {
 
   if (!data) return null;
 
-  const { empresas, total, casadas } = empresasDaTela(data.fornecedores, search, showAtivos);
+  const { empresas, total, casadas } = empresasDaTela(data.fornecedores, search, showAtivos, tipo);
   const filiaisNaTela = empresas.reduce((n, g) => n + g.filiais.length, 0);
   const mapa = abertas.busca === search ? abertas.mapa : {};
   // A busca que dá uma empresa só abre as filiais dela sozinha (D523).
@@ -241,7 +241,17 @@ export function FornecedoresPage() {
         searchPlaceholder="Buscar por empresa, razão social, CNPJ, e-mail, cidade…"
         onSearchChange={(v) => setFornFilter({ search: v })}
       >
+        {/* A lista abre com quem fornece material (CTO-D964); os prestadores
+            de serviço e as empresas sem marca ficam a um clique. */}
         <ToggleGroup
+          label="O que a empresa fornece"
+          options={['material', 'servico', 'todas'] as const}
+          labels={{ material: 'Material', servico: 'Serviço', todas: 'Todas as empresas' }}
+          value={tipo}
+          onChange={(v) => setFornFilter({ tipo: v })}
+        />
+        <ToggleGroup
+          label="Ativos ou inativos"
           options={['todos', 'ativos', 'inativos'] as const}
           value={showAtivos}
           onChange={(v) => setFornFilter({ status: v })}

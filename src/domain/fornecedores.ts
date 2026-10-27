@@ -285,6 +285,20 @@ export function opcoesDeEmpresa(grupos: EmpresaDaLista[]): OpcaoPesquisavel[] {
 
 export type FiltroDeAtivo = 'todos' | 'ativos' | 'inativos';
 
+/**
+ * O que a empresa fornece (CTO-D964): a lista de Fornecedores abre com quem
+ * fornece material, só material ou os dois. A marca é a do banco, resolvida
+ * por filial (`fornece_material` e `presta_servico`), e a empresa tem a marca
+ * quando alguma filial a tem. A empresa sem marca nenhuma só aparece em "Todas".
+ */
+export type FiltroDeTipo = 'material' | 'servico' | 'todas';
+
+export function empresaDoTipo(g: EmpresaDaLista, tipo: FiltroDeTipo): boolean {
+  if (tipo === 'material') return g.filiais.some((f) => f.fornece_material === true);
+  if (tipo === 'servico') return g.filiais.some((f) => f.presta_servico === true);
+  return true;
+}
+
 export interface EmpresasDaTela {
   /** As empresas que a tela mostra, na ordem do apelido. */
   empresas: EmpresaDaLista[];
@@ -307,18 +321,25 @@ function filialCasa(f: Fornecedor, termo: string, digitos: string): boolean {
 /**
  * O que a tela de Fornecedores mostra (CTO-D641 §2):
  *   - uma empresa por linha, pelo `agruparPorEmpresa`;
+ *   - o que ela fornece, pelo `empresaDoTipo` (D964): material, serviço ou todas;
  *   - "Ativos": a empresa com ALGUMA filial ativa; "Inativos": a empresa com
  *     alguma filial inativa — a filial desativada continua achável;
  *   - a busca acha pelo apelido e por razão social, fantasia, CNPJ, e-mail e
  *     cidade de qualquer filial. O CNPJ acha com ou sem a pontuação.
  */
-export function empresasDaTela(lista: Fornecedor[], busca: string, filtro: FiltroDeAtivo): EmpresasDaTela {
+export function empresasDaTela(
+  lista: Fornecedor[],
+  busca: string,
+  filtro: FiltroDeAtivo,
+  tipo: FiltroDeTipo = 'todas',
+): EmpresasDaTela {
   const grupos = agruparPorEmpresa(lista);
   const termo = normalizarBusca(busca.trim());
   // Só dígitos e pontuação de documento: a busca é por CNPJ.
   const digitos = /^[\d.\-/\s]+$/.test(busca.trim()) ? busca.replace(/\D/g, '') : '';
   const casadas = new Set<string>();
   const empresas = grupos.filter((g) => {
+    if (!empresaDoTipo(g, tipo)) return false;
     if (filtro === 'ativos' && !g.filiais.some((f) => f.ativo)) return false;
     if (filtro === 'inativos' && !g.filiais.some((f) => !f.ativo)) return false;
     if (!termo) return true;

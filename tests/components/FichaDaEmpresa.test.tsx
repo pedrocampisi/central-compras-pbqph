@@ -120,7 +120,8 @@ beforeEach(() => {
   banco.recarregar = vi.fn(async () => {});
   useDataStore.setState({ data: dados() });
   useAuthStore.setState({ perfil: { papel: 'admin' } as never });
-  useUiStore.setState({ toasts: [], fornFilter: { search: '', status: 'todos' } } as never);
+  // O selo é de todas as empresas: a lista aqui mostra também quem só presta serviço (D964).
+  useUiStore.setState({ toasts: [], fornFilter: { search: '', status: 'todos', tipo: 'todas' } } as never);
   useQualificacaoStore.getState().definir(qualificacoes(HISTORICO));
   useOcEditingStore.getState().stopEditing();
   baixados.length = 0;
