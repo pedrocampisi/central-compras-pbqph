@@ -4616,3 +4616,22 @@ tela quando o Banco mandar as funções".
   - não abri a tela no ensaio com login.
 
 **Na produção, o banco sobe antes da tela.** No desfazer, a tela volta antes do banco. **O banco não mudou.**
+---
+
+## Decisão 146 — a conta da tela é a do banco, às quatro casas (perícia, achado 2) · 27/10/2026
+
+**POR QUÊ (CTO-D960, achado 2 da perícia de 26/10):** a `computeOcTotals` somava sem arredondar a linha. Três linhas
+de R$ 100,01 com 5,0045% de desconto davam R$ 285,02 no banco (o número que a IA mostra) e R$ 285,01 na tela.
+
+**O QUE FOI** (ramo `d954-a-oc-no-mcp`, commits `deade5f` e `5758872`, sem publicar):
+- **a conta do `numeric` do Postgres na tela** (`src/domain/numericDoBanco.ts`): inteiro com escala, empate longe
+  de zero, a escala da divisão do Postgres;
+- **a `computeOcTotals` e a `computeItemTotal`** fazem as quatro colunas da `oc_itens`, cada uma às 4 casas, e o total
+  da `oc_totais`: Σ líquido + Σ IPI + frete + outras − desconto material; o cabeçalho nas 2 casas da coluna;
+- **o centavo do banco** também na conferência do papel, na soma das linhas do papel e no CSV do Histórico;
+- **as provas:** o contraexemplo e a isca; 400 linhas medidas no ensaio (a conta antiga errava 180 na quarta casa e
+  137 no centavo; a nova, nenhuma); 1348 testes; 10 de 10 sabotagens vermelhas;
+- **as 4 OCs da produção, lidas sem gravar:** nenhuma muda, nem o total nem uma linha; o PDF delas sai igual.
+
+**O que não fiz:** a trava do total negativo na Nova OC (carta do Banco da D960, §2) espera a palavra do CTO.
+**O banco não mudou.**

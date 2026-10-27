@@ -45,7 +45,7 @@ mais barato que carta apontando para o item errado.
 
 ## 🔴 Abertas
 
-### 44. A OC no mesmo MCP (CTO-D953, D954): a tela no ramo, esperando o perito
+### 44. A OC no mesmo MCP (CTO-D953, D954, D960): o perito passou e o achado 2 está consertado; falta a produção
 
 *Aberta em 26/10/2026, na decisão 143.* O Pedro quer o Antigravity na OC pelo MCP da Central, sem conector novo. O
 plano foi ao CTO, com cópia ao Banco e à Central:
@@ -58,7 +58,8 @@ plano foi ao CTO, com cópia ao Banco e à Central:
 2. ~~o lado do Banco: a regra única e as funções `ia_*`, no ensaio~~ (a carta do Banco da D954);
 3. ~~o meu ramo: o aviso "Montado pela IA" e a carga lendo a regra do banco, sem publicar~~ (`d954-a-oc-no-mcp`,
    `e88d33d`, decisão 145);
-4. o perito;
+4. ~~o perito~~ (D960: nenhum caminho para a IA emitir; o achado 2, a conta da tela às quatro casas, consertado
+   em `5758872`, decisão 146);
 5. a produção, na ordem do §12.8, e o teste de gente.
 
 ---
