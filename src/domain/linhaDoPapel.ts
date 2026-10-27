@@ -19,9 +19,11 @@
 
 import { computeItemTotal } from './compute';
 import { formatBrl } from './format';
+import { emCentavos } from './numericDoBanco';
 import type { Item } from './types';
 
-const centavos = (v: number) => Math.round(v * 100);
+// O centavo com o empate para longe do zero, como o banco (CTO-D960).
+const centavos = emCentavos;
 const quatroCasas = (v: number) => Math.round(v * 10000) / 10000;
 
 /** A conta da linha dá o total impresso, ao centavo. */

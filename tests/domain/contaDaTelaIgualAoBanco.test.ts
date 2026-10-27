@@ -8,15 +8,21 @@ import { describe, expect, it } from 'vitest';
  * A do banco é a `compras.oc_totais`: cada linha guardada com quatro casas
  * (`oc_itens.valor_bruto`, `valor_desconto`, `valor_liquido` e `valor_ipi`, colunas
  * calculadas), somadas, mais frete e outras despesas, menos o desconto
- * material. Os números de `NO_BANCO` foram MEDIDOS no ensaio em 26/10/2026, com
- * as mesmas fórmulas e os mesmos tipos, por uma consulta que só lê. A tela não
- * arredonda a linha; por isso as duas podem diferir na quarta casa, e o
- * combinado é o centavo, que é o que a OC mostra e imprime.
+ * material. Todos os números do banco aqui foram MEDIDOS no ensaio em
+ * 26/10/2026, com as mesmas fórmulas e os mesmos tipos, por consultas que só
+ * leem.
+ *
+ * Perícia de 26/10, achado 2 (CTO-D960): a tela somava sem arredondar a linha, e
+ * o combinado era só o centavo. Não bastava: três linhas de R$ 100,01 com
+ * 5,0045% de desconto dão R$ 285,02 no banco e davam R$ 285,01 na tela. Desde
+ * então a tela faz a conta do banco às quatro casas, e o teste exige a quarta
+ * casa igual, linha a linha.
  */
-import { computeOcTotals } from '../../src/domain/compute';
+import { computeItemTotal, computeOcTotals } from '../../src/domain/compute';
+import { emCentavos } from '../../src/domain/numericDoBanco';
+import { formatBrl } from '../../src/domain/format';
 import { normalizeItem, normalizeOC } from '../../src/domain/normalize';
-
-const centavos = (v: number) => Math.round(v * 100);
+import LINHAS_DO_BANCO from '../fixtures/contaDoBanco_d960.json';
 
 /** [quantidade, preço, desconto %, IPI %], como a tela os grava. */
 type Linha = [number, number, number, number];
@@ -29,7 +35,51 @@ function ocCom(linhas: Linha[], frete = 0, outras = 0, descontoMaterial = 0) {
   });
 }
 
-describe('D954 — a conta da tela é a conta do banco, ao centavo', () => {
+/**
+ * A ISCA: a conta da tela até a D960, sem arredondar a linha. O teste tem de
+ * saber separar as duas, senão ele não prova nada.
+ */
+function contaSemArredondarALinha(linhas: Linha[]): number {
+  return linhas.reduce((s, [q, p, d, ipi]) => s + q * p * (1 - d / 100) * (1 + ipi / 100), 0);
+}
+
+const PERITO: Linha[] = [[1, 100.01, 5.0045, 0], [1, 100.01, 5.0045, 0], [1, 100.01, 5.0045, 0]];
+
+describe('D954 e D960 — a conta da tela é a conta do banco, às quatro casas', () => {
+  it('o contraexemplo do perito: R$ 285,02 no banco, e agora também na tela', () => {
+    // No ensaio: round(3 * (100.01 * (1 - 5.0045 / 100))::numeric(16,4), 2) = 285.02.
+    const t = computeOcTotals(ocCom(PERITO));
+    expect(t.total_geral).toBe(285.015);
+    expect(formatBrl(t.total_geral)).toBe(formatBrl(285.02));
+    expect(emCentavos(t.total_geral)).toBe(28502);
+    // A isca cai no centavo de baixo: é a divergência que o perito achou.
+    expect(formatBrl(contaSemArredondarALinha(PERITO))).toBe(formatBrl(285.01));
+  });
+
+  it('400 linhas medidas no ensaio: as quatro colunas de cada uma, iguais na quarta casa', () => {
+    const erradas: string[] = [];
+    for (const [i, linha] of (LINHAS_DO_BANCO as [number, number, number, number, string, string, string, string][]).entries()) {
+      const [q, p, d, ipi, bruto, desconto, liquido, valorIpi] = linha;
+      const t = computeOcTotals(ocCom([[q, p, d, ipi]]));
+      const item = computeItemTotal(normalizeItem({ descricao: 'x', quantidade: q, preco_unit: p, desc_pct: d, ipi_pct: ipi }));
+      const daTela = [t.sub_total, t.desc_itens, item.liquido, item.ipi];
+      const doBanco = [bruto, desconto, liquido, valorIpi].map(Number);
+      if (daTela.some((v, k) => v !== doBanco[k])) erradas.push(`${i}: ${daTela.join(' ')} ≠ ${doBanco.join(' ')}`);
+    }
+    expect(erradas).toEqual([]);
+  });
+
+  it('as 400 linhas numa OC só: o total é a soma das colunas do banco, e a isca erra', () => {
+    const linhas = LINHAS_DO_BANCO as [number, number, number, number, string, string, string, string][];
+    // A soma exata das colunas do banco, em décimos de milésimo.
+    const quatroCasas = (s: string) => BigInt(s.replace('.', ''));
+    const soma = linhas.reduce((s, l) => s + quatroCasas(l[6]) + quatroCasas(l[7]), 0n);
+    const t = computeOcTotals(ocCom(linhas.map((l) => [l[0], l[1], l[2], l[3]])));
+    expect(BigInt(Math.round(t.total_geral * 1e4))).toBe(soma);
+    const isca = contaSemArredondarALinha(linhas.map((l) => [l[0], l[1], l[2], l[3]]));
+    expect(Math.round(isca * 100)).not.toBe(Number((soma + 50n) / 100n));
+  });
+
   it('o papel de 23/10, como a tela o leu (o desconto em quatro casas, o −0,01 no desconto material)', () => {
     // As linhas que a Nova OC monta do papel de 23/10 (TotalAoCentavoNaOc.test.tsx).
     const oc = ocCom(
@@ -40,22 +90,13 @@ describe('D954 — a conta da tela é a conta do banco, ao centavo', () => {
       ],
       0, 0, 0.01,
     );
-    const NO_BANCO = { sub_total: 537.35, desconto_itens: 81.3428, total_ipi: 0, total_geral: 455.9972 };
-    const t = computeOcTotals(oc);
-    expect(centavos(t.sub_total)).toBe(centavos(NO_BANCO.sub_total));
-    expect(centavos(t.desc_itens)).toBe(centavos(NO_BANCO.desconto_itens));
-    expect(centavos(t.total_ipi)).toBe(centavos(NO_BANCO.total_ipi));
-    expect(centavos(t.total_geral)).toBe(centavos(NO_BANCO.total_geral));
-    expect(centavos(t.total_geral)).toBe(45600);
+    expect(computeOcTotals(oc)).toMatchObject({ sub_total: 537.35, desc_itens: 81.3428, total_ipi: 0, total_geral: 455.9972 });
   });
 
   it('com IPI, quantidade quebrada, frete, outras despesas e desconto material', () => {
     const oc = ocCom([[3, 19.99, 7.5, 10], [12.5, 4.333, 0, 5], [1, 1234.56, 2.25, 3.25]], 35.5, 12.3, 4.2);
-    const NO_BANCO = { sub_total: 1348.6925, desconto_itens: 32.2754, total_ipi: 47.4757, total_geral: 1407.4929 };
-    const t = computeOcTotals(oc);
-    expect(centavos(t.sub_total)).toBe(centavos(NO_BANCO.sub_total));
-    expect(centavos(t.desc_itens)).toBe(centavos(NO_BANCO.desconto_itens));
-    expect(centavos(t.total_ipi)).toBe(centavos(NO_BANCO.total_ipi));
-    expect(centavos(t.total_geral)).toBe(centavos(NO_BANCO.total_geral));
+    expect(computeOcTotals(oc)).toMatchObject({
+      sub_total: 1348.6925, desc_itens: 32.2754, total_ipi: 47.4757, total_geral: 1407.4929,
+    });
   });
 });
