@@ -127,3 +127,22 @@ pnpm typecheck
 
 8. **Movimento só em espera e no login.** E a espera só aparece depois de um quarto de segundo —
    antes disso, pisca à toa.
+
+---
+
+## Como esta casa trabalha (CTO-D963, perícia do Fiscal de 27/10/2026)
+
+Valem para todas as casas; aqui ficam escritas onde quem trabalha nesta casa lê.
+
+1. **Sabotagem só em cópia isolada.** Use um `git worktree` próprio ou uma pasta temporária, e
+   nunca a árvore de trabalho, nem a cópia do ramo em `Copias_de_trabalho`. Se o app fechar no
+   meio da rodada, a sabotagem fica aplicada na cópia descartável, e não no código de verdade.
+2. **Toda retomada começa pelo `git status`,** na pasta da casa e na cópia de trabalho do ramo.
+   Antes de continuar, diga o que está mudado e por quê.
+3. **Não encerre a vez dizendo "agora começo".** Ou faça na mesma vez, ou diga "espero a
+   campainha". A janela só trabalha enquanto está ativa.
+4. **Ordem que muda chega em carta curta,** e a campainha aponta o arquivo. **Casa não chama
+   casa:** ao terminar um passo, escreva a carta e avise o CTO; quem chama a próxima casa é ele
+   (D961b).
+5. **Antes de pedir login ou clique ao Pedro, meça tudo o que dá para medir sem ele.** Diga
+   também quantas vezes ele já fez aquilo no mesmo processo.
