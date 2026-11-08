@@ -114,7 +114,7 @@ pnpm typecheck
 
 4. **Cor, sombra, raio e fonte vêm todos de `src/styles/tokens.css`.** Nada de cor solta dentro
    de módulo. A fonte oficial do padrão visual é
-   `..\00_Diretrizes_e_padroes\Padrao_Front_end\`.
+   `..\00_Diretrizes_e_padroes\Padrao_Front_end\DESIGN.md`.
 
 5. **Uma ação principal (laranja) por tela.** Qualquer segundo botão é de contorno.
 
@@ -127,6 +127,8 @@ pnpm typecheck
 
 8. **Movimento só em espera e no login.** E a espera só aparece depois de um quarto de segundo —
    antes disso, pisca à toa.
+
+10. **O padrão visual é o "Dia e noite"** (Creme de dia, Marinho e Ouro de noite), em `..\00_Diretrizes_e_padroes\Padrao_Front_end\DESIGN.md` (D1018). Não pintar nada até a carta da vez desta casa (a última, por ser a maior); tela nova segue o estilo de hoje até lá.
 
 ---
 

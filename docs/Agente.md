@@ -46,7 +46,7 @@ lista em 19/08: ganharam tabela no banco e voltaram a ser editáveis.)*
 
 ## 0.1 Padrão visual (direção "Creme") — regras que valem para todo CSS daqui
 
-Fonte oficial: `00_Diretrizes_e_padroes/Padrao_Front_end/` (`DESIGN.md`,
+Fonte oficial: `00_Diretrizes_e_padroes/Padrao_Front_end/DESIGN.md` (padrão "Dia e noite", D1018; esta casa só pinta na carta da vez; também `DESIGN.md`,
 `tokens.css`, `template-base.html`, `template-login.html`). Aplicado aqui em
 12/08/2026. **O motivo de cada regra está nas decisões 14, 15 e 16 do
 [`PLANEJAMENTO.md`](PLANEJAMENTO.md)** — aqui fica só a regra.
@@ -73,7 +73,7 @@ Fonte oficial: `00_Diretrizes_e_padroes/Padrao_Front_end/` (`DESIGN.md`,
 - **Sem portão de boas-vindas e sem animação de entrada neste aplicativo.** Por
   isso `public/marca/` não tem `anim-entrada.mp4`, `anim-poster-final.png` nem
   `efeito-entrada.mp3` — a fonte deles, se um dia precisar, é
-  `00_Diretrizes_e_padroes/Padrao_Front_end/assets/`. E os quadros do martelo
+  `00_Diretrizes_e_padroes/Padrao_Front_end/` (`animacao/`, `marca/`, `mascote/`; a `assets/` não existe mais, D1018). E os quadros do martelo
   ficam **fora do pré-carregamento** do service worker (`globIgnores` no
   `vite.config.ts`). · **decisão 16**
 - Documentos, códigos e chaves em `var(--fonte-mono)`; números de tabela em

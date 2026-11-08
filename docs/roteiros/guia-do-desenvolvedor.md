@@ -29,7 +29,7 @@ enquanto a virada não for aprovada. Quem for mexer lá deve ler
 
 Desde 12/08/2026 a interface segue o **padrão front-end da Campisi** (direção
 "Creme", claro e escuro), cuja fonte oficial é
-`campisi-central/Padrao_Front_end/`. As regras que restringem qualquer CSS novo
+`00_Diretrizes_e_padroes/Padrao_Front_end/DESIGN.md` (padrão "Dia e noite", D1018). As regras que restringem qualquer CSS novo
 estão resumidas na seção 0.1 do `docs/Agente.md`; o resumo do resumo:
 cor só via `src/styles/tokens.css`, **um** botão laranja por tela, ícone de
 traço (nunca emoji), mascote longe de tabela e movimento só em espera. Os
