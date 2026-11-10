@@ -301,6 +301,14 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+  /* O cabeçalho recortado continua para o leitor de tela, mas o que se aperta
+     nele sai do caminho do Tab: eram três "?" invisíveis na Qualificação
+     (D1034k, achado 6). O texto inteiro de cada critério mora no cartão aberto. */
+  .cc-cartoes thead button,
+  .cc-cartoes thead a,
+  .cc-cartoes thead input {
+    visibility: hidden;
+  }
   .cc-cartoes tbody tr {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;

@@ -221,3 +221,12 @@ describe('Achado 5 — o Painel conta as filiais da empresa, e não as que compr
     expect(lista.textContent).toMatch(/R\$\s120,00/);
   });
 });
+
+describe('Achado 6 — a Qualificação em cartão não deixa ajuda invisível no caminho do Tab', () => {
+  it('abaixo de 720 px, os botões do cabeçalho recortado saem da ordem do teclado', () => {
+    const css = readFileSync('src/styles/candidatas.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(css).toMatch(/\.cc-cartoes thead (button|\*)[^{]*\{[^}]*(visibility:\s*hidden|display:\s*none)/);
+    // e o texto inteiro do critério continua ao alcance, no cartão aberto
+    expect(readFileSync('src/features/qualificacao/QualificacaoPage.tsx', 'utf-8')).toContain('<strong>{atual.criterios[i] ?? `Critério ${i + 1}`}</strong>');
+  });
+});
