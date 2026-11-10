@@ -44,10 +44,9 @@
 
 .contagem {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  /* caixa de frase, como manda o padrão (DESIGN.md: nada em caixa alta) */
   color: var(--ouro-palavra);
 }
 
@@ -67,7 +66,7 @@
 
 .fazer {
   margin: 8px 0 0;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--tinta-suave);
 }

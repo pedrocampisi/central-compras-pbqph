@@ -12,7 +12,7 @@
 
 .dica {
   margin: 6px 0 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--tinta-suave);
 }
 
@@ -36,7 +36,7 @@
 .correcoes {
   margin: 0;
   padding-left: 18px;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--tinta-suave);
 }

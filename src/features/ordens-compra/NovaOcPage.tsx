@@ -14,6 +14,7 @@ import { FieldGroup } from '../../components/FieldGroup/FieldGroup';
 import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Icon } from '../../components/Icon/Icon';
+import { Mais } from '../../components/Mais/Mais';
 import { computeItemTotal, computeOcTotals } from '../../domain/compute';
 import { formatBrl, todayIso, nowIso } from '../../domain/format';
 import { uid } from '../../domain/id';
@@ -141,7 +142,10 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
     // Com o campo de importação aberto, é ele que ocupa o lugar do vazio.
     if (semVazio) return null;
     return (
+      // Compacto, sem o mascote: no meio do formulário o castor grande empurrava
+      // os totais e o "Emitir" para longe (D1034b).
       <EmptyState
+        compacto
         title="Nenhum item adicionado"
         description={VAZIO_DOS_ITENS}
         action={{ label: '+ Adicionar Item', onClick: onAdd }}
@@ -173,7 +177,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
             const duvida = confira[it.id];
             return (
               <tr key={it.id} className={duvida ? styles.linhaConfira : undefined}>
-                <td style={{ textAlign: 'center', color: 'var(--tinta-fraca)', fontSize: 11 }}>{idx + 1}</td>
+                <td style={{ textAlign: 'center', color: 'var(--tinta-fraca)', fontSize: 13 }}>{idx + 1}</td>
                 <td>
                   <select
                     className={styles.cellSelect}
@@ -259,7 +263,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
                     onChange={(e) => onUpdate(it.id, { desc_pct: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--ouro-tinta)', whiteSpace: 'nowrap' }}>
+                <td style={{ textAlign: 'right', fontSize: 13, fontWeight: 600, color: 'var(--ouro-tinta)', whiteSpace: 'nowrap' }}>
                   {formatBrl(total)}
                 </td>
                 <td>
@@ -302,7 +306,8 @@ function TotalsPanel({ oc, onChangeField, confira = {}, onConfirmar = () => {}, 
         <span>Subtotal bruto:</span>
         <span>{formatBrl(t.sub_total)}</span>
         <span>( − ) Desconto itens:</span>
-        <span className={styles.totalNeg}>{formatBrl(t.desc_itens)}</span>
+        {/* O desconto em vermelho só quando há desconto: o zero vermelho parecia erro (D1034b). */}
+        <span className={t.desc_itens > 0 ? styles.totalNeg : undefined}>{formatBrl(t.desc_itens)}</span>
         <span>( + ) IPI total:</span>
         <span>{formatBrl(t.total_ipi)}</span>
         <div className={styles.totalsDivider} />
@@ -952,11 +957,14 @@ export function NovaOcPage() {
           </p>
         </div>
         <div className={styles.acoesDoTopo}>
-          <Button variant="ghost" size="sm" onClick={abrirTutorial} title="Mostra, campo por campo, como fazer uma OC">
+          {/* No celular, as ações de apoio do alto moram no "Mais" (D1034f item 5, que vale
+              para o lote b): a fila de cinco botões ocupava três linhas antes do primeiro campo.
+              Nada some: cada uma está no "Mais", e Cancelar, Visualizar e Emitir também no pé. */}
+          <Button variant="ghost" size="sm" className={styles.soNoLargo} onClick={abrirTutorial} title="Mostra, campo por campo, como fazer uma OC">
             <Icon name="guia" size={13} /> Tutorial
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void handleCancelar()}>Cancelar</Button>
-          <Button variant="ghost" size="sm" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
+          <Button variant="outline" size="sm" className={styles.soNoLargo} onClick={() => void handleCancelar()}>Cancelar</Button>
+          <Button variant="ghost" size="sm" className={styles.soNoLargo} onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
             <Icon name="eye" size={13} /> Visualizar
           </Button>
           <Button
@@ -974,6 +982,7 @@ export function NovaOcPage() {
           <Button
             variant="outline"
             size="sm"
+            className={styles.soNoLargo}
             onClick={() => void handleEmitir()}
             loading={savingPdf}
             disabled={!emiteOk}
@@ -981,6 +990,21 @@ export function NovaOcPage() {
           >
             <Icon name="file-text" size={13} /> Emitir OC + PDF
           </Button>
+          <Mais
+            className={styles.soNoEstreito}
+            rotulo="Mais ações da OC"
+            acoes={[
+              { rotulo: 'Tutorial', aoEscolher: abrirTutorial },
+              { rotulo: 'Visualizar o PDF', aoEscolher: () => void handlePreviewPdf() },
+              {
+                rotulo: 'Emitir OC + PDF',
+                aoEscolher: () => void handleEmitir(),
+                desabilitada: !emiteOk,
+                titulo: emiteOk ? undefined : 'Seu acesso não permite emitir OCs',
+              },
+              { rotulo: 'Cancelar', aoEscolher: () => void handleCancelar() },
+            ]}
+          />
         </div>
       </div>
 

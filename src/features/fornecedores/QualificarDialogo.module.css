@@ -100,7 +100,7 @@
   padding: 4px 8px;
   border: 1px solid var(--linha);
   border-radius: var(--raio-p);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--tinta-suave);
   cursor: pointer;
 }

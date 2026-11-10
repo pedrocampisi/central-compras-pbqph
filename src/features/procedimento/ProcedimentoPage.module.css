@@ -28,7 +28,7 @@
   background: var(--painel);
 }
 .sobretitulo {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--ouro-palavra);
@@ -52,7 +52,7 @@
   border-radius: var(--raio-p);
   background: var(--fundo);
 }
-.campos dt { font-size: 11px; color: var(--tinta-suave); }
+.campos dt { font-size: 13px; color: var(--tinta-suave); }
 .campos dd {
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +68,7 @@
   border-radius: var(--raio-pill);
   background: var(--sucesso-fundo);
   color: var(--sucesso);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -116,10 +116,9 @@
 .fluxo h3,
 .fluxo h4 {
   margin: 0 0 8px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  /* caixa de frase, como manda o padrão (DESIGN.md: nada em caixa alta) */
   color: var(--ouro-tinta);
 }
 .fluxo h4 { margin-top: 16px; }
@@ -139,7 +138,7 @@
   background: var(--fundo);
   color: var(--tinta-suave);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
   text-align: left;
 }
@@ -162,7 +161,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   padding: 10px;
   border-radius: var(--raio-p);
   background: var(--realce);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--tinta-suave);
 }
 .sequencia strong { color: var(--tinta); }
@@ -208,7 +207,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   border: 1px solid var(--linha-controle);
   border-radius: var(--raio-pill);
   background: var(--fundo);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--tinta-suave);
   white-space: nowrap;
@@ -234,7 +233,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   border-left-color: var(--ouro-tinta);
   background: var(--realce);
 }
-.miudo { font-size: 12px; color: var(--tinta-suave); }
+.miudo { font-size: 13px; color: var(--tinta-suave); }
 
 .quadros {
   display: grid;
@@ -289,7 +288,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   gap: 2px;
   padding: 12px 4px 0;
   border-top: 1px solid var(--linha);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--tinta-suave);
 }
 .rodape strong { color: var(--tinta); }
@@ -344,7 +343,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   padding: 2px 8px;
   border-radius: var(--raio-pill);
   background: var(--sucesso-fundo);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--sucesso);
 }
@@ -393,7 +392,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
   line-height: 1.45;
   resize: vertical;
 }
-.dica { font-size: 12px; color: var(--tinta-fraca); }
+.dica { font-size: 13px; color: var(--tinta-fraca); }
 .erro {
   margin: 0;
   padding: 8px 10px;
@@ -436,7 +435,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce)
     content: attr(data-coluna);
     display: block;
     margin-bottom: 2px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--tinta);
   }
