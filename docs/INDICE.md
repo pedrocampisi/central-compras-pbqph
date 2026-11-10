@@ -56,6 +56,7 @@ proíbe.
 |---|---|
 | [Arquivo_Morto/LEIA-ME.md](Arquivo_Morto/LEIA-ME.md) | A convenção antiga do correio, **substituída pela lei em 20/08/2026**. É registro |
 | [Arquivo_Morto/INDICE.md](Arquivo_Morto/INDICE.md) | Onde foi parar cada carta encerrada, e **por quê** |
+| [Pericias/2026-11-10_pericia_codex_pintura-da-oc.md](Pericias/2026-11-10_pericia_codex_pintura-da-oc.md) | O laudo do perito (Codex) sobre a pintura "Dia e noite", do `5e08819` ao `fdc1b86`: seis achados. A triagem (D1034k) deu os seis como verdadeiros e os consertou no ramo `d1034-d-a-triagem`. É registro |
 
 ## Onde está o estado da migração
 
