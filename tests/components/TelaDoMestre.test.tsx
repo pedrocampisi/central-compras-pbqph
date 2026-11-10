@@ -182,7 +182,7 @@ describe('a tela do mestre, ligada ao banco', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
     await userEvent.type(screen.getByRole('textbox'), '4567');
     const papel = screen.getByRole('group', { name: 'Papel do fornecedor para Cimento de teste' });
-    expect(within(papel).getByText('Anexar papel do fornecedor')).toBeTruthy();
+    expect(within(papel).getByText('Anexar papel')).toBeTruthy();
     await userEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     expect(await screen.findByText('Recebido.')).toBeTruthy();
     expect(servico.registrarEntregaDoMestre).toHaveBeenCalledWith(

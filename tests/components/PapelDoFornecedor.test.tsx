@@ -17,7 +17,8 @@ import { guardaNaMemoria } from '../../src/services/guardaDoAparelho';
 
 const OBRA = { id: 'obra-1', nome: 'Obra de Teste' };
 const TITULO = 'Papel do fornecedor para Cimento de teste';
-const ANEXAR = 'Anexar papel do fornecedor';
+const ANEXAR = 'Anexar papel';
+const VER_A_LISTA = 'Ver o que o fornecedor tem de mandar';
 
 const PEDE_19: RegistroPedido = {
   ecrId: 19, pede: true, aCadaEntrega: false, porque: 'nada guardado ainda', revisao: '00', posicoes: [1],
@@ -90,6 +91,9 @@ async function chegarAoPapel() {
   fireEvent.change(screen.getByRole('textbox'), { target: { value: '4567' } });
 }
 
+/** A lista do que o fornecedor manda nasce fechada (CTO-D1034p): um toque abre. */
+const abrirALista = () => fireEvent.click(within(papel()).getByRole('button', { name: VER_A_LISTA }));
+
 const escolherFoto = (f: File) => fireEvent.change(papel().querySelector('input[type=file]')!, { target: { files: [f] } });
 
 /** Toca em "Anexar papel do fornecedor", tira a foto e espera a leitura. */
@@ -103,9 +107,40 @@ const registrosEnviados = (p: MaterialAChegarProps) =>
   (p.aoReceber as ReturnType<typeof vi.fn>).mock.calls[0]![0].registros as Record<string, unknown>[];
 
 describe('o papel do fornecedor no carimbo (D811 §3, D840 §2)', () => {
+  it('CTO-D1034p: a lista nasce fechada, abre num toque com as mesmas linhas, fecha, e nasce fechada de novo', async () => {
+    montar();
+    await chegarAoPapel();
+    const linha = within(papel()).getByRole('button', { name: VER_A_LISTA });
+    expect(linha.getAttribute('aria-expanded')).toBe('false');
+    expect(papel().querySelector('[data-palavras-da-ecr]')).toBeNull();
+    expect(within(papel()).queryByText('FISPQ do produto (teste)')).toBeNull();
+    fireEvent.click(linha);
+    const aberta = within(papel()).getByRole('button', { name: 'Fechar o que o fornecedor tem de mandar' });
+    expect(aberta.getAttribute('aria-expanded')).toBe('true');
+    expect(document.getElementById(aberta.getAttribute('aria-controls')!)).toBe(papel().querySelector('[data-palavras-da-ecr]'));
+    expect(within(papel()).getByText('FISPQ do produto (teste)')).toBeTruthy();
+    expect(within(papel()).getByText('Certificado conforme a norma (teste)')).toBeTruthy();
+    fireEvent.click(aberta);
+    expect(papel().querySelector('[data-palavras-da-ecr]')).toBeNull();
+    cleanup();
+    montar();
+    await chegarAoPapel();
+    expect(within(papel()).getByRole('button', { name: VER_A_LISTA }).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('CTO-D1034p: a frase curta vem antes do botão "Anexar papel", que diz o nome inteiro ao leitor de tela', async () => {
+    montar();
+    await chegarAoPapel();
+    const frase = within(papel()).getByText('Veio papel com o caminhão? Anexe. Se não veio, o escritório cuida.');
+    const botao = within(papel()).getByText(ANEXAR).closest('label')!;
+    expect(frase.compareDocumentPosition(botao) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(papel()).getByLabelText('Anexar papel do fornecedor').getAttribute('type')).toBe('file');
+  });
+
   it('oferece só onde o banco diz que pede, e mostra o que a ECR pede com as palavras dela', async () => {
     montar();
     await chegarAoPapel();
+    abrirALista();
     const g = papel();
     expect(within(g).getByText('FISPQ do produto (teste)')).toBeTruthy();
     expect(within(g).getByText('Certificado conforme a norma (teste)')).toBeTruthy();
@@ -120,12 +155,13 @@ describe('o papel do fornecedor no carimbo (D811 §3, D840 §2)', () => {
       expect(within(papel()).queryByRole('button', { name: b })).toBeNull();
     }
     expect(within(papel()).queryByRole('textbox')).toBeNull();
-    expect(within(papel()).getByText(/Se não veio, não precisa fazer nada: o escritório cuida\./)).toBeTruthy();
+    expect(within(papel()).getByText('Veio papel com o caminhão? Anexe. Se não veio, o escritório cuida.')).toBeTruthy();
   });
 
   it('a moldura fala como o canteiro: sem "ECR", sem "conforme" fora da lista da ECR', async () => {
     montar();
     await chegarAoPapel();
+    abrirALista();
     const g = papel().cloneNode(true) as HTMLElement;
     g.querySelector('[data-palavras-da-ecr]')!.remove();
     expect(g.textContent).not.toMatch(/ecr|conforme|tratativa/i);
@@ -142,6 +178,7 @@ describe('o papel do fornecedor no carimbo (D811 §3, D840 §2)', () => {
     }];
     montar({ cartoes: [{ ...CARTAO, registros }] });
     await chegarAoPapel();
+    abrirALista();
     const itens = within(papel()).getAllByRole('listitem').map((li) => li.textContent);
     expect(itens).toEqual(['GCA: a guia de cada transporte (teste)', 'O documento fiscal (teste)']);
     const nota = within(papel()).getByText('Atenção: exceto compensado (teste)');
@@ -153,7 +190,7 @@ describe('o papel do fornecedor no carimbo (D811 §3, D840 §2)', () => {
     montar({ cartoes: [{ ...CARTAO, registros: [{ ...PEDE_19, linhas: [] }] }] });
     await chegarAoPapel();
     expect(within(papel()).getByText(ANEXAR)).toBeTruthy();
-    expect(within(papel()).queryByText('O que o fornecedor tem de mandar:')).toBeNull();
+    expect(within(papel()).queryByRole('button', { name: VER_A_LISTA })).toBeNull();
     expect(papel().querySelector('[data-palavras-da-ecr]')).toBeNull();
   });
 

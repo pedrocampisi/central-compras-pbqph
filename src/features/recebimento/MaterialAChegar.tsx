@@ -684,6 +684,11 @@ function PapelDoFornecedor({
 }) {
   const [lendo, setLendo] = useState(false);
   const [escolhendo, setEscolhendo] = useState(false);
+  // A lista do que o fornecedor manda é coisa do PBQP-H: nasce fechada, a um
+  // toque, e não guarda o estado (CTO-D1034p, pedido do Pedro). No escritório
+  // ela continua aberta, em outra tela.
+  const [verLista, setVerLista] = useState(false);
+  const idDaLista = `lista-do-papel-${pedido.ecrId}`;
   const novaEscolha = useUltimaEscolha();
   const miniatura = useMemo(() => (foto ? URL.createObjectURL(foto) : ''), [foto]);
   useEffect(() => () => {
@@ -721,10 +726,11 @@ function PapelDoFornecedor({
     if (alcance !== 'vale_ate') setEscolhendo(false);
   }
 
-  const campoDaFoto = (texto: string) => (
+  const campoDaFoto = (texto: string, nome?: string) => (
     <label className={styles.secundario}>
       <Icon name="camera" size={22} /> {texto}
       <input
+        aria-label={nome}
         className={styles.escondido}
         type="file"
         accept="image/*"
@@ -739,8 +745,20 @@ function PapelDoFornecedor({
       <legend className={styles.perguntaTexto}>{tituloDoRegistro(material)}</legend>
       {/* As linhas como na ECR: a numerada na lista, a sem número como nota. Sem texto no sistema, sem caixa. */}
       {pedido.linhas.length > 0 && (
-        <div className={styles.palavrasDaEcr} data-palavras-da-ecr="">
-          <p className={styles.dica}>O que o fornecedor tem de mandar:</p>
+        <button
+          type="button"
+          className={styles.abreALista}
+          aria-expanded={verLista}
+          aria-controls={idDaLista}
+          onClick={() => setVerLista((v) => !v)}
+          data-abre-a-lista=""
+        >
+          {verLista ? 'Fechar o que o fornecedor tem de mandar' : 'Ver o que o fornecedor tem de mandar'}
+          <Icon name="chevron" size={18} className={verLista ? styles.setaAberta : styles.setaFechada} />
+        </button>
+      )}
+      {pedido.linhas.length > 0 && verLista && (
+        <div className={styles.palavrasDaEcr} id={idDaLista} data-palavras-da-ecr="">
           {blocosDaSecao(pedido.linhas).map((b, i) =>
             b.tipo === 'lista' ? (
               <ul key={i} className={styles.oQuePede}>
@@ -759,8 +777,8 @@ function PapelDoFornecedor({
 
       {g.resposta !== 'veio' ? (
         <div className={styles.foto}>
-          <p className={styles.dica}>Se o papel veio com o caminhão, anexe. Se não veio, não precisa fazer nada: o escritório cuida.</p>
-          {campoDaFoto('Anexar papel do fornecedor')}
+          <p className={styles.dica}>Veio papel com o caminhão? Anexe. Se não veio, o escritório cuida.</p>
+          {campoDaFoto('Anexar papel', 'Anexar papel do fornecedor')}
         </div>
       ) : (
         <div className={styles.foto}>

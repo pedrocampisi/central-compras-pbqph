@@ -635,6 +635,30 @@
 }
 
 /* O papel do fornecedor (D811): a lista da ECR como está, e as três respostas. */
+/* A linha que abre a lista do papel (CTO-D1034p): uma linha só, com a seta,
+   44 px de alvo, na cor do link da tela. */
+.abreALista {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--linha);
+  background: none;
+  color: var(--ouro-tinta);
+  font: inherit;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+.abreALista:focus-visible {
+  outline: 3px solid var(--ouro-tinta);
+  outline-offset: 2px;
+}
+
 .palavrasDaEcr {
   display: flex;
   flex-direction: column;
