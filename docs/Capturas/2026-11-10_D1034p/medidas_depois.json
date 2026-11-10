@@ -1,0 +1,42 @@
+{
+  "dia_ao_abrir": {
+    "textoDoBotao": "Anexar papel",
+    "alturaDoBotao": 60,
+    "linhasDoBotao": 3,
+    "doTopoDaTelaAteOBotao": 1247,
+    "doTopoDoPapelAteOBotao": 165,
+    "listaAberta": false,
+    "itensDaLista": 0,
+    "rolaDeLado": 0
+  },
+  "dia_lista_aberta": {
+    "textoDoBotao": "Anexar papel",
+    "alturaDoBotao": 60,
+    "linhasDoBotao": 3,
+    "doTopoDaTelaAteOBotao": 1697,
+    "doTopoDoPapelAteOBotao": 616,
+    "listaAberta": true,
+    "itensDaLista": 7,
+    "rolaDeLado": 0
+  },
+  "noite_ao_abrir": {
+    "textoDoBotao": "Anexar papel",
+    "alturaDoBotao": 60,
+    "linhasDoBotao": 3,
+    "doTopoDaTelaAteOBotao": 1247,
+    "doTopoDoPapelAteOBotao": 165,
+    "listaAberta": false,
+    "itensDaLista": 0,
+    "rolaDeLado": 0
+  },
+  "noite_lista_aberta": {
+    "textoDoBotao": "Anexar papel",
+    "alturaDoBotao": 60,
+    "linhasDoBotao": 3,
+    "doTopoDaTelaAteOBotao": 1697,
+    "doTopoDoPapelAteOBotao": 616,
+    "listaAberta": true,
+    "itensDaLista": 7,
+    "rolaDeLado": 0
+  }
+}
