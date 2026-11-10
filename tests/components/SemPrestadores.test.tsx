@@ -38,7 +38,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 
 async function abrirOc() {
   render(<App />);
-  const menu = await screen.findByRole('navigation');
+  const menu = await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
   await screen.findByText('Nenhuma OC ainda');
   return menu;
 }

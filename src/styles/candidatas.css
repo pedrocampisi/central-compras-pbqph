@@ -9,6 +9,13 @@
  *   1. cc-busca ······ o campo de busca da tela de trabalho, com o X (D975)
  *   2. cc-gaveta ····· a gaveta lateral da ficha (fornecedor, obra, ECR)
  *   3. cc-escolha ···· a lista de escolha que aceita texto (obra, fornecedor)
+ *
+ * Do lote (a2), pela revisão de uso do CTO (D1034f):
+ *
+ *   4. cc-mais ······· o botão "Mais" (três pontos) e o menu das ações que
+ *                      não são a principal
+ *   5. cc-linha-abre · a linha da tabela que abre a coisa, com o foco do teclado
+ *   6. cc-cartoes ···· a tabela que vira cartões abaixo de 720 px
  */
 
 /* 1. CANDIDATA: CAMPO DE BUSCA DA TELA DE TRABALHO.
@@ -199,4 +206,157 @@
   padding: var(--espaco-3);
   font-size: 0.9375rem;
   color: var(--tinta-suave);
+}
+
+/* 4. CANDIDATA: O BOTÃO "MAIS" E O SEU MENU.
+ * O botão é a peça Ícone (cp-icone), um pouco menor ao lado de um botão p
+ * (36 px); o menu flutua em painel-alto, como a lista de escolha, e cada ação
+ * tem 44 px de altura. A posição vem do JS (position: fixed, medida no botão). */
+.cc-mais {
+  position: relative;
+  flex: none;
+}
+.cc-mais-botao {
+  width: 36px;
+  height: 36px;
+}
+.cc-mais-botao[aria-expanded='true'] {
+  border-color: var(--ouro-tinta);
+  color: var(--ouro-tinta);
+  background: var(--ouro-suave);
+}
+.cc-mais-lista {
+  position: fixed;
+  z-index: 320;
+  width: 232px;
+  max-height: min(360px, 70vh);
+  overflow-y: auto;
+  padding: var(--espaco-1);
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio);
+  background: var(--painel-alto);
+  box-shadow: var(--sombra-cartao);
+}
+.cc-mais-lista [role='menuitem'] {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--tinta);
+  font: 500 0.9375rem/1.3 var(--font-sans);
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+}
+.cc-mais-lista [role='menuitem']:hover,
+.cc-mais-lista [role='menuitem']:focus-visible {
+  outline: none;
+  background: var(--ouro-suave);
+}
+.cc-mais-lista [role='menuitem']:disabled {
+  color: var(--tinta-fraca);
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* 5. CANDIDATA: A LINHA QUE ABRE A COISA.
+ * Clique, Enter ou Espaço abrem a ficha (D976). Com o foco do teclado, a linha
+ * ganha o anel por dentro, para não ser cortada pela caixa da tabela. */
+.cc-linha-abre {
+  cursor: pointer;
+}
+.cc-linha-abre:focus-visible {
+  outline: 2px solid var(--ouro-tinta);
+  outline-offset: -2px;
+  background: var(--realce);
+}
+
+/* 6. CANDIDATA: A TABELA QUE VIRA CARTÕES NO CELULAR.
+ * Abaixo de 720 px a tabela rolava de lado e cortava no meio do nome. Cada
+ * linha vira um cartão: em cima o título (número ou nome) e o selo; embaixo os
+ * detalhes, cada um com o nome da coluna (`data-rotulo`); no pé, as ações. A
+ * célula diz o seu lugar em `data-cartao`. */
+@media (max-width: 720px) {
+  .cc-cartoes,
+  .cc-cartoes tbody {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+  }
+  .cc-cartoes colgroup {
+    display: none;
+  }
+  .cc-cartoes thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .cc-cartoes tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 6px var(--espaco-3);
+    padding: var(--espaco-4);
+    border-bottom: 1px solid var(--linha);
+  }
+  .cc-cartoes tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .cc-cartoes tbody td {
+    display: block;
+    height: auto;
+    min-width: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    text-align: left !important;
+    box-shadow: none !important;
+  }
+  .cc-cartoes td[data-cartao='titulo'] {
+    grid-column: 1;
+    grid-row: 1;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .cc-cartoes td[data-cartao='selo'] {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    max-width: 52vw;
+    text-align: right !important;
+  }
+  .cc-cartoes td[data-cartao='selo'] > * {
+    margin-left: auto;
+  }
+  .cc-cartoes td[data-cartao='detalhe'] {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: var(--espaco-3);
+    font-size: 0.9375rem;
+  }
+  .cc-cartoes td[data-cartao='detalhe']::before {
+    content: attr(data-rotulo);
+    flex: none;
+    width: 6.5rem;
+    color: var(--tinta-suave);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+  .cc-cartoes td[data-cartao='fora'] {
+    display: none;
+  }
+  .cc-cartoes td[data-cartao='acoes'],
+  .cc-cartoes td[data-cartao='largo'] {
+    grid-column: 1 / -1;
+    margin-top: var(--espaco-2);
+  }
+  .cc-cartoes td[data-cartao='acoes'] > * {
+    justify-content: flex-start;
+  }
 }

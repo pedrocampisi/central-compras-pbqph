@@ -4,7 +4,7 @@
  * que estavam duplicados em Histórico, Fornecedores e Obras.
  */
 
-import type { ReactNode, SelectHTMLAttributes } from 'react';
+import { useState, type ReactNode, type SelectHTMLAttributes } from 'react';
 import { CampoDeBusca } from '../CampoDeBusca/CampoDeBusca';
 import { Icon } from '../Icon/Icon';
 import styles from './ListToolbar.module.css';
@@ -15,6 +15,11 @@ interface ListToolbarProps {
   onSearchChange: (value: string) => void;
   /** Selects e toggles adicionais, à direita da busca. */
   children?: ReactNode;
+  /**
+   * Quantos filtros estão ligados (fora do padrão). No celular os filtros se
+   * recolhem num botão "Filtros", que mostra este número (D1034f item 5).
+   */
+  filtrosLigados?: number;
 }
 
 export function ListToolbar({
@@ -22,7 +27,9 @@ export function ListToolbar({
   searchPlaceholder = 'Buscar…',
   onSearchChange,
   children,
+  filtrosLigados = 0,
 }: ListToolbarProps) {
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   return (
     <div className={styles.filterBar}>
       {/* A busca da tela de trabalho, a candidata `cc-busca`: sem botão
@@ -38,7 +45,24 @@ export function ListToolbar({
           aria-label={searchPlaceholder}
         />
       </div>
-      {children}
+      {children && (
+        <>
+          {/* Só no celular: a primeira linha da lista subia para 560 px do topo
+              com os filtros um por linha (D1034f item 5). Os filtros continuam
+              na página; o botão só os mostra e esconde. */}
+          <button
+            type="button"
+            className={`cp-btn cp-btn--contorno cp-btn--p ${styles.botaoFiltros}`}
+            aria-expanded={filtrosAbertos}
+            onClick={() => setFiltrosAbertos((a) => !a)}
+          >
+            <Icon name="filtro" size={16} />
+            Filtros
+            {filtrosLigados > 0 && <span className={styles.ligados}>{filtrosLigados}</span>}
+          </button>
+          <div className={`${styles.filtros} ${filtrosAbertos ? styles.filtrosAbertos : ''}`}>{children}</div>
+        </>
+      )}
     </div>
   );
 }
@@ -53,11 +77,13 @@ interface ToggleGroupProps<T extends string> {
   labels?: Partial<Record<T, string>>;
   /** O nome do grupo para o leitor de tela, quando há mais de um na barra. */
   label?: string;
+  /** O nome do grupo, escrito antes dele ("Tipo", "Situação"): dois grupos lado a lado se confundem sem nome (D1034f item 7). */
+  titulo?: string;
 }
 
-export function ToggleGroup<T extends string>({ options, value, onChange, labels, label }: ToggleGroupProps<T>) {
-  return (
-    <div className="cp-chips" role={label ? 'group' : undefined} aria-label={label}>
+export function ToggleGroup<T extends string>({ options, value, onChange, labels, label, titulo }: ToggleGroupProps<T>) {
+  const chips = (
+    <div className="cp-chips" role={label || titulo ? 'group' : undefined} aria-label={label ?? titulo}>
       {options.map((v) => (
         <button
           key={v}
@@ -69,6 +95,15 @@ export function ToggleGroup<T extends string>({ options, value, onChange, labels
           {labels?.[v] ?? v.charAt(0).toUpperCase() + v.slice(1)}
         </button>
       ))}
+    </div>
+  );
+  if (!titulo) return chips;
+  return (
+    <div className={styles.grupo}>
+      <span className={styles.nomeDoGrupo} aria-hidden="true">
+        {titulo}
+      </span>
+      {chips}
     </div>
   );
 }

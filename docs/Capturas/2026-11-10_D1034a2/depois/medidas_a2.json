@@ -1,0 +1,129 @@
+{
+  "historico_1366_altura_das_linhas": [
+    [
+      "Rascunho",
+      59
+    ],
+    [
+      "EmitidaNã",
+      69
+    ],
+    [
+      "EntregueN",
+      69
+    ],
+    [
+      "EmitidaNã",
+      69
+    ],
+    [
+      "Cancelada",
+      59
+    ],
+    [
+      "EntregueN",
+      69
+    ],
+    [
+      "EntregueN",
+      69
+    ],
+    [
+      "EmitidaNã",
+      69
+    ]
+  ],
+  "historico_1366_largura_das_acoes": 211,
+  "historico_1366_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "fornecedores_1366_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "fornecedores_busca_cabe": {
+    "texto": "Buscar por nome ou CNPJ…",
+    "precisa": 203,
+    "tem": 231
+  },
+  "ficha_cnpj": "44.555.666/0001-01",
+  "qualificacao_1366_dia_direita": {
+    "ultimaColunaDireita": 1333,
+    "caixaDireita": 1334,
+    "rolaDeLado": 0,
+    "tela": 1366
+  },
+  "qualificacao_1366_noite_direita": {
+    "ultimaColunaDireita": 1333,
+    "caixaDireita": 1334,
+    "rolaDeLado": 0,
+    "tela": 1366
+  },
+  "barra_375": {
+    "altura": 65,
+    "nomes": [
+      [
+        "Painel",
+        true
+      ],
+      [
+        "Nova OC",
+        true
+      ],
+      [
+        "Histórico",
+        true
+      ],
+      [
+        "Recebidos",
+        true
+      ],
+      [
+        "Mais",
+        true
+      ]
+    ]
+  },
+  "foco_volta_ao_mais": "Mais: abrir o menu",
+  "historico_375_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "historico_375_primeira_oc_topo": 365,
+  "fornecedores_375_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "obras_375_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "qualificacao_375_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": [
+      0
+    ]
+  },
+  "catalogo_375_sem_lado": {
+    "pagina": 0,
+    "main": 0,
+    "caixas": []
+  }
+}

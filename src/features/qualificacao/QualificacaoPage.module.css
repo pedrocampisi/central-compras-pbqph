@@ -76,9 +76,9 @@
 /* A planilha tem doze colunas: aqui elas se apertam para caber em 1366 sem esconder a situação.
  * O cabeçalho quebra; a célula tem menos respiro; o nome fica preso à esquerda quando a tabela rola. */
 .tabela td { vertical-align: top; }
-.tabela tbody td { padding: 10px 8px; }
+.tabela tbody td { padding: 10px 6px; }
 .tabela thead th {
-  padding: 0 8px 8px;
+  padding: 0 6px 8px;
   white-space: normal;
   letter-spacing: 0.06em;
   vertical-align: bottom;
@@ -124,11 +124,12 @@
   min-width: 70px;
   max-width: 120px;
 }
-.criterioTexto {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* O título curto do critério, inteiro, e o "?" com o nome completo (CTO-D1034f item 8). */
+.criterioTitulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
   letter-spacing: 0.04em;
   line-height: 1.35;
 }
@@ -182,14 +183,20 @@
   .situacao { max-width: none; }
   .situacao > span { white-space: nowrap; }
 }
+/* Uma ação e o "Mais" numa linha só (CTO-D1034f item 8): o botão do "Mais", na altura do botão p da linha. */
 .acoesDaLinha {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 4px;
   margin-top: 6px;
   font-weight: 400;
 }
-.acoesDaLinha button {
+.acoesDaLinha :global(.cc-mais-botao) {
+  width: 28px;
+  height: 28px;
+}
+.acoesDaLinha > button {
   height: 26px;
   padding: 0 9px;
   font-size: 13px;

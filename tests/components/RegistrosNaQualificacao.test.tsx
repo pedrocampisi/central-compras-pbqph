@@ -48,6 +48,7 @@ import { useEntregasSemPapelStore } from '../../src/stores/useEntregasSemPapelSt
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { RegistroGuardado, RegistrosDoFornecedor } from '../../src/domain/registrosGuardados';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { escolherNoMais } from './maisDaLinha';
 
 const A1: Fornecedor = {
   ...normalizeFornecedor({ id: 'a1', razao_social: 'Alfa (teste) filial a1' }),
@@ -141,7 +142,7 @@ beforeEach(() => {
 
 async function abrirPapeis() {
   render(<QualificacaoPage />);
-  fireEvent.click(screen.getByRole('button', { name: 'Papéis' }));
+  escolherNoMais(document.querySelector<HTMLElement>('[data-tabela-da-qualificacao] tbody tr')!, 'Papéis');
   const caixa = document.querySelector<HTMLElement>('[data-registros-da-ecr="12"]')!;
   await waitFor(() => expect(caixa.querySelectorAll('[data-registro]').length).toBe(2));
   return caixa;
@@ -219,7 +220,7 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
     };
     useDataStore.setState({ data: { ...dados(), ecrs: [semRegistro] } as unknown as Data });
     render(<QualificacaoPage />);
-    fireEvent.click(screen.getByRole('button', { name: 'Papéis' }));
+    escolherNoMais(document.querySelector<HTMLElement>('[data-tabela-da-qualificacao] tbody tr')!, 'Papéis');
     expect(await screen.findByText('A ECR diz "Não aplicável" no registro do fornecedor: nenhuma entrega pede o papel.')).toBeTruthy();
     expect(screen.queryByText('Nenhum papel guardado para esta ECR.')).toBeNull();
   });
@@ -227,7 +228,7 @@ describe('a ECR, o que ela pede e o que está guardado', () => {
   it('sem nada guardado, a tela diz; a falha da leitura avisa, e não finge lista vazia', async () => {
     banco.carregar = vi.fn(async () => ({ registros: [], marcas: [] }));
     render(<QualificacaoPage />);
-    fireEvent.click(screen.getByRole('button', { name: 'Papéis' }));
+    escolherNoMais(document.querySelector<HTMLElement>('[data-tabela-da-qualificacao] tbody tr')!, 'Papéis');
     expect((await screen.findByText('Nenhum papel guardado para esta ECR.')).closest('[data-aviso-da-ecr]')).toBeTruthy();
 
     useRegistrosStore.setState({ dados: null, erro: '', carregando: false });

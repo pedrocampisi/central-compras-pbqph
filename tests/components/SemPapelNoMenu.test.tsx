@@ -64,7 +64,7 @@ beforeEach(() => {
 async function itemRecebimentos(papel: string) {
   login.papel = papel;
   render(<App />);
-  const menu = await screen.findByRole('navigation');
+  const menu = await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
   await waitFor(() => expect(useDataStore.getState().data).not.toBeNull());
   return within(menu).getByRole('button', { name: /Recebimentos/ });
 }

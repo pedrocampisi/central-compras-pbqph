@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Perícia do Codex, 27/09/2026, achado 6 (CTO-D607): as duas portas de emissão,
@@ -43,6 +43,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { itemDoMais } from './maisDaLinha';
 
 /** Três filiais: a bloqueada, a de bloqueio desconhecido (a carga não trouxe) e a livre. */
 const filial = (id: string, bloqueio: boolean | undefined): Fornecedor => ({
@@ -154,8 +155,9 @@ describe('Perícia 27/09, achado 6 — a porta "emitida" do Histórico', () => {
     useDataStore.setState({ data: { ...dados(), ordens_compra: [oc('bloqueada', 'emitida')] } });
     render(<HistoricoPage />);
     const linha = screen.getByText('Filial bloqueada (teste)').closest('tr')!;
+    const item = itemDoMais(linha, 'Cancelar');
     await act(async () => {
-      fireEvent.click(within(linha).getByRole('button', { name: 'Cancelar' }));
+      fireEvent.click(item);
     });
     expect(gravacoes.status).toHaveBeenCalledWith('oc-bloqueada', 'cancelada', 1);
   });

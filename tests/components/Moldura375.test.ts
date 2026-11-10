@@ -88,10 +88,21 @@ describe('D1034 — abaixo de 960 px o menu é a gaveta do pacote', () => {
     expect(aside).toContain('id="menu-lateral"');
   });
 
-  it('o botão de três traços abre a gaveta, diz se está aberta e aponta para o menu', () => {
-    expect(app).toMatch(/aria-label="Abrir o menu"[\s\S]{0,200}aria-expanded=\{menuAberto\}[\s\S]{0,80}aria-controls="menu-lateral"/);
-    expect(vale(naBase, '.abrirMenu', 'display')).toBe('none');
-    expect(vale(naEstreita, '.abrirMenu', 'display')).toBe('grid');
+  it('o "Mais" da barra de baixo abre a gaveta, diz se está aberta e aponta para o menu (CTO-D1034f item 6)', () => {
+    expect(app).toMatch(/aria-label="Mais: abrir o menu"[\s\S]{0,80}aria-expanded=\{menuAberto\}[\s\S]{0,80}aria-controls="menu-lateral"/);
+    expect(app).toMatch(/ref=\{botaoDoMenu\}[\s\S]{0,80}aria-label="Mais: abrir o menu"/);
+  });
+
+  it('a barra de baixo (peça BarraDoCelular) só aparece abaixo de 960 px, com Painel, Nova OC, Histórico e Recebimentos', () => {
+    expect(vale(naBase, '.barraDoCelular', 'display')).toBe('none');
+    expect(vale(naEstreita, '.barraDoCelular', 'display')).toBe('block');
+    expect(app).toContain('className="cp-barra"');
+    const barra = app.match(/const NAV_BARRA[\s\S]*?\];/)?.[0] ?? '';
+    expect([...barra.matchAll(/id: '([^']+)'/g)].map((m) => m[1])).toEqual(['dashboard', 'nova-oc', 'historico', 'recebimentos']);
+    // O nome curto cabe inteiro num quinto de 375 px (cerca de 9 letras na fonte da peça).
+    for (const m of barra.matchAll(/curto: '([^']+)'/g)) expect(m[1]!.length, m[1]).toBeLessThanOrEqual(9);
+    // O fim da página não fica atrás da barra.
+    expect(vale(naEstreita, '.mainContent', 'padding-bottom')).toMatch(/64px/);
   });
 
   it('com a gaveta aberta, o resto da tela sai do alcance do teclado (DESIGN.md §14)', () => {

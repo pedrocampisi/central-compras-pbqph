@@ -106,7 +106,8 @@
   gap: var(--espaco-4);
   flex-shrink: 0;
 }
-.abrirMenu {
+/* A barra de baixo do celular (peça BarraDoCelular) fica desligada no largo. */
+.barraDoCelular {
   display: none;
 }
 .topbarContext {
@@ -133,14 +134,18 @@
   min-width: 0;
 }
 
-/* Responsivo: abaixo de 960 px o menu vira gaveta e o botão de três traços
-   aparece na barra do alto. */
+/* Responsivo: abaixo de 960 px o menu vira gaveta, e a barra de baixo do
+   celular aparece, com o "Mais" que a abre (CTO-D1034f item 6). */
 @media (max-width: 960px) {
   .sidebar {
     width: min(300px, 86vw);
   }
-  .abrirMenu {
-    display: grid;
+  .barraDoCelular {
+    display: block;
+  }
+  /* O fim da página não fica escondido atrás da barra (64 px e a borda do aparelho). */
+  .mainContent {
+    padding-bottom: calc(var(--espaco-8) + 64px + env(safe-area-inset-bottom));
   }
   /* D579: o topo cresce com o que tem dentro e o selo desce para a linha de
      baixo quando nao cabe -- com altura presa, o titulo quebrado passava por

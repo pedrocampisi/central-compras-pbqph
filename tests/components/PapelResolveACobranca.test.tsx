@@ -58,6 +58,7 @@ import { useEntregasSemPapelStore } from '../../src/stores/useEntregasSemPapelSt
 import { useRegistrosStore } from '../../src/stores/useRegistrosStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data } from '../../src/domain/types';
+import { escolherNoMais } from './maisDaLinha';
 
 const FORNECEDOR = normalizeFornecedor({ id: 'filial-a', razao_social: 'Filial A (teste)' });
 const OBRA = normalizeObra({ id: 'obra-teste', nome: 'Obra de teste' });
@@ -108,7 +109,7 @@ describe('o papel guardado pela OC resolve a cobrança (achado 7)', () => {
     expect(useEntregasSemPapelStore.getState().linhas).toHaveLength(1);
     const coberturasAntes = banco.cobertura.mock.calls.length;
 
-    fireEvent.click(within(linha()).getByRole('button', { name: 'Anexar papel' }));
+    escolherNoMais(linha(), 'Anexar papel');
     const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
     fireEvent.change(janela.querySelector('input[type="file"]')!, {
       target: { files: [new File([new Uint8Array([1])], 'guia.pdf', { type: 'application/pdf' })] },

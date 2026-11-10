@@ -37,6 +37,7 @@ import { useUiStore } from '../../src/stores/useUiStore';
 import type { DadosDaQualificacao } from '../../src/services/supabase/qualificacao';
 import type { LinhaDeQualificacao } from '../../src/domain/qualificacao';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { acoesDoMais, escolherNoMais } from './maisDaLinha';
 
 const filial = (id: string, empresa: string | undefined, apelido: string): Fornecedor => ({
   ...normalizeFornecedor({ id, razao_social: `${apelido} filial ${id}` }),
@@ -100,7 +101,13 @@ function qualificacoes(linhas = LINHAS): DadosDaQualificacao {
 }
 
 const tabela = () => document.querySelector<HTMLElement>('[data-tabela-da-qualificacao]')!;
-const cabecalho = () => [...tabela().querySelectorAll('thead th')].map((th) => th.textContent!.trim());
+// O título sem o "?" do critério (o botão da ajuda, CTO-D1034f item 8).
+const cabecalho = () =>
+  [...tabela().querySelectorAll('thead th')].map((th) => {
+    const copia = th.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('button').forEach((b) => b.remove());
+    return copia.textContent!.trim();
+  });
 const linhaDe = (chave: string) => tabela().querySelector<HTMLElement>(`[data-linha="${chave}"]`)!;
 const aba = (c: string) => document.querySelector<HTMLElement>(`[data-aba="${c}"]`)!;
 const dialogo = () => document.querySelector<HTMLElement>('[data-dialogo-qualificar]');
@@ -142,7 +149,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     render(<QualificacaoPage />);
     expect(cabecalho()).toEqual([
       'Fornecedor', 'Tipo', 'Qualificada em', 'Requalificar em',
-      '1. Atende a ECR', '2. Menor preço', '3. Prazo',
+      'Atendimento', 'Preço', 'Prazo',
       'Nota de desempenho', 'Situação', 'Permissão para compra',
     ]);
     const a = linhaDe('empresa-a').textContent!;
@@ -165,7 +172,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     render(<QualificacaoPage />);
     fireEvent.click(aba('controle_tecnologico'));
     expect(cabecalho()).toEqual([
-      'Fornecedor', 'Qualificada em', 'Requalificar em', '1. Acreditação', '2. NBR 17025', '3. ISO 9001',
+      'Fornecedor', 'Qualificada em', 'Requalificar em', 'Acreditação', 'NBR 17025', 'ISO 9001',
       'Desempenho', 'Situação',
     ]);
   });
@@ -198,7 +205,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     fireEvent.click(within(linhaDe('empresa-b')).getByRole('button', { name: 'Não atende' }));
     expect(document.querySelector('[data-criterios-de="empresa-b"]')!.textContent).not.toContain('lançada no sistema');
 
-    fireEvent.click(within(linhaDe('empresa-a')).getByRole('button', { name: 'Histórico' }));
+    escolherNoMais(linhaDe('empresa-a'), 'Histórico');
     const ficha = document.querySelector<HTMLElement>('[data-ficha-da-empresa]')!;
     const itens = [...ficha.querySelectorAll<HTMLElement>('[data-categoria="material"] details ol > li')];
     expect(itens).toHaveLength(2);
@@ -269,9 +276,9 @@ describe('CTO-D661 — qualificar e requalificar, com o mesmo diálogo', () => {
     expect(dialogo()!.textContent).toContain('Blocos Novos (teste) filial novo-1');
   });
 
-  it('"Histórico" abre a ficha da empresa', () => {
+  it('"Histórico", no "Mais" da linha, abre a ficha da empresa', () => {
     render(<QualificacaoPage />);
-    fireEvent.click(within(linhaDe('empresa-a')).getByRole('button', { name: 'Histórico' }));
+    escolherNoMais(linhaDe('empresa-a'), 'Histórico');
     expect(document.querySelector('[data-ficha-da-empresa]')).not.toBeNull();
   });
 
@@ -341,8 +348,21 @@ describe('CTO-D805 A3 — a tela diz o que é cada coisa', () => {
     expect(ecrs.title).toBe('As ECRs para as quais a empresa está qualificada. Não são itens comprados.');
   });
 
-  it('as perguntas dos critérios continuam as do PS.02', () => {
+  it('as perguntas dos critérios continuam as do PS.02: o título é curto, e o nome inteiro mora no "?" (CTO-D1034f item 8)', () => {
     render(<QualificacaoPage />);
-    expect(cabecalho().slice(4, 7)).toEqual(['1. Atende a ECR', '2. Menor preço', '3. Prazo']);
+    expect(cabecalho().slice(4, 7)).toEqual(['Atendimento', 'Preço', 'Prazo']);
+    const ths = [...tabela().querySelectorAll<HTMLElement>('thead th')].slice(4, 7);
+    expect(ths.map((th) => th.title)).toEqual(['Atende a ECR', 'Menor preço', 'Prazo']);
+    const ajuda = within(ths[1]!).getByRole('button', { name: 'Ajuda: Critério 2' });
+    fireEvent.click(ajuda);
+    expect(within(ths[1]!).getByRole('note').textContent).toContain('Critério 2: Menor preço');
+  });
+
+  it('a linha tem uma ação principal; "Histórico" e "Papéis" no "Mais" (CTO-D1034f item 8)', () => {
+    render(<QualificacaoPage />);
+    const linha = linhaDe('empresa-a');
+    expect(within(linha).getByRole('button', { name: 'Requalificar' })).toBeTruthy();
+    expect(within(linha).queryByRole('button', { name: 'Histórico' })).toBeNull();
+    expect(acoesDoMais(linha)).toEqual(['Histórico', 'Papéis']);
   });
 });

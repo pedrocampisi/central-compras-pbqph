@@ -108,7 +108,7 @@ describe('CTO-D641 — a empresa uma vez', () => {
     expect(screen.getByText('3 de 3 empresas · 6 filiais')).toBeTruthy();
   });
 
-  it('ao clicar na empresa, as filiais abrem logo abaixo: a cidade, a rua quando a cidade empata, o CNPJ, o contato e o "Editar"', () => {
+  it('ao clicar na empresa, as filiais abrem logo abaixo: a cidade, a rua quando a cidade empata, o CNPJ, o contato, e a linha abre a ficha', () => {
     render(<FornecedoresPage />);
     fireEvent.click(screen.getByRole('button', { name: /Tintas Aurora \(teste\): abrir as 3 filiais/ }));
     const abertas = filiais();
@@ -124,8 +124,9 @@ describe('CTO-D641 — a empresa uma vez', () => {
     expect(abertas[1]!.textContent).toContain('11.222.333/0001-81');
     expect(abertas[1]!.textContent).toContain('matriz@exemplo.invalid');
     expect(abertas[2]!.textContent).toContain('Uberlândia/MG · Avenida Brasil, 100');
-    // O "Editar" da filial abre a gaveta de hoje, com a filial dela.
-    fireEvent.click(within(abertas[2]!).getByRole('button', { name: 'Editar' }));
+    // A linha da filial abre a gaveta de hoje, com a filial dela (D1034f item 2: sem "Editar").
+    expect(within(abertas[2]!).queryByRole('button', { name: 'Editar' })).toBeNull();
+    fireEvent.click(abertas[2]!);
     expect(screen.getByDisplayValue('loja2@exemplo.invalid')).toBeTruthy();
   });
 
@@ -214,27 +215,29 @@ describe('CTO-D641 — ativo', () => {
 });
 
 describe('CTO-D641 — a filial sem empresa', () => {
-  it('vira empresa sozinha, num nível só: o CNPJ e a cidade na linha, e o "Editar" abre a gaveta direto', () => {
+  it('vira empresa sozinha, num nível só: o CNPJ e a cidade na linha, e a linha abre a gaveta direto, também no Enter', () => {
     render(<FornecedoresPage />);
     const beta = linhaDa('filial:b1');
     expect(beta.textContent).toContain('Concreto Beta (teste)');
     expect(beta.textContent).toContain('Patos de Minas/MG');
     expect(beta.textContent).toContain('77.888.999/0001-55');
     expect(within(beta).queryByRole('button', { name: /abrir/ })).toBeNull();
-    fireEvent.click(within(beta).getByRole('button', { name: 'Editar' }));
+    expect(beta.getAttribute('tabindex')).toBe('0');
+    expect(beta.getAttribute('aria-label')).toMatch(/^Abrir a ficha de /);
+    fireEvent.keyDown(beta, { key: 'Enter' });
     expect(screen.getByDisplayValue('beta@exemplo.invalid')).toBeTruthy();
   });
 });
 
 describe('CTO-D644 — as colunas não andam', () => {
   // O jsdom não mede tela: a trava olha as duas coisas que fixam a largura —
-  // as seis colunas declaradas (sempre as mesmas) e a tabela de layout fixo.
+  // as cinco colunas declaradas (a de ações saiu com o "Editar", D1034f) (sempre as mesmas) e a tabela de layout fixo.
   const colunas = () => [...document.querySelectorAll('table colgroup col')].map((c) => c.className);
 
-  it('as seis colunas são as mesmas na lista, na busca com a empresa fechada e no filtro', () => {
+  it('as cinco colunas são as mesmas na lista, na busca com a empresa fechada e no filtro', () => {
     const { unmount } = render(<FornecedoresPage />);
     const naLista = colunas();
-    expect(naLista).toHaveLength(6);
+    expect(naLista).toHaveLength(5);
     unmount();
 
     buscar('Ube'); // duas empresas, nenhuma aberta: a cena em que o cabeçalho mais andava
@@ -252,12 +255,33 @@ describe('CTO-D644 — as colunas não andam', () => {
     const css = readFileSync('src/features/fornecedores/FornecedoresPage.module.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
     const regra = (classe: string) => css.match(new RegExp(`\\.${classe}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
     expect(regra('tabela')).toMatch(/table-layout:\s*fixed/);
-    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo', 'colAcoes']) {
+    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo']) {
       expect(regra(c), c).toMatch(/width:\s*\d+px/);
     }
     const tsx = readFileSync('src/features/fornecedores/FornecedoresPage.tsx', 'utf-8');
-    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo', 'colAcoes']) {
+    for (const c of ['colCnpj', 'colContato', 'colQualificacao', 'colAtivo']) {
       expect(tsx, c).toContain(`styles.${c}`);
     }
+  });
+});
+
+describe('CTO-D1034f itens 7 e 9 — os grupos de filtro com nome, a busca que cabe, e o CNPJ da ficha', () => {
+  it('"Tipo" antes de Material/Serviço/Todas, e "Situação" antes de Todos/Ativos/Inativos', () => {
+    render(<FornecedoresPage />);
+    const tipo = screen.getByRole('group', { name: 'O que a empresa fornece' });
+    const situacao = screen.getByRole('group', { name: 'Ativos ou inativos' });
+    expect(tipo.parentElement!.textContent!.startsWith('Tipo')).toBe(true);
+    expect(situacao.parentElement!.textContent!.startsWith('Situação')).toBe(true);
+  });
+
+  it('a busca diz "Buscar por nome ou CNPJ…"', () => {
+    render(<FornecedoresPage />);
+    expect(screen.getByPlaceholderText('Buscar por nome ou CNPJ…')).toBeTruthy();
+  });
+
+  it('a ficha mostra o CNPJ com a pontuação, igual à lista', () => {
+    render(<FornecedoresPage />);
+    fireEvent.click(linhaDa('filial:b1'));
+    expect(screen.getByDisplayValue('77.888.999/0001-55')).toBeTruthy();
   });
 });

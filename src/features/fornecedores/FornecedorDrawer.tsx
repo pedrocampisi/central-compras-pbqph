@@ -15,6 +15,7 @@ import { salvarFornecedor } from '../../services/supabase/dados';
 import { recarregarDados } from '../../services/supabase/sync';
 import { podeEditar } from '../../services/supabase/auth';
 import { uid } from '../../domain/id';
+import { formatarDocumento } from '../../domain/destinatario';
 import { nowIso } from '../../domain/format';
 import type { Fornecedor } from '../../domain/types';
 import { ecrsDaGaveta, seloDaFilial } from '../../domain/qualificacao';
@@ -53,7 +54,11 @@ function emptyFornecedor(): Fornecedor {
 export function FornecedorDrawer({ open, fornecedor, onClose, aoCriar }: Props) {
   // O drawer é montado apenas quando aberto (render condicional na página),
   // então o estado inicial do form já reflete o fornecedor correto.
-  const [form, setForm] = useState<Fornecedor>(() => fornecedor ?? emptyFornecedor());
+  // O CNPJ aparece com a pontuação, igual à lista (CTO-D1034f item 9). O que se
+  // grava não muda: a linha do banco leva só os dígitos (`linhaDoFornecedor`).
+  const [form, setForm] = useState<Fornecedor>(() =>
+    fornecedor ? { ...fornecedor, cnpj: formatarDocumento(fornecedor.cnpj ?? '', 'pj') } : emptyFornecedor(),
+  );
   const [salvando, setSalvando] = useState(false);
   const perfil = useAuthStore((s) => s.perfil);
   const showToast = useUiStore((s) => s.showToast);

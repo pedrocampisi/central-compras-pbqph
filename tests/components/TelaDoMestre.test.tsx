@@ -256,7 +256,7 @@ describe('a porta do App', () => {
   it('o mestre cai em "Material a chegar", sem menu, e os dados do escritório não são lidos', async () => {
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Material a chegar' })).toBeTruthy();
-    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.queryByRole('navigation', { name: 'Telas da Central de Compras' })).toBeNull();
     expect(login.carregarDados).not.toHaveBeenCalled();
   });
 

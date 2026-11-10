@@ -35,3 +35,51 @@
   border-color: var(--ouro-tinta);
   box-shadow: 0 0 0 4px var(--ouro-suave);
 }
+
+/* Os filtros: no computador ficam na fila, como sempre (`display: contents`
+ * não muda nada no arranjo); no celular se recolhem no botão "Filtros"
+ * (D1034f item 5), e a busca fica à vista. */
+.filtros {
+  display: contents;
+}
+.botaoFiltros {
+  display: none;
+}
+.ligados {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: var(--raio-pill);
+  background: var(--ouro-suave);
+  color: var(--tinta);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) {
+  .botaoFiltros {
+    display: inline-flex;
+  }
+  .filtros {
+    display: none;
+  }
+  .filtrosAbertos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-3);
+    width: 100%;
+  }
+  .filtrosAbertos > * {
+    flex: 1 1 100%;
+  }
+}
+
+/* O nome do grupo de recorte ("Tipo", "Situação"), antes dos chips (D1034f item 7). */
+.grupo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  flex-wrap: wrap;
+}
+.nomeDoGrupo {
+  font: 600 0.875rem/1.3 var(--font-sans);
+  color: var(--tinta-suave);
+}

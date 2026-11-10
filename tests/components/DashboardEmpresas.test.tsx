@@ -17,7 +17,7 @@ vi.mock('../../src/services/supabase/ecrs', () => ({ podeRevisarEcr: async () =>
 vi.mock('../../src/services/supabase/sync', () => ({ recarregarDados: vi.fn(async () => {}) }));
 
 import { DashboardPage } from '../../src/features/dashboard/DashboardPage';
-import { normalizeFornecedor } from '../../src/domain/normalize';
+import { normalizeFornecedor, normalizeItem, normalizeOC } from '../../src/domain/normalize';
 import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useQualificacaoStore } from '../../src/stores/useQualificacaoStore';
@@ -65,5 +65,30 @@ describe('CTO-D644 — o cartão "Fornecedores" conta empresas', () => {
     expect(
       await cartao([filial('a1', 'A'), filial('a2', 'A', false), filial('c1', 'C', false), filial('c2', 'C', false)]),
     ).toBe('1');
+  });
+});
+
+describe('CTO-D1034f item 11 — "Fornecedores com mais compras", por empresa', () => {
+  const oc = (id: string, fornecedor: string, preco: number, status = 'emitida') =>
+    normalizeOC({
+      id, numero: `2026/${id}`, status, fornecedor_id: fornecedor, obra_id: 'obra', data: '2026-09-18', versao: 1,
+      itens: [normalizeItem({ descricao: 'Item (teste)', quantidade: 1, unidade: 'un', preco_unit: preco })],
+    });
+
+  it('as filiais da mesma empresa somam numa linha só, com o nome da empresa; a cancelada não conta', async () => {
+    const data = dados([filial('a1', 'A'), filial('a2', 'A'), filial('b1', undefined)]);
+    data.ordens_compra = [oc('001', 'a1', 100), oc('002', 'a2', 250), oc('003', 'b1', 300), oc('004', 'a1', 999, 'cancelada')];
+    useDataStore.setState({ data });
+    await act(async () => {
+      render(<DashboardPage />);
+    });
+    const titulo = [...document.querySelectorAll('h3')].find((h) => h.textContent === 'Fornecedores com mais compras');
+    expect(titulo).toBeTruthy();
+    expect(document.body.textContent).not.toContain('Top Fornecedores');
+    const lista = titulo!.parentElement!;
+    const nomes = [...lista.querySelectorAll('[class*="nome"]')].map((n) => n.textContent);
+    expect(nomes).toEqual(['Empresa A (teste)', 'Filial b1 (teste)']);
+    expect(lista.textContent).toContain('2 filiais');
+    expect(lista.textContent).toMatch(/R\$\s350,00/);
   });
 });

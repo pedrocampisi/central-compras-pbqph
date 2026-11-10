@@ -46,7 +46,9 @@ export type IconName =
   | 'qr'
   | 'livro'
   | 'guia'
-  | 'menu';
+  | 'menu'
+  | 'mais'
+  | 'filtro';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -239,6 +241,16 @@ const PATHS: Record<IconName, React.ReactNode> = {
     </>
   ),
   // Abrir o menu no celular (D1034): abaixo de 960 px ele vira gaveta.
+  // Três pontos: o botão "Mais" das ações que não cabem na linha (D1034f).
+  mais: (
+    <>
+      <circle cx="5" cy="12" r="1.2" />
+      <circle cx="12" cy="12" r="1.2" />
+      <circle cx="19" cy="12" r="1.2" />
+    </>
+  ),
+  // O funil dos filtros que se recolhem no celular (D1034f item 5).
+  filtro: <path d="M4 5h16l-6 7.5V19l-4 1.5v-8z" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
 };
 

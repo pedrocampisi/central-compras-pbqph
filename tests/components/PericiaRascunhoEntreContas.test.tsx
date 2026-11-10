@@ -96,7 +96,7 @@ beforeEach(() => {
 describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de conta', () => {
   it('a outra conta, que não revisa, não encontra o rascunho da conta anterior', async () => {
     render(<App />);
-    await screen.findByRole('navigation');
+    await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
     await act(async () => useUiStore.getState().setActiveTab('catalogo'));
     fireEvent.click(await screen.findByRole('button', { name: 'Editar a ECR 03' }));
     fireEvent.change(screen.getByLabelText('Texto da linha 1 da seção 01'), { target: { value: RASCUNHO } });
@@ -108,7 +108,7 @@ describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de cont
     expect(useRevisaoEcrStore.getState().rascunho).toBeNull();
     auth.conta = 'outra';
     await act(async () => auth.aoMudar!('SIGNED_IN', sessaoDe('outra')));
-    await screen.findByRole('navigation');
+    await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
     await act(async () => useUiStore.getState().setActiveTab('catalogo'));
     await screen.findByText('Concreto Usinado');
     await act(async () => {});
@@ -125,7 +125,7 @@ describe('Perícia 27/09, achado 4 — o rascunho da ECR depois da troca de cont
 
   it('troca de conta sem passar pela saída: o rascunho da conta anterior também some', async () => {
     render(<App />);
-    await screen.findByRole('navigation');
+    await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
     await act(async () => useUiStore.getState().setActiveTab('catalogo'));
     fireEvent.click(await screen.findByRole('button', { name: 'Editar a ECR 03' }));
     fireEvent.change(screen.getByLabelText('Texto da linha 1 da seção 01'), { target: { value: RASCUNHO } });

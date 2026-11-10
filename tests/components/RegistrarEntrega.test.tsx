@@ -50,6 +50,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data } from '../../src/domain/types';
+import { acoesDoMais } from './maisDaLinha';
 
 const FORNECEDOR = normalizeFornecedor({ id: 'filial-a', razao_social: 'Filial A (teste)' });
 const OBRA = normalizeObra({ id: 'obra-teste', nome: 'Obra de teste' });
@@ -94,7 +95,7 @@ beforeEach(() => {
   useUiStore.setState({ toasts: [] });
 });
 
-function abrir(numero = '2026/001', botao = 'Entregue') {
+function abrir(numero = '2026/001', botao = 'Marcar entregue') {
   render(<HistoricoPage />);
   fireEvent.click(within(linhaDa(numero)).getByRole('button', { name: botao }));
   return caixa()!;
@@ -114,18 +115,19 @@ async function registrar() {
   });
 }
 
-describe('D604 §3.2 — o "Entregue" abre a avaliação', () => {
-  it('a OC emitida mostra "Entregue"; a entregue, "Outra entrega"; rascunho e cancelada, nenhum', () => {
+describe('D604 §3.2 — o "Marcar entregue" abre a avaliação', () => {
+  it('a OC emitida mostra "Marcar entregue"; a entregue, "Outra entrega"; rascunho e cancelada, nenhum', () => {
     render(<HistoricoPage />);
-    expect(within(linhaDa('2026/001')).queryByRole('button', { name: 'Entregue' })).toBeTruthy();
+    expect(within(linhaDa('2026/001')).queryByRole('button', { name: 'Marcar entregue' })).toBeTruthy();
     expect(within(linhaDa('2026/002')).queryByRole('button', { name: 'Outra entrega' })).toBeTruthy();
-    expect(within(linhaDa('2026/004')).queryByRole('button', { name: /Entregue|Outra entrega/ })).toBeNull();
+    expect(within(linhaDa('2026/004')).queryByRole('button', { name: /Marcar entregue|Outra entrega/ })).toBeNull();
+    expect(acoesDoMais(linhaDa('2026/004'))).not.toContain('Marcar entregue');
   });
 
   it('quem só lê não registra entrega', () => {
     useAuthStore.setState({ perfil: { papel: 'leitura' } as never });
     render(<HistoricoPage />);
-    expect(within(linhaDa('2026/001')).queryByRole('button', { name: 'Entregue' })).toBeNull();
+    expect(within(linhaDa('2026/001')).queryByRole('button', { name: 'Marcar entregue' })).toBeNull();
   });
 
   it('clicar em "Entregue" não grava nada sozinho: abre a caixa, com o dia de hoje no recebimento', () => {

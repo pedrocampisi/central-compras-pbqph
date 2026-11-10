@@ -4,16 +4,13 @@
 > **Estado:** VALE HOJE
 > **Escopo:** só o que **esta casa** tem aberto. Fechado vai ao [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md) no mesmo commit da decisão que fecha (D429, D972). O texto de antes da limpeza de 04/11/2026 (D972) está em [`Arquivo_Morto/PENDENCIAS_ate_2026-11-04.md`](Arquivo_Morto/PENDENCIAS_ate_2026-11-04.md). Teto: 300 linhas.
 
-Número de item não se reaproveita (carta enviada aponta para ele). Fechados desde a última limpeza: 30, 36, 40, 41, 42, 43.
+Número de item não se reaproveita (carta enviada aponta para ele). Fechados desde a última limpeza: 30, 36, 40, 41, 42, 43, 45.
 Pausa do Pedro de 04/09: trabalho novo só por carta do CTO; se a pausa ainda vale, não conferi.
 
 ## 🔴 Abertas
 
-### 46. A pintura "Dia e noite" da casa (D1034, D1034b)
-Plano aceito (`docs/Enviados/2026-11-10_..._D1034-o-plano-da-pintura.md`). Três lotes, cada ramo nasce do anterior: (a) `d1034-a-casca`: casca, menu, login, cinco listas, candidatas `cc-` do campo de busca com X, da gaveta de ficha e da lista de escolha; (b) `d1034-b-o-pedido` (vai à perícia); (c) `d1034-c-o-mestre`. PDF fica; sem animação de entrada; quem não escolheu modo e tem o computador escuro passa a ver o dia. **Lote (a) construído em 10/11/2026** no ramo `d1034-a-casca`, empurrado e **fora da produção**: bateria verde, `conferir_casas` em dia, fotos em `docs/Capturas/2026-11-10_D1034a/`, carta `docs/Enviados/2026-11-10_de_Ordem_de_Compra_para_CTO_D1034a-a-casca-pintada.md`. Passa de mil linhas novas sem teste: **vai à perícia antes da produção**. **Espera:** a sentada do CTO sobre o lote (a), as três candidatas `cc-` irem ao pacote, e a perícia. Depois, o lote (b) nasce deste ramo.
-
-### 45. A D975, o X nas buscas: pronta, espera a campainha do CTO
-Ramo `d975-sobre-origin-main` (`ce30041`, `f540077`), sem o `2bc863d`; o `d975-x-na-busca` não sobe. Publica-se hoje, depois das 19h, na campainha do CTO, junto com o `d1034-plano-e-regras` (só documento). Depois, o CTO confere o X no ar.
+### 46. A pintura "Dia e noite" da casa (D1034, D1034b, D1034f)
+Plano aceito (`docs/Enviados/2026-11-10_..._D1034-o-plano-da-pintura.md`). Três lotes, cada ramo nasce do anterior: (a) `d1034-a-casca`; (b) `d1034-b-o-pedido` (vai à perícia); (c) `d1034-c-o-mestre`. PDF fica; sem animação de entrada; quem não escolheu modo e tem o computador escuro passa a ver o dia. **Lote (a)** construído e **aceito como pintura** pelo CTO (D1034f). **Lote (a2)**, a revisão de uso do CTO (doze itens), feito em 10/11/2026 no mesmo ramo, **fora da produção**: bateria verde, `conferir_casas` em dia, fotos em `docs/Capturas/2026-11-10_D1034a2/`, carta `docs/Enviados/2026-11-10_de_Ordem_de_Compra_para_CTO_D1034a2-a-revisao-de-uso.md`. Seis candidatas `cc-` (busca, gaveta, escolha, mais, linha que abre, cartões). **Espera:** a perícia do (a) e do (a2) juntos (o CTO pede ao Pedro), e as candidatas irem ao pacote. O lote (b) começa agora, num ramo que nasce deste, com as regras dos itens 1, 2, 4 e 5 desde o começo.
 
 ### 44. A OC no mesmo MCP (D953 a D961)
 Tela no ar (`6bb4a34d`, dec. 147) e `regra_da_oc` na produção. **Falta:** a `mcp` (Banco), a página (Central) e o teste de gente no Antigravity (D961h, do CTO).

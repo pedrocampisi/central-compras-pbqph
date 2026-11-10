@@ -136,7 +136,9 @@ export const useUiStore = create<UiState>((set) => ({
     set((s) => ({
       toasts: [...s.toasts.filter((t) => chave === undefined || t.chave !== chave), { id, message, tone, chave }],
     }));
-    // Auto-dismiss após 3.4s
+    // Some sozinho após 3.4s, menos o de erro: o erro fica até a pessoa fechar
+    // (DESIGN.md, peça Aviso; CTO-D1034f item 10). Erro que some some antes de ser lido.
+    if (tone === 'error') return;
     setTimeout(() => {
       set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }));
     }, 3400);

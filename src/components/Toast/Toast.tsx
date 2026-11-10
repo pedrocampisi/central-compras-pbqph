@@ -1,8 +1,12 @@
 import { createPortal } from 'react-dom';
 import { useUiStore } from '../../stores/useUiStore';
+import { Icon } from '../Icon/Icon';
 import styles from './Toast.module.css';
 
-/** Renderiza todos os toasts da fila do useUiStore via portal. */
+/**
+ * Renderiza todos os toasts da fila do useUiStore via portal. O de erro não some
+ * sozinho (CTO-D1034f item 10): fica até a pessoa fechar, no X ou num clique no aviso.
+ */
 export function ToastContainer() {
   const toasts = useUiStore((s) => s.toasts);
   const dismiss = useUiStore((s) => s.dismissToast);
@@ -16,7 +20,20 @@ export function ToastContainer() {
           role="alert"
           onClick={() => dismiss(t.id)}
         >
-          {t.message}
+          <span className={styles.texto}>{t.message}</span>
+          {t.tone === 'error' && (
+            <button
+              type="button"
+              className={`cp-icone ${styles.fechar}`}
+              aria-label="Fechar o aviso"
+              onClick={(e) => {
+                e.stopPropagation();
+                dismiss(t.id);
+              }}
+            >
+              <Icon name="x" size={16} />
+            </button>
+          )}
         </div>
       ))}
     </div>,

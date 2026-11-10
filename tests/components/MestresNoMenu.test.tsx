@@ -52,7 +52,7 @@ beforeEach(() => {
 async function menuDe(papel: string) {
   login.papel = papel;
   render(<App />);
-  const menu = await screen.findByRole('navigation');
+  const menu = await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
   await waitFor(() => expect(useDataStore.getState().data).not.toBeNull());
   const botao = within(menu).queryByRole('button', { name: 'Acesso dos encarregados' });
   // Pede a tela mesmo sem o botão (um link guardado, a aba de antes): ela não pode abrir.

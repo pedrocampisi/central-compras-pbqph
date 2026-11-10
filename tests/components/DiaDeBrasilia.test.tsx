@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * CTO-D621 §2, junto com o B7 da perícia de 28/09 (a mesma família): primeiro
@@ -24,6 +24,7 @@ import { useDataStore } from '../../src/stores/useDataStore';
 import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import type { Data } from '../../src/domain/types';
+import { escolherNoMais } from './maisDaLinha';
 
 const FORNECEDOR = normalizeFornecedor({ id: 'filial-a', razao_social: 'Filial A (teste)' });
 const OBRA = normalizeObra({ id: 'obra-teste', nome: 'Obra de teste' });
@@ -67,7 +68,7 @@ afterEach(() => {
 describe('CTO-D621 — das 21h à meia-noite, o dia é o de Brasília', () => {
   it('a OC duplicada às 21h30 nasce com a data de 28/09, e não a de amanhã', () => {
     render(<HistoricoPage />);
-    fireEvent.click(within(screen.getByText('2026/001').closest('tr')!).getByRole('button', { name: 'Duplicar' }));
+    escolherNoMais(screen.getByText('2026/001').closest('tr')!, 'Duplicar');
     const rascunho = useOcEditingStore.getState().ocEditing!;
     expect(rascunho.data).toBe('2026-09-28');
     expect(rascunho.ano).toBe(2026);

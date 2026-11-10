@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * CTO-D680: "O nome da OC precisa vir com o apelido e não esse nome
@@ -37,6 +37,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { itemDoMais } from './maisDaLinha';
 
 const COMARCO: Fornecedor = {
   ...normalizeFornecedor({ id: 'com', razao_social: 'COMARCO COMERCIAL ARAGUARI INDUSTRIA E CONSTRUCOES LTDA (teste)' }),
@@ -95,8 +96,9 @@ describe('CTO-D680 — o nome do PDF vem com o apelido, nas duas portas', () => 
   it('o "PDF" do Histórico', async () => {
     render(<HistoricoPage />);
     const linha = screen.getByText('2026/099').closest('tr')!;
+    const item = itemDoMais(linha, 'PDF');
     await act(async () => {
-      fireEvent.click(within(linha).getByRole('button', { name: 'PDF' }));
+      fireEvent.click(item);
     });
     expect(salvos).toEqual(['comarco 2026-09-18 R-263-29 oc.pdf']);
   });

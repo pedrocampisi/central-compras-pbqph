@@ -7,6 +7,7 @@
  */
 
 import styles from './HistoricoPage.module.css';
+import { Mais, type AcaoDoMais } from '../../components/Mais/Mais';
 import { useEffect, useMemo, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
@@ -349,7 +350,7 @@ export function HistoricoPage() {
   function seloDaPasta(o: OrdemCompra) {
     if (!naPasta) return null;
     const p = naPasta.get(o.id);
-    if (!p) return <span className={styles.foraDaPasta}>Não está</span>;
+    if (!p) return <span className={styles.foraDaPasta}>Não está na pasta da obra</span>;
     const link = linkSeguro(p.webUrl);
     const rotulo = (
       <>
@@ -418,34 +419,72 @@ export function HistoricoPage() {
   }
 
   /**
-   * Debaixo do status, nas OCs emitidas (D685): o ✓ com o link e o botão de
-   * mandar. Fica na coluna Status e não numa coluna própria: com mais uma
-   * coluna a tabela não cabia mais a 1366, e as Ações rolavam para fora.
+   * Debaixo do status, nas OCs emitidas (D685): o ✓ com o link, ou o "Não está
+   * na pasta da obra". Fica na coluna Status e não numa coluna própria. O botão
+   * de mandar foi para o "Mais" da linha (D1034f item 1); enquanto manda, o
+   * estado aparece aqui.
    */
   function pastaDaOc(o: OrdemCompra) {
     if (o.status !== 'emitida' && o.status !== 'entregue') return null;
-    const selo = seloDaPasta(o);
-    if (!selo && !gravaOk) return null;
+    const selo = mandando === o.id ? <span className={styles.foraDaPasta}>Mandando para a pasta…</span> : seloDaPasta(o);
+    if (!selo) return null;
     return (
       <div data-pasta-da-oc className={styles.abaixoDoSelo}>
         {selo}
-        {/* Só quem emite OC manda para a pasta: é o papel que a função exige (D682 §2). */}
-        {gravaOk && (
-          <Button
-            variant="ghost"
-            size="sm"
-            loading={mandando === o.id}
-            disabled={mandando !== null && mandando !== o.id}
-            title={
-              naPasta?.has(o.id)
-                ? 'Manda o PDF de novo para a pasta da obra: troca o arquivo que está lá, sem fazer cópia'
-                : 'Manda o PDF para a pasta da obra'
-            }
-            onClick={() => void handleMandarParaAPasta(o)}
-          >
-            {naPasta?.has(o.id) ? 'Reenviar' : 'Enviar'}
+      </div>
+    );
+  }
+
+  /**
+   * As ações da linha (D1034f item 1): uma principal, pela situação, em botão de
+   * contorno; as outras no "Mais". Nada some: o que saiu da linha está no menu.
+   */
+  function acoesDaLinha(o: OrdemCompra) {
+    const emitidaOuEntregue = o.status === 'emitida' || o.status === 'entregue';
+    const principal =
+      !gravaOk
+        ? o.status !== 'rascunho'
+          ? { rotulo: 'PDF', aoEscolher: () => void handleRegenPdf(o) }
+          : null
+        : o.status === 'rascunho'
+          ? { rotulo: 'Editar', aoEscolher: () => handleEdit(o) }
+          : o.status === 'emitida'
+            ? // A entrega se registra com a avaliação do recebimento: a OC não vai a entregue sem ela (CTO-D604 §3.2).
+              { rotulo: 'Marcar entregue', aoEscolher: () => setEntregando(o) }
+            : o.status === 'entregue'
+              ? // A já entregue aceita outra entrega — a parcial.
+                { rotulo: 'Outra entrega', aoEscolher: () => setEntregando(o) }
+              : { rotulo: 'Duplicar', aoEscolher: () => handleDuplicate(o) };
+    const resto: AcaoDoMais[] = [];
+    if (gravaOk && principal?.rotulo !== 'Duplicar') resto.push({ rotulo: 'Duplicar', aoEscolher: () => handleDuplicate(o) });
+    if (o.status !== 'rascunho' && principal?.rotulo !== 'PDF') resto.push({ rotulo: 'PDF', aoEscolher: () => void handleRegenPdf(o) });
+    // O papel deste lote que chegou por e-mail entra pela OC (CTO-D811 §4.3, D812 §2).
+    if (emitidaOuEntregue && gravaOk && ecrsNaOrdemDosItens(o.itens).length > 0) {
+      resto.push({ rotulo: 'Anexar papel', aoEscolher: () => setAnexando(o) });
+    }
+    // Só quem emite OC manda para a pasta: é o papel que a função exige (D682 §2).
+    if (emitidaOuEntregue && gravaOk) {
+      const la = naPasta?.has(o.id);
+      resto.push({
+        rotulo: la ? 'Reenviar para a pasta da obra' : 'Enviar para a pasta da obra',
+        desabilitada: mandando !== null,
+        titulo: la
+          ? 'Manda o PDF de novo para a pasta da obra: troca o arquivo que está lá, sem fazer cópia'
+          : 'Manda o PDF para a pasta da obra',
+        aoEscolher: () => void handleMandarParaAPasta(o),
+      });
+    }
+    if (o.status !== 'cancelada' && gravaOk) {
+      resto.push({ rotulo: 'Cancelar', aoEscolher: () => void handleStatusChange(o, 'cancelada') });
+    }
+    return (
+      <div className={styles.acoesDaLinha}>
+        {principal && (
+          <Button variant="outline" size="sm" onClick={principal.aoEscolher}>
+            {principal.rotulo}
           </Button>
         )}
+        <Mais acoes={resto} rotulo={`Mais ações da OC ${o.numero || '(rascunho)'}`} />
       </div>
     );
   }
@@ -456,6 +495,7 @@ export function HistoricoPage() {
     {
       key: 'numero',
       label: 'Número',
+      cartao: 'titulo',
       render: (o) =>
         o.numero ? (
           <strong className="doc">{o.numero}</strong>
@@ -467,16 +507,19 @@ export function HistoricoPage() {
     {
       key: 'fornecedor',
       label: 'Fornecedor',
-      render: (o) => fornecedorNome.get(o.fornecedor_id) || '—',
+      cartao: 'detalhe',
+      render: (o) => <NomeEmDuasLinhas texto={fornecedorNome.get(o.fornecedor_id) || '—'} />,
     },
     {
       key: 'obra',
       label: 'Obra',
-      render: (o) => obraNome.get(o.obra_id) || '—',
+      cartao: 'detalhe',
+      render: (o) => <NomeEmDuasLinhas texto={obraNome.get(o.obra_id) || '—'} />,
     },
     {
       key: 'itens',
       label: 'Itens',
+      cartao: 'fora', // no cartão do celular: número, selo, fornecedor, obra e total (D1034f item 4)
       render: (o) => <span className={styles.fraco}>{o.itens.length}</span>,
     },
     {
@@ -492,6 +535,7 @@ export function HistoricoPage() {
     {
       key: 'status',
       label: 'Status',
+      cartao: 'selo',
       render: (o) => (
         <>
           <Pill status={o.status} />
@@ -520,12 +564,21 @@ export function HistoricoPage() {
           </p>
         </div>
         <div className={styles.acoesDoTopo}>
-          <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
+          {/* No celular estes dois vão para o "Mais" do alto, e a "+ Nova OC" fica à vista (D1034f item 5). */}
+          <Button variant="outline" size="sm" className={styles.soNoLargo} onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void handlePdfDasAvaliacoes()}>
+          <Button variant="outline" size="sm" className={styles.soNoLargo} onClick={() => void handlePdfDasAvaliacoes()}>
             <Icon name="file-text" size={13} /> PDF das avaliações
           </Button>
+          <Mais
+            className={styles.soNoEstreito}
+            rotulo="Mais ações do Histórico"
+            acoes={[
+              { rotulo: 'Exportar CSV', desabilitada: ocs.length === 0, aoEscolher: handleExportCsv },
+              { rotulo: 'PDF das avaliações', aoEscolher: () => void handlePdfDasAvaliacoes() },
+            ]}
+          />
           <Button
             variant="primary"
             size="sm"
@@ -543,6 +596,7 @@ export function HistoricoPage() {
         searchValue={histFilter.search}
         searchPlaceholder="Buscar por número, fornecedor…"
         onSearchChange={(v) => setHistFilter({ search: v })}
+        filtrosLigados={[histFilter.status, histFilter.fornecedor, histFilter.obra].filter(Boolean).length}
       >
         <FilterSelect
           value={histFilter.status}
@@ -594,38 +648,8 @@ export function HistoricoPage() {
           rows={ocs}
           rowKey={(o) => o.id}
           emptyTitle="Nenhuma OC encontrada"
-          rowActions={(o) => (
-            <div className={styles.acoesDaLinha}>
-              {o.status === 'rascunho' && gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => handleEdit(o)}>Editar</Button>
-              )}
-              {gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => handleDuplicate(o)}>Duplicar</Button>
-              )}
-              {o.status !== 'rascunho' && (
-                <Button variant="ghost" size="sm" onClick={() => void handleRegenPdf(o)}>PDF</Button>
-              )}
-              {/* A entrega se registra com a avaliação do recebimento: a OC
-                  não vai a entregue sem ela (CTO-D604 §3.2). A já entregue
-                  aceita outra entrega — a parcial. */}
-              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => setEntregando(o)}>
-                  {o.status === 'emitida' ? 'Entregue' : 'Outra entrega'}
-                </Button>
-              )}
-              {/* O papel deste lote que chegou por e-mail entra pela OC (CTO-D811 §4.3, D812 §2). */}
-              {(o.status === 'emitida' || o.status === 'entregue') && gravaOk && ecrsNaOrdemDosItens(o.itens).length > 0 && (
-                <Button variant="ghost" size="sm" onClick={() => setAnexando(o)}>
-                  Anexar papel
-                </Button>
-              )}
-              {o.status !== 'cancelada' && gravaOk && (
-                <Button variant="ghost" size="sm" onClick={() => void handleStatusChange(o, 'cancelada')}>
-                  Cancelar
-                </Button>
-              )}
-            </div>
-          )}
+          rowActions={acoesDaLinha}
+          larguraDasAcoes="13rem"
         />
       )}
 
@@ -660,5 +684,14 @@ export function HistoricoPage() {
         />
       )}
     </div>
+  );
+}
+
+/** O nome longo para em duas linhas, com o nome inteiro no `title` (D1034f item 1: a linha não passa de 72 px). */
+function NomeEmDuasLinhas({ texto }: { texto: string }) {
+  return (
+    <span className={styles.duasLinhas} title={texto}>
+      {texto}
+    </span>
   );
 }

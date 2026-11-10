@@ -6,6 +6,9 @@
 
 ---
 
+### 45. A D975, o X nas buscas: pronta, espera a campainha do CTO — **FECHADA EM 10/11/2026: NO AR em `378ff412`; o CTO conferiu o X no ar às 12h07 (CTO-D975d, citado na D1034f §4)**
+Ramo `d975-sobre-origin-main` (`ce30041`, `f540077`), sem o `2bc863d`; o `d975-x-na-busca` não sobe. Publica-se hoje, depois das 19h, na campainha do CTO, junto com o `d1034-plano-e-regras` (só documento). Depois, o CTO confere o X no ar.
+
 ### 35. O PS.02 no sistema (D730): no ar, esperando a conferência do CTO — **FECHADA EM 06/10/2026: conferida pelo CTO por fora (CTO-D738 §1); a Rev. 01 segue na pendência 36**
 
 *Aberta em 06/10/2026, na decisão 91.* A página "Procedimento de Compras (PS.02)", o PDF e o "ver no PS.02, item N"

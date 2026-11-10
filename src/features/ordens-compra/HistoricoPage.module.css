@@ -7,15 +7,13 @@
   gap: var(--espaco-2);
 }
 
-/* As ações da linha quebram em duas linhas em vez de empurrar a tabela para
-   fora da tela: com a letra e o menu do padrão, seis botões numa linha só não
-   cabiam mais a 1366 px. */
+/* As ações da linha (D1034f item 1): a principal em contorno e o "Mais", numa
+   linha só, encostadas à direita da coluna de largura fixa. */
 .acoesDaLinha {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
-  gap: var(--espaco-1);
-  width: 13.5rem;
+  gap: var(--espaco-2);
 }
 
 .fraco {
@@ -65,4 +63,26 @@
 }
 .link {
   font-weight: 600;
+}
+
+/* O nome longo (fornecedor, obra) para em duas linhas; o inteiro fica no `title`. */
+.duasLinhas {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* No celular, "Exportar CSV" e "PDF das avaliações" vão para o "Mais" do alto (D1034f item 5). */
+.soNoEstreito {
+  display: none;
+}
+@media (max-width: 720px) {
+  .soNoLargo {
+    display: none;
+  }
+  .soNoEstreito {
+    display: block;
+  }
 }

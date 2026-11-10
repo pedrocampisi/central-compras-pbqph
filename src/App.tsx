@@ -83,6 +83,18 @@ const NAV_COMPRAS: NavItem[] = [
   { id: 'procedimento', label: NOME_NO_MENU, icon: 'livro' },
 ];
 
+/**
+ * A barra de baixo do celular (peça BarraDoCelular, CTO-D1034f item 6): as
+ * quatro telas mais usadas e o "Mais", que abre o menu com o resto. Os nomes
+ * cabem inteiros; o nome completo vai para o leitor de tela.
+ */
+const NAV_BARRA: (NavItem & { curto: string })[] = [
+  { id: 'dashboard', label: 'Painel', curto: 'Painel', icon: 'dashboard' },
+  { id: 'nova-oc', label: 'Nova OC', curto: 'Nova OC', icon: 'plus' },
+  { id: 'historico', label: 'Histórico', curto: 'Histórico', icon: 'history' },
+  { id: 'recebimentos', label: 'Recebimentos', curto: 'Recebidos', icon: 'caixa' },
+];
+
 const NAV_SISTEMA: NavItem[] = [
   { id: 'config', label: 'Configurações', icon: 'settings' },
 ];
@@ -139,8 +151,8 @@ export default function App() {
   /** Dentro do ícone, a tela de entrada é a do QR; quem tem senha pede o formulário. */
   const [usarSenha, setUsarSenha] = useState(false);
 
-  // O menu vira gaveta abaixo de 960 px (DESIGN.md §9, peça MenuLateral): o botão
-  // de três traços abre; o véu, o Esc e a escolha de uma tela fecham, e o foco volta ao botão.
+  // O menu vira gaveta abaixo de 960 px (DESIGN.md §9, peça MenuLateral): o "Mais" da
+  // barra de baixo abre; o véu, o Esc e a escolha de uma tela fecham, e o foco volta ao "Mais".
   const [menuAberto, setMenuAberto] = useState(false);
   const botaoDoMenu = useRef<HTMLButtonElement>(null);
   const fecharMenu = useCallback(() => setMenuAberto(false), []);
@@ -152,7 +164,7 @@ export default function App() {
     [setTab, menuAberto, fecharMenu],
   );
   // Com a gaveta aberta o resto fica fora do alcance (inert): o foco entra nela, na tela da vez.
-  // Ao fechar, o foco volta ao botão de três traços, depois que o inert sai (antes, o foco não pega).
+  // Ao fechar, o foco volta ao "Mais", depois que o inert sai (antes, o foco não pega).
   const menuJaAbriu = useRef(false);
   useEffect(() => {
     if (!menuAberto) {
@@ -498,18 +510,6 @@ export default function App() {
       <div className={styles.mainWrapper} inert={menuAberto}>
         {/* Topbar */}
         <header className={styles.topbar}>
-          <button
-            ref={botaoDoMenu}
-            type="button"
-            className={`cp-icone ${styles.abrirMenu}`}
-            aria-label="Abrir o menu"
-            title="Abrir o menu"
-            aria-expanded={menuAberto}
-            aria-controls="menu-lateral"
-            onClick={() => setMenuAberto(true)}
-          >
-            <Icon name="menu" size={18} />
-          </button>
           {/* O nome da tela mora no cabeçalho da página, uma vez só (CTO-D643):
               a barra diz de que sistema é, e o estado do banco. */}
           <div className={styles.topbarContext}>Central de Compras</div>
@@ -555,6 +555,35 @@ export default function App() {
             </>
           )}
         </main>
+
+        {/* A barra de baixo do celular (peça BarraDoCelular): só abaixo de 960 px. */}
+        <div className={styles.barraDoCelular}>
+          <nav className="cp-barra" aria-label="Telas mais usadas">
+            {NAV_BARRA.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-current={activeTab === item.id ? 'page' : undefined}
+                aria-label={item.curto === item.label ? undefined : item.label}
+                onClick={() => irPara(item.id)}
+              >
+                <Icon name={item.icon} size={22} />
+                <span>{item.curto}</span>
+              </button>
+            ))}
+            <button
+              ref={botaoDoMenu}
+              type="button"
+              aria-label="Mais: abrir o menu"
+              aria-expanded={menuAberto}
+              aria-controls="menu-lateral"
+              onClick={() => setMenuAberto(true)}
+            >
+              <Icon name="menu" size={22} />
+              <span>Mais</span>
+            </button>
+          </nav>
+        </div>
       </div>
 
       {/* ── Global overlays ────────────────────────────────────────── */}

@@ -130,7 +130,7 @@ beforeEach(() => {
 function abrirFicha(nome = 'Filial A (teste)') {
   render(<FornecedoresPage />);
   const linhaDaTabela = screen.getByText(nome).closest('tr')!;
-  fireEvent.click(within(linhaDaTabela).getByRole('button', { name: 'Editar' }));
+  fireEvent.click(linhaDaTabela);
   fireEvent.click(screen.getByRole('button', { name: 'Abrir a ficha da empresa' }));
   return caixa('[data-ficha-da-empresa]')!;
 }
@@ -184,7 +184,7 @@ describe('D604 §3.4 — o selo', () => {
 describe('D614 §2.1 — a gaveta mostra as ECRs da qualificação, só para ler', () => {
   function abrirGaveta(nome = 'Filial A (teste)') {
     render(<FornecedoresPage />);
-    fireEvent.click(within(screen.getByText(nome).closest('tr')!).getByRole('button', { name: 'Editar' }));
+    fireEvent.click(screen.getByText(nome).closest('tr')!);
   }
 
   it('a linha diz as ECRs da qualificação que vale e onde muda; não há caixa de ECR para marcar', () => {

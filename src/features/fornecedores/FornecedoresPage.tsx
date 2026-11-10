@@ -10,7 +10,7 @@
  * uma filial só fica num nível só (D523).
  */
 
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { Button } from '../../components/Button/Button';
@@ -130,26 +130,41 @@ export function FornecedoresPage() {
     );
   }
 
+  /**
+   * A linha da filial abre a ficha (D1034f item 2; a D976): no clique e, com o
+   * foco nela, no Enter e no Espaço. O "Editar" que repetia o clique saiu.
+   */
+  function abreAFicha(f: Fornecedor, nome: string) {
+    return {
+      tabIndex: 0,
+      className: 'cc-linha-abre',
+      'aria-label': `Abrir a ficha de ${nome}`,
+      onClick: () => openEdit(f),
+      onKeyDown: (e: KeyboardEvent<HTMLTableRowElement>) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openEdit(f);
+        }
+      },
+    };
+  }
+
   /** A empresa de uma filial só: um nível, como a linha de antes (D523). */
   function linhaDeUmaFilial(g: EmpresaDaLista) {
     const f = g.filiais[0]!;
     return (
-      <tr key={g.chave} data-empresa={g.chave} onClick={() => openEdit(f)} style={{ cursor: 'pointer' }}>
-        <td>
+      <tr key={g.chave} data-empresa={g.chave} {...abreAFicha(f, g.apelido)}>
+        <td data-cartao="titulo">
           <div className={styles.empresa}>
             <span className={styles.semSeta} />
             {nomeDaEmpresa(g)}
           </div>
         </td>
-        <td>{cnpjDe(f)}</td>
-        <td>{contatoDe(f)}</td>
-        <td>{seloDaEmpresa(g)}</td>
-        <td>{ativoDaFilial(f)}</td>
-        <td onClick={(e) => e.stopPropagation()}>
-          <div className={tabela.rowActions}>
-            <Button variant="ghost" size="sm" onClick={() => openEdit(f)}>Editar</Button>
-          </div>
-        </td>
+        <td data-cartao="detalhe" data-rotulo="CNPJ">{cnpjDe(f)}</td>
+        <td data-cartao="detalhe" data-rotulo="Contato">{contatoDe(f)}</td>
+        <td data-cartao="selo">{seloDaEmpresa(g)}</td>
+        <td data-cartao="detalhe" data-rotulo="Ativo">{ativoDaFilial(f)}</td>
       </tr>
     );
   }
@@ -160,7 +175,7 @@ export function FornecedoresPage() {
     const razoesDiferentes = razoesDistintas(g.filiais).length > 1;
     return [
       <tr key={g.chave} data-empresa={g.chave} onClick={() => alternar(g)} style={{ cursor: 'pointer' }}>
-        <td colSpan={3}>
+        <td colSpan={3} data-cartao="titulo">
           <button
             type="button"
             className={styles.abrir}
@@ -175,9 +190,8 @@ export function FornecedoresPage() {
             {nomeDaEmpresa(g)}
           </button>
         </td>
-        <td>{seloDaEmpresa(g)}</td>
-        <td>{ativoDe(g)}</td>
-        <td />
+        <td data-cartao="selo">{seloDaEmpresa(g)}</td>
+        <td data-cartao="detalhe" data-rotulo="Ativo">{ativoDe(g)}</td>
       </tr>,
       ...(aberto
         ? g.filiais.map((f) => {
@@ -187,26 +201,20 @@ export function FornecedoresPage() {
                 key={f.id}
                 data-filial={f.id}
                 data-achada={achada || undefined}
-                className={achada ? `${styles.filial} ${styles.casou}` : styles.filial}
-                onClick={() => openEdit(f)}
-                style={{ cursor: 'pointer' }}
+                {...abreAFicha(f, `${g.apelido}, ${localDaFilial(f, g.filiais)}`)}
+                className={`cc-linha-abre ${achada ? `${styles.filial} ${styles.casou}` : styles.filial}`}
               >
-                <td>
+                <td data-cartao="titulo">
                   <div className={styles.local}>
                     {localDaFilial(f, g.filiais)}
                     {achada && <span className={styles.achada}>achada pela busca</span>}
                   </div>
                   {razoesDiferentes && <div className={styles.razaoDaFilial}>{f.razao_social}</div>}
                 </td>
-                <td>{cnpjDe(f)}</td>
-                <td>{contatoDe(f)}</td>
-                <td />
-                <td>{ativoDaFilial(f)}</td>
-                <td onClick={(e) => e.stopPropagation()}>
-                  <div className={tabela.rowActions}>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(f)}>Editar</Button>
-                  </div>
-                </td>
+                <td data-cartao="detalhe" data-rotulo="CNPJ">{cnpjDe(f)}</td>
+                <td data-cartao="detalhe" data-rotulo="Contato">{contatoDe(f)}</td>
+                <td data-cartao="fora" />
+                <td data-cartao="detalhe" data-rotulo="Ativo">{ativoDaFilial(f)}</td>
               </tr>
             );
           })
@@ -238,12 +246,14 @@ export function FornecedoresPage() {
       {/* Filtros */}
       <ListToolbar
         searchValue={search}
-        searchPlaceholder="Buscar por empresa, razão social, CNPJ, e-mail, cidade…"
+        searchPlaceholder="Buscar por nome ou CNPJ…"
         onSearchChange={(v) => setFornFilter({ search: v })}
+        filtrosLigados={[tipo !== 'todas', showAtivos !== 'todos'].filter(Boolean).length}
       >
         {/* A lista abre com quem fornece material (CTO-D964); os prestadores
             de serviço e as empresas sem marca ficam a um clique. */}
         <ToggleGroup
+          titulo="Tipo"
           label="O que a empresa fornece"
           options={['material', 'servico', 'todas'] as const}
           labels={{ material: 'Material', servico: 'Serviço', todas: 'Todas as empresas' }}
@@ -251,6 +261,7 @@ export function FornecedoresPage() {
           onChange={(v) => setFornFilter({ tipo: v })}
         />
         <ToggleGroup
+          titulo="Situação"
           label="Ativos ou inativos"
           options={['todos', 'ativos', 'inativos'] as const}
           value={showAtivos}
@@ -275,7 +286,7 @@ export function FornecedoresPage() {
         />
       ) : (
         <div className={tabela.wrap}>
-          <table className={`cp-tabela ${tabela.table} ${styles.tabela}`}>
+          <table className={`cp-tabela cc-cartoes ${tabela.table} ${styles.tabela}`}>
             {/* As larguras fixas (CTO-D644): o cabeçalho não anda entre a lista,
                 a busca e os filtros. A empresa fica com o resto. */}
             <colgroup>
@@ -284,7 +295,6 @@ export function FornecedoresPage() {
               <col className={styles.colContato} />
               <col className={styles.colQualificacao} />
               <col className={styles.colAtivo} />
-              <col className={styles.colAcoes} />
             </colgroup>
             <thead>
               <tr>
@@ -293,7 +303,6 @@ export function FornecedoresPage() {
                 <th>E-mail / Telefone</th>
                 <th>Qualificação</th>
                 <th>Ativo</th>
-                <th className={tabela.actionsCol}>Ações</th>
               </tr>
             </thead>
             <tbody>

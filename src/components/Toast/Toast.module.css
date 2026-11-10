@@ -1,5 +1,6 @@
 /* O aviso curto, com o desenho da peça Aviso do pacote (pecas\Aviso): desce do
- * topo, em pílula, painel-alto com a borda ouro, e some sozinho. A peça é um
+ * topo, em pílula, painel-alto com a borda ouro, e some sozinho; o de erro fica
+ * até a pessoa fechar (CTO-D1034f item 10), com o X. A peça é um
  * aviso por página, `position: fixed`; a casa ainda pode mostrar dois de uma
  * vez, então a fila mora aqui e cada aviso usa o desenho da peça.
  *
@@ -57,6 +58,19 @@
 .error {
   --ponto: var(--erro);
   border-color: var(--erro);
+}
+
+.texto {
+  min-width: 0;
+}
+/* O X do aviso de erro: a peça Ícone menor, para caber na pílula. */
+.fechar {
+  width: 32px;
+  height: 32px;
+  margin: -6px -14px -6px 0;
+}
+.error {
+  padding-right: 20px;
 }
 
 @keyframes desce {

@@ -70,7 +70,7 @@ describe('CTO-D814 — o perfil sem a Ordem de Compra', () => {
     render(<App />);
     expect(await screen.findByText(AVISO)).toBeTruthy();
     expect(screen.getByText('prova@exemplo.invalid')).toBeTruthy();
-    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.queryByRole('navigation', { name: 'Telas da Central de Compras' })).toBeNull();
     expect(login.carregou).toBe(0);
     fireEvent.click(screen.getByRole('button', { name: 'Sair' }));
     await waitFor(() => expect(login.saiu).toBe(1));
@@ -89,7 +89,7 @@ describe('CTO-D814 — o perfil sem a Ordem de Compra', () => {
   ])('%s: entra como hoje', async (_nome, perfil) => {
     login.perfil = perfil;
     render(<App />);
-    expect(await screen.findByRole('navigation')).toBeTruthy();
+    expect(await screen.findByRole('navigation', { name: 'Telas da Central de Compras' })).toBeTruthy();
     await waitFor(() => expect(login.carregou).toBe(1));
     expect(screen.queryByText(AVISO)).toBeNull();
   });

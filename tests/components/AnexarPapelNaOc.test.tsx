@@ -38,6 +38,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useRegistrosStore } from '../../src/stores/useRegistrosStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data } from '../../src/domain/types';
+import { acoesDoMais, escolherNoMais } from './maisDaLinha';
 
 const FORNECEDOR = normalizeFornecedor({ id: 'filial-a', razao_social: 'Filial A (teste)' });
 const OBRA = normalizeObra({ id: 'obra-teste', nome: 'Obra de teste' });
@@ -68,7 +69,7 @@ function dados(): Data {
 }
 
 const linhaDa = (numero: string) => screen.getByText(numero).closest('tr')!;
-const temBotao = (numero: string) => !!within(linhaDa(numero)).queryByRole('button', { name: 'Anexar papel' });
+const temBotao = (numero: string) => acoesDoMais(linhaDa(numero)).includes('Anexar papel');
 
 beforeEach(() => {
   banco.arquivar = vi.fn(async () => 'doc-novo');
@@ -98,7 +99,7 @@ describe('o "Anexar papel" na lista das OCs', () => {
 
   it('a janela fala da OC e da ECR dela, e guarda pela OC: o lote entra, e a lista dos papéis lê de novo', async () => {
     render(<HistoricoPage />);
-    fireEvent.click(within(linhaDa('2026/001')).getByRole('button', { name: 'Anexar papel' }));
+    escolherNoMais(linhaDa('2026/001'), 'Anexar papel');
     const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
     expect(janela.textContent).toContain('OC 2026/001 · Filial A (teste)');
     expect(janela.textContent).toContain('ECR 12 — Madeira (teste)');
@@ -119,7 +120,7 @@ describe('o "Anexar papel" na lista das OCs', () => {
   it('na ECR com a marca "a cada entrega", o lote não entra pela OC, e a janela manda à lista das entregas sem papel (D840 §2.3)', async () => {
     banco.carregar = vi.fn(async () => ({ registros: [], marcas: [{ ecrId: 12, porque: 'a GCA de cada transporte (teste)' }] }));
     render(<HistoricoPage />);
-    fireEvent.click(within(linhaDa('2026/001')).getByRole('button', { name: 'Anexar papel' }));
+    escolherNoMais(linhaDa('2026/001'), 'Anexar papel');
     const janela = document.querySelector<HTMLElement>('[data-dialogo-anexar]')!;
     await waitFor(() => expect(useRegistrosStore.getState().dados).not.toBeNull());
     fireEvent.change(janela.querySelector('input[type="file"]')!, {
@@ -139,5 +140,57 @@ describe('o "Anexar papel" na lista das OCs', () => {
     fireEvent.click(within(janela).getByRole('button', { name: 'Guardar papel' }));
     await waitFor(() => expect(banco.guardar).toHaveBeenCalledTimes(1));
     expect(banco.guardar.mock.calls[0]![0]).toMatchObject({ ecrId: 12, alcance: 'vale_ate', validoAte: '2027-06-30' });
+  });
+});
+
+describe('CTO-D1034f itens 1, 4 e 5 — a linha do Histórico, o cartão do celular e o alto da lista', () => {
+  const botoesForaDoMais = (numero: string) =>
+    within(linhaDa(numero))
+      .getAllByRole('button')
+      .filter((b) => !b.closest('.cc-mais'))
+      .map((b) => b.textContent);
+
+  it('uma ação principal por linha, pela situação; o resto no "Mais", e nada some', () => {
+    render(<HistoricoPage />);
+    expect(botoesForaDoMais('2026/001')).toEqual(['Marcar entregue']);
+    expect(botoesForaDoMais('2026/002')).toEqual(['Outra entrega']);
+    expect(botoesForaDoMais('2026/003')).toEqual(['Editar']);
+    expect(botoesForaDoMais('2026/004')).toEqual(['Duplicar']);
+    expect(acoesDoMais(linhaDa('2026/001'))).toEqual(['Duplicar', 'PDF', 'Anexar papel', 'Enviar para a pasta da obra', 'Cancelar']);
+    expect(acoesDoMais(linhaDa('2026/004'))).toEqual(['PDF']);
+    // O "Mais" tem nome para o leitor de tela, com o número da OC.
+    expect(within(linhaDa('2026/001')).getByRole('button', { name: 'Mais ações da OC 2026/001' })).toBeTruthy();
+  });
+
+  it('a coluna de ações tem largura fixa', () => {
+    render(<HistoricoPage />);
+    const th = [...document.querySelectorAll<HTMLElement>('thead th')].find((x) => x.textContent === 'Ações')!;
+    expect(th.style.width).toBe('13rem');
+  });
+
+  it('cada célula diz o seu lugar no cartão: o número e o selo em cima, fornecedor, obra e total embaixo, as ações no pé', () => {
+    render(<HistoricoPage />);
+    expect(document.querySelector('table')!.classList.contains('cc-cartoes')).toBe(true);
+    const lugar = (rotulo: string) =>
+      linhaDa('2026/001').querySelector<HTMLElement>(`td[data-rotulo="${rotulo}"]`)!.dataset.cartao;
+    expect(lugar('Número')).toBe('titulo');
+    expect(lugar('Status')).toBe('selo');
+    expect(lugar('Fornecedor')).toBe('detalhe');
+    expect(lugar('Obra')).toBe('detalhe');
+    expect(lugar('Total')).toBe('detalhe');
+    expect(linhaDa('2026/001').querySelector('td[data-cartao="acoes"]')).not.toBeNull();
+  });
+
+  it('o alto: "Filtros" com o número dos ligados, e Exportar CSV e PDF das avaliações também no "Mais" do alto', () => {
+    useUiStore.setState({ histFilter: { ...useUiStore.getState().histFilter, status: 'emitida' } });
+    render(<HistoricoPage />);
+    const filtros = screen.getByRole('button', { name: /Filtros/ });
+    expect(filtros.textContent).toContain('1');
+    expect(filtros.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(filtros);
+    expect(filtros.getAttribute('aria-expanded')).toBe('true');
+    const alto = screen.getByRole('button', { name: 'Mais ações do Histórico' }).closest<HTMLElement>('.cc-mais')!;
+    expect(acoesDoMais(alto)).toEqual(['Exportar CSV', 'PDF das avaliações']);
+    useUiStore.setState({ histFilter: { search: '', status: '', fornecedor: '', obra: '' } });
   });
 });

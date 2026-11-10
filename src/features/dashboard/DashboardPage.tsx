@@ -13,6 +13,7 @@ import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { computeOcTotals } from '../../domain/compute';
 import { agruparPorEmpresa } from '../../domain/fornecedores';
+import { formatarDocumento } from '../../domain/destinatario';
 import { formatBrl, formatDate } from '../../domain/format';
 import { Pill } from '../../components/Pill/Pill';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -52,14 +53,31 @@ export function DashboardPage() {
       porObra.set(oc.obra_id, obra);
     }
 
-    const topForn: RankEntry[] = [...porFornecedor.entries()]
-      .sort((a, b) => b[1] - a[1])
+    // Por empresa, e não por filial (CTO-D1034f item 11; a D644): as filiais da
+    // mesma empresa somam numa linha só, igual ao número de cima e à tela de Fornecedores.
+    const empresaDaFilial = new Map<string, { chave: string; apelido: string }>();
+    for (const g of agruparPorEmpresa(data.fornecedores)) {
+      for (const f of g.filiais) empresaDaFilial.set(f.id, { chave: g.chave, apelido: g.apelido });
+    }
+    const porEmpresa = new Map<string, RankEntry & { filiais: Set<string> }>();
+    for (const [id, valor] of porFornecedor) {
+      const e = empresaDaFilial.get(id) ?? { chave: `sem:${id}`, apelido: 'Desconhecido' };
+      const linha = porEmpresa.get(e.chave) ?? { nome: e.apelido || 'Desconhecido', sub: '', valor: 0, filiais: new Set<string>() };
+      linha.valor += valor;
+      linha.filiais.add(id);
+      porEmpresa.set(e.chave, linha);
+    }
+    const topForn: RankEntry[] = [...porEmpresa.values()]
+      .sort((a, b) => b.valor - a.valor)
       .slice(0, 5)
-      .map(([id, valor]) => ({
-        nome: fornecedorById.get(id)?.razao_social ?? 'Desconhecido',
-        sub: fornecedorById.get(id)?.cnpj ?? '',
-        valor,
-      }));
+      .map(({ nome, valor, filiais }) => {
+        const unica = filiais.size === 1 ? fornecedorById.get([...filiais][0]!) : undefined;
+        return {
+          nome,
+          sub: unica ? (unica.cnpj ? formatarDocumento(unica.cnpj, 'pj') : '') : `${filiais.size} filiais`,
+          valor,
+        };
+      });
 
     const topObras: RankEntry[] = [...porObra.entries()]
       .sort((a, b) => b[1].valor - a[1].valor)
@@ -156,7 +174,7 @@ export function DashboardPage() {
 
         <div>
           <div className={styles.card}>
-            <h3>Top Fornecedores (por valor)</h3>
+            <h3>Fornecedores com mais compras</h3>
             {topForn.length === 0 ? (
               <EmptyState title="Sem dados" compacto />
             ) : (

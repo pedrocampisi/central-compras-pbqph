@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * CTO-D953, D954: o rascunho que a IA monta pelo MCP da Central é uma OC comum,
@@ -43,6 +43,7 @@ import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useRegistrosStore } from '../../src/stores/useRegistrosStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data, OrdemCompra } from '../../src/domain/types';
+import { escolherNoMais } from './maisDaLinha';
 
 const IA = 'Assistente (teste)';
 const FORNECEDOR = { ...normalizeFornecedor({ id: 'f1', razao_social: 'Fornecedor (teste)' }), fornece_material: true };
@@ -115,7 +116,7 @@ describe('D954 — o aviso do rascunho que a IA montou', () => {
 
   it('a cópia de uma OC da IA é da pessoa: sai sem a marca, e sem o aviso', () => {
     render(<HistoricoPage />);
-    fireEvent.click(within(screen.getByText('2026/010').closest('tr')!).getByRole('button', { name: 'Duplicar' }));
+    escolherNoMais(screen.getByText('2026/010').closest('tr')!, 'Duplicar');
     const copia = useOcEditingStore.getState().ocEditing!;
     expect(copia.status).toBe('rascunho');
     expect(copia.montada_pela_ia).toBeUndefined();

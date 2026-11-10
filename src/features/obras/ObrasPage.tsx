@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useUiStore } from '../../stores/useUiStore';
 import { DataTable } from '../../components/DataTable/DataTable';
-import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ObraDrawer } from './ObraDrawer';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
@@ -53,6 +52,7 @@ export function ObrasPage() {
     {
       key: 'nome',
       label: 'Nome',
+      cartao: 'titulo',
       render: (o) => (
         <div>
           <strong>{o.nome}</strong>
@@ -92,6 +92,7 @@ export function ObrasPage() {
     {
       key: 'ativa',
       label: 'Ativa',
+      cartao: 'selo',
       render: (o) => (
         <span style={{ color: o.ativa ? 'var(--sucesso)' : 'var(--tinta-suave)', fontWeight: 600, fontSize: 13 }}>
           {o.ativa ? '✓ Ativa' : '— Inativa'}
@@ -117,6 +118,7 @@ export function ObrasPage() {
         searchValue={search}
         searchPlaceholder="Buscar por nome, CEI, responsável, cidade…"
         onSearchChange={(v) => setObraFilter({ search: v })}
+        filtrosLigados={showAtivas !== 'todas' ? 1 : 0}
       >
         <ToggleGroup
           options={['todas', 'ativas', 'inativas'] as const}
@@ -141,12 +143,10 @@ export function ObrasPage() {
           rows={filtered}
           rowKey={(o) => o.id}
           emptyTitle="Nenhuma obra encontrada"
+          // A linha abre a ficha, no clique e no Enter (D1034f item 2). O "Ver / Pasta"
+          // repetia esse clique: a pasta das OCs se conecta dentro da ficha.
           onRowClick={openEdit}
-          rowActions={(o) => (
-            <div style={{ display: 'flex', gap: 4 }}>
-              <Button variant="ghost" size="sm" onClick={() => openEdit(o)}>Ver / Pasta</Button>
-            </div>
-          )}
+          rowLabel={(o) => `Abrir a obra ${o.nome}`}
         />
       )}
 

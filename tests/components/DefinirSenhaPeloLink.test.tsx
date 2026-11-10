@@ -73,7 +73,7 @@ beforeEach(() => {
 /** A pessoa chega pelo link do e-mail: a biblioteca abre a sessão e diz "recuperação". */
 async function chegarPeloLink() {
   render(<App />);
-  await screen.findByRole('navigation');
+  await screen.findByRole('navigation', { name: 'Telas da Central de Compras' });
   expect(login.aoMudar).toBeTypeOf('function');
   act(() => login.aoMudar!('PASSWORD_RECOVERY', SESSAO));
   await screen.findByRole('heading', { name: 'Definir nova senha' });
@@ -88,7 +88,7 @@ async function gravar(senha: string, repetida = senha) {
 describe('D700 — quem chega pelo link do "Esqueci" define a senha na própria OC', () => {
   it('o evento de recuperação abre "Definir nova senha", e não a OC', async () => {
     await chegarPeloLink();
-    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.queryByRole('navigation', { name: 'Telas da Central de Compras' })).toBeNull();
     expect(screen.getByLabelText('Nova senha')).toHaveAttribute('type', 'password');
   });
 
@@ -96,7 +96,7 @@ describe('D700 — quem chega pelo link do "Esqueci" define a senha na própria 
     await chegarPeloLink();
     await gravar(SENHA);
     expect(login.updateUser).toHaveBeenCalledWith({ password: SENHA });
-    expect(await screen.findByRole('navigation')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Telas da Central de Compras' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Definir nova senha' })).toBeNull();
     expect(useUiStore.getState().toasts.map((t) => t.message)).toContain('Senha definida com sucesso!');
   });
@@ -114,7 +114,7 @@ describe('D700 — quem chega pelo link do "Esqueci" define a senha na própria 
 
     await userEvent.click(botao);
     expect(login.updateUser).toHaveBeenCalledTimes(2);
-    expect(await screen.findByRole('navigation')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Telas da Central de Compras' })).toBeInTheDocument();
   });
 
   it('as duas senhas diferentes, ou curta: avisa e não manda nada ao login', async () => {

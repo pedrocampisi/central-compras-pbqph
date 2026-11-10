@@ -59,6 +59,8 @@ import { FornecedorDrawer } from '../fornecedores/FornecedorDrawer';
 import { QualificarDialogo } from '../fornecedores/QualificarDialogo';
 import { SeloDaQualificacao } from '../fornecedores/SeloDaQualificacao';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
+import { Ajuda } from '../../components/Ajuda/Ajuda';
+import { Mais } from '../../components/Mais/Mais';
 import { RegistrosDaEmpresa } from './RegistrosDaEmpresa';
 import styles from './QualificacaoPage.module.css';
 
@@ -72,6 +74,27 @@ const NOME_PADRAO: Record<Categoria, string> = {
 };
 
 type Filtro = 'todas' | 'pedem ação';
+
+/**
+ * O título curto do critério no cabeçalho (CTO-D1034f item 8): "1. Atend…" não
+ * se lia. O nome que vem do banco não muda; ele inteiro mora no "?" do título.
+ */
+const CURTOS: [RegExp, string][] = [
+  [/^atend/i, 'Atendimento'],
+  [/^entreg/i, 'Entrega'],
+  [/^document/i, 'Documentos'],
+  [/^prazo/i, 'Prazo'],
+  [/pre[çc]o/i, 'Preço'],
+];
+function tituloCurtoDoCriterio(criterio: string | undefined, i: number): string {
+  const c = (criterio ?? '').trim();
+  if (!c) return `Critério ${i + 1}`;
+  const achado = CURTOS.find(([r]) => r.test(c));
+  if (achado) return achado[1];
+  if (c.length <= 12) return c;
+  const primeira = c.split(/\s+/)[0]!;
+  return primeira.length <= 12 ? primeira : `Critério ${i + 1}`;
+}
 
 export function QualificacaoPage() {
   const data = useDataStore((s) => s.data);
@@ -191,7 +214,12 @@ export function QualificacaoPage() {
       ) : (
         <div role="tabpanel" data-categoria={aba}>
           <div className={styles.barra}>
-            <ListToolbar searchValue={busca} searchPlaceholder="Buscar empresa ou tipo…" onSearchChange={setBusca}>
+            <ListToolbar
+              searchValue={busca}
+              searchPlaceholder="Buscar empresa ou tipo…"
+              onSearchChange={setBusca}
+              filtrosLigados={filtro !== 'todas' ? 1 : 0}
+            >
               <ToggleGroup options={['todas', 'pedem ação'] as const} value={filtro} onChange={setFiltro} />
             </ListToolbar>
             {podeQualificar && (
@@ -220,20 +248,24 @@ export function QualificacaoPage() {
             />
           ) : (
             <div className={`${tabela.wrap} ${styles.rolagem}`}>
-              <table className={`cp-tabela ${tabela.table} ${styles.tabela}`} data-tabela-da-qualificacao="">
+              <table className={`cp-tabela cc-cartoes ${tabela.table} ${styles.tabela}`} data-tabela-da-qualificacao="">
                 <thead>
                   <tr>
                     <th>Fornecedor</th>
                     {comTipo && <th>Tipo</th>}
                     <th>Qualificada em</th>
                     <th>Requalificar em</th>
-                    {[0, 1, 2].map((i) => (
-                      <th key={i} className={styles.criterioTh} title={atual.criterios[i] ?? ''}>
-                        <span className={styles.criterioTexto}>
-                          {i + 1}. {atual.criterios[i] ?? `Critério ${i + 1}`}
-                        </span>
-                      </th>
-                    ))}
+                    {[0, 1, 2].map((i) => {
+                      const inteiro = atual.criterios[i] ?? `Critério ${i + 1}`;
+                      return (
+                        <th key={i} className={styles.criterioTh} title={inteiro}>
+                          <span className={styles.criterioTitulo}>
+                            {tituloCurtoDoCriterio(atual.criterios[i], i)}
+                            <Ajuda sobre={`Critério ${i + 1}`}>{`Critério ${i + 1}: ${inteiro}`}</Ajuda>
+                          </span>
+                        </th>
+                      );
+                    })}
                     <th title={O_QUE_E_A_NOTA}>{comTipo ? 'Nota de desempenho' : 'Desempenho'}</th>
                     <th>Situação</th>
                     {material && <th>Permissão para compra</th>}
@@ -248,17 +280,17 @@ export function QualificacaoPage() {
                     const linha = (
                       <tr key={l.chave} data-linha={l.chave} data-situacao={v.situacao} className={styles.linha}>
                         {/* As ações moram embaixo do nome, que fica preso à esquerda: com a tabela
-                            rolada para o lado, o "Requalificar" continua à vista. */}
-                        <td className={styles.nome}>
+                            rolada para o lado, o "Requalificar" continua à vista. Uma ação
+                            principal; "Histórico" e "Papéis" no "Mais" (CTO-D1034f item 8). */}
+                        <td className={styles.nome} data-cartao="titulo">
                           {l.nome}
                           <div className={styles.acoesDaLinha}>
-                            {l.filial && podeQualificar && (
+                            {l.filial && podeQualificar ? (
                               <Button variant="outline" size="sm" onClick={() => setQualificando(l.filial)}>
                                 Requalificar
                               </Button>
-                            )}
-                            {l.filial ? (
-                              <Button variant="ghost" size="sm" onClick={() => setFicha(l.filial)}>
+                            ) : l.filial ? (
+                              <Button variant="outline" size="sm" onClick={() => setFicha(l.filial)}>
                                 Histórico
                               </Button>
                             ) : (
@@ -266,16 +298,19 @@ export function QualificacaoPage() {
                                 fora do cadastro
                               </span>
                             )}
-                            {/* Os papéis do fornecedor moram na linha aberta, junto dos critérios (CTO-D812). */}
-                            {material && v.ecrs.length > 0 && (
-                              <Button variant="ghost" size="sm" onClick={alternar} aria-expanded={aberto}>
-                                Papéis
-                              </Button>
-                            )}
+                            <Mais
+                              rotulo={`Mais ações de ${l.nome}`}
+                              acoes={[
+                                !!l.filial && podeQualificar && { rotulo: 'Histórico', aoEscolher: () => setFicha(l.filial) },
+                                // Os papéis do fornecedor moram na linha aberta, junto dos critérios (CTO-D812).
+                                material &&
+                                  v.ecrs.length > 0 && { rotulo: aberto ? 'Fechar os papéis' : 'Papéis', aoEscolher: alternar },
+                              ]}
+                            />
                           </div>
                         </td>
                         {comTipo && (
-                          <td className={styles.tipo}>
+                          <td className={styles.tipo} data-cartao="detalhe" data-rotulo="Tipo">
                             {v.tipo || '—'}
                             {material && v.ecrs.length > 0 && (
                               <div className={styles.ecrs} title={O_QUE_SAO_AS_ECRS} data-ecrs-qualificadas="">
@@ -284,12 +319,16 @@ export function QualificacaoPage() {
                             )}
                           </td>
                         )}
-                        <td className="mono">{dataBr(v.qualificadaEm)}</td>
-                        <td className="mono">{dataBr(v.venceEm)}</td>
+                        <td className="mono" data-cartao="detalhe" data-rotulo="Qualificada em">
+                          {dataBr(v.qualificadaEm)}
+                        </td>
+                        <td className="mono" data-cartao="detalhe" data-rotulo="Requalificar em">
+                          {dataBr(v.venceEm)}
+                        </td>
                         {[0, 1, 2].map((i) => {
                           const k = v.criterios[i];
                           return (
-                            <td key={i}>
+                            <td key={i} data-cartao="detalhe" data-rotulo={tituloCurtoDoCriterio(atual.criterios[i], i)}>
                               {k ? (
                                 <button
                                   type="button"
@@ -308,7 +347,7 @@ export function QualificacaoPage() {
                           );
                         })}
                         {/* A nota dos critérios, e embaixo as entregas avaliadas dos últimos 12 meses, com o nome (CTO-D805 A3). */}
-                        <td className={styles.nota}>
+                        <td className={styles.nota} data-cartao="detalhe" data-rotulo="Nota">
                           {v.nota} de {v.criterios.length || 3}
                           <div className={styles.minimo}>mínimo {v.minimo}</div>
                           <div className={styles.entregas} title={textoDoDesempenho(d)}>
@@ -316,11 +355,11 @@ export function QualificacaoPage() {
                             <span data-entregas="">{desempenhoCurto(d)}</span>
                           </div>
                         </td>
-                        <td className={styles.situacao}>
+                        <td className={styles.situacao} data-cartao="selo">
                           <SeloDaQualificacao selo={{ situacao: v.situacao, qualificadaEm: v.qualificadaEm, venceEm: v.venceEm, ecrs: v.ecrs }} />
                         </td>
                         {material && (
-                          <td>
+                          <td data-cartao="detalhe" data-rotulo="Permissão para compra">
                             <span className={styles.permissao} data-pode={l.podeComprar || undefined}>
                               {l.podeComprar ? 'Sim' : 'Não'}
                             </span>
@@ -332,7 +371,7 @@ export function QualificacaoPage() {
                     return [
                       linha,
                       <tr key={`${l.chave}-criterios`} className={styles.detalhe} data-criterios-de={l.chave}>
-                        <td colSpan={colunas}>
+                        <td colSpan={colunas} data-cartao="largo">
                           <ol className={styles.criterios}>
                             {v.criterios.map((k, i) => (
                               <li key={i}>

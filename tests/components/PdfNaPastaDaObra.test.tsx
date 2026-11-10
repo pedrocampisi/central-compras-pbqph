@@ -73,6 +73,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 import { useOcEditingStore } from '../../src/stores/useOcEditingStore';
 import { useUiStore } from '../../src/stores/useUiStore';
 import type { Data, Fornecedor } from '../../src/domain/types';
+import { acoesDoMais, itemDoMais } from './maisDaLinha';
 
 const COMARCO: Fornecedor = {
   ...normalizeFornecedor({ id: 'com', razao_social: 'COMARCO COMERCIAL (teste)' }),
@@ -179,8 +180,9 @@ async function emitir() {
 
 /** Clica no botão de mandar da OC e espera o aviso. */
 async function mandar(linha: HTMLElement, nome: string) {
+  const item = itemDoMais(linha, nome);
   await act(async () => {
-    fireEvent.click(within(linha).getByRole('button', { name: nome }));
+    fireEvent.click(item);
   });
   await waitFor(() => expect(toasts()).toHaveLength(1));
 }
@@ -260,7 +262,7 @@ describe('D685 — ao emitir, o Graph primeiro', () => {
 });
 
 describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => {
-  it('a OC na pasta mostra o ✓ com o link; a outra, "Não está"', async () => {
+  it('a OC na pasta mostra o ✓ com o link; a outra, "Não está na pasta da obra" (D1034f item 3)', async () => {
     pdfNaPasta.linhas = [{ oc_id: 'oc-teste', web_url: 'https://pasta-de-teste.invalid/oc.pdf', nome: NOME, gravado_em: '', vezes: 1 }];
     await act(async () => {
       render(<HistoricoPage />);
@@ -269,10 +271,10 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
     const link = within(linha).getByRole('link', { name: /Na pasta/ });
     expect(link.getAttribute('href')).toBe('https://pasta-de-teste.invalid/oc.pdf');
     expect(link.getAttribute('target')).toBe('_blank');
-    expect(within(linha).getByRole('button', { name: 'Reenviar' })).toBeTruthy();
+    expect(acoesDoMais(linha)).toContain('Reenviar para a pasta da obra');
     const outra = screen.getByText('2026/098').closest('tr')!;
-    expect(within(outra).getByText('Não está')).toBeTruthy();
-    expect(within(outra).getByRole('button', { name: 'Enviar' })).toBeTruthy();
+    expect(within(outra).getByText('Não está na pasta da obra')).toBeTruthy();
+    expect(acoesDoMais(outra)).toContain('Enviar para a pasta da obra');
   });
 
   it('o link que não é https não vira link', async () => {
@@ -285,15 +287,15 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
     expect(within(linha).getByText(/Na pasta/)).toBeTruthy();
   });
 
-  it('sem o ✓ lido (a tabela não respondeu), nenhuma OC aparece como "Não está"; o botão continua', async () => {
+  it('sem o ✓ lido (a tabela não respondeu), nenhuma OC aparece como "Não está na pasta da obra"; o botão continua', async () => {
     pdfNaPasta.erro = { message: 'relation "compras.oc_pdf_na_pasta" does not exist' };
     await act(async () => {
       render(<HistoricoPage />);
     });
-    expect(screen.queryByText('Não está')).toBeNull();
+    expect(screen.queryByText(/Não está/)).toBeNull();
     expect(screen.queryByRole('link', { name: /Na pasta/ })).toBeNull();
     const linha = screen.getByText('2026/099').closest('tr')!;
-    expect(within(linha).getByRole('button', { name: 'Enviar' })).toBeTruthy();
+    expect(acoesDoMais(linha)).toContain('Enviar para a pasta da obra');
   });
 
   it('quem só lê e o ✓ que não veio: nada debaixo do status', async () => {
@@ -313,7 +315,7 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
       render(<HistoricoPage />);
     });
     expect(screen.queryByRole('link', { name: /Na pasta/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: /^(Enviar|Reenviar)$/ })).toBeNull();
+    expect(acoesDoMais(screen.getByText('2026/099').closest('tr')!).filter((a) => /pasta da obra/.test(a))).toEqual([]);
   });
 
   it('"mandar de novo" chama a função com a OC e o nome; com 200 não baixa nada, e o ✓ é relido', async () => {
@@ -322,7 +324,7 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
     });
     pdfNaPasta.linhas = [{ oc_id: 'oc-teste', web_url: 'https://pasta-de-teste.invalid/oc.pdf', nome: NOME, gravado_em: '', vezes: 2 }];
     const linha = screen.getByText('2026/099').closest('tr')!;
-    await mandar(linha, 'Enviar');
+    await mandar(linha, 'Enviar para a pasta da obra');
     expect(funcao.chamadas.map((c) => [c.corpo['oc_id'], c.corpo['nome_arquivo']])).toEqual([['oc-teste', NOME]]);
     expect(salvos).toEqual([]);
     expect(toasts()).toEqual([`OC 2026/099: PDF guardado na pasta da obra como "${NOME}".`]);
@@ -335,7 +337,7 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
       render(<HistoricoPage />);
     });
     const linha = screen.getByText('2026/099').closest('tr')!;
-    await mandar(linha, 'Enviar');
+    await mandar(linha, 'Enviar para a pasta da obra');
     expect(salvos).toEqual([{ nome: NOME, pasta: false }]);
     expect(toasts()).toEqual([`OC 2026/099: ${FALHOU}`]);
   });
@@ -347,6 +349,6 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
       render(<HistoricoPage />);
     });
     expect(screen.getByRole('link', { name: /Na pasta/ })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /^(Enviar|Reenviar)$/ })).toBeNull();
+    expect(acoesDoMais(screen.getByText('2026/099').closest('tr')!).filter((a) => /pasta da obra/.test(a))).toEqual([]);
   });
 });
