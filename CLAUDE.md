@@ -112,11 +112,12 @@ pnpm typecheck
    React — foi ela que permitiu trocar arquivo por banco sem tocar em regra nenhuma. Mantenha
    assim.
 
-4. **Cor, sombra, raio e fonte vêm todos de `src/styles/tokens.css`.** Nada de cor solta dentro
-   de módulo. A fonte oficial do padrão visual é
-   `..\00_Diretrizes_e_padroes\Padrao_Front_end\`.
+4. **Cor, sombra, raio e fonte vêm todos dos tokens** (hoje `src/styles/tokens.css`; depois da pintura, a
+   cópia `padrao_campisi\tokens\tokens.css`). Nada de cor solta dentro de módulo. A fonte oficial do padrão
+   visual é `..\00_Diretrizes_e_padroes\Padrao_Front_end\DESIGN.md`, "Dia e noite".
 
-5. **Uma ação principal (laranja) por tela.** Qualquer segundo botão é de contorno.
+5. **Um destaque por tela** (DESIGN.md, seção 2): uma ação principal, e qualquer segundo botão é de
+   contorno. A cor dela é a do modo (âmbar de dia, ouro de noite), pela peça Botão.
 
 6. **Ícone é desenho, nunca emoji** — emoji desenha diferente em cada sistema e não aceita a cor
    do tema.
@@ -125,8 +126,14 @@ pnpm typecheck
    que será a porta de entrada da equipe. Aqui o login é só formulário, e some no dia em que a
    Central assumir a autenticação.
 
-8. **Movimento só em espera e no login.** E a espera só aparece depois de um quarto de segundo —
-   antes disso, pisca à toa.
+8. **O movimento aponta, e só o que o padrão manda** (DESIGN.md, seção 11): nada se mexe à toa, nunca na
+   tabela nem no dinheiro, e quem pediu menos movimento vê tudo parado. A espera só aparece depois de um
+   quarto de segundo — antes disso, pisca à toa.
+
+10. **O padrão visual é o "Dia e noite"** (Creme de dia, Marinho e Ouro de noite),
+    `..\00_Diretrizes_e_padroes\Padrao_Front_end\DESIGN.md` (D1018). **A pintura desta casa começa pela D1034**
+    (palavra do Pedro, 10/11/2026), em lotes, depois da D975 publicada. As peças entram só pela ferramenta
+    `copiar_para_casa.py`, nunca à mão; o modo de dia é o de partida.
 
 ---
 
