@@ -1,5 +1,9 @@
 # PENDENCIAS.md até 04/11/2026 — texto inteiro, como estava (D972)
 
+> **Data:** 04/11/2026
+> **Estado:** CONCLUÍDO
+> **Escopo:** o `PENDENCIAS.md` inteiro até 04/11/2026, como estava, guardado na limpeza da D972. Registro, não fila.
+>
 > **Por que existe:** a D972 do CTO mandou limpar o `PENDENCIAS.md` (476 linhas, teto 300). O texto abaixo é o de antes,
 > sem alteração; o vivo foi reescrito do zero só com o que segue aberto.
 >
@@ -489,4 +493,4 @@ segurou).
 
 ## Onde estão as fechadas
 
-Os itens fechados moram em [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.
+Os itens fechados moram em [`PENDENCIAS_FECHADAS.md`](PENDENCIAS_FECHADAS.md), inteiros e com a data, desde 26/09/2026 (CTO-D571). Item que fecha sai daqui no mesmo dia.
