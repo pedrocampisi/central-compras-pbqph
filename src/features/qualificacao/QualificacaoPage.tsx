@@ -20,6 +20,7 @@ import { Button } from '../../components/Button/Button';
 import { CampoPesquisavel } from '../../components/CampoPesquisavel/CampoPesquisavel';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import tabela from '../../components/DataTable/DataTable.module.css';
+import { tituloDoCriterio } from '../../domain/titulosDosCriterios';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Icon } from '../../components/Icon/Icon';
 import { ListToolbar, ToggleGroup } from '../../components/ListToolbar/ListToolbar';
@@ -75,27 +76,6 @@ const NOME_PADRAO: Record<Categoria, string> = {
 };
 
 type Filtro = 'todas' | 'pedem ação';
-
-/**
- * O título curto do critério no cabeçalho (CTO-D1034f item 8): "1. Atend…" não
- * se lia. O nome que vem do banco não muda; ele inteiro mora no "?" do título.
- */
-const CURTOS: [RegExp, string][] = [
-  [/^atend/i, 'Atendimento'],
-  [/^entreg/i, 'Entrega'],
-  [/^document/i, 'Documentos'],
-  [/^prazo/i, 'Prazo'],
-  [/pre[çc]o/i, 'Preço'],
-];
-function tituloCurtoDoCriterio(criterio: string | undefined, i: number): string {
-  const c = (criterio ?? '').trim();
-  if (!c) return `Critério ${i + 1}`;
-  const achado = CURTOS.find(([r]) => r.test(c));
-  if (achado) return achado[1];
-  if (c.length <= 12) return c;
-  const primeira = c.split(/\s+/)[0]!;
-  return primeira.length <= 12 ? primeira : `Critério ${i + 1}`;
-}
 
 export function QualificacaoPage() {
   const data = useDataStore((s) => s.data);
@@ -213,7 +193,7 @@ export function QualificacaoPage() {
           As qualificações não carregaram{erro ? ` (${erro})` : ''}. Recarregue a página para ver e qualificar.
         </p>
       ) : (
-        <div role="tabpanel" data-categoria={aba}>
+        <div role="tabpanel" data-categoria={aba} className="section">
           <div className={styles.barra}>
             <ListToolbar
               searchValue={busca}
@@ -261,7 +241,7 @@ export function QualificacaoPage() {
                       return (
                         <th key={i} className={styles.criterioTh} title={inteiro}>
                           <span className={styles.criterioTitulo}>
-                            {tituloCurtoDoCriterio(atual.criterios[i], i)}
+                            {tituloDoCriterio(aba, i)}
                             <Ajuda sobre={`Critério ${i + 1}`}>{`Critério ${i + 1}: ${inteiro}`}</Ajuda>
                           </span>
                         </th>
@@ -329,7 +309,7 @@ export function QualificacaoPage() {
                         {[0, 1, 2].map((i) => {
                           const k = v.criterios[i];
                           return (
-                            <td key={i} data-cartao="detalhe" data-rotulo={tituloCurtoDoCriterio(atual.criterios[i], i)}>
+                            <td key={i} data-cartao="detalhe" data-rotulo={tituloDoCriterio(aba, i)}>
                               {k ? (
                                 <button
                                   type="button"

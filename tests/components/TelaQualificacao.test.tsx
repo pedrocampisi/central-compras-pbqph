@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { PERGUNTAS_DOS_CRITERIOS } from '../../src/domain/titulosDosCriterios';
 
 /**
  * CTO-D661: a tela Qualificação, igual à planilha FO 8.4.1.1. As cinco abas,
@@ -77,11 +78,11 @@ const linha = (o: Partial<LinhaDeQualificacao>): LinhaDeQualificacao => ({
 });
 
 const CATEGORIAS: DadosDaQualificacao['categorias'] = [
-  { categoria: 'material', nome: 'Materiais', minimo: 2, criterios: ['Atende a ECR', 'Menor preço', 'Prazo'] },
-  { categoria: 'servico', nome: 'Serviço', minimo: 2, criterios: ['Documentação', 'EPI', 'Preço'] },
-  { categoria: 'controle_tecnologico', nome: 'Controle tecnológico', minimo: 1, criterios: ['Acreditação', 'NBR 17025', 'ISO 9001'] },
-  { categoria: 'projeto', nome: 'Projetos', minimo: 2, criterios: ['ART', 'NBR 15575', 'Preço'] },
-  { categoria: 'locacao', nome: 'Locação', minimo: 2, criterios: ['Contrato', 'Checklist', 'Preço'] },
+  { categoria: 'material', nome: 'Materiais', minimo: 2, criterios: [...PERGUNTAS_DOS_CRITERIOS.material] },
+  { categoria: 'servico', nome: 'Serviço', minimo: 2, criterios: [...PERGUNTAS_DOS_CRITERIOS.servico] },
+  { categoria: 'controle_tecnologico', nome: 'Controle tecnológico', minimo: 1, criterios: [...PERGUNTAS_DOS_CRITERIOS.controle_tecnologico] },
+  { categoria: 'projeto', nome: 'Projetos', minimo: 2, criterios: [...PERGUNTAS_DOS_CRITERIOS.projeto] },
+  { categoria: 'locacao', nome: 'Locação', minimo: 2, criterios: [...PERGUNTAS_DOS_CRITERIOS.locacao] },
 ];
 
 /** Alfa qualificada (com histórico atrás), Beta vencida, Gama desqualificada; um laboratório; Locação vazia. */
@@ -149,7 +150,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     render(<QualificacaoPage />);
     expect(cabecalho()).toEqual([
       'Fornecedor', 'Tipo', 'Qualificada em', 'Requalificar em',
-      'Atendimento', 'Preço', 'Prazo',
+      'Qualidade', 'Preço', 'Prazo',
       'Nota de desempenho', 'Situação', 'Permissão para compra',
     ]);
     const a = linhaDe('empresa-a').textContent!;
@@ -172,7 +173,7 @@ describe('CTO-D661 — as colunas da planilha', () => {
     render(<QualificacaoPage />);
     fireEvent.click(aba('controle_tecnologico'));
     expect(cabecalho()).toEqual([
-      'Fornecedor', 'Qualificada em', 'Requalificar em', 'Acreditação', 'NBR 17025', 'ISO 9001',
+      'Fornecedor', 'Qualificada em', 'Requalificar em', 'Acreditação', 'ISO 17025', 'ISO 9001',
       'Desempenho', 'Situação',
     ]);
   });
@@ -180,11 +181,11 @@ describe('CTO-D661 — as colunas da planilha', () => {
   it('o critério: "atende" ou "não atende", o texto e o motivo no passar do mouse e num clique', () => {
     render(<QualificacaoPage />);
     const botao = within(linhaDe('empresa-a')).getByRole('button', { name: 'Não atende' });
-    expect(botao.getAttribute('title')).toBe('Menor preço: não atende — mais caro (teste)');
+    expect(botao.getAttribute('title')).toBe('O fornecedor tem o menor preço de mercado?: não atende — mais caro (teste)');
     fireEvent.click(botao);
     const aberto = document.querySelector<HTMLElement>('[data-criterios-de="empresa-a"]')!;
-    expect(aberto.textContent).toContain('Atende a ECR: atende — atende a ECR (teste)');
-    expect(aberto.textContent).toContain('Menor preço: não atende — mais caro (teste)');
+    expect(aberto.textContent).toContain('O fornecedor atende no critério de qualidade?: atende — atende a ECR (teste)');
+    expect(aberto.textContent).toContain('O fornecedor tem o menor preço de mercado?: não atende — mais caro (teste)');
     expect(aberto.textContent).toContain('Qualificada por Pessoa de teste');
   });
 
@@ -350,12 +351,12 @@ describe('CTO-D805 A3 — a tela diz o que é cada coisa', () => {
 
   it('as perguntas dos critérios continuam as do PS.02: o título é curto, e o nome inteiro mora no "?" (CTO-D1034f item 8)', () => {
     render(<QualificacaoPage />);
-    expect(cabecalho().slice(4, 7)).toEqual(['Atendimento', 'Preço', 'Prazo']);
+    expect(cabecalho().slice(4, 7)).toEqual(['Qualidade', 'Preço', 'Prazo']);
     const ths = [...tabela().querySelectorAll<HTMLElement>('thead th')].slice(4, 7);
-    expect(ths.map((th) => th.title)).toEqual(['Atende a ECR', 'Menor preço', 'Prazo']);
+    expect(ths.map((th) => th.title)).toEqual([...PERGUNTAS_DOS_CRITERIOS.material]);
     const ajuda = within(ths[1]!).getByRole('button', { name: 'Ajuda: Critério 2' });
     fireEvent.click(ajuda);
-    expect(within(ths[1]!).getByRole('note').textContent).toContain('Critério 2: Menor preço');
+    expect(within(ths[1]!).getByRole('note').textContent).toContain('Critério 2: O fornecedor tem o menor preço de mercado?');
   });
 
   it('a linha tem uma ação principal; "Histórico" e "Papéis" no "Mais" (CTO-D1034f item 8)', () => {

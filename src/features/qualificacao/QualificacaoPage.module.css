@@ -60,7 +60,7 @@
   min-width: 0;
 }
 .soLeitura {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 13px;
   color: var(--tinta-suave);
 }
@@ -78,9 +78,10 @@
 .tabela td { vertical-align: top; }
 .tabela tbody td { padding: 10px 6px; }
 .tabela thead th {
-  padding: 0 6px 8px;
+  /* A altura do cabeçalho das outras listas (cp-tabela: 10 px em cima e embaixo),
+     sem o espaçamento de caixa alta que sobrou de antes (CTO-D1034n). */
+  padding: 10px 6px;
   white-space: normal;
-  letter-spacing: 0.06em;
   vertical-align: bottom;
 }
 .tabela th:first-child,
@@ -121,17 +122,19 @@
 
 /* O cabeçalho do critério: o texto da planilha, em até duas linhas; inteiro no passar do mouse. */
 .tabela thead th.criterioTh {
-  min-width: 70px;
-  max-width: 120px;
+  min-width: 112px;
+  max-width: 140px;
 }
 /* O título curto do critério, inteiro, e o "?" com o nome completo (CTO-D1034f item 8). */
 .criterioTitulo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  letter-spacing: 0.04em;
+  /* Em bloco, e não em flex: o "?" anda junto da última palavra, e um título de
+     duas palavras fica em duas linhas, sem o "?" sozinho numa terceira (D1034n). */
+  display: block;
   line-height: 1.35;
+}
+.criterioTitulo > span > button {
+  margin-left: 4px;
+  vertical-align: middle;
 }
 .marca {
   padding: 2px 6px;

@@ -53,7 +53,7 @@ beforeEach(() => {
   useOcEditingStore.getState().stopEditing();
 });
 
-const tsx = readFileSync('src/features/ordens-compra/NovaOcPage.tsx', 'utf-8');
+const tsx = readFileSync('src/features/ordens-compra/NovaOcPage.tsx', 'utf-8').replace(/\r\n/g, '\n');
 const css = readFileSync('src/features/ordens-compra/NovaOcPage.module.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
 const candidatas = readFileSync('src/styles/candidatas.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
 const alto = () => document.querySelector<HTMLElement>('.section-header')!;
