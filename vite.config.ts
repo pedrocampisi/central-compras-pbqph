@@ -53,7 +53,7 @@ export default defineConfig(() => {
     gravarVersao(versao),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['marca/brasao.png', 'marca/mascote-rosto.png', 'icons/*.png'],
+      includeAssets: ['marca/mascote-rosto.png', 'icons/*.png'],
       manifest: {
         name: 'Central de Compras PBQP-H',
         short_name: 'Central Compras',
@@ -80,7 +80,18 @@ export default defineConfig(() => {
         // Os quadros do martelo (133 KB) ficam fora do pacote pré-carregado:
         // só aparecem em espera acima de 250ms, e o próprio loader os busca
         // na hora.
-        globIgnores: ['**/marca/loader-quadro-*.png'],
+        globIgnores: [
+          '**/marca/loader-quadro-*.png',
+          // Desde a pintura (D1034) o brasão e o mascote vêm da cópia do padrão
+          // (padrao_campisi/). Ficam fora do pré-carregado as figuras que
+          // nenhuma tela usa: as antigas da casa e as do pacote que a OC não
+          // mostra. O arquivo continua no servidor; só não desce de antemão.
+          'marca/brasao.png',
+          'marca/brasao-nome.png',
+          'marca/mascote-corpo.png',
+          'padrao_campisi/marca/brasao-nome.png',
+          'padrao_campisi/mascote/mascote-rosto.png',
+        ],
         // Large chunks — cache them longer
         runtimeCaching: [
           {

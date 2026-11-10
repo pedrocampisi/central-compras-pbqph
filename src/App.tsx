@@ -8,7 +8,7 @@
  * arquivo": os botões de Conectar/Salvar da era do JSON saíram junto.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react';
 import styles from './App.module.css';
 
 // Stores
@@ -30,7 +30,6 @@ import { recarregarDados } from './services/supabase/sync';
 
 // Hooks
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { useTema } from './hooks/useTema';
 
 // Components
 import { ToastContainer } from './components/Toast/Toast';
@@ -67,7 +66,8 @@ interface NavItem {
 }
 
 const NAV_COMPRAS: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  // "Painel", e não "Dashboard": o nome da tela em português, igual no menu e no título (D1034c, item 2).
+  { id: 'dashboard', label: 'Painel', icon: 'dashboard' },
   { id: 'nova-oc', label: 'Nova OC', icon: 'plus' },
   { id: 'historico', label: 'Histórico', icon: 'history' },
   // O que chegou na obra sem pedido, para ligar à OC ou descartar (CTO-D696 §5.2).
@@ -139,7 +139,30 @@ export default function App() {
   /** Dentro do ícone, a tela de entrada é a do QR; quem tem senha pede o formulário. */
   const [usarSenha, setUsarSenha] = useState(false);
 
-  const { escuro, alternar } = useTema();
+  // O menu vira gaveta abaixo de 960 px (DESIGN.md §9, peça MenuLateral): o botão
+  // de três traços abre; o véu, o Esc e a escolha de uma tela fecham, e o foco volta ao botão.
+  const [menuAberto, setMenuAberto] = useState(false);
+  const botaoDoMenu = useRef<HTMLButtonElement>(null);
+  const fecharMenu = useCallback(() => setMenuAberto(false), []);
+  const irPara = useCallback(
+    (aba: TabId) => {
+      setTab(aba);
+      if (menuAberto) fecharMenu();
+    },
+    [setTab, menuAberto, fecharMenu],
+  );
+  // Com a gaveta aberta o resto fica fora do alcance (inert): o foco entra nela, na tela da vez.
+  // Ao fechar, o foco volta ao botão de três traços, depois que o inert sai (antes, o foco não pega).
+  const menuJaAbriu = useRef(false);
+  useEffect(() => {
+    if (!menuAberto) {
+      if (menuJaAbriu.current) botaoDoMenu.current?.focus();
+      return;
+    }
+    menuJaAbriu.current = true;
+    const menu = document.getElementById('menu-lateral');
+    (menu?.querySelector<HTMLElement>('.cp-item.ativo') ?? menu?.querySelector<HTMLElement>('button'))?.focus();
+  }, [menuAberto]);
 
   // O número no item Recebimentos (CTO-D845 §2): as entregas sem papel do fornecedor. Só para
   // quem emite OC (a régua da lista no banco), e lido de novo quando os dados mudam.
@@ -309,7 +332,26 @@ export default function App() {
 
   useKeyboardShortcuts({
     onNewOC: () => setTab('nova-oc'),
+    onEsc: () => {
+      if (menuAberto) fecharMenu();
+    },
   });
+
+  // A tecla "/" leva o cursor à busca da lista, de qualquer lugar da tela, como na
+  // Central (DESIGN.md §14). Dentro de um campo, a barra é só uma barra.
+  useEffect(() => {
+    const naBarra = (e: KeyboardEvent) => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const alvo = e.target;
+      if (alvo instanceof Element && alvo.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const busca = document.querySelector<HTMLInputElement>('main .cc-busca input');
+      if (!busca) return;
+      e.preventDefault();
+      busca.focus();
+    };
+    window.addEventListener('keydown', naBarra);
+    return () => window.removeEventListener('keydown', naBarra);
+  }, []);
 
   // ── Portões de entrada ─────────────────────────────────────────────────────
 
@@ -381,119 +423,115 @@ export default function App() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  const NavBotao = (item: NavItem) => (
+    <button
+      key={item.id}
+      type="button"
+      className={['cp-item', activeTab === item.id ? 'ativo' : ''].join(' ')}
+      aria-current={activeTab === item.id ? 'page' : undefined}
+      onClick={() => irPara(item.id)}
+    >
+      <Icon name={item.icon} size={19} />
+      <span>{item.label}</span>
+      {/* O número no item Recebimentos (CTO-D845 §2): o que espera o escritório, no fim da linha. */}
+      {item.id === 'recebimentos' && semPapel > 0 && (
+        <b className={styles.contador} data-contador-sem-papel="" title={`${semPapel} sem papel do fornecedor`}>
+          {semPapel}
+        </b>
+      )}
+    </button>
+  );
+
   return (
     <div className={styles.layout}>
-      {/* ── Sidebar ───────────────────────────────────────────────── */}
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>
-          <div className={styles.logoWrap}>
-            <img
-              src={`${import.meta.env.BASE_URL}marca/brasao.png`}
-              alt="Campisi Engenharia"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          </div>
-          <div>
-            <div className={styles.brandName}>Compras</div>
-            <div className={styles.brandSub}>Campisi</div>
-          </div>
+      {/* ── O menu: a peça MenuLateral do pacote; no celular, a gaveta do pacote ── */}
+      <div className={['cp-veu', menuAberto ? 'aberto' : ''].join(' ')} onClick={fecharMenu} aria-hidden />
+      <aside
+        id="menu-lateral"
+        className={['cp-lateral', 'cp-gaveta', styles.sidebar, menuAberto ? 'aberta' : ''].join(' ')}
+        style={{ '--brasao': `url(${import.meta.env.BASE_URL}padrao_campisi/marca/brasao.png)` } as CSSProperties}
+      >
+        <div className="cp-marca">
+          <span className="cp-brasao" role="img" aria-label="Campisi Engenharia" />
+          <span>
+            <b>Compras</b>
+            <small className={styles.marcaSub}>Campisi · PBQP-H Nível A</small>
+          </span>
         </div>
 
-        <div className={styles.pbqphBadge}>
-          <span className={styles.pbqphDot} />
-          <span className={styles.pbqphLabel}>PBQP-H Nível A</span>
-        </div>
-
-        <nav id="tabsNav">
-          <div className={styles.navLabel}>Compras</div>
-          {NAV_COMPRAS.filter((item) => item.id !== 'mestres' || podeGerirMestre(perfil?.papel)).map((item) => (
-            <button
-              key={item.id}
-              className={[styles.tabBtn, activeTab === item.id ? styles.active : ''].join(' ')}
-              onClick={() => setTab(item.id)}
-            >
-              <Icon name={item.icon} />
-              {/* Antes do nome, de propósito: no menu estreito o nome some, e o número fica sobre o ícone. */}
-              {item.id === 'recebimentos' && semPapel > 0 && (
-                <b className={styles.contador} data-contador-sem-papel="" title={`${semPapel} sem papel do fornecedor`}>
-                  {semPapel}
-                </b>
-              )}
-              <span>{item.label}</span>
-            </button>
-          ))}
-          <div className={styles.navLabel}>Sistema</div>
-          {NAV_SISTEMA.map((item) => (
-            <button
-              key={item.id}
-              className={[styles.tabBtn, activeTab === item.id ? styles.active : ''].join(' ')}
-              onClick={() => setTab(item.id)}
-            >
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </button>
-          ))}
+        <nav id="tabsNav" className={styles.menu} aria-label="Telas da Central de Compras">
+          <p className="cp-grupo">Compras</p>
+          <div className="cp-nav">
+            {NAV_COMPRAS.filter((item) => item.id !== 'mestres' || podeGerirMestre(perfil?.papel)).map(NavBotao)}
+          </div>
+          <p className={`cp-grupo ${styles.grupoSeguinte}`}>Sistema</p>
+          <div className="cp-nav">{NAV_SISTEMA.map(NavBotao)}</div>
         </nav>
 
-        {/* Rodapé da lateral — quem está logado, tema e ações de sessão */}
-        <div className={styles.sidebarFooter}>
-          <div className={styles.sfIdentidade}>
-            <div className={styles.avatar} aria-hidden="true">
+        {/* O pé do menu: a troca de modo (peça TrocaDeModo), o Recarregar e quem está usando. */}
+        <div className={styles.pe}>
+          <button className="cp-item cp-modo" type="button" data-trocar-modo>
+            <span className="sol"><Icon name="sun" size={19} /></span>
+            <span className="lua"><Icon name="moon" size={19} /></span>
+            <span className="vai-dia">Modo diurno</span>
+            <span className="vai-noite">Modo noturno</span>
+          </button>
+          <button className="cp-item" type="button" onClick={() => void handleRecarregar()}>
+            <Icon name="reload" size={19} /> Recarregar os dados
+          </button>
+          <div className="cp-usuario">
+            <span className="cp-mono" aria-hidden="true">
               {iniciais(perfil?.nome ?? '', sessao.user.email ?? '')}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div className={styles.sfNome} title={sessao.user.email ?? ''}>
-                {perfil?.nome || sessao.user.email || '—'}
-              </div>
-              <div className={styles.sfPapel}>{perfil ? PAPEL_LABEL[perfil.papel] : '—'}</div>
-            </div>
-            <button
-              className={styles.temaBtn}
-              onClick={alternar}
-              title={escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro'}
-              aria-label={escuro ? 'Mudar para o tema claro' : 'Mudar para o tema escuro'}
-            >
-              <Icon name={escuro ? 'moon' : 'sun'} size={16} />
-            </button>
-          </div>
-          <div className={styles.sfActions}>
-            <button className={styles.btnGhostSm} onClick={() => void handleRecarregar()}>
-              <Icon name="reload" size={13} /> Recarregar
-            </button>
-            <button className={styles.btnGhostSm} onClick={() => void handleSair()}>
-              <Icon name="logout" size={13} /> Sair
+            </span>
+            <span className={styles.quem}>
+              <b title={sessao.user.email ?? ''}>{perfil?.nome || sessao.user.email || '—'}</b>
+              <small>{perfil ? PAPEL_LABEL[perfil.papel] : '—'}</small>
+            </span>
+            <button type="button" className="cp-icone" onClick={() => void handleSair()} aria-label="Sair" title="Sair">
+              <Icon name="logout" size={17} />
             </button>
           </div>
         </div>
       </aside>
 
       {/* ── Main ──────────────────────────────────────────────────── */}
-      <div className={styles.mainWrapper}>
+      <div className={styles.mainWrapper} inert={menuAberto}>
         {/* Topbar */}
         <header className={styles.topbar}>
+          <button
+            ref={botaoDoMenu}
+            type="button"
+            className={`cp-icone ${styles.abrirMenu}`}
+            aria-label="Abrir o menu"
+            title="Abrir o menu"
+            aria-expanded={menuAberto}
+            aria-controls="menu-lateral"
+            onClick={() => setMenuAberto(true)}
+          >
+            <Icon name="menu" size={18} />
+          </button>
           {/* O nome da tela mora no cabeçalho da página, uma vez só (CTO-D643):
               a barra diz de que sistema é, e o estado do banco. */}
           <div className={styles.topbarContext}>Central de Compras</div>
           <div className={styles.topbarRight}>
-            <div className={styles.syncChip}>
-              <span className={styles.chipDot} />
-              Banco conectado
-            </div>
+            {/* Com a carga falhada o selo não diz "conectado" (D1034a): dizia, por cima do aviso de erro. */}
+            {erroDados ? (
+              <span className="cp-selo cp-selo--erro">Dados não carregaram</span>
+            ) : (
+              <span className="cp-selo cp-selo--pronto">Banco conectado</span>
+            )}
           </div>
         </header>
 
         {/* Content */}
         <main className={styles.mainContent}>
           {erroDados && (
-            <div className={styles.banner}>
-              <span>{erroDados}</span>
-              <button
-                className="btn-secondary"
-                style={{ padding: '5px 12px', fontSize: 12 }}
-                onClick={() => void handleRecarregar()}
-              >
+            <div className="cp-faixa erro" role="alert">
+              <Icon name="alerta" size={20} />
+              <span className={styles.faixaTexto}>
+                <b>Os dados não carregaram.</b> {erroDados} Não conclua que uma OC ou um cadastro não existe.
+              </span>
+              <button type="button" className="cp-btn cp-btn--contorno cp-btn--p" onClick={() => void handleRecarregar()}>
                 Tentar de novo
               </button>
             </div>

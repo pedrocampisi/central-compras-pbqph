@@ -1,29 +1,29 @@
-/* Reset minimalista + base do padrão Campisi.
- * As fontes (Source Serif 4 + Albert Sans) são carregadas no index.html, com
- * preconnect — @import dentro do CSS atrasa o primeiro texto na tela. */
-
-* {
-  box-sizing: border-box;
-}
+/* O que a casa ainda acrescenta à base do padrão.
+ *
+ * A base (fundo, tinta, letra, seleção, foco, barra de rolagem fina) é do
+ * `componentes.css` do pacote, que carrega antes deste arquivo (DESIGN.md §15:
+ * a casa não redesenha a moldura da peça). Aqui fica só o que o pacote não diz.
+ *
+ * A letra do corpo continua em 14 px até o lote (c): as telas dos lotes (b) e
+ * (c) ainda medem tudo a partir dela. As peças do padrão medem em rem e não
+ * dependem disto. */
 
 html,
 body {
   margin: 0;
   height: 100%;
-  background: var(--fundo);
-  color: var(--texto);
-  font-family: var(--fonte-sans);
+}
+body {
   font-size: 14px;
   line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* Títulos na serifada; o peso e o tamanho ficam com cada tela. */
+/* Títulos na letra de título do modo; o peso e o tamanho ficam com cada tela. */
 h1,
 h2,
 h3 {
-  font-family: var(--fonte-display);
-  color: var(--texto);
+  font-family: var(--font-display);
+  color: var(--tinta);
 }
 
 button,
@@ -44,28 +44,12 @@ button {
 }
 
 a {
-  color: var(--marca);
-}
-
-/* Acabamento obrigatório do padrão — as superfícies que o navegador desenha
- * também são da marca. */
-::selection {
-  background: var(--marca-media);
+  color: var(--ouro-tinta);
 }
 
 input,
 textarea {
-  caret-color: var(--marca);
-}
-
-:focus-visible {
-  outline: 2px solid var(--marca);
-  outline-offset: 2px;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--borda-forte) transparent;
+  caret-color: var(--ouro-tinta);
 }
 
 .hidden {
@@ -76,13 +60,11 @@ textarea {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--borda-forte);
+  background: var(--linha-controle);
   border-radius: var(--raio-pill);
 }
 

@@ -2,21 +2,23 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 /**
- * A moldura (o topo e o menu) na tela estreita (CTO-D579). O jsdom não mede
- * tela, então a trava lê as regras que causaram os dois defeitos medidos no
- * navegador, a 375 e a 768:
+ * A moldura (o topo e o menu) na tela estreita. O jsdom não mede tela, então a
+ * trava lê as regras.
  *
- *   - o topo tinha altura presa de 68px. A 375, o título "Nova Ordem de Compra"
- *     quebrava em quatro linhas e passava por cima do título da página; no
- *     Dashboard, o selo "Banco conectado" saía cortado na borda direita;
- *   - o rodapé do menu punha o avatar e o botão do tema lado a lado (32 + 10 +
- *     34 = 76px) num menu de 44px por dentro. A fila centrada passava dos dois
- *     lados e o avatar saía cortado pela esquerda — sem rolagem, calado.
+ * Os dois defeitos medidos no navegador em 2026, a 375 e a 768 (CTO-D579),
+ * continuam travados:
+ *   - o topo tinha altura presa de 68px. A 375, o título quebrava e passava por
+ *     cima da página, e o selo "Banco conectado" saía cortado na borda direita;
+ *   - o rodapé do menu estreito (64 px) não cabia o avatar e o botão do tema.
  *
- * O conserto mora só na regra da tela estreita: a 1280 e a 1920 nada muda.
+ * Desde a pintura "Dia e noite" (D1034, lote a), o menu estreito de ícones saiu:
+ * abaixo de 960 px o menu é a gaveta do pacote (cp-gaveta), que entra pela
+ * esquerda com o véu atrás (DESIGN.md §9, peça MenuLateral). De 961 px para
+ * cima, o mesmo <aside> é o menu fixo de 272 px, e a gaveta fica desligada.
  */
 
 const semComentario = readFileSync('src/App.module.css', 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '');
+const app = readFileSync('src/App.tsx', 'utf-8');
 
 /** O miolo de um `@media (...)`, pelas chaves. */
 function bloco(css: string, cabeca: string) {
@@ -30,9 +32,6 @@ function bloco(css: string, cabeca: string) {
   }
   throw new Error(`${cabeca} sem fim`);
 }
-
-const estreita = bloco(semComentario, '@media (max-width: 900px)');
-const base = semComentario.slice(0, estreita.de) + semComentario.slice(estreita.ate);
 
 type Regra = { seletores: string[]; corpo: string };
 const regrasDe = (css: string): Regra[] =>
@@ -49,37 +48,19 @@ function vale(regras: Regra[], seletor: string, prop: string) {
   for (const r of regras) if (r.seletores.includes(seletor)) achado = valor(r.corpo, prop) ?? achado;
   return achado;
 }
-const px = (v: string | undefined) => {
-  const m = v?.match(/^(-?\d+(?:\.\d+)?)(px)?$/);
-  if (!m) throw new Error(`não é medida em px: ${v}`);
-  return Number(m[1]);
-};
 
-/** Respiro horizontal (esquerda + direita), com o atalho `padding` e os lados por cima. */
-function respiroDeLado(regrasEmOrdem: Regra[], seletor: string) {
-  let esq = 0;
-  let dir = 0;
-  for (const r of regrasEmOrdem) {
-    if (!r.seletores.includes(seletor)) continue;
-    const atalho = valor(r.corpo, 'padding')?.split(/\s+/);
-    if (atalho) {
-      const [, d = atalho[0], , e = d] = atalho;
-      dir = px(d);
-      esq = px(e);
-    }
-    const pe = valor(r.corpo, 'padding-left');
-    const pd = valor(r.corpo, 'padding-right');
-    if (pe) esq = px(pe);
-    if (pd) dir = px(pd);
-  }
-  return esq + dir;
-}
-
+const estreita = bloco(semComentario, '@media (max-width: 960px)');
+const larga = bloco(semComentario, '@media (min-width: 961px)');
+// A base é o que fica fora dos @media de largura: o que vale em toda tela.
+const [primeiro, segundo] = [larga, estreita].sort((a, b) => a.de - b.de) as [typeof larga, typeof estreita];
+const base =
+  semComentario.slice(0, primeiro.de) + semComentario.slice(primeiro.ate, segundo.de) + semComentario.slice(segundo.ate);
 const naBase = regrasDe(base);
 const naEstreita = [...naBase, ...regrasDe(estreita.miolo)];
+const naLarga = [...naBase, ...regrasDe(larga.miolo)];
 
 describe('D579 — o topo não prende a altura na tela estreita', () => {
-  it('a 900px ou menos o topo cresce com o que tem dentro', () => {
+  it('a 960px ou menos o topo cresce com o que tem dentro', () => {
     const altura = vale(naEstreita, '.topbar', 'height');
     expect(altura === undefined || altura === 'auto', `height: ${altura}`).toBe(true);
     expect(vale(naEstreita, '.topbar', 'min-height')).toBe('68px');
@@ -89,32 +70,52 @@ describe('D579 — o topo não prende a altura na tela estreita', () => {
     expect(vale(naEstreita, '.topbar', 'flex-wrap')).toBe('wrap');
   });
 
-  // "A 700px ou menos o título diminui" saiu com a D643: a barra não tem mais o
-  // título da tela, que mora no cabeçalho da página (TituloUmaVez.test.tsx).
   it('a barra não tem regra de título: o nome da tela saiu dela (CTO-D643)', () => {
     expect(semComentario).not.toContain('.topbarTitle');
   });
-});
 
-describe('D579 — o avatar cabe no menu estreito', () => {
-  const lateral = px(vale(naEstreita, '.sidebar', 'width'));
-  const porDentro = lateral - respiroDeLado(naEstreita, '.sidebar') - respiroDeLado(naEstreita, '.sidebarFooter');
-  const avatar = px(vale(naEstreita, '.avatar', 'width'));
-  const tema = px(vale(naEstreita, '.temaBtn', 'width'));
-
-  it('o avatar e o botão do tema cabem, um em cima do outro ou lado a lado', () => {
-    const coluna = vale(naEstreita, '.sfIdentidade', 'flex-direction') === 'column';
-    const precisa = coluna ? Math.max(avatar, tema) : avatar + px(vale(naEstreita, '.sfIdentidade', 'gap')) + tema;
-    expect(precisa, `${coluna ? 'coluna' : 'fila'} de ${precisa}px num rodapé de ${porDentro}px`).toBeLessThanOrEqual(
-      porDentro,
-    );
+  it('fora da tela estreita, o topo segue com 68px presos', () => {
+    expect(vale(naLarga, '.topbar', 'height')).toBe('68px');
+    expect(vale(naLarga, '.topbar', 'flex-wrap')).toBeUndefined();
   });
 });
 
-describe('D579 — a 1280 e a 1920 nada muda', () => {
-  it('fora da tela estreita, o topo segue com 68px presos e o rodapé do menu em fila', () => {
-    expect(vale(naBase, '.topbar', 'height')).toBe('68px');
-    expect(vale(naBase, '.topbar', 'flex-wrap')).toBeUndefined();
-    expect(vale(naBase, '.sfIdentidade', 'flex-direction')).toBeUndefined();
+describe('D1034 — abaixo de 960 px o menu é a gaveta do pacote', () => {
+  it('o mesmo <aside> leva as duas peças: o menu (cp-lateral) e a gaveta (cp-gaveta)', () => {
+    const aside = app.match(/<aside[\s\S]*?>/)?.[0] ?? '';
+    expect(aside).toContain("'cp-lateral'");
+    expect(aside).toContain("'cp-gaveta'");
+    expect(aside).toContain('id="menu-lateral"');
+  });
+
+  it('o botão de três traços abre a gaveta, diz se está aberta e aponta para o menu', () => {
+    expect(app).toMatch(/aria-label="Abrir o menu"[\s\S]{0,200}aria-expanded=\{menuAberto\}[\s\S]{0,80}aria-controls="menu-lateral"/);
+    expect(vale(naBase, '.abrirMenu', 'display')).toBe('none');
+    expect(vale(naEstreita, '.abrirMenu', 'display')).toBe('grid');
+  });
+
+  it('com a gaveta aberta, o resto da tela sai do alcance do teclado (DESIGN.md §14)', () => {
+    expect(app).toContain('inert={menuAberto}');
+  });
+
+  it('de 961 px para cima a gaveta fica desligada: o menu fixo de 272 px, sempre à vista', () => {
+    expect(vale(naLarga, '.sidebar', 'position')).toBe('relative');
+    expect(vale(naLarga, '.sidebar', 'transform')).toBe('none');
+    expect(vale(naLarga, '.sidebar', 'visibility')).toBe('visible');
+    expect(vale(naLarga, '.sidebar', 'width')).toBe('272px');
+  });
+
+  it('a 375 a gaveta tem largura para o avatar, o nome e o botão de sair numa linha', () => {
+    expect(vale(naEstreita, '.sidebar', 'width')).toBe('min(300px, 86vw)');
+    const gaveta = Math.min(300, 0.86 * 375);
+    const porDentro = gaveta - 2 * 16 - 2 * 10; // o respiro do cp-lateral e o do cp-usuario
+    const precisa = 40 + 12 + 44 + 12 + 60; // iniciais, vão, sair, vão e o mínimo do nome
+    expect(precisa).toBeLessThanOrEqual(porDentro);
+  });
+});
+
+describe('D1034a — o selo do alto não diz "conectado" quando a carga falhou', () => {
+  it('com erro nos dados o selo é o de erro; sem erro, o de pronto', () => {
+    expect(app).toMatch(/erroDados \? \(\s*<span className="cp-selo cp-selo--erro">Dados não carregaram<\/span>\s*\) : \(\s*<span className="cp-selo cp-selo--pronto">Banco conectado<\/span>/);
   });
 });

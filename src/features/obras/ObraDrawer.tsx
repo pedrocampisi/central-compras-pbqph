@@ -161,10 +161,10 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
             flex: 1,
             padding: '7px 10px',
             borderRadius: 7,
-            border: handleConnected ? '1px solid var(--green)' : '1px solid var(--border)',
-            background: handleConnected ? 'var(--green-bg)' : 'var(--surface-alt)',
-            fontSize: 12,
-            color: form.pasta_oc_path ? 'var(--text)' : 'var(--text-muted)',
+            border: handleConnected ? '1px solid var(--sucesso)' : '1px solid var(--linha)',
+            background: handleConnected ? 'var(--sucesso-fundo)' : 'var(--painel)',
+            fontSize: 13,
+            color: form.pasta_oc_path ? 'var(--tinta)' : 'var(--tinta-suave)',
             fontFamily: 'monospace',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -173,7 +173,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
             alignItems: 'center',
             gap: 6,
           }}>
-            {handleConnected && <span style={{ color: 'var(--green)', fontWeight: 700 }}>✓</span>}
+            {handleConnected && <span style={{ color: 'var(--sucesso)', fontWeight: 700 }}>✓</span>}
             {form.pasta_oc_path || 'Nenhuma pasta selecionada'}
           </div>
           <Button variant="outline" size="sm" onClick={handlePickPasta}>
@@ -185,7 +185,7 @@ export function ObraDrawer({ open, obra, onClose }: Props) {
             </Button>
           )}
         </div>
-        <p style={{ gridColumn: '1 / -1', fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
+        <p style={{ gridColumn: '1 / -1', fontSize: 13, color: 'var(--tinta-suave)', margin: 0 }}>
           {handleConnected
             ? 'PDFs desta obra serão salvos nesta pasta. Se a pasta estiver no OneDrive, sincroniza para a nuvem automaticamente.'
             : 'Selecione a pasta da obra (ex: OneDrive\\…\\JARDIM IPANEMA II\\notas\\Ordem de Compra). PDFs serão salvos lá automaticamente.'}

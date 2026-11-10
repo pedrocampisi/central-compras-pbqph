@@ -19,14 +19,17 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--texto-muted);
+  color: var(--tinta-suave);
   cursor: pointer;
+  transition:
+    color var(--dur-resposta),
+    background-color var(--dur-resposta);
 }
 .limpar:hover {
-  background: var(--marca-fraca);
-  color: var(--texto);
+  background: var(--ouro-suave);
+  color: var(--ouro-tinta);
 }
 .limpar:focus-visible {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 1px;
 }

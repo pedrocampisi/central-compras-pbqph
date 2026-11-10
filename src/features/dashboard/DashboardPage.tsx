@@ -1,5 +1,5 @@
 /**
- * Aba Dashboard — resumo de OCs recentes e indicadores.
+ * O Painel — resumo de OCs recentes e indicadores.
  * Cards: total de OCs, emitidas, rascunhos, volume, fornecedores ativos (empresas), obras ativas.
  * Listas: últimas 8 OCs, top 5 fornecedores por valor e OCs por obra.
  * No topo, para quem revisa ECR, as tratativas abertas (CTO-D613 §3).
@@ -90,44 +90,30 @@ export function DashboardPage() {
       {/* O título da tela, uma vez só (CTO-D643): antes, só a barra do alto o dizia. */}
       <div className={`section-header ${styles.cabeca}`}>
         <div>
-          <h2>Dashboard</h2>
+          <h2>Painel</h2>
         </div>
       </div>
 
       {/* O que espera ação vem primeiro: só para quem revisa ECR (CTO-D613 §3). */}
       <TratativasAbertas />
 
-      {/* Summary strip */}
+      {/* Os números da casa, na peça Métrica do padrão (D1034): o número grande,
+          a legenda embaixo e um fio em cima, sem caixa em volta. Aparecem
+          prontos: a contagem é animação, e a casa não liga animação (regra 8). */}
       <div className={styles.strip}>
-        <div className={styles.tile}>
-          <small>Total OCs</small>
-          <div className={styles.tileValue}>{ocs.length}</div>
-        </div>
-        <div className={styles.tile}>
-          <small>Emitidas</small>
-          <div className={styles.tileValue}>{emitidas}</div>
-        </div>
-        <div className={styles.tile}>
-          <small>Rascunhos</small>
-          <div className={styles.tileValue}>{rascunhos}</div>
-        </div>
-        <div className={styles.tile}>
-          <small>Volume total (exceto canceladas)</small>
-          <div className={styles.tileValue} style={{ fontSize: 18 }}>{formatBrl(totalGeral)}</div>
-        </div>
-        <div className={styles.tile}>
-          <small>Fornecedores</small>
-          {/* Conta EMPRESAS com alguma filial ativa, como a lista de Fornecedores
-              (CTO-D644; a regra da D501): três filiais da mesma empresa são um
-              fornecedor. Contava filiais. */}
-          <div className={styles.tileValue} data-fornecedores-ativos>
-            {agruparPorEmpresa(data.fornecedores.filter((f) => f.ativo)).length}
-          </div>
-        </div>
-        <div className={styles.tile}>
-          <small>Obras ativas</small>
-          <div className={styles.tileValue}>{data.obras.filter((o) => o.ativa).length}</div>
-        </div>
+        <Metrica num={ocs.length} cap="ordens de compra no total" />
+        <Metrica num={emitidas} cap="emitidas" />
+        <Metrica num={rascunhos} cap="rascunhos" />
+        <Metrica num={formatBrl(totalGeral)} cap="de volume total, sem as canceladas" dinheiro />
+        {/* Conta EMPRESAS com alguma filial ativa, como a lista de Fornecedores
+            (CTO-D644; a regra da D501): três filiais da mesma empresa são um
+            fornecedor. Contava filiais. */}
+        <Metrica
+          num={agruparPorEmpresa(data.fornecedores.filter((f) => f.ativo)).length}
+          cap="fornecedores ativos"
+          marca="data-fornecedores-ativos"
+        />
+        <Metrica num={data.obras.filter((o) => o.ativa).length} cap="obras ativas" />
       </div>
 
       {/* Grid: últimas OCs + rankings */}
@@ -153,7 +139,7 @@ export function DashboardPage() {
                 return (
                   <div key={oc.id} className={styles.listItem}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>
+                      <div className={styles.nome}>
                         {oc.numero} — {f?.razao_social || '—'}
                       </div>
                       <div className={styles.meta}>
@@ -178,7 +164,7 @@ export function DashboardPage() {
             )}
           </div>
 
-          <div className={styles.card} style={{ marginTop: 16 }}>
+          <div className={`${styles.card} ${styles.cardSeguinte}`}>
             <h3>OCs por Obra (por valor)</h3>
             {topObras.length === 0 ? (
               <EmptyState title="Sem dados" compacto />
@@ -198,12 +184,25 @@ function RankList({ entries }: { entries: RankEntry[] }) {
       {entries.map((e, i) => (
         <div key={i} className={styles.listItem}>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 13 }}>{e.nome}</div>
+            <div className={styles.nome}>{e.nome}</div>
             {e.sub && <div className={styles.meta}>{e.sub}</div>}
           </div>
-          <div style={{ fontWeight: 700, color: 'var(--navy)' }}>{formatBrl(e.valor)}</div>
+          <div className={styles.valor}>{formatBrl(e.valor)}</div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** A peça Métrica do pacote. `marca` põe o atributo que as verificações procuram. */
+function Metrica({ num, cap, dinheiro, marca }: { num: number | string; cap: string; dinheiro?: boolean; marca?: string }) {
+  const extra = marca ? { [marca]: '' } : {};
+  return (
+    <div className={`cp-metrica ${dinheiro ? styles.dinheiro : ''}`}>
+      <div className="num" {...extra}>
+        {num}
+      </div>
+      <div className="cap">{cap}</div>
     </div>
   );
 }

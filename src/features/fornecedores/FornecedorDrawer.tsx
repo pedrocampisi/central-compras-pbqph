@@ -157,7 +157,7 @@ export function FornecedorDrawer({ open, fornecedor, onClose, aoCriar }: Props) 
           </div>
           <p
             data-ecrs-da-qualificacao
-            style={{ gridColumn: '1 / -1', margin: 0, fontSize: 13, color: 'var(--texto-suave)' }}
+            style={{ gridColumn: '1 / -1', margin: 0, fontSize: 13, color: 'var(--tinta-suave)' }}
           >
             {ecrsDaGaveta(seloDeMaterial)}
           </p>

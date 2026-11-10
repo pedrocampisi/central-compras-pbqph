@@ -22,53 +22,68 @@ ol {
 }
 
 /* ── Cabeçalho de tela ─────────────────────────────────────────────────────
- * Estas classes já eram usadas por todas as páginas, mas não existia
- * definição para elas — os títulos saíam no tamanho padrão do navegador.
- * Agora seguem a escala do padrão: título na serifada, subtítulo suave. */
+ * Tela de trabalho abre com o título da página (`t-pagina`, DESIGN.md §7 e
+ * §10): a letra de título do modo, sem saudação e sem mascote. O subtítulo
+ * diz o que a tela tem, numa linha, em tinta-suave. Os botões ficam à direita,
+ * no fim do caminho do olho, e quebram para baixo quando não cabem. */
 .section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--espaco-5);
 }
 
 .section-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--espaco-4);
   flex-wrap: wrap;
 }
 
 .section-header h2 {
-  font-family: var(--fonte-display);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--texto);
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: 1.08;
+  font-weight: var(--peso-titulo);
+  letter-spacing: var(--ar-titulo);
+  color: var(--tinta);
+  text-wrap: balance;
+}
+/* no celular o título de 48 px tomava a primeira tela inteira */
+@media (max-width: 600px) {
+  .section-header h2 {
+    font-size: 2.25rem;
+  }
 }
 
 .section-sub {
-  color: var(--texto-suave);
-  font-size: 13.5px;
-  margin-top: 4px;
+  color: var(--tinta-suave);
+  font-size: 1rem;
+  margin-top: var(--espaco-2);
 }
 
-/* Botão secundário para os poucos pontos que não usam o componente Button. */
+/* Botão secundário para os poucos pontos que não usam o componente Button:
+ * o contorno do padrão (cp-btn--contorno), sem repetir a moldura dele. */
 .btn-secondary {
-  height: 38px;
+  min-height: 36px;
   padding: 0 16px;
   background: transparent;
-  color: var(--marca);
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
+  color: var(--tinta);
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio-pill);
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transicao);
+  transition:
+    color var(--dur-resposta),
+    border-color var(--dur-resposta),
+    background-color var(--dur-resposta);
 }
 .btn-secondary:hover {
-  background: var(--marca-fraca);
+  color: var(--ouro-tinta);
+  border-color: var(--ouro-tinta);
+  background: var(--ouro-suave);
 }
 
 /* Números que precisam alinhar por dígito (valores, quantidades, datas). */

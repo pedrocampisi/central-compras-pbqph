@@ -1,6 +1,7 @@
 /**
- * Estado vazio do padrão Campisi: mascote de corpo inteiro, uma frase curta e
- * UMA ação.
+ * A peça Vazio do pacote (pecas\Vazio): mascote de corpo inteiro, uma frase
+ * curta e UMA ação. A ação é de contorno: o destaque da tela é o botão do
+ * cabeçalho, que faz a mesma coisa.
  *
  * O mascote só aparece quando o vazio É a tela — lista sem resultado, aba
  * ainda sem cadastro. Dentro de um cartão que divide espaço com números
@@ -37,7 +38,7 @@ export function EmptyState({ title, description, detail, action, compacto }: Emp
   const subtitle = description ?? detail;
 
   const actionNode = isActionConfig(action) ? (
-    <button className={styles.actionBtn} onClick={action.onClick}>
+    <button type="button" className="cp-btn cp-btn--contorno" onClick={action.onClick}>
       {action.label}
     </button>
   ) : (
@@ -45,11 +46,10 @@ export function EmptyState({ title, description, detail, action, compacto }: Emp
   );
 
   return (
-    <div className={compacto ? styles.wrapCompacto : styles.wrap}>
+    <div className={compacto ? styles.wrapCompacto : `cp-vazio ${styles.wrap}`}>
       {!compacto && (
         <img
-          className={styles.mascote}
-          src={`${import.meta.env.BASE_URL}marca/mascote-corpo.png`}
+          src={`${import.meta.env.BASE_URL}padrao_campisi/mascote/mascote-corpo.png`}
           alt=""
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';

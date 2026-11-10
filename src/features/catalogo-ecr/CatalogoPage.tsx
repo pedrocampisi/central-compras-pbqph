@@ -58,7 +58,7 @@ function Historico({ ecr }: { ecr: Ecr }) {
       ) : ecr.revisoes.length === 0 ? (
         <p className={styles.semTexto}>{NENHUMA_REVISAO}</p>
       ) : (
-        <table className={styles.tabela}>
+        <table className={`cp-tabela ${styles.tabela}`}>
           <thead>
             <tr>
               {COLUNAS_DO_HISTORICO.map((c) => (

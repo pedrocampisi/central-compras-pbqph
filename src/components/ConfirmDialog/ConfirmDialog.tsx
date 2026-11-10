@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../Button/Button';
 import styles from './ConfirmDialog.module.css';
@@ -13,6 +14,11 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+/**
+ * A peça Janela do pacote (pecas\Janela): painel-alto, raio-g, o véu atrás,
+ * até 400 px. Fecha no Esc, como a peça manda, e o foco entra nela ao abrir,
+ * para o teclado não ficar na tela de trás.
+ */
 export function ConfirmDialog({
   open,
   title,
@@ -23,14 +29,30 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const caixa = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    caixa.current?.focus();
+    // Na captura, e parando ali: com a janela aberta por cima de uma gaveta, o
+    // Esc fecha só a janela.
+    const noEsc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.stopPropagation();
+      onCancel();
+    };
+    window.addEventListener('keydown', noEsc, true);
+    return () => window.removeEventListener('keydown', noEsc, true);
+  }, [open, onCancel]);
+
   if (!open) return null;
 
   return createPortal(
     <div className={styles.overlay} role="dialog" aria-modal aria-labelledby="confirm-title">
-      <div className={styles.box}>
+      <div className={`cp-janela ${styles.box}`} ref={caixa} tabIndex={-1}>
         <h3 id="confirm-title" className={styles.title}>{title}</h3>
         <p className={styles.message}>{message}</p>
-        <div className={styles.actions}>
+        <div className={`acoes ${styles.actions}`}>
           <Button variant="secondary" onClick={onCancel}>
             {cancelLabel}
           </Button>

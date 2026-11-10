@@ -1,8 +1,8 @@
 .card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
   margin-bottom: 10px;
-  background: var(--surface);
+  background: var(--painel);
   overflow: hidden;
 }
 
@@ -12,9 +12,9 @@
   align-items: center;
   gap: 8px;
   padding-right: 12px;
-  background: var(--bg);
+  background: var(--fundo);
 }
-.cabeca:hover { background: var(--marca-fraca); }
+.cabeca:hover { background: var(--realce); }
 .head {
   flex: 1;
   min-width: 0;
@@ -23,7 +23,8 @@
   align-items: center;
   column-gap: 12px;
   row-gap: 4px;
-  padding: 12px 14px;
+  min-height: 56px;
+  padding: 12px 16px;
   border: 0;
   background: none;
   color: inherit;
@@ -31,26 +32,26 @@
   text-align: left;
   cursor: pointer;
 }
-.head:focus-visible { outline: 2px solid var(--marca); outline-offset: -2px; }
+.head:focus-visible { outline: 2px solid var(--ouro-tinta); outline-offset: -2px; }
 .seta {
   flex: none;
-  color: var(--text-muted);
+  color: var(--tinta-suave);
 }
 .setaAberta { transform: rotate(180deg); }
 /* O título encolhe ao lado da seta: a 375 a seta não ganha uma linha só para ela. */
 .titleRow { flex: 1 1 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-width: 0; }
 .code {
   font-weight: 600;
-  color: var(--marca);
-  font-size: 13.5px;
-  font-family: var(--fonte-mono);
+  color: var(--ouro-tinta);
+  font-size: 0.9375rem;
+  font-family: var(--font-mono);
 }
-.name { font-weight: 600; font-size: 13px; }
-.meta { font-size: 11px; color: var(--text-muted); }
+.name { font-weight: 600; font-size: 0.9375rem; color: var(--tinta); }
+.meta { font-size: 0.875rem; color: var(--tinta-suave); }
 .revisao {
   margin-left: auto;
-  font-size: 11.5px;
-  color: var(--text-mid);
+  font-size: 13px;
+  color: var(--tinta-suave);
   white-space: nowrap;
 }
 .pdf { flex: none; }
@@ -58,13 +59,13 @@
   flex: none;
   padding: 2px 8px;
   border-radius: var(--raio-pill);
-  background: var(--marca-fraca);
-  font-size: 11px;
+  background: var(--realce);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
-.body { padding: 16px 18px; border-top: 1px solid var(--border); }
+.body { padding: 16px 18px; border-top: 1px solid var(--linha); }
 
 /* As seções como o documento: "01. REFERÊNCIA", com o traço embaixo. */
 .secao { margin-bottom: 16px; }
@@ -73,11 +74,11 @@
 .historico h4 {
   margin: 0 0 8px;
   padding-bottom: 4px;
-  border-bottom: 2px solid var(--texto);
-  font-size: 12px;
+  border-bottom: 2px solid var(--tinta);
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .lista {
   margin: 0;
@@ -85,48 +86,48 @@
   list-style: square;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-mid);
+  color: var(--tinta-suave);
 }
 .lista li { margin-bottom: 3px; }
-.lista strong { color: var(--texto); }
+.lista strong { color: var(--tinta); }
 
 /* A nota fora da lista, em destaque, como no documento. */
 .nota {
   margin: 8px 0 0;
   padding: 8px 10px;
   border-left: 3px solid var(--erro);
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 13px;
   line-height: 1.5;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
-.semTexto { margin: 0; font-size: 13px; color: var(--text-muted); }
+.semTexto { margin: 0; font-size: 13px; color: var(--tinta-suave); }
 
 /* A marca "a cada entrega" (CTO-D812): do Banco, fora do texto da ECR. */
 .marca {
   margin: 0 0 8px;
   padding: 8px 10px;
-  border-left: 3px solid var(--marca);
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
+  border-left: 3px solid var(--ouro-tinta);
+  border-radius: var(--raio-p);
+  background: var(--realce);
   font-size: 13px;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .materiais { margin-bottom: 16px; }
-.materiais ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-mid); }
+.materiais ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--tinta-suave); }
 .materiais li { margin-bottom: 3px; }
 .tag {
   display: inline-block;
   margin-left: 6px;
   padding: 1px 6px;
-  background: var(--marca-fraca);
-  border-radius: var(--raio-pequeno);
-  font-size: 10px;
-  color: var(--navy-mid);
+  background: var(--realce);
+  border-radius: var(--raio-p);
+  font-size: 13px;
+  color: var(--tinta-suave);
   font-weight: 600;
 }
 
@@ -134,21 +135,21 @@
 .tabela {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 .tabela th,
 .tabela td {
   padding: 6px 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--linha);
   text-align: left;
   vertical-align: top;
 }
 .tabela th {
-  background: var(--bg);
+  background: var(--fundo);
   font-weight: 700;
-  color: var(--texto);
+  color: var(--tinta);
 }
-.tabela td { color: var(--text-mid); }
+.tabela td { color: var(--tinta-suave); }
 
 @media (max-width: 700px) {
   .body { padding: 14px 12px; }
@@ -170,20 +171,20 @@
   .tabela td { display: block; width: 100%; }
   .tabela tr {
     margin-bottom: 8px;
-    border: 1px solid var(--border);
-    border-radius: var(--raio-pequeno);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-p);
   }
   .tabela td {
     display: flex;
     gap: 8px;
     border: 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--linha);
   }
   .tabela td:last-child { border-bottom: 0; }
   .tabela td::before {
     content: attr(data-coluna);
     flex: 0 0 96px;
     font-weight: 700;
-    color: var(--texto);
+    color: var(--tinta);
   }
 }

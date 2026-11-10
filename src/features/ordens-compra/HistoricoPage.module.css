@@ -1,0 +1,68 @@
+/* O Histórico no padrão "Dia e noite" (D1034, lote a): só o arranjo; a moldura
+ * da tabela, dos botões e dos selos é das peças do pacote. */
+
+.acoesDoTopo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+}
+
+/* As ações da linha quebram em duas linhas em vez de empurrar a tabela para
+   fora da tela: com a letra e o menu do padrão, seis botões numa linha só não
+   cabiam mais a 1366 px. */
+.acoesDaLinha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--espaco-1);
+  width: 13.5rem;
+}
+
+.fraco {
+  color: var(--tinta-suave);
+  font-size: 0.8125rem;
+}
+.total {
+  color: var(--ouro-tinta);
+  white-space: nowrap;
+}
+.abaixoDoSelo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+.avisoDaIa {
+  margin-top: 6px;
+  max-width: 220px;
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+.avisoDaIaRascunho {
+  color: var(--aviso);
+  font-weight: 600;
+}
+.atencao {
+  color: var(--aviso);
+  font-weight: 600;
+}
+.naPasta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--sucesso);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.foraDaPasta {
+  color: var(--tinta-suave);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+.link {
+  font-weight: 600;
+}

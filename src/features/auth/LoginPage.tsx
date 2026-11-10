@@ -14,14 +14,16 @@
  * padrão visual comum das telas de trabalho.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import { SEM_ORDEM_DE_COMPRA, entrar, traduzErroAuth } from '../../services/supabase/auth';
 import { supabase } from '../../services/supabase/client';
 import { useUiStore } from '../../stores/useUiStore';
 import { FALTA_EMAIL, TEXTOS_DO_ACESSO, type ModoDoAcesso } from './textosDoAcesso';
 import styles from './LoginPage.module.css';
 
-const MARCA = `${import.meta.env.BASE_URL}marca/`;
+const MARCA = `${import.meta.env.BASE_URL}padrao_campisi/mascote/`;
+/** O brasão de uma tinta só, pintado pelo modo (DESIGN.md §13): a imagem vira máscara. */
+const BRASAO = { '--brasao': `url(${import.meta.env.BASE_URL}padrao_campisi/marca/brasao.png)` } as CSSProperties;
 
 /**
  * Para onde o link do e-mail volta (CTO-D700). Sem isto, o login manda ao
@@ -113,18 +115,11 @@ export function LoginPage() {
   return (
     <main className={styles.wrap}>
       <form className={styles.card} onSubmit={handleSubmit} noValidate>
-        <img
-          src={`${MARCA}brasao.png`}
-          alt=""
-          className={styles.logo}
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
+        <span className={`cp-brasao ${styles.logo}`} style={BRASAO} aria-hidden="true" />
         <h1 className={styles.brandName}>{textos ? textos.titulo : 'Central de Compras'}</h1>
         <p className={styles.brandSub}>{textos ? textos.frase : 'Entre com seu e-mail da empresa.'}</p>
 
-        <label className={styles.field}>
+        <label className={`cp-campo ${styles.field}`}>
           <span>E-mail</span>
           <input
             ref={campoEmail}
@@ -138,7 +133,7 @@ export function LoginPage() {
         </label>
 
         {!textos && (
-          <label className={styles.field}>
+          <label className={`cp-campo ${styles.field}`}>
             <span>Senha</span>
             <input
               type="password"
@@ -164,26 +159,26 @@ export function LoginPage() {
         {/* A ação laranja é UMA por tela, e é a da situação em que a pessoa está. */}
         {textos ? (
           <>
-            <button className={styles.btnEntrar} type="submit" disabled={enviando}>
+            <button className={`cp-btn cp-btn--ouro ${styles.btnEntrar}`} type="submit" disabled={enviando}>
               {enviando ? textos.acaoEnviando : textos.acao}
             </button>
-            <button type="button" className={styles.linkBtn} onClick={() => mudarPara('entrar')}>
+            <button type="button" className={`cp-btn cp-btn--texto ${styles.linkBtn}`} onClick={() => mudarPara('entrar')}>
               Voltar para entrar
             </button>
           </>
         ) : (
           <>
-            <button className={styles.btnEntrar} type="submit" disabled={entrando}>
+            <button className={`cp-btn cp-btn--ouro ${styles.btnEntrar}`} type="submit" disabled={entrando}>
               {entrando ? 'Entrando…' : 'Entrar'}
             </button>
             <button
               type="button"
-              className={styles.btnSecundario}
+              className={`cp-btn cp-btn--contorno ${styles.btnSecundario}`}
               onClick={() => mudarPara('primeiro-acesso')}
             >
               Primeiro acesso — definir minha senha
             </button>
-            <button type="button" className={styles.linkBtn} onClick={() => mudarPara('esqueci')}>
+            <button type="button" className={`cp-btn cp-btn--texto ${styles.linkBtn}`} onClick={() => mudarPara('esqueci')}>
               Esqueci minha senha
             </button>
           </>
@@ -237,18 +232,11 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
   return (
     <main className={styles.wrap}>
       <form className={styles.card} onSubmit={(e) => void handleSalvar(e)}>
-        <img
-          src={`${MARCA}brasao.png`}
-          alt=""
-          className={styles.logo}
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
+        <span className={`cp-brasao ${styles.logo}`} style={BRASAO} aria-hidden="true" />
         <h1 className={styles.brandName}>Definir nova senha</h1>
         <p className={styles.brandSub}>Central de Compras · Campisi</p>
 
-        <label className={styles.field}>
+        <label className={`cp-campo ${styles.field}`}>
           <span>Nova senha</span>
           <input
             type="password"
@@ -260,7 +248,7 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
           />
         </label>
 
-        <label className={styles.field}>
+        <label className={`cp-campo ${styles.field}`}>
           <span>Repita a nova senha</span>
           <input
             type="password"
@@ -277,7 +265,7 @@ export function DefinirSenhaPage({ onConcluida }: { onConcluida: () => void }) {
           </p>
         )}
 
-        <button className={styles.btnEntrar} type="submit" disabled={salvando}>
+        <button className={`cp-btn cp-btn--ouro ${styles.btnEntrar}`} type="submit" disabled={salvando}>
           {salvando ? 'Salvando…' : 'Salvar senha e entrar'}
         </button>
       </form>
@@ -307,7 +295,7 @@ export function SemOrdemDeCompraPage({ email, onSair }: { email: string; onSair:
         <p className={styles.brandSub}>
           Você entrou como <strong>{email}</strong>. {SEM_ORDEM_DE_COMPRA}
         </p>
-        <button type="button" className={styles.btnSecundario} onClick={onSair}>
+        <button type="button" className={`cp-btn cp-btn--contorno ${styles.btnSecundario}`} onClick={onSair}>
           Sair
         </button>
       </div>
@@ -338,7 +326,7 @@ export function SemAcessoPage({ email, onSair }: { email: string; onSair: () => 
           Você entrou como <strong>{email}</strong>, mas o seu acesso ainda não foi liberado por um
           administrador.
         </p>
-        <button type="button" className={styles.btnSecundario} onClick={onSair}>
+        <button type="button" className={`cp-btn cp-btn--contorno ${styles.btnSecundario}`} onClick={onSair}>
           Sair
         </button>
       </div>

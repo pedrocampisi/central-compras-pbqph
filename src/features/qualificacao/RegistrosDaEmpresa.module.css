@@ -10,32 +10,32 @@
   gap: 10px;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid var(--borda);
+  border-top: 1px solid var(--linha);
 }
 .titulo {
   margin: 0;
   font-size: 13px;
   font-weight: 700;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .ecr {
   padding: 10px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--painel);
 }
 .ecr h5 {
   margin: 0 0 6px;
   font-size: 13px;
   font-weight: 700;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .ecr h6 {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 /* Lado a lado no computador; um embaixo do outro no celular. */
@@ -52,14 +52,14 @@
   list-style: square;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .nota {
   margin: 6px 0 0;
   padding: 6px 8px;
   border-left: 3px solid var(--erro);
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 13px;
   font-weight: 600;
 }
@@ -67,21 +67,21 @@
 .marca {
   margin: 0 0 8px;
   padding: 6px 8px;
-  border-left: 3px solid var(--marca);
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
+  border-left: 3px solid var(--ouro-tinta);
+  border-radius: var(--raio-p);
+  background: var(--realce);
   font-size: 13px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .aviso {
   margin: 0 0 6px;
   padding: 6px 8px;
   border-left: 3px solid var(--aviso);
-  border-radius: var(--raio-pequeno);
-  background: var(--aviso-bg);
+  border-radius: var(--raio-p);
+  background: var(--aviso-fundo);
   font-size: 13px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .guardados {
@@ -94,15 +94,15 @@
 }
 .guardados li {
   padding: 6px 8px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   font-size: 13px;
   overflow-wrap: anywhere;
 }
 .guardados li[data-vigencia='vencido'],
 .guardados li[data-vigencia='vence_em_30_dias'] {
   border-color: var(--aviso);
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
 }
 .linhaDoPapel {
   display: flex;
@@ -110,32 +110,32 @@
   align-items: center;
   gap: 8px;
 }
-.linhaDoPapel strong { margin-right: auto; color: var(--texto); }
+.linhaDoPapel strong { margin-right: auto; color: var(--tinta); }
 .abrir {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  color: var(--marca);
+  font-size: 13px;
+  color: var(--ouro-tinta);
 }
 .quem,
 .correcao {
   margin-top: 2px;
-  font-size: 12px;
-  color: var(--texto-suave);
+  font-size: 13px;
+  color: var(--tinta-suave);
 }
 .correcao { font-style: italic; }
 
 .vazio {
   margin: 0 0 6px;
   font-size: 13px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .erro {
   margin: 0;
   padding: 6px 8px;
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   color: var(--erro);
   font-size: 13px;
 }

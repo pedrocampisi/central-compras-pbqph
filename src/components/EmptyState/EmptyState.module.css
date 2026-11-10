@@ -1,60 +1,31 @@
+/* A peça Vazio do pacote (cp-vazio) desenha o vazio que É a tela: o mascote
+ * de 160 a 190 px, a frase e a ação. Aqui fica o título dela e o vazio
+ * compacto, sem mascote, para dentro de cartão que convive com dado. */
 .wrap {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--texto-suave);
+  gap: var(--espaco-2);
 }
 
-/* Vazio dentro de cartão: sem mascote e sem moldura, para não competir com o
- * dado que está ao lado. */
 .wrapCompacto {
-  padding: 26px 16px;
+  padding: var(--espaco-6) var(--espaco-4);
   text-align: center;
-  color: var(--texto-suave);
-}
-
-/* O mascote é colorido — não leva o filtro de inversão do brasão no escuro. */
-.mascote {
-  width: 175px;
-  max-width: 60%;
-  height: auto;
-  display: block;
-  margin: 0 auto 4px;
+  color: var(--tinta-suave);
 }
 
 .title {
   display: block;
-  color: var(--texto);
-  font-family: var(--fonte-display);
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  color: var(--tinta);
+  font: var(--peso-cartao) 1.25rem/1.3 var(--font-display);
+  letter-spacing: var(--ar-cartao);
 }
 
 .detail {
   margin: 0;
-  font-size: 13.5px;
-  color: var(--texto-suave);
+  font-size: 1rem;
+  color: var(--tinta-suave);
 }
 
 .action {
-  margin-top: 16px;
+  margin-top: var(--espaco-3);
   display: flex;
   justify-content: center;
-}
-
-.actionBtn {
-  height: 38px;
-  padding: 0 16px;
-  background: transparent;
-  color: var(--marca);
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
-  font-size: 13.5px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background var(--transicao);
-}
-.actionBtn:hover {
-  background: var(--marca-fraca);
 }

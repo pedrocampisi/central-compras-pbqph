@@ -1,66 +1,67 @@
-/* Aviso rápido do padrão Campisi: fixo embaixo, centralizado, some sozinho. */
+/* O aviso curto, com o desenho da peça Aviso do pacote (pecas\Aviso): desce do
+ * topo, em pílula, painel-alto com a borda ouro, e some sozinho. A peça é um
+ * aviso por página, `position: fixed`; a casa ainda pode mostrar dois de uma
+ * vez, então a fila mora aqui e cada aviso usa o desenho da peça.
+ *
+ * O tom vira um ponto colorido COM a borda, nunca só a cor: o texto do aviso
+ * já diz o que aconteceu (DESIGN.md §6). */
 
 .container {
   position: fixed;
-  bottom: 26px;
+  top: 28px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  z-index: 200;
+  gap: var(--espaco-2);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  z-index: 400;
   pointer-events: none;
 }
 .toast {
-  padding: 11px 20px;
-  border-radius: var(--raio);
-  background: var(--sucesso);
-  color: #fff;
-  box-shadow: var(--sombra-suave);
-  font-size: 13.5px;
-  font-weight: 600;
-  max-width: min(420px, 92vw);
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  padding: 12px 24px;
+  border-radius: var(--raio-pill);
+  border: 1px solid var(--ouro-borda);
+  background: var(--painel-alto);
+  color: var(--tinta);
+  box-shadow: var(--sombra-cartao);
+  font-size: 1rem;
+  line-height: 1.4;
   cursor: pointer;
   pointer-events: all;
-  animation: slideIn var(--transicao) ease;
+  animation: desce var(--dur-desloca) var(--ease-mola);
 }
-[data-tema='escuro'] .toast {
-  color: #0b1a23;
+.toast::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ponto);
 }
 .success {
-  background: var(--sucesso);
-}
-.warning {
-  background: var(--aviso);
-  color: #fff;
-}
-.error {
-  background: var(--erro);
-  color: #fff;
+  --ponto: var(--sucesso);
 }
 .info {
-  background: var(--marca);
-  color: var(--painel);
+  --ponto: var(--info);
 }
-[data-tema='escuro'] .warning,
-[data-tema='escuro'] .error,
-[data-tema='escuro'] .info {
-  color: #0b1a23;
+.warning {
+  --ponto: var(--aviso);
+  border-color: var(--aviso);
+}
+.error {
+  --ponto: var(--erro);
+  border-color: var(--erro);
 }
 
-@keyframes slideIn {
+@keyframes desce {
   from {
     opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .toast {
-    animation: none;
+    transform: translateY(-24px);
   }
 }

@@ -1,106 +1,13 @@
-/* Botões do padrão Campisi.
- *
- * `primary` é o botão laranja — e o padrão manda UMA ação primária por tela.
- * Se a tela já tem um laranja, o botão seguinte é `outline`. */
+/* O que a casa acrescenta à peça Botão do pacote (cp-btn), sem redesenhar a
+ * moldura dela (DESIGN.md §15): o botão desligado e o girador da espera. */
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: var(--raio);
-  font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 600;
-  height: 38px;
-  padding: 0 16px;
-  white-space: nowrap;
-  transition:
-    background var(--transicao),
-    border-color var(--transicao),
-    color var(--transicao);
-}
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* ── Ação primária: uma por tela ─────────────────────────────────────────── */
-.primary {
-  background: var(--acento);
-  color: var(--acento-texto);
-  border-color: transparent;
-  border-radius: var(--raio-pill);
-  font-weight: 700;
-  height: 42px;
-  padding: 0 22px;
-}
-.primary:hover:not(:disabled) {
-  background: var(--acento-sombra);
-}
-
-/* ── Secundária ──────────────────────────────────────────────────────────
- * `outline` e `secondary` são o mesmo botão do padrão; os dois nomes
- * sobrevivem porque estão espalhados nas telas. */
-.outline,
-.secondary,
-.navy {
-  background: transparent;
-  color: var(--marca);
-  border: 1px solid var(--borda-forte);
-}
-.outline:hover:not(:disabled),
-.secondary:hover:not(:disabled),
-.navy:hover:not(:disabled) {
-  background: var(--marca-fraca);
-}
-
-.ghost {
-  background: transparent;
-  color: var(--marca);
-  border: none;
-  font-weight: 600;
-}
-.ghost:hover:not(:disabled) {
-  background: var(--marca-fraca);
-}
-
-.danger {
-  background: var(--erro);
-  color: #fff;
-  border-color: transparent;
-}
-[data-tema='escuro'] .danger {
-  color: #1c0e0b;
-}
-.danger:hover:not(:disabled) {
-  filter: brightness(0.94);
-}
-
-.success {
-  background: var(--sucesso);
-  color: #fff;
-  border-color: transparent;
-}
-[data-tema='escuro'] .success {
-  color: #0b1a23;
-}
-
-/* ── Tamanhos ────────────────────────────────────────────────────────────── */
-.sm {
-  height: 32px;
-  padding: 0 12px;
-  font-size: 12.5px;
-}
-.sm.primary {
-  height: 34px;
-  padding: 0 16px;
-}
-
-/* Girador do estado "carregando" — é espera, não enfeite: o padrão só permite
- * movimento em espera e no login. */
+/* Girador do estado "carregando": é espera, não enfeite. */
 .spinner {
   display: inline-block;
   width: 12px;

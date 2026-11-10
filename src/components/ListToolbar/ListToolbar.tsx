@@ -25,11 +25,11 @@ export function ListToolbar({
 }: ListToolbarProps) {
   return (
     <div className={styles.filterBar}>
-      {/* Busca em pílula do padrão. Aqui ela NÃO leva botão "Buscar": estas são
-          telas de trabalho, onde a lista filtra enquanto se digita — botão só
-          na tela de entrada. */}
-      <div className={styles.busca}>
-        <Icon name="search" size={18} className={styles.buscaIcone} />
+      {/* A busca da tela de trabalho, a candidata `cc-busca`: sem botão
+          "Buscar", porque a lista filtra enquanto se digita (DESIGN.md §10);
+          o botão dourado fica para a ação da tela. */}
+      <div className="cc-busca">
+        <Icon name="search" size={18} />
         <CampoDeBusca
           className={styles.searchInput}
           placeholder={searchPlaceholder}
@@ -43,7 +43,7 @@ export function ListToolbar({
   );
 }
 
-// ── Toggle de status (Todos / Ativos / Inativos …) ────────────────────────────
+// ── Recorte da lista (Todos / Ativos / Inativos …): a peça Chips do pacote ─────
 
 interface ToggleGroupProps<T extends string> {
   options: readonly T[];
@@ -57,12 +57,12 @@ interface ToggleGroupProps<T extends string> {
 
 export function ToggleGroup<T extends string>({ options, value, onChange, labels, label }: ToggleGroupProps<T>) {
   return (
-    <div className={styles.toggleGroup} role={label ? 'group' : undefined} aria-label={label}>
+    <div className="cp-chips" role={label ? 'group' : undefined} aria-label={label}>
       {options.map((v) => (
         <button
           key={v}
           type="button"
-          className={[styles.toggleBtn, value === v ? styles.toggleActive : ''].join(' ')}
+          className="cp-chip"
           aria-pressed={value === v}
           onClick={() => onChange(v)}
         >

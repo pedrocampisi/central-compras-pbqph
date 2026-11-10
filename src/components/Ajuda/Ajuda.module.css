@@ -12,27 +12,27 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--borda-forte);
+  border: 1px solid var(--linha-controle);
   border-radius: var(--raio-pill);
   background: var(--painel);
-  color: var(--texto-suave);
-  font-family: var(--fonte-sans);
-  font-size: 12.5px;
+  color: var(--tinta-suave);
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
   transition:
-    border-color var(--transicao),
-    color var(--transicao);
+    border-color var(--dur-resposta),
+    color var(--dur-resposta);
 }
 .botao:hover,
 .botaoAberto {
-  border-color: var(--marca);
-  color: var(--marca);
+  border-color: var(--ouro-tinta);
+  color: var(--ouro-tinta);
 }
 .botao:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--marca-fraca);
+  box-shadow: 0 0 0 3px var(--realce);
 }
 
 .resposta {
@@ -43,10 +43,10 @@
   gap: 6px;
   margin-top: 2px;
   padding: 10px 12px;
-  border-left: 3px solid var(--marca);
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
-  color: var(--texto);
+  border-left: 3px solid var(--ouro-tinta);
+  border-radius: var(--raio-p);
+  background: var(--realce);
+  color: var(--tinta);
   font-size: 13px;
   font-weight: 400;
   line-height: 1.5;
@@ -61,9 +61,9 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
@@ -77,7 +77,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   font-weight: 600;
   cursor: pointer;

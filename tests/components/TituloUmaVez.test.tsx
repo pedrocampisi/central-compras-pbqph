@@ -46,7 +46,7 @@ window.matchMedia ??= ((q: string) => ({
 })) as unknown as typeof window.matchMedia;
 
 const TELAS: [TabId, string][] = [
-  ['dashboard', 'Dashboard'],
+  ['dashboard', 'Painel'], // "Painel" no menu e no título desde a D1034 (era "Dashboard")
   ['nova-oc', 'Nova Ordem de Compra'],
   ['historico', 'Histórico de OCs'],
   ['fornecedores', 'Fornecedores'],

@@ -1,47 +1,38 @@
-/* Tabela densa do padrão Campisi: linha 40–44px, cabeçalho micro em caixa
- * alta, números em tabular (as colunas de valor alinham na vírgula). */
+/* A peça Tabela do pacote (cp-tabela): linhas de 44 px separadas por `linha`,
+ * cabeçalho em caixa de frase, nada abaixo de 13 px. Aqui fica o que a casa
+ * acrescenta: a rolagem dentro da caixa no celular, o cabeçalho que fica
+ * parado, a letra de máquina no documento e a coluna das ações. */
 
 .wrap {
   overflow-x: auto;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--painel);
+  box-shadow: var(--sombra-repouso);
 }
 .table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--painel);
-  font-size: 13.5px;
   font-variant-numeric: tabular-nums;
 }
 .table thead th {
-  background: var(--painel);
-  text-align: left;
-  padding: 0 12px 8px;
-  font-size: 11px;
-  color: var(--texto-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  border-bottom: 1px solid var(--borda-forte);
-  font-weight: 600;
   position: sticky;
   top: 0;
+  background: var(--painel);
   white-space: nowrap;
 }
 .table tbody td {
-  padding: 11px 12px;
-  border-bottom: 1px solid var(--borda);
+  padding-top: var(--espaco-2);
+  padding-bottom: var(--espaco-2);
   vertical-align: middle;
 }
-.table tbody tr {
-  transition: background var(--transicao);
-}
-.table tbody tr:hover {
-  background: var(--marca-fraca);
+.table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 /* Documentos (CNPJ, número da OC) em mono: dígito com largura fixa é o que
  * deixa comparar duas linhas de relance. */
 .table td :global(.doc),
 .table td :global(.mono) {
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
 }
 
 .actionsCol {
@@ -50,13 +41,7 @@
 }
 .rowActions {
   display: flex;
-  gap: 4px;
+  gap: var(--espaco-1);
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-.rowActions button {
-  height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
-  border-radius: var(--raio-pequeno);
 }

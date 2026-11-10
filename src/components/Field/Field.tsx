@@ -38,7 +38,7 @@ export type FieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps
 export function FieldShell({
   label, hint, wide, span2, required, marca, ajuda, aviso, htmlFor, children,
 }: FieldBaseProps & { htmlFor: string; children: ReactNode; /** Um "?" ao lado do rótulo (CTO-D764). */ ajuda?: ReactNode }) {
-  const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
+  const cls = ['cp-campo', styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
     .join(' ');
   const rotulo = (
@@ -58,14 +58,14 @@ export function FieldShell({
         rotulo
       )}
       {children}
-      {hint && <span className={styles.hint}>{hint}</span>}
+      {hint && <span className={`ajuda ${styles.hint}`}>{hint}</span>}
       {aviso}
     </div>
   );
 }
 
 export function Field({ label, hint, wide, span2, required, marca, aviso, as: As = 'input', ...rest }: FieldProps) {
-  const cls = [styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
+  const cls = ['cp-campo', styles.field, wide ? styles.wide : '', span2 ? styles.span2 : '']
     .filter(Boolean)
     .join(' ');
 
@@ -84,7 +84,7 @@ export function Field({ label, hint, wide, span2, required, marca, aviso, as: As
       ) : (
         <input {...(rest as InputHTMLAttributes<HTMLInputElement>)} />
       )}
-      {hint && <span className={styles.hint}>{hint}</span>}
+      {hint && <span className={`ajuda ${styles.hint}`}>{hint}</span>}
       {aviso}
     </div>
   );

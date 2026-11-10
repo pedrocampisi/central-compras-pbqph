@@ -1,6 +1,6 @@
 # Pendências — Ordem de Compra
 
-> **Data:** 04/11/2026
+> **Data:** 10/11/2026
 > **Estado:** VALE HOJE
 > **Escopo:** só o que **esta casa** tem aberto. Fechado vai ao [`Arquivo_Morto/PENDENCIAS_FECHADAS.md`](Arquivo_Morto/PENDENCIAS_FECHADAS.md) no mesmo commit da decisão que fecha (D429, D972). O texto de antes da limpeza de 04/11/2026 (D972) está em [`Arquivo_Morto/PENDENCIAS_ate_2026-11-04.md`](Arquivo_Morto/PENDENCIAS_ate_2026-11-04.md). Teto: 300 linhas.
 
@@ -10,7 +10,7 @@ Pausa do Pedro de 04/09: trabalho novo só por carta do CTO; se a pausa ainda va
 ## 🔴 Abertas
 
 ### 46. A pintura "Dia e noite" da casa (D1034, D1034b)
-Plano aceito (`docs/Enviados/2026-11-10_..._D1034-o-plano-da-pintura.md`). Três lotes, cada ramo nasce do anterior: (a) `d1034-a-casca`: casca, menu, login, cinco listas, candidatas `cc-` do campo de busca com X, da gaveta de ficha e da lista de escolha; (b) `d1034-b-o-pedido` (vai à perícia); (c) `d1034-c-o-mestre`. PDF fica; sem animação de entrada; quem não escolheu modo e tem o computador escuro passa a ver o dia. **Espera:** a publicação da D975, e uma sessão nova do CTO para construir o lote (a). Quem chegar lê o plano e a D1034b em `Devolucoes/`.
+Plano aceito (`docs/Enviados/2026-11-10_..._D1034-o-plano-da-pintura.md`). Três lotes, cada ramo nasce do anterior: (a) `d1034-a-casca`: casca, menu, login, cinco listas, candidatas `cc-` do campo de busca com X, da gaveta de ficha e da lista de escolha; (b) `d1034-b-o-pedido` (vai à perícia); (c) `d1034-c-o-mestre`. PDF fica; sem animação de entrada; quem não escolheu modo e tem o computador escuro passa a ver o dia. **Lote (a) construído em 10/11/2026** no ramo `d1034-a-casca`, empurrado e **fora da produção**: bateria verde, `conferir_casas` em dia, fotos em `docs/Capturas/2026-11-10_D1034a/`, carta `docs/Enviados/2026-11-10_de_Ordem_de_Compra_para_CTO_D1034a-a-casca-pintada.md`. Passa de mil linhas novas sem teste: **vai à perícia antes da produção**. **Espera:** a sentada do CTO sobre o lote (a), as três candidatas `cc-` irem ao pacote, e a perícia. Depois, o lote (b) nasce deste ramo.
 
 ### 45. A D975, o X nas buscas: pronta, espera a campainha do CTO
 Ramo `d975-sobre-origin-main` (`ce30041`, `f540077`), sem o `2bc863d`; o `d975-x-na-busca` não sobe. Publica-se hoje, depois das 19h, na campainha do CTO, junto com o `d1034-plano-e-regras` (só documento). Depois, o CTO confere o X no ar.

@@ -45,7 +45,8 @@ export type IconName =
   | 'capacete'
   | 'qr'
   | 'livro'
-  | 'guia';
+  | 'guia'
+  | 'menu';
 
 const PATHS: Record<IconName, React.ReactNode> = {
   dashboard: (
@@ -237,6 +238,8 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M10 8.5v7l5.5-3.5z" />
     </>
   ),
+  // Abrir o menu no celular (D1034): abaixo de 960 px ele vira gaveta.
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
 };
 
 export function Icon({ name, size = 16, className }: IconProps) {

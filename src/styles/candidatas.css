@@ -1,0 +1,202 @@
+/* AS PEÇAS CANDIDATAS DA ORDEM DE COMPRA (D1034b, item 2).
+ *
+ * O pacote "Dia e noite" ainda não tem estas três peças, e a casa precisa
+ * delas no lote (a). Nascem aqui como CANDIDATAS, com o prefixo `cc-`, feitas
+ * só com os tokens do padrão. Depois da sentada do lote, o CTO as leva ao
+ * pacote; elas viram `cp-`, a casa refaz a cópia e este arquivo encolhe.
+ * Nenhuma muda peça que já existe no pacote.
+ *
+ *   1. cc-busca ······ o campo de busca da tela de trabalho, com o X (D975)
+ *   2. cc-gaveta ····· a gaveta lateral da ficha (fornecedor, obra, ECR)
+ *   3. cc-escolha ···· a lista de escolha que aceita texto (obra, fornecedor)
+ */
+
+/* 1. CANDIDATA: CAMPO DE BUSCA DA TELA DE TRABALHO.
+ * A peça Busca do pacote é a da tela de entrada, com o botão "Buscar". Na tela
+ * de trabalho a busca não tem botão: filtra enquanto se digita (DESIGN.md §10),
+ * e o botão dourado fica para a ação da tela. Mesmo desenho da Busca, na
+ * altura de um campo (44 px), com a lupa e o X de 32 px para apagar. */
+.cc-busca {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 34rem;
+  min-height: 44px;
+  padding: 0 var(--espaco-3) 0 var(--espaco-4);
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio-pill);
+  background: var(--painel-alto);
+  box-shadow: var(--sombra-repouso);
+  transition:
+    border-color var(--dur-resposta),
+    box-shadow var(--dur-desloca);
+}
+.cc-busca:focus-within {
+  border-color: var(--ouro-tinta);
+  box-shadow: 0 0 0 4px var(--ouro-suave);
+}
+.cc-busca > svg {
+  flex: none;
+  color: var(--tinta-fraca);
+  transition: color var(--dur-resposta);
+}
+.cc-busca:focus-within > svg {
+  color: var(--ouro-tinta);
+}
+.cc-busca input {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tinta);
+  font: 400 1rem/1.4 var(--font-sans);
+  caret-color: var(--ouro-tinta);
+}
+.cc-busca input:focus {
+  outline: none; /* o foco aparece no contorno da busca inteira */
+}
+.cc-busca input::placeholder {
+  color: var(--tinta-fraca);
+}
+
+/* 2. CANDIDATA: GAVETA LATERAL DA FICHA.
+ * A gaveta do pacote (cp-gaveta) é a do menu do celular, que entra pela
+ * esquerda. A ficha entra pela direita, por cima da lista, com o véu do pacote
+ * (cp-veu) atrás: o título em cima, o miolo rola, as ações no pé. Até 680 px;
+ * no celular, a largura toda. Fecha no Esc, no X e no véu. */
+.cc-gaveta {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 50;
+  width: min(680px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--painel-alto);
+  border-left: 1px solid var(--linha);
+  box-shadow: var(--sombra-elevada);
+  color: var(--tinta);
+  animation: cc-gaveta-entra var(--dur-desloca) var(--ease-saida);
+}
+/* A gaveta recebe o foco ao abrir (para o Esc e o Tab começarem nela); o anel
+   fica para os campos e botões de dentro, não para a gaveta inteira. */
+.cc-gaveta:focus {
+  outline: none;
+}
+@keyframes cc-gaveta-entra {
+  from {
+    transform: translateX(100%);
+  }
+}
+.cc-gaveta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4) var(--espaco-5);
+  border-bottom: 1px solid var(--linha);
+}
+.cc-gaveta-topo h2 {
+  margin: 0;
+  font: var(--peso-cartao, 400) 1.5rem/1.25 var(--font-display);
+  letter-spacing: var(--ar-cartao, -0.01em);
+  color: var(--tinta);
+}
+.cc-gaveta-miolo {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--espaco-5);
+}
+.cc-gaveta-pe {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4) var(--espaco-5);
+  border-top: 1px solid var(--linha);
+}
+
+/* 3. CANDIDATA: LISTA DE ESCOLHA COM TEXTO.
+ * O campo aceita texto e mostra só as opções que casam; seta e Enter escolhem,
+ * Esc fecha. A caixa tem a medida da peça Campo (44 px); a lista flutua em
+ * painel-alto, e a opção da vez acende como o item ativo do menu. */
+.cc-escolha {
+  position: relative;
+  min-width: 0;
+}
+.cc-escolha > svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tinta-fraca);
+  pointer-events: none;
+}
+.cc-escolha input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio-p);
+  background: var(--painel);
+  color: var(--tinta);
+  font: 400 1rem/1.4 var(--font-sans);
+  text-overflow: ellipsis;
+  transition:
+    border-color var(--dur-resposta),
+    box-shadow var(--dur-resposta);
+}
+.cc-escolha input::placeholder {
+  color: var(--tinta-suave);
+}
+.cc-escolha input:focus-visible {
+  outline: none;
+  border-color: var(--ouro-tinta);
+  box-shadow: 0 0 0 4px var(--ouro-suave);
+}
+.cc-escolha-lista {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + var(--espaco-1));
+  left: 0;
+  right: 0;
+  min-width: 240px;
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--espaco-1);
+  list-style: none;
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio);
+  background: var(--painel-alto);
+  box-shadow: var(--sombra-cartao);
+}
+.cc-escolha-lista [role='option'] {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  align-content: center;
+  padding: var(--espaco-2) var(--espaco-3);
+  border-radius: var(--raio-p);
+  color: var(--tinta);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.cc-escolha-lista .ativa {
+  background: var(--ouro-suave);
+}
+.cc-escolha-lista .escolhida > :first-child {
+  font-weight: 600;
+  color: var(--ouro-tinta);
+}
+.cc-escolha-lista small {
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+.cc-escolha-nada {
+  padding: var(--espaco-3);
+  font-size: 0.9375rem;
+  color: var(--tinta-suave);
+}

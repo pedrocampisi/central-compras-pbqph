@@ -1,0 +1,8 @@
+Cópia marcada do Padrão Front-end "Dia e noite" da Plataforma Campisi.
+
+NÃO EDITE NADA NESTA PASTA. O que é só desta casa vai em arquivo próprio, fora dela.
+A regra: ..\00_Diretrizes_e_padroes\Padrao_Front_end\DESIGN.md (seção 1).
+
+Copiada em 10/11/2026 12:21, do registro 80bde13 das diretrizes.
+Para atualizar: python <diretrizes>\Padrao_Front_end\ferramentas\copiar_para_casa.py <a pasta acima desta>
+Para conferir:  python <diretrizes>\Padrao_Front_end\ferramentas\conferir_casas.py

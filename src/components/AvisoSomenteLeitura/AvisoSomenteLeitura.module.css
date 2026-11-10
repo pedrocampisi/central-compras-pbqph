@@ -7,7 +7,7 @@
   padding: 11px 14px;
   border: 1px solid var(--aviso);
   border-radius: var(--raio);
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
   color: var(--aviso);
   font-size: 13.5px;
   font-weight: 500;

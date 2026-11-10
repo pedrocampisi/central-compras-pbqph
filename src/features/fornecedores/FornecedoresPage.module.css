@@ -47,15 +47,15 @@
   cursor: pointer;
 }
 .abrir:focus-visible {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 2px;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
 }
 .seta {
   flex: none;
   margin-top: 2px;
-  color: var(--texto-muted);
-  transition: transform var(--transicao);
+  color: var(--tinta-suave);
+  transition: transform var(--dur-resposta);
 }
 .setaAberta {
   transform: rotate(180deg);
@@ -68,12 +68,12 @@
 }
 .nome {
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .resumo {
   margin-top: 1px;
-  font-size: 11.5px;
-  color: var(--texto-muted);
+  font-size: 13px;
+  color: var(--tinta-suave);
 }
 
 /* A filial, dentro da empresa aberta: recuada, com o fio à esquerda. */
@@ -82,29 +82,29 @@
 }
 .filial td:first-child {
   padding-left: 36px;
-  box-shadow: inset 26px 0 0 var(--fundo), inset 28px 0 0 var(--borda-forte);
+  box-shadow: inset 26px 0 0 var(--fundo), inset 28px 0 0 var(--linha-controle);
 }
 .local {
-  font-size: 12.5px;
-  color: var(--texto);
+  font-size: 13px;
+  color: var(--tinta);
 }
 .razaoDaFilial {
   margin-top: 1px;
-  font-size: 11.5px;
-  color: var(--texto-muted);
+  font-size: 13px;
+  color: var(--tinta-suave);
 }
 /* A filial que a busca achou: a marca da casa no fio, e o texto que diz. */
 .casou td:first-child {
-  box-shadow: inset 26px 0 0 var(--fundo), inset 29px 0 0 var(--marca);
+  box-shadow: inset 26px 0 0 var(--fundo), inset 29px 0 0 var(--ouro-tinta);
 }
 .achada {
   display: inline-block;
   margin-left: 8px;
   padding: 0 6px;
   border-radius: var(--raio-pill);
-  background: var(--marca-fraca);
-  color: var(--marca);
-  font-size: 10.5px;
+  background: var(--realce);
+  color: var(--ouro-tinta);
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
   vertical-align: 1px;
@@ -114,28 +114,28 @@
   white-space: nowrap;
 }
 .contato {
-  font-size: 12px;
+  font-size: 13px;
   overflow-wrap: anywhere;
 }
 .telefone {
-  font-size: 11px;
-  color: var(--texto-muted);
+  font-size: 13px;
+  color: var(--tinta-suave);
 }
 .ativo {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--sucesso);
   white-space: nowrap;
 }
 .inativo {
   font-weight: 600;
-  font-size: 12px;
-  color: var(--texto-muted);
+  font-size: 13px;
+  color: var(--tinta-suave);
   white-space: nowrap;
 }
 .misto {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--aviso);
   white-space: nowrap;
 }

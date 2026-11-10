@@ -1,0 +1,115 @@
+/* Dia e noite — generated from tokens.json */
+:root, [data-theme="noturno"] {
+  --fundo: #050f1c;
+  --painel: #08192b;
+  --painel-alto: #0b2138;
+  --painel-destaque: #102c48;
+  --linha: rgba(200,207,216,0.16);
+  --linha-controle: #5b6675;
+  --grade: rgba(238,243,248,0.045);
+  --realce: rgba(238,243,248,0.06);
+  --tinta: #eef3f8;
+  --tinta-suave: #a9b1ba;
+  --tinta-fraca: #8a94a0;
+  --ouro: #f0c674;
+  --ouro-2: #e0a94f;
+  --ouro-claro: #fff1cf;
+  --ouro-hover: #fff1cf;
+  --ouro-hover-2: #f0c674;
+  --sobre-ouro: #0b2138;
+  --ouro-suave: rgba(240,198,116,0.12);
+  --ouro-borda: rgba(240,198,116,0.4);
+  --ouro-contorno: rgba(240,198,116,0.4);
+  --ouro-brilho: rgba(240,198,116,0.32);
+  --ouro-tinta: #f0c674;
+  --ouro-palavra: #f0c674;
+  --brasao-cor: #acadae;
+  --sucesso: #5bc48e;
+  --sucesso-fundo: rgba(91,196,142,0.14);
+  --aviso: #f59e5b;
+  --aviso-fundo: rgba(245,158,91,0.14);
+  --erro: #ff7b6b;
+  --erro-fundo: rgba(255,123,107,0.14);
+  --sobre-erro: #2a0c07;
+  --info: #7cc4e8;
+  --info-fundo: rgba(124,196,232,0.14);
+  --veu: rgba(5,15,28,0.72);
+  --sombra-repouso: none;
+  --sombra-cartao: 0 18px 40px rgba(0,0,0,0.45);
+  --sombra-elevada: 0 26px 52px rgba(0,0,0,0.55);
+  --sombra-mascote: 0 22px 40px rgba(0,0,0,0.6);
+}
+[data-theme="diurno"] {
+  --fundo: #fbf3de;
+  --painel: #fffdf8;
+  --painel-alto: #fffdf8;
+  --painel-destaque: #ffffff;
+  --linha: #ead9c0;
+  --linha-controle: #937e5c;
+  --grade: rgba(2,59,86,0.05);
+  --realce: rgba(2,59,86,0.06);
+  --tinta: #1c3242;
+  --tinta-suave: #4f4b40;
+  --tinta-fraca: #6b6455;
+  --ouro: #f6a425;
+  --ouro-2: #f09a1c;
+  --ouro-claro: #ffd78c;
+  --ouro-hover: #ea9713;
+  --ouro-hover-2: #e48e10;
+  --sobre-ouro: #1f1200;
+  --ouro-suave: rgba(11,90,128,0.16);
+  --ouro-borda: #d9be97;
+  --ouro-contorno: #3d7391;
+  --ouro-brilho: rgba(246,164,37,0.32);
+  --ouro-tinta: #023b56;
+  --ouro-palavra: #9a4f12;
+  --brasao-cor: #023b56;
+  --sucesso: #1a5030;
+  --sucesso-fundo: #d8ebdc;
+  --aviso: #544100;
+  --aviso-fundo: #ffe8bd;
+  --erro: #82281a;
+  --erro-fundo: #f7e0d8;
+  --sobre-erro: #ffffff;
+  --info: #094a6a;
+  --info-fundo: #dcebf3;
+  --veu: rgba(28,50,66,0.45);
+  --sombra-repouso: 0 1px 2px rgba(140,62,22,0.05), 0 8px 22px rgba(140,62,22,0.07);
+  --sombra-cartao: 0 4px 12px rgba(140,62,22,0.08), 0 18px 44px rgba(140,62,22,0.14);
+  --sombra-elevada: 0 4px 12px rgba(140,62,22,0.08), 0 18px 44px rgba(140,62,22,0.14);
+  --sombra-mascote: 0 16px 26px rgba(140,62,22,0.18);
+}
+:root {
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-5: 24px;
+  --espaco-6: 32px;
+  --espaco-7: 48px;
+  --espaco-8: 64px;
+  --espaco-9: 96px;
+  --raio-p: 10px;
+  --raio: 14px;
+  --raio-g: 20px;
+  --raio-pill: 999px;
+  --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Albert Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-serif: "Source Serif 4", Georgia, serif;
+}
+.t-heroi { font-family: var(--font-display); font-size: 68px; line-height: 1.02; font-weight: 200; letter-spacing: -0.028em; }
+.t-pagina { font-family: var(--font-display); font-size: 48px; line-height: 1.08; font-weight: 300; letter-spacing: -0.022em; }
+.t-bloco { font-family: var(--font-display); font-size: 24px; line-height: 1.25; font-weight: 400; letter-spacing: -0.01em; }
+.t-cartao { font-family: var(--font-display); font-size: 20px; line-height: 1.25; font-weight: 400; letter-spacing: -0.01em; }
+.t-numero { font-family: var(--font-display); font-size: 56px; line-height: 1; font-weight: 300; letter-spacing: -0.03em; }
+.t-dia-titulo { font-family: var(--font-serif); font-size: 68px; line-height: 1.02; font-weight: 500; letter-spacing: -0.015em; }
+.t-dia-cartao { font-family: var(--font-serif); font-size: 20px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
+.t-lead { font-family: var(--font-sans); font-size: 19px; line-height: 1.55; font-weight: 300; }
+.t-corpo { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; font-weight: 400; }
+.t-corpo-forte { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; font-weight: 600; }
+.t-contexto { font-family: var(--font-sans); font-size: 15px; line-height: 1.5; font-weight: 400; }
+.t-rotulo { font-family: var(--font-sans); font-size: 14px; line-height: 1.4; font-weight: 500; }
+.t-saudacao { font-family: var(--font-sans); font-size: 18px; line-height: 1.4; font-weight: 400; }
+.t-secao { font-family: var(--font-sans); font-size: 16px; line-height: 1.4; font-weight: 600; }
+.t-documento { font-family: var(--font-mono); font-size: 15px; line-height: 1.5; font-weight: 400; }

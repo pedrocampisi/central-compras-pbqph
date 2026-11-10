@@ -1,71 +1,93 @@
+/* O Painel no padrão "Dia e noite" (D1034, lote a). Os números são a peça
+ * Métrica do pacote; aqui fica só o arranjo deles e o das três listas. */
+
+.cabeca {
+  margin-bottom: var(--espaco-4);
+}
+
+/* Seis métricas: três por linha no computador; abaixo disso, duas, com o
+   dinheiro numa linha só dele. */
 .strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-5) var(--espaco-6);
+  margin-bottom: var(--espaco-7);
 }
-.tile {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--raio);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-shadow: var(--shadow);
+.dinheiro {
+  grid-column: 1 / -1;
+  order: -1; /* o maior número abre a tela estreita; os outros cinco vêm em pares */
 }
-.tile small {
-  color: var(--texto-suave);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+@media (min-width: 1100px) {
+  .strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .dinheiro {
+    grid-column: auto;
+    order: 0;
+  }
 }
-.tileValue {
-  font-size: 30px;
-  line-height: 1.1;
-  font-weight: 800;
-  color: var(--texto);
-  font-variant-numeric: tabular-nums;
-  margin-top: 4px;
+/* Dinheiro nunca quebra de linha (peça Métrica): o valor encolhe na tela
+   estreita em vez de passar da borda. */
+.dinheiro :global(.num) {
+  font-size: clamp(2rem, 1rem + 1.8vw, 3.5rem);
 }
+
 .grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 16px;
+  gap: var(--espaco-5);
 }
+@media (max-width: 1080px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card {
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--painel);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
-  padding: 14px;
+  padding: var(--espaco-5);
+  box-shadow: var(--sombra-repouso);
 }
+.cardSeguinte {
+  margin-top: var(--espaco-5);
+}
+/* O nome da lista: frase, nunca rótulo em caixa alta (peça Título, cp-secao). */
 .card h3 {
-  margin: 0 0 10px;
-  font-size: 12px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 700;
+  margin: 0 0 var(--espaco-4);
+  font: 600 1rem/1.4 var(--font-sans);
+  color: var(--tinta-suave);
 }
-.list { display: grid; gap: 8px; }
+
+.list {
+  display: grid;
+  gap: var(--espaco-2);
+}
 .listItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--raio-pequeno);
-  font-size: 13px;
+  gap: var(--espaco-3);
+  min-height: 56px;
+  padding: var(--espaco-2) var(--espaco-3);
+  background: var(--painel-alto);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
 }
-.meta { color: var(--text-muted); font-size: 11px; }
-
-@media (max-width: 1080px) {
-  .grid { grid-template-columns: 1fr; }
+.nome {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--tinta);
 }
-
-/* O cabeçalho da tela (CTO-D643): o título, com o mesmo respiro das faixas. */
-.cabeca {
-  margin-bottom: 16px;
+.meta {
+  color: var(--tinta-suave);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.valor {
+  font-weight: 700;
+  color: var(--ouro-tinta);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }

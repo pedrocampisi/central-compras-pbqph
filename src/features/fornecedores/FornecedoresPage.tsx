@@ -275,7 +275,7 @@ export function FornecedoresPage() {
         />
       ) : (
         <div className={tabela.wrap}>
-          <table className={`${tabela.table} ${styles.tabela}`}>
+          <table className={`cp-tabela ${tabela.table} ${styles.tabela}`}>
             {/* As larguras fixas (CTO-D644): o cabeçalho não anda entre a lista,
                 a busca e os filtros. A empresa fica com o resto. */}
             <colgroup>

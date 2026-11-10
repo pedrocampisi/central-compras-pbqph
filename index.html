@@ -10,24 +10,12 @@
     <title>Central de Compras PBQP-H — Campisi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Albert+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script>
-      // Tema antes da primeira pintura: se ficar para o React, a tela pisca
-      // clara antes de virar escura. Espelha hooks/useTema.ts.
-      (function () {
-        try {
-          var salvo = localStorage.getItem('tema');
-          if (salvo === 'escuro') document.documentElement.dataset.tema = 'escuro';
-          else if (salvo === null && matchMedia('(prefers-color-scheme: dark)').matches)
-            document.documentElement.dataset.tema = 'escuro';
-        } catch (e) {
-          /* navegador sem localStorage: fica no claro */
-        }
-      })();
-    </script>
+    <!-- O padrao "Dia e noite" (DESIGN.md, secao 5): o modo antes das folhas, para a tela nunca piscar na cor
+         errada; as letras vem pelo @import do componentes.css, uma vez so. -->
+    <script src="/padrao_campisi/componentes/modo.js"></script>
+    <script src="/cor-da-barra.js"></script>
+    <link rel="stylesheet" href="/padrao_campisi/tokens/tokens.css" />
+    <link rel="stylesheet" href="/padrao_campisi/componentes/componentes.css" />
   </head>
   <body>
     <div id="root"></div>

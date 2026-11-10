@@ -57,7 +57,7 @@ export function ObrasPage() {
         <div>
           <strong>{o.nome}</strong>
           {o.cei && (
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>CNO: {o.cei}</div>
+            <div style={{ fontSize: 13, color: 'var(--tinta-suave)', marginTop: 1 }}>CNO: {o.cei}</div>
           )}
         </div>
       ),
@@ -67,8 +67,8 @@ export function ObrasPage() {
       label: 'Responsável / Telefone',
       render: (o) => (
         <div>
-          {o.responsavel && <div style={{ fontSize: 12 }}>{o.responsavel}</div>}
-          {o.telefone && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{o.telefone}</div>}
+          {o.responsavel && <div style={{ fontSize: 13 }}>{o.responsavel}</div>}
+          {o.telefone && <div style={{ fontSize: 13, color: 'var(--tinta-suave)' }}>{o.telefone}</div>}
         </div>
       ),
     },
@@ -84,7 +84,7 @@ export function ObrasPage() {
       key: 'pasta_oc_path',
       label: 'Pasta OCs',
       render: (o) => (
-        <span style={{ fontSize: 11, fontFamily: 'monospace', color: o.pasta_oc_path ? 'var(--text)' : 'var(--text-muted)' }}>
+        <span style={{ fontSize: 13, fontFamily: 'monospace', color: o.pasta_oc_path ? 'var(--tinta)' : 'var(--tinta-suave)' }}>
           {o.pasta_oc_path || '—'}
         </span>
       ),
@@ -93,7 +93,7 @@ export function ObrasPage() {
       key: 'ativa',
       label: 'Ativa',
       render: (o) => (
-        <span style={{ color: o.ativa ? 'var(--green)' : 'var(--text-muted)', fontWeight: 600, fontSize: 12 }}>
+        <span style={{ color: o.ativa ? 'var(--sucesso)' : 'var(--tinta-suave)', fontWeight: 600, fontSize: 13 }}>
           {o.ativa ? '✓ Ativa' : '— Inativa'}
         </span>
       ),

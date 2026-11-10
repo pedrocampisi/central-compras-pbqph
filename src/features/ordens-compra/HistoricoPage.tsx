@@ -6,6 +6,7 @@
  * obra, com o link, e o botão de mandar de novo pelo servidor.
  */
 
+import styles from './HistoricoPage.module.css';
 import { useEffect, useMemo, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
@@ -348,7 +349,7 @@ export function HistoricoPage() {
   function seloDaPasta(o: OrdemCompra) {
     if (!naPasta) return null;
     const p = naPasta.get(o.id);
-    if (!p) return <span style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>Não está</span>;
+    if (!p) return <span className={styles.foraDaPasta}>Não está</span>;
     const link = linkSeguro(p.webUrl);
     const rotulo = (
       <>
@@ -361,12 +362,12 @@ export function HistoricoPage() {
         target="_blank"
         rel="noopener noreferrer"
         title={`Abrir "${p.nome}" na pasta da obra`}
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--success)', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}
+        className={styles.naPasta}
       >
         {rotulo}
       </a>
     ) : (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--success)', fontSize: 12, whiteSpace: 'nowrap' }}>
+      <span className={styles.naPasta}>
         {rotulo}
       </span>
     );
@@ -378,16 +379,16 @@ export function HistoricoPage() {
     if (!a) return null;
     const foto = linkSeguro(fotosDasEntregas.get(a.fotoDocumentoId) ?? '');
     return (
-      <div data-recebimento-da-oc style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+      <div data-recebimento-da-oc className={styles.abaixoDoSelo}>
         <span>
           Recebido {formatDate(a.recebidoEm)}
           {a.avaliadoPorNome ? ` · ${a.avaliadoPorNome}` : ''}
         </span>
         {!a.chegouTudo && (
-          <span style={{ color: 'var(--aviso)', fontWeight: 600 }}>Só uma parte: espera o resto</span>
+          <span className={styles.atencao}>Só uma parte: espera o resto</span>
         )}
         {foto && (
-          <a href={foto} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+          <a href={foto} target="_blank" rel="noopener noreferrer" className={styles.link}>
             Foto da nota
           </a>
         )}
@@ -398,13 +399,13 @@ export function HistoricoPage() {
               key={c.ecrId}
               data-cobertura={c.ecrId}
               data-situacao={c.situacao}
-              style={c.situacao === 'sem_papel' ? { color: 'var(--aviso)', fontWeight: 600 } : undefined}
+              className={c.situacao === 'sem_papel' ? styles.atencao : undefined}
             >
               {textoDaCobertura(c)}
               {papel && (
                 <>
                   {' · '}
-                  <a href={papel} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600 }}>
+                  <a href={papel} target="_blank" rel="noopener noreferrer" className={styles.link}>
                     Abrir
                   </a>
                 </>
@@ -426,7 +427,7 @@ export function HistoricoPage() {
     const selo = seloDaPasta(o);
     if (!selo && !gravaOk) return null;
     return (
-      <div data-pasta-da-oc style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, marginTop: 6 }}>
+      <div data-pasta-da-oc className={styles.abaixoDoSelo}>
         {selo}
         {/* Só quem emite OC manda para a pasta: é o papel que a função exige (D682 §2). */}
         {gravaOk && (
@@ -459,7 +460,7 @@ export function HistoricoPage() {
         o.numero ? (
           <strong className="doc">{o.numero}</strong>
         ) : (
-          <span style={{ color: 'var(--texto-muted)', fontSize: 12 }}>(numera ao emitir)</span>
+          <span className={styles.fraco}>(numera ao emitir)</span>
         ),
     },
     { key: 'data', label: 'Data', render: (o) => formatDate(o.data) },
@@ -476,13 +477,13 @@ export function HistoricoPage() {
     {
       key: 'itens',
       label: 'Itens',
-      render: (o) => <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{o.itens.length}</span>,
+      render: (o) => <span className={styles.fraco}>{o.itens.length}</span>,
     },
     {
       key: 'total',
       label: 'Total',
       render: (o) => (
-        <strong style={{ color: 'var(--navy)', fontFamily: 'inherit' }}>
+        <strong className={styles.total}>
           {formatBrl(computeOcTotals(o).total_geral)}
         </strong>
       ),
@@ -497,11 +498,7 @@ export function HistoricoPage() {
           {avisoDaIa(o) && (
             <div
               data-montada-pela-ia=""
-              style={{
-                marginTop: 6, fontSize: 12, maxWidth: 220,
-                color: o.status === 'rascunho' ? 'var(--aviso)' : 'var(--text-muted)',
-                fontWeight: o.status === 'rascunho' ? 600 : undefined,
-              }}
+              className={`${styles.avisoDaIa} ${o.status === 'rascunho' ? styles.avisoDaIaRascunho : ''}`}
             >
               {avisoDaIa(o)}
             </div>
@@ -522,7 +519,7 @@ export function HistoricoPage() {
             {ocs.length} de {data.ordens_compra.length} registro(s)
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className={styles.acoesDoTopo}>
           <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={ocs.length === 0}>
             <Icon name="download" size={13} /> Exportar CSV
           </Button>
@@ -598,7 +595,7 @@ export function HistoricoPage() {
           rowKey={(o) => o.id}
           emptyTitle="Nenhuma OC encontrada"
           rowActions={(o) => (
-            <div style={{ display: 'flex', gap: 4 }}>
+            <div className={styles.acoesDaLinha}>
               {o.status === 'rascunho' && gravaOk && (
                 <Button variant="ghost" size="sm" onClick={() => handleEdit(o)}>Editar</Button>
               )}

@@ -1,6 +1,7 @@
+/* O que a casa acrescenta à peça Campo do pacote (cp-campo): o rótulo, a
+ * caixa de 44 px, o foco no anel e a ajuda embaixo são da peça. Aqui fica o
+ * arranjo na grade do formulário. */
 .field {
-  display: grid;
-  gap: 4px;
   min-width: 0;
   /* Quando um vizinho da mesma linha tem a linha de dica embaixo (endereço do
      fornecedor, "Faturar para" da obra), a linha da grade fica mais alta —
@@ -15,17 +16,13 @@
    em 15/09/2026). `1 / -1` ocupa o que houver, sem inventar. */
 .field.span2 { grid-column: 1 / -1; }
 
-.field label {
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--texto-suave);
-}
 /* O rótulo com o "?" (CTO-D764): a linha quebra, e a resposta ocupa a largura toda. */
 .rotuloComAjuda {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 6px;
+  font: 500 0.875rem/1.4 var(--font-sans);
 }
 .required {
   color: var(--erro);
@@ -35,30 +32,13 @@
 .field select,
 .field textarea {
   width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
-  background: var(--painel-2);
-  color: var(--texto);
-  font-size: 13.5px;
-  font-family: inherit;
-  transition: border-color var(--transicao);
-}
-.field input:hover,
-.field select:hover,
-.field textarea:hover,
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
-  border-color: var(--marca);
 }
 .field textarea {
   resize: vertical;
   min-height: 70px;
 }
 .hint {
-  font-size: 12px;
-  color: var(--texto-suave);
+  display: block;
 }
 
 /* Números e documentos alinham por dígito — comparar duas linhas de valor

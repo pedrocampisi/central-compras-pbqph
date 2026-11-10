@@ -114,8 +114,8 @@ export function CampoPesquisavel({
   const idAtivo = aberto && visiveis[ativo] ? `${idCampo}-op-${ativo}` : undefined;
 
   return (
-    <div className={[styles.caixa, variante === 'filtro' ? styles.filtro : styles.campo].join(' ')}>
-      <Icon name="search" size={14} className={styles.lupa} />
+    <div className={['cc-escolha', variante === 'filtro' ? styles.filtro : ''].join(' ')}>
+      <Icon name="search" size={16} />
       <input
         id={idCampo}
         type="text"
@@ -128,7 +128,6 @@ export function CampoPesquisavel({
         aria-required={required || undefined}
         autoComplete="off"
         spellCheck={false}
-        className={styles.entrada}
         value={aberto ? busca : escolhida?.rotulo ?? ''}
         placeholder={aberto ? escolhida?.rotulo ?? rotuloVazio : rotuloVazio}
         onClick={abrir}
@@ -141,9 +140,9 @@ export function CampoPesquisavel({
         onBlur={fechar}
       />
       {aberto && (
-        <ul id={idLista} role="listbox" ref={listaRef} className={styles.lista}>
+        <ul id={idLista} role="listbox" ref={listaRef} className="cc-escolha-lista">
           {visiveis.length === 0 ? (
-            <li className={styles.nada} role="presentation">Nada encontrado para “{busca.trim()}”</li>
+            <li className="cc-escolha-nada" role="presentation">Nada encontrado para “{busca.trim()}”</li>
           ) : (
             visiveis.map((o, i) => (
               <li
@@ -152,9 +151,8 @@ export function CampoPesquisavel({
                 role="option"
                 aria-selected={o.valor === valor}
                 className={[
-                  styles.opcao,
-                  i === ativo ? styles.ativa : '',
-                  o.valor === valor ? styles.escolhida : '',
+                  i === ativo ? 'ativa' : '',
+                  o.valor === valor ? 'escolhida' : '',
                   o.valor === '' ? styles.opcaoVazia : '',
                 ].join(' ')}
                 // mousedown, e não click: o click chega depois do blur, e o
@@ -166,7 +164,7 @@ export function CampoPesquisavel({
                 onMouseMove={() => setAtivo(i)}
               >
                 <span className={styles.rotulo}>{o.rotulo}</span>
-                {o.detalhe && <span className={styles.detalhe}>{o.detalhe}</span>}
+                {o.detalhe && <small>{o.detalhe}</small>}
               </li>
             ))
           )}

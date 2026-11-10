@@ -1,178 +1,119 @@
 /* Entrada da Central de Compras.
  *
- * SEM portão de boas-vindas e SEM animação de entrada: a cerimônia da marca é
- * da Central (`Plataforma_Campisi/Central`), que é por onde a
- * equipe entra. Aqui fica só o necessário para autenticar — e o dia em que a
- * Central assumir o login, esta tela some.
+ * SEM portão de boas-vindas e SEM animação de entrada (regra 7 do CLAUDE.md da
+ * casa): a cerimônia da marca é da Central, por onde a equipe entra. Aqui fica
+ * só o formulário, com as peças do pacote: o brasão pintado pelo modo, o Campo
+ * e o Botão. O dia em que a Central assumir o login, esta tela some.
  *
- * Diferente do resto do padrão, esta tela acompanha o tema normalmente: sem o
- * vídeo, não há mais cor de fundo para casar. */
+ * O cartão é pequeno de propósito (DESIGN.md §9, item 5). */
 
 .wrap {
   position: fixed;
   inset: 0;
   overflow: auto;
   background: var(--fundo);
-  color: var(--texto);
+  color: var(--tinta);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
+  padding: var(--espaco-6) var(--espaco-4);
 }
 
 .card {
-  background: var(--painel);
-  border-radius: var(--raio-grande);
-  box-shadow: var(--sombra-elevada);
-  padding: 40px 40px 28px;
-  width: min(420px, 92vw);
+  background: var(--painel-alto);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-cartao);
+  padding: var(--espaco-7) var(--espaco-6) var(--espaco-6);
+  width: min(440px, 100%);
   text-align: center;
   display: flex;
   flex-direction: column;
 }
 .logo {
-  width: 72px;
   display: block;
-  margin: 0 auto 16px;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--espaco-4);
 }
-[data-tema='escuro'] .logo {
-  filter: brightness(0) invert(1) opacity(0.94);
+img.logo {
+  width: 120px;
+  height: auto;
 }
 .brandName {
-  font-family: var(--fonte-display);
-  font-size: 26px;
-  font-weight: 600;
-  margin: 0 0 6px;
-  color: var(--texto);
+  font: var(--peso-cartao) 1.75rem/1.2 var(--font-display);
+  letter-spacing: var(--ar-cartao);
+  margin: 0 0 var(--espaco-2);
+  color: var(--tinta);
 }
 .brandSub {
-  color: var(--texto-suave);
-  margin: 0 0 18px;
-  font-size: 14px;
+  color: var(--tinta-suave);
+  margin: 0 0 var(--espaco-3);
+  font-size: 1rem;
 }
 
 .field {
-  display: block;
   text-align: left;
-}
-.field span {
-  display: block;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--texto-suave);
-  margin: 14px 0 6px;
+  margin-top: var(--espaco-4);
 }
 .field input {
   width: 100%;
-  height: 46px;
-  padding: 0 16px;
-  background: var(--painel-2);
-  color: var(--texto);
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
-  font: inherit;
-  font-size: 14.5px;
-  transition: border-color var(--transicao);
-}
-.field input:hover,
-.field input:focus {
-  border-color: var(--marca);
-}
-.field input::placeholder {
-  color: var(--texto-muted);
 }
 
 /* Única ação primária da tela. */
 .btnEntrar {
   width: 100%;
-  min-height: 48px;
-  padding: 8px 16px;
-  margin-top: 24px;
-  background: var(--acento);
-  color: var(--acento-texto);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  border: 0;
-  border-radius: var(--raio-pill);
-  cursor: pointer;
-  transition: background var(--transicao);
-}
-.btnEntrar:hover:not(:disabled) {
-  background: var(--acento-sombra);
-}
-.btnEntrar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  margin-top: var(--espaco-5);
+  --altura: 48px;
 }
 
 /* Altura MÍNIMA, não fixa: a 375px "Primeiro acesso — definir minha senha"
    quebra em duas linhas, e em 44px fixos as duas ficavam espremidas. */
 .btnSecundario {
   width: 100%;
+  height: auto;
   min-height: 44px;
-  padding: 6px 12px;
-  margin-top: 12px;
-  background: transparent;
-  color: var(--marca);
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 600;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
-  cursor: pointer;
-  transition: background var(--transicao);
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-top: var(--espaco-3);
+  white-space: normal;
+  line-height: 1.3;
 }
-.btnSecundario:hover:not(:disabled) {
-  background: var(--marca-fraca);
+
+/* Alvo de toque de 44px (pendência 9 d). */
+.linkBtn {
+  align-self: center;
+  margin-top: var(--espaco-2);
 }
+
+.btnEntrar:disabled,
 .btnSecundario:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* Alvo de toque de 44px (pendência 9 d): era 29px, pequeno para o dedo no
-   celular. A altura cresce sem mudar a aparência — o texto continua link. */
-.linkBtn {
-  align-self: center;
-  min-height: 44px;
-  background: none;
-  border: 0;
-  color: var(--marca);
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 8px;
-  padding: 0 12px;
-}
-.linkBtn:hover:not(:disabled) {
-  text-decoration: underline;
+  transform: none;
 }
 
 .erro,
 .aviso {
-  margin: 16px 0 0;
+  margin: var(--espaco-4) 0 0;
   padding: 10px 12px;
   border-radius: var(--raio);
-  font-size: 13px;
+  font-size: 0.9375rem;
   font-weight: 500;
   text-align: left;
+  color: var(--tinta);
 }
 .erro {
   border: 1px solid var(--erro);
-  background: var(--erro-bg);
-  color: var(--erro);
+  background: var(--erro-fundo);
 }
 .aviso {
   border: 1px solid var(--aviso);
-  background: var(--aviso-bg);
-  color: var(--aviso);
+  background: var(--aviso-fundo);
 }
 
-/* 12.5px (pendência 9 e): era 11.5px, a menor letra da tela. */
 .rodape {
-  margin: 14px 0 0;
-  font-size: 12.5px;
-  color: var(--texto-muted);
+  margin: var(--espaco-4) 0 0;
+  font-size: 0.875rem;
+  color: var(--tinta-suave);
 }

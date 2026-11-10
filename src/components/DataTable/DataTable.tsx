@@ -36,7 +36,7 @@ export function DataTable<T>({
 
   return (
     <div className={styles.wrap}>
-      <table className={styles.table}>
+      <table className={`cp-tabela ${styles.table}`}>
         <thead>
           <tr>
             {columns.map((col) => (

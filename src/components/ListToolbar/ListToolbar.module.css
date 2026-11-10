@@ -1,91 +1,37 @@
+/* A barra de filtros das listas: a busca (candidata cc-busca), os recortes
+ * (peça Chips) e as listas de escolha, numa fila que quebra quando não cabe. */
 .filterBar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--espaco-3);
   flex-wrap: wrap;
 }
 
-/* ── Busca em pílula ─────────────────────────────────────────────────────── */
-.busca {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 240px;
-  max-width: 460px;
-  background: var(--painel);
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio-pill);
-  padding: 7px 18px;
-  box-shadow: var(--sombra-suave);
-}
-.busca:focus-within {
-  outline: 2px solid var(--marca);
-  outline-offset: 2px;
-}
-.buscaIcone {
-  color: var(--texto-muted);
-  flex: none;
-}
 .searchInput {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  background: transparent;
-  color: var(--texto);
-  font: inherit;
-  font-size: 13.5px;
-  outline: none;
-}
-.searchInput::placeholder {
-  color: var(--texto-muted);
+  font-size: 1rem;
 }
 
-/* ── Alternador (Todos / Ativos / Inativos) ──────────────────────────────── */
-.toggleGroup {
-  display: flex;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio-pill);
-  overflow: hidden;
-}
-.toggleBtn {
-  height: 34px;
-  padding: 0 16px;
-  font-size: 12.5px;
-  font-weight: 500;
-  font-family: inherit;
-  background: transparent;
-  color: var(--texto-suave);
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
-  transition: background var(--transicao), color var(--transicao);
-}
-.toggleBtn:hover {
-  background: var(--marca-fraca);
-}
-.toggleActive,
-.toggleActive:hover {
-  background: var(--marca-fraca);
-  color: var(--marca);
-  font-weight: 600;
-}
-
-/* ── Select de filtro ────────────────────────────────────────────────────── */
+/* O select de filtro com a medida da peça Campo (44 px) e em pílula, como a
+ * busca ao lado dele. */
 .filterSelect {
-  height: 34px;
-  padding: 0 10px;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio);
-  font-size: 12.5px;
-  font-family: inherit;
-  background: var(--painel);
-  color: var(--texto);
-  outline: none;
+  min-height: 44px;
+  min-width: 170px;
+  padding: 0 14px;
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio-pill);
+  background: var(--painel-alto);
+  color: var(--tinta);
+  font: 400 1rem/1.4 var(--font-sans);
   cursor: pointer;
-  min-width: 150px;
-  transition: border-color var(--transicao);
+  transition:
+    border-color var(--dur-resposta),
+    box-shadow var(--dur-resposta);
 }
 .filterSelect:hover {
-  border-color: var(--marca);
+  border-color: var(--ouro-tinta);
+}
+.filterSelect:focus-visible {
+  outline: none;
+  border-color: var(--ouro-tinta);
+  box-shadow: 0 0 0 4px var(--ouro-suave);
 }
