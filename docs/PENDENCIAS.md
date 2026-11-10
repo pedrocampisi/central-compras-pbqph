@@ -9,6 +9,12 @@ Pausa do Pedro de 04/09: trabalho novo só por carta do CTO; se a pausa ainda va
 
 ## 🔴 Abertas
 
+### 46. A pintura "Dia e noite" da casa (D1034, D1034b)
+Plano aceito (`docs/Enviados/2026-11-10_..._D1034-o-plano-da-pintura.md`). Três lotes, cada ramo nasce do anterior: (a) `d1034-a-casca`: casca, menu, login, cinco listas, candidatas `cc-` do campo de busca com X, da gaveta de ficha e da lista de escolha; (b) `d1034-b-o-pedido` (vai à perícia); (c) `d1034-c-o-mestre`. PDF fica; sem animação de entrada; quem não escolheu modo e tem o computador escuro passa a ver o dia. **Espera:** a publicação da D975, e uma sessão nova do CTO para construir o lote (a). Quem chegar lê o plano e a D1034b em `Devolucoes/`.
+
+### 45. A D975, o X nas buscas: pronta, espera a campainha do CTO
+Ramo `d975-sobre-origin-main` (`ce30041`, `f540077`), sem o `2bc863d`; o `d975-x-na-busca` não sobe. Publica-se hoje, depois das 19h, na campainha do CTO, junto com o `d1034-plano-e-regras` (só documento). Depois, o CTO confere o X no ar.
+
 ### 44. A OC no mesmo MCP (D953 a D961)
 Tela no ar (`6bb4a34d`, dec. 147) e `regra_da_oc` na produção. **Falta:** a `mcp` (Banco), a página (Central) e o teste de gente no Antigravity (D961h, do CTO).
 
