@@ -1,0 +1,72 @@
+{
+  "recebimentos_375_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "encarregados_375_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_dia_tabela_rola_de_lado_px": 0,
+  "novaoc_itens_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_botoes_de_baixo_dia": [
+    {
+      "t": "+ Adicionar item",
+      "w": 144,
+      "h": 44
+    },
+    {
+      "t": "Importar de um orçamento (IA)",
+      "w": 269,
+      "h": 44
+    },
+    {
+      "t": "Ajuda: Como pôr os itens",
+      "w": 44,
+      "h": 44
+    }
+  ],
+  "novaoc_itens_dia_alvos": {
+    "alvos": 21,
+    "menor": 44,
+    "abaixoDe44": 0
+  },
+  "recebimentos_375_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "encarregados_375_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_noite_tabela_rola_de_lado_px": 0,
+  "novaoc_itens_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_botoes_de_baixo_noite": [
+    {
+      "t": "+ Adicionar item",
+      "w": 144,
+      "h": 44
+    },
+    {
+      "t": "Importar de um orçamento (IA)",
+      "w": 269,
+      "h": 44
+    },
+    {
+      "t": "Ajuda: Como pôr os itens",
+      "w": 44,
+      "h": 44
+    }
+  ],
+  "novaoc_itens_noite_alvos": {
+    "alvos": 21,
+    "menor": 44,
+    "abaixoDe44": 0
+  }
+}

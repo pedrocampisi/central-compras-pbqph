@@ -178,6 +178,21 @@
     height: 44px;
     font-size: 22px;
   }
+  /* Os dois botões e o "?" embaixo dos cartões também com 44 px de alvo (D1034j). */
+  .itemsActions > button,
+  .portasDosItens > button {
+    min-height: 44px;
+    height: auto;
+  }
+  /* O "?" fica do tamanho de sempre à vista, e o alvo cresce em volta dele:
+     o círculo de 22 px é desenhado no fundo de um botão de 44. */
+  .itemsActions button[aria-label^='Ajuda'],
+  .portasDosItens button[aria-label^='Ajuda'] {
+    width: 44px;
+    height: 44px;
+    border-color: transparent;
+    background: radial-gradient(circle, var(--painel) 0 10px, var(--linha-controle) 10px 11px, transparent 11.5px);
+  }
 }
 
 /* Quebra entre os botões: a 375px o "Importar de um orçamento (IA)" passava 3px da

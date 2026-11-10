@@ -76,3 +76,16 @@ describe('D1034i — os itens da Nova OC em cartão abaixo de 720 px', () => {
     expect(estreito).toMatch(/\.removeBtn\s*\{\s*width:\s*44px;\s*height:\s*44px/);
   });
 });
+
+describe('D1034j — embaixo dos cartões dos itens, o alvo também tem 44 px', () => {
+  const css = semComentario(readFileSync('src/features/ordens-compra/NovaOcPage.module.css', 'utf-8'));
+  const estreito = css.slice(css.search(/@media \(max-width: 720px\) \{\s*\.tableWrap/));
+
+  it('o "+ Adicionar item" e o "Importar de um orçamento (IA)", na fila e no vazio', () => {
+    expect(estreito).toMatch(/\.itemsActions > button,\s*\.portasDosItens > button\s*\{\s*min-height:\s*44px/);
+  });
+
+  it('o "?" ao lado deles: 44 px de alvo, com o círculo de sempre desenhado no fundo', () => {
+    expect(estreito).toMatch(/\.itemsActions button\[aria-label\^='Ajuda'\],\s*\.portasDosItens button\[aria-label\^='Ajuda'\]\s*\{\s*width:\s*44px;\s*height:\s*44px/);
+  });
+});
