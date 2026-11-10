@@ -55,26 +55,28 @@ export function DashboardPage() {
 
     // Por empresa, e não por filial (CTO-D1034f item 11; a D644): as filiais da
     // mesma empresa somam numa linha só, igual ao número de cima e à tela de Fornecedores.
-    const empresaDaFilial = new Map<string, { chave: string; apelido: string }>();
+    // A linha diz quantas filiais a empresa TEM no cadastro, e não quantas compraram
+    // (D1034k, achado 5): 3 filiais com OC em 1 mostravam o CNPJ dessa uma.
+    const empresaDaFilial = new Map<string, { chave: string; apelido: string; cadastradas: string[] }>();
     for (const g of agruparPorEmpresa(data.fornecedores)) {
-      for (const f of g.filiais) empresaDaFilial.set(f.id, { chave: g.chave, apelido: g.apelido });
+      const cadastradas = g.filiais.map((f) => f.id);
+      for (const f of g.filiais) empresaDaFilial.set(f.id, { chave: g.chave, apelido: g.apelido, cadastradas });
     }
-    const porEmpresa = new Map<string, RankEntry & { filiais: Set<string> }>();
+    const porEmpresa = new Map<string, RankEntry & { filiais: string[] }>();
     for (const [id, valor] of porFornecedor) {
-      const e = empresaDaFilial.get(id) ?? { chave: `sem:${id}`, apelido: 'Desconhecido' };
-      const linha = porEmpresa.get(e.chave) ?? { nome: e.apelido || 'Desconhecido', sub: '', valor: 0, filiais: new Set<string>() };
+      const e = empresaDaFilial.get(id) ?? { chave: `sem:${id}`, apelido: 'Desconhecido', cadastradas: [id] };
+      const linha = porEmpresa.get(e.chave) ?? { nome: e.apelido || 'Desconhecido', sub: '', valor: 0, filiais: e.cadastradas };
       linha.valor += valor;
-      linha.filiais.add(id);
       porEmpresa.set(e.chave, linha);
     }
     const topForn: RankEntry[] = [...porEmpresa.values()]
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 5)
       .map(({ nome, valor, filiais }) => {
-        const unica = filiais.size === 1 ? fornecedorById.get([...filiais][0]!) : undefined;
+        const unica = filiais.length === 1 ? fornecedorById.get(filiais[0]!) : undefined;
         return {
           nome,
-          sub: unica ? (unica.cnpj ? formatarDocumento(unica.cnpj, 'pj') : '') : `${filiais.size} filiais`,
+          sub: unica ? (unica.cnpj ? formatarDocumento(unica.cnpj, 'pj') : '') : `${filiais.length} filiais`,
           valor,
         };
       });

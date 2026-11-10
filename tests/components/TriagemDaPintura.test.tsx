@@ -190,3 +190,34 @@ describe('Achado 4 — vários avisos de erro não escondem o mais novo', () => 
     expect(screen.getAllByRole('alert').map((a) => a.textContent).join(' ')).toContain('Falha 3 (teste)');
   });
 });
+
+describe('Achado 5 — o Painel conta as filiais da empresa, e não as que compraram', () => {
+  const filial = (id: string, empresa: string): Fornecedor => ({
+    ...normalizeFornecedor({ id, razao_social: `Filial ${id} (teste)`, cnpj: '11222333000181' }),
+    ativo: true,
+    empresa_id: empresa,
+    empresa_apelido: `Empresa ${empresa} (teste)`,
+  });
+  it('empresa de 3 filiais com uma OC de R$ 120,00 em uma só: "3 filiais" e R$ 120,00', async () => {
+    useAuthStore.setState({ perfil: { papel: 'admin' } as never });
+    useQualificacaoStore.getState().definir({ linhas: [], categorias: [], tratativas: [], desempenho: [] });
+    const data = {
+      schema_version: 5, version: 1, app_name: '', shared_file_name: '', seeded_at: '', last_saved: '',
+      config: { emitentes: [], endereco_cobranca: {}, ultimo_numero_oc: 0, ano_corrente: 2026, condicoes_pagamento: [], texto_condicoes_contratacao: '', texto_envio_nf: '', texto_qualidade: '', pasta_backups: '' },
+      fornecedores: [filial('a1', 'A'), filial('a2', 'A'), filial('a3', 'A')],
+      obras: [], ecrs: [],
+      ordens_compra: [normalizeOC({
+        id: '001', numero: '2026/001', status: 'emitida', fornecedor_id: 'a1', obra_id: 'obra', data: '2026-09-18', versao: 1,
+        itens: [normalizeItem({ descricao: 'Item (teste)', quantidade: 1, unidade: 'un', preco_unit: 120 })],
+      })],
+    } as unknown as Data;
+    useDataStore.setState({ data });
+    await act(async () => {
+      render(<DashboardPage />);
+    });
+    const titulo = [...document.querySelectorAll('h3')].find((h) => h.textContent === 'Fornecedores com mais compras')!;
+    const lista = titulo.parentElement!;
+    expect(lista.textContent).toContain('3 filiais');
+    expect(lista.textContent).toMatch(/R\$\s120,00/);
+  });
+});
