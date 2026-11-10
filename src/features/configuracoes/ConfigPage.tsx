@@ -51,7 +51,7 @@ export function ConfigPage() {
       </FieldGroup>
 
       {/* ── Integração IA ─────────────────────────────────────────────────── */}
-      <FieldGroup title="Importação de Pedidos por IA">
+      <FieldGroup title="Importação de pedidos por IA">
         <p className={styles.hint}>
           A leitura de pedidos por IA agora roda no servidor, com a chave
           guardada lá — nenhuma configuração é necessária neste computador.
@@ -59,7 +59,7 @@ export function ConfigPage() {
       </FieldGroup>
 
       {/* ── Condições de pagamento ────────────────────────────────────────── */}
-      <FieldGroup title="Condições de Pagamento">
+      <FieldGroup title="Condições de pagamento">
         <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {cfg.condicoes_pagamento.map((c) => (
             <div key={c} className={styles.condicaoChip}>
@@ -93,10 +93,10 @@ export function ConfigPage() {
           política e o registro por ECR vêm do código e das ECRs (D805). A coluna
           no banco fica. */}
       <fieldset disabled className="fieldset-reset">
-        <FieldGroup title="Textos Legais">
+        <FieldGroup title="Textos legais">
           <Field
             as="textarea"
-            label="Condições de Contratação"
+            label="Condições de contratação"
             span2
             rows={4}
             value={cfg.texto_condicoes_contratacao}
@@ -104,7 +104,7 @@ export function ConfigPage() {
           />
           <Field
             as="textarea"
-            label="Instrução para Envio de NF"
+            label="Instrução para envio de NF"
             span2
             rows={3}
             value={cfg.texto_envio_nf}

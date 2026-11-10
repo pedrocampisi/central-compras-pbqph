@@ -63,7 +63,7 @@ describe('D900 — a coluna PRAZO dos itens saiu', () => {
     render(<NovaOcPage />);
     const tabela = screen.getByRole('columnheader', { name: 'Descrição' }).closest('table')!;
     expect(within(tabela).getAllByRole('columnheader').map((th) => th.textContent)).toEqual(
-      ['#', 'ECR', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço Unit.', 'IPI%', 'Desc%', 'Total', ''],
+      ['#', 'ECR', 'Descrição', 'Obs.', 'Qtd', 'Un', 'Preço unit.', 'IPI%', 'Desc%', 'Total', ''],
     );
     expect(screen.queryByPlaceholderText('Ex: 7 dias')).toBeNull();
     expect(screen.getByLabelText('Entrega prevista')).toBeInTheDocument();

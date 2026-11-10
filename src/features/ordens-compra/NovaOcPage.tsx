@@ -148,7 +148,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
         compacto
         title="Nenhum item adicionado"
         description={VAZIO_DOS_ITENS}
-        action={{ label: '+ Adicionar Item', onClick: onAdd }}
+        action={{ label: '+ Adicionar item', onClick: onAdd }}
       />
     );
   }
@@ -164,7 +164,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
             <th style={{ width: 80 }}>Obs.</th>
             <th style={{ width: 70 }}>Qtd</th>
             <th style={{ width: 60 }}>Un</th>
-            <th style={{ width: 90 }}>Preço Unit.</th>
+            <th style={{ width: 90 }}>Preço unit.</th>
             <th style={{ width: 60 }}>IPI%</th>
             <th style={{ width: 60 }}>Desc%</th>
             <th style={{ width: 90, textAlign: 'right' }}>Total</th>
@@ -1104,7 +1104,7 @@ export function NovaOcPage() {
 
         <Field
           as="select"
-          label="Condição de Pagamento"
+          label="Condição de pagamento"
           value={ocEditing.condicao_pagamento}
           onChange={(e) => { updateField('condicao_pagamento', e.target.value); mexeuNoAlto('condicao'); }}
           aviso={avisoDoAlto('condicao')}
@@ -1177,7 +1177,7 @@ export function NovaOcPage() {
             </div>
           )}
           <div className={styles.itemsActions} data-tutorial="itens">
-            <Button variant="outline" size="sm" onClick={addItem}>+ Adicionar Item</Button>
+            <Button variant="outline" size="sm" onClick={addItem}>+ Adicionar item</Button>
             <Button
               variant="ghost"
               size="sm"

@@ -94,7 +94,7 @@ describe('só Obra e Fornecedor têm pesquisa (palavra do Pedro: "os outros não
   it('ECR, unidade, condição de pagamento e status continuam listas simples', () => {
     expect(nova).toMatch(/<select[\s\S]*?ecr_id/);
     expect(nova).toMatch(/<select[\s\S]*?UN_PADRAO/);
-    expect(nova).toMatch(/as="select"\s+label="Condição de Pagamento"/);
+    expect(nova).toMatch(/as="select"\s+label="Condição de pagamento"/);
     expect(hist).toMatch(/<FilterSelect[\s\S]*?Todos os status/);
     // O campo Filial da D542 saiu (D549): a OC escolhe só a empresa.
     expect(nova).not.toContain('oc-filial');

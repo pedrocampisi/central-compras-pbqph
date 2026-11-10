@@ -27,7 +27,7 @@ describe('D808 §3 — a Configuração sem o "Requisito de Qualidade"', () => {
     render(<ConfigPage />);
     expect(screen.queryByText('Requisito de Qualidade')).toBeNull();
     expect(screen.queryByDisplayValue('requisito antigo (teste)')).toBeNull();
-    expect(screen.getByText('Condições de Contratação')).toBeInTheDocument();
+    expect(screen.getByText('Condições de contratação')).toBeInTheDocument();
     expect(screen.getByDisplayValue('condições (teste)')).toBeInTheDocument();
     expect(screen.getByDisplayValue('nota (teste)')).toBeInTheDocument();
   });

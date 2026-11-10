@@ -18,7 +18,7 @@ import { O_QUE_E_ECR } from './ecr';
 /** A dica embaixo de "Entrega prevista". */
 export const DICA_DA_ENTREGA = 'O dia combinado com o fornecedor. É o que o encarregado vê na obra.';
 /** O vazio da tabela de itens. */
-export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar Item" ou importe um pedido via IA.';
+export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar item" ou importe um pedido via IA.';
 /** A dica do "Importar Pedido (IA)". */
 export const DICA_DA_IMPORTACAO = 'Importar os itens de um pedido (PDF, foto ou print) pela IA';
 

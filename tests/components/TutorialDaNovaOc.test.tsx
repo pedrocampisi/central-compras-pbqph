@@ -114,7 +114,7 @@ describe('D763 — o tutorial, de ponta a ponta', () => {
     fireEvent.click(noBalao('Próximo'));
 
     expect(aceso()).toBe('itens');
-    fireEvent.click(screen.getAllByRole('button', { name: '+ Adicionar Item' })[0]!);
+    fireEvent.click(screen.getAllByRole('button', { name: '+ Adicionar item' })[0]!);
 
     expect(aceso()).toBe('tabela');
     // A pessoa preenche a linha: o passo de leitura não sai do lugar sozinho.
