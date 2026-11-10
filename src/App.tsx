@@ -176,6 +176,18 @@ export default function App() {
     (menu?.querySelector<HTMLElement>('.cp-item.ativo') ?? menu?.querySelector<HTMLElement>('button'))?.focus();
   }, [menuAberto]);
 
+  // Acima de 960 px o menu deixa de ser gaveta. Se a janela alarga com ela aberta, ela
+  // fecha: antes, o véu e o inert ficavam, e a tela de trabalho parava de responder
+  // (D1034k, achado 3 do laudo).
+  useEffect(() => {
+    if (!menuAberto) return;
+    const alargou = () => {
+      if (window.innerWidth > 960) fecharMenu();
+    };
+    window.addEventListener('resize', alargou);
+    return () => window.removeEventListener('resize', alargou);
+  }, [menuAberto, fecharMenu]);
+
   // O número no item Recebimentos (CTO-D845 §2): as entregas sem papel do fornecedor. Só para
   // quem emite OC (a régua da lista no banco), e lido de novo quando os dados mudam.
   const podeEmitir = podeEmitirOc(perfil?.papel);

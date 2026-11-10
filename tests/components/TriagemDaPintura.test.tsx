@@ -161,3 +161,18 @@ describe('Achado 2 — o "Mais" não corta as primeiras ações quando não cabe
     }
   });
 });
+
+describe('Achado 3 — o menu do celular não fica armado ao alargar a janela', () => {
+  it('aberto a 959 px e alargado para 1.100, o véu sai e a tela de trabalho volta a responder', async () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 959 });
+    await abrirApp();
+    fireEvent.click(screen.getByRole('button', { name: 'Mais: abrir o menu' }));
+    expect(document.querySelector('.cp-veu.aberto')).not.toBeNull();
+    await act(async () => {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1100 });
+      window.dispatchEvent(new Event('resize'));
+    });
+    expect(document.querySelector('.cp-veu.aberto')).toBeNull();
+    expect(document.querySelector('[inert]')).toBeNull();
+  });
+});
