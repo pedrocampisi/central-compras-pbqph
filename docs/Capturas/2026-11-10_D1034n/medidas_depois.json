@@ -1,0 +1,186 @@
+{
+  "1620_0": {
+    "aba": "Materiais3 2",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Qualidade?",
+      "Preço?",
+      "Prazo?",
+      "Nota de desempenho",
+      "Situação",
+      "Permissão para compra"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Qualidade",
+      "Preço",
+      "Prazo",
+      "Nota",
+      "Permissão para compra"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 62,
+    "rolaDeLado": 0
+  },
+  "1620_1": {
+    "aba": "Serviço2 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Documentos e NR?",
+      "Fornece EPI?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Documentos e NR",
+      "Fornece EPI",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 63,
+    "rolaDeLado": 0
+  },
+  "1620_2": {
+    "aba": "Controle tecnológico1",
+    "cabecalho": [
+      "Fornecedor",
+      "Qualificada em",
+      "Requalificar em",
+      "Acreditação?",
+      "ISO 17025?",
+      "ISO 9001?",
+      "Desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Qualificada em",
+      "Requalificar em",
+      "Acreditação",
+      "ISO 17025",
+      "ISO 9001",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 43,
+    "rolaDeLado": 0
+  },
+  "1620_3": {
+    "aba": "Projetos1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Responsabilidade técnica?",
+      "NBR 15575?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Responsabilidade técnica",
+      "NBR 15575",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 63,
+    "rolaDeLado": 0
+  },
+  "1620_4": {
+    "aba": "Locação1 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Contrato?",
+      "Check list?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Contrato",
+      "Check list",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 43,
+    "rolaDeLado": 0
+  },
+  "375_0": {
+    "aba": "Materiais3 2",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Qualidade?",
+      "Preço?",
+      "Prazo?",
+      "Nota de desempenho",
+      "Situação",
+      "Permissão para compra"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Qualidade",
+      "Preço",
+      "Prazo",
+      "Nota",
+      "Permissão para compra"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 79,
+    "rolaDeLado": 0
+  },
+  "375_1": {
+    "aba": "Serviço2 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Documentos e NR?",
+      "Fornece EPI?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "Documentos e NR",
+      "Fornece EPI",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 24,
+    "alturaDoCabecalho": 61,
+    "rolaDeLado": 0
+  }
+}

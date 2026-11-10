@@ -1,0 +1,178 @@
+{
+  "1620_0": {
+    "aba": "Materiais3 2",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "Preço?",
+      "O?",
+      "Nota de desempenho",
+      "Situação",
+      "Permissão para compra"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota",
+      "Permissão para compra"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 55,
+    "rolaDeLado": 0
+  },
+  "1620_1": {
+    "aba": "Serviço2 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "O?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 31,
+    "rolaDeLado": 0
+  },
+  "1620_2": {
+    "aba": "Controle tecnológico1",
+    "cabecalho": [
+      "Fornecedor",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "O?",
+      "O?",
+      "Desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 31,
+    "rolaDeLado": 0
+  },
+  "1620_3": {
+    "aba": "Projetos1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "O?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 31,
+    "rolaDeLado": 0
+  },
+  "1620_4": {
+    "aba": "Locação1 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "O?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 31,
+    "rolaDeLado": 0
+  },
+  "375_0": {
+    "aba": "Materiais3 2",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "Preço?",
+      "O?",
+      "Nota de desempenho",
+      "Situação",
+      "Permissão para compra"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota",
+      "Permissão para compra"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 67,
+    "rolaDeLado": 0
+  },
+  "375_1": {
+    "aba": "Serviço2 1",
+    "cabecalho": [
+      "Fornecedor",
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O?",
+      "O?",
+      "Preço?",
+      "Nota de desempenho",
+      "Situação"
+    ],
+    "rotulosDoCartao": [
+      "Tipo",
+      "Qualificada em",
+      "Requalificar em",
+      "O",
+      "Preço",
+      "Nota"
+    ],
+    "respiroDaBuscaAteATabela": 0,
+    "alturaDoCabecalho": 53,
+    "rolaDeLado": 0
+  }
+}
