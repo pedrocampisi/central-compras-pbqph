@@ -131,3 +131,33 @@ describe('Achado 1 — o teclado não sai da ficha nem da janela aberta', () => 
     expect(soltas).toEqual([]);
   });
 });
+
+describe('Achado 2 — o "Mais" não corta as primeiras ações quando não cabe', () => {
+  it('em 667 × 350, com o botão a 110 px do topo e uma lista de 230 px, o topo da lista fica dentro da tela', async () => {
+    const alturaAntes = window.innerHeight;
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 350 });
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 667 });
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      if (this.classList.contains('cc-mais-botao')) return { top: 110, bottom: 146, left: 600, right: 636, width: 36, height: 36, x: 600, y: 110, toJSON() {} } as DOMRect;
+      return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0, toJSON() {} } as DOMRect;
+    });
+    const altura = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
+      return this.classList.contains('cc-mais-lista') ? 230 : 0;
+    });
+    try {
+      render(<Mais rotulo="Mais ações (teste)" acoes={['Duplicar', 'PDF', 'Anexar', 'Enviar', 'Cancelar'].map((r) => ({ rotulo: r, aoEscolher() {} }))} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Mais ações (teste)' }));
+      const lista = screen.getByRole('menu');
+      const s = lista.style;
+      const max = s.maxHeight ? parseFloat(s.maxHeight) : 230;
+      const visivel = Math.min(230, max);
+      const topo = s.top ? parseFloat(s.top) : 350 - parseFloat(s.bottom) - visivel;
+      expect(topo).toBeGreaterThanOrEqual(8);
+      expect(topo + visivel).toBeLessThanOrEqual(350 - 8);
+    } finally {
+      rect.mockRestore();
+      altura.mockRestore();
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: alturaAntes });
+    }
+  });
+});
