@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './styles/ponte-dos-nomes.css';
 import './styles/candidatas.css';
 import './styles/reset.css';
 import './styles/animations.css';

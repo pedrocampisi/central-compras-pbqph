@@ -107,6 +107,79 @@
 }
 .removeBtn:hover { background: var(--erro-fundo); color: var(--erro); }
 
+/* Os itens em cartão abaixo de 720 px (D1034i). A 375 a tabela rolava 151 px
+   de lado por dentro e a descrição mostrava "Descriçã"; os campos mediam 22 px.
+   Agora cada item é um cartão de 12 colunas, cada campo com o nome em cima e
+   44 px de alvo, e nenhum campo some. */
+@media (max-width: 720px) {
+  .tableWrap {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+  }
+  .itemsTable,
+  .itemsTable tbody {
+    display: block;
+  }
+  .itemsTable thead {
+    display: none;
+  }
+  .itemsTable tbody tr {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    background: var(--painel);
+  }
+  .itemsTable tbody tr:last-child { border-bottom: 1px solid var(--linha); }
+  .itemsTable tbody tr:hover { background: var(--painel); }
+  .itemsTable td {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 0;
+  }
+  .itemsTable td[data-rotulo]::before {
+    content: attr(data-rotulo);
+    font-size: 13px;
+    color: var(--tinta-fraca);
+  }
+  .itemsTable td[data-cartao='num'] { grid-column: 1 / 2; grid-row: 1; justify-content: center; }
+  .itemsTable td[data-cartao='descricao'] { grid-column: 2 / 13; grid-row: 1; }
+  .itemsTable td[data-cartao='qtd'] { grid-column: 1 / 5; grid-row: 2; }
+  .itemsTable td[data-cartao='un'] { grid-column: 5 / 9; grid-row: 2; }
+  .itemsTable td[data-cartao='preco'] { grid-column: 9 / 13; grid-row: 2; }
+  .itemsTable td[data-cartao='ecr'] { grid-column: 1 / 4; grid-row: 3; }
+  .itemsTable td[data-cartao='ipi'] { grid-column: 4 / 7; grid-row: 3; }
+  .itemsTable td[data-cartao='desc'] { grid-column: 7 / 10; grid-row: 3; }
+  .itemsTable td[data-cartao='obs'] { grid-column: 10 / 13; grid-row: 3; }
+  .itemsTable td[data-cartao='total'] {
+    grid-column: 1 / 10;
+    grid-row: 4;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    text-align: left !important;
+    font-size: 14px !important;
+  }
+  .itemsTable td[data-cartao='tirar'] { grid-column: 10 / 13; grid-row: 4; align-items: flex-end; }
+  .cellInput,
+  .cellSelect {
+    min-height: 44px;
+    border-color: var(--linha);
+    background: var(--fundo);
+  }
+  .removeBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+}
+
 /* Quebra entre os botões: a 375px o "Importar de um orçamento (IA)" passava 3px da
    borda e a tela ganhava rolagem de lado (medido na D554). */
 .itemsActions {

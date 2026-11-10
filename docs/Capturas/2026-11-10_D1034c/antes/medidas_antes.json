@@ -1,0 +1,128 @@
+{
+  "mestre_lista_dia_alvos": {
+    "alvos": 5,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 44,
+        "w": 40,
+        "t": "Sair"
+      }
+    ]
+  },
+  "mestre_lista_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "mestre_cartao_dia_alvos": {
+    "alvos": 6,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 44,
+        "w": 40,
+        "t": "Sair"
+      }
+    ]
+  },
+  "mestre_receber_dia_alvos": {
+    "alvos": 12,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 1,
+        "w": 1,
+        "t": "file"
+      }
+    ]
+  },
+  "mestre_receber_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "mestre_lista_noite_alvos": {
+    "alvos": 5,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 44,
+        "w": 40,
+        "t": "Sair"
+      }
+    ]
+  },
+  "mestre_lista_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "mestre_cartao_noite_alvos": {
+    "alvos": 6,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 44,
+        "w": 40,
+        "t": "Sair"
+      }
+    ]
+  },
+  "mestre_receber_noite_alvos": {
+    "alvos": 12,
+    "abaixoDe44": 1,
+    "exemplos": [
+      {
+        "h": 1,
+        "w": 1,
+        "t": "file"
+      }
+    ]
+  },
+  "mestre_receber_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "recebimentos_1366_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "encarregados_1366_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "recebimentos_375_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "encarregados_375_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_dia_tabela_rola_de_lado_px": 151,
+  "novaoc_itens_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_dia_alvos": {
+    "alvos": 21,
+    "menor": 22,
+    "abaixoDe44": 21
+  },
+  "recebimentos_375_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "encarregados_375_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_noite_tabela_rola_de_lado_px": 151,
+  "novaoc_itens_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "novaoc_itens_noite_alvos": {
+    "alvos": 21,
+    "menor": 22,
+    "abaixoDe44": 21
+  }
+}

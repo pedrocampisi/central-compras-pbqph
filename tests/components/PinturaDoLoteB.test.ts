@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { NOMES_VELHOS_DA_PONTE } from './nomesVelhosDaPonte';
 import { readFileSync } from 'node:fs';
 
 /**
@@ -25,8 +26,8 @@ const FOLHAS = [
 ];
 
 const semComentario = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
-const ponte = semComentario(readFileSync('src/styles/ponte-dos-nomes.css', 'utf-8'));
-const NOMES_VELHOS = [...ponte.matchAll(/(--[a-z0-9-]+):/g)].map((m) => m[1]!);
+// A ponte saiu no fim do lote (c); a lista dos nomes dela fica congelada no teste.
+const NOMES_VELHOS = NOMES_VELHOS_DA_PONTE;
 
 describe('D1034b — as folhas do pedido falam só a língua do padrão', () => {
   it('a ponte tem nomes para procurar (a trava não passa vazia)', () => {

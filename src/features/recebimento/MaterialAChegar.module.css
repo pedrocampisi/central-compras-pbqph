@@ -29,8 +29,7 @@
   color: var(--ouro-palavra);
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  /* Caixa de frase (DESIGN.md), sem o espaçado da caixa alta (D1034c). */
 }
 
 .titulo {
@@ -218,8 +217,7 @@
   color: var(--ouro-palavra);
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  /* Caixa de frase (DESIGN.md), sem o espaçado da caixa alta (D1034c). */
 }
 
 .fornecedor {
@@ -535,6 +533,9 @@
 .sair {
   align-self: center;
   min-height: 44px;
+  /* O alvo do polegar nos dois sentidos: a palavra curta media 40 px de largura (D1034c). */
+  min-width: 44px;
+  padding: 0 12px;
   border: 0;
   background: none;
   color: var(--tinta-suave);

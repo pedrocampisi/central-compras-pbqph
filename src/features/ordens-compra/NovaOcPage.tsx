@@ -183,8 +183,12 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
   }
 
   return (
+    // Abaixo de 720 px cada item vira um cartão (D1034i): a descrição em cima, na
+    // largura inteira; quantidade, unidade e preço numa linha; ECR, IPI, desconto
+    // e observação na outra; o total e o X no pé. Cada célula diz o seu nome
+    // (`data-rotulo`) e o seu lugar (`data-cartao`). No computador, a tabela.
     <div className={styles.tableWrap}>
-      <table className={styles.itemsTable}>
+      <table className={styles.itemsTable} data-itens-em-cartao="">
         <thead>
           <tr>
             <th style={{ width: 32 }}>#</th>
@@ -206,9 +210,10 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
             const duvida = confira[it.id];
             return (
               <tr key={it.id} className={duvida ? styles.linhaConfira : undefined}>
-                <td style={{ textAlign: 'center', color: 'var(--tinta-fraca)', fontSize: 13 }}>{idx + 1}</td>
-                <td>
+                <td data-cartao="num" style={{ textAlign: 'center', color: 'var(--tinta-fraca)', fontSize: 13 }}>{idx + 1}</td>
+                <td data-cartao="ecr" data-rotulo="ECR">
                   <select
+                    aria-label={`ECR do item ${idx + 1}`}
                     className={styles.cellSelect}
                     value={it.ecr_id ?? ''}
                     onChange={(e) => onUpdate(it.id, { ecr_id: e.target.value ? Number(e.target.value) : null })}
@@ -219,8 +224,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     ))}
                   </select>
                 </td>
-                <td>
+                <td data-cartao="descricao">
                   <input
+                    aria-label={`Descrição do item ${idx + 1}`}
                     className={styles.cellInput}
                     value={it.descricao}
                     placeholder="Descrição do item"
@@ -232,15 +238,17 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     </span>
                   )}
                 </td>
-                <td>
+                <td data-cartao="obs" data-rotulo="Obs.">
                   <input
+                    aria-label={`Observação do item ${idx + 1}`}
                     className={styles.cellInput}
                     value={it.observacao}
                     onChange={(e) => onUpdate(it.id, { observacao: e.target.value })}
                   />
                 </td>
-                <td>
+                <td data-cartao="qtd" data-rotulo="Qtd">
                   <input
+                    aria-label={`Quantidade do item ${idx + 1}`}
                     className={styles.cellInput}
                     type="number"
                     min={0}
@@ -250,8 +258,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     onChange={(e) => onUpdate(it.id, { quantidade: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td>
+                <td data-cartao="un" data-rotulo="Un">
                   <select
+                    aria-label={`Unidade do item ${idx + 1}`}
                     className={styles.cellSelect}
                     value={it.unidade}
                     onChange={(e) => onUpdate(it.id, { unidade: e.target.value })}
@@ -259,8 +268,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     {UN_PADRAO.map((u) => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </td>
-                <td>
+                <td data-cartao="preco" data-rotulo="Preço unit.">
                   <input
+                    aria-label={`Preço unitário do item ${idx + 1}`}
                     className={styles.cellInput}
                     type="number"
                     min={0}
@@ -270,8 +280,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     onChange={(e) => onUpdate(it.id, { preco_unit: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td>
+                <td data-cartao="ipi" data-rotulo="IPI%">
                   <input
+                    aria-label={`IPI% do item ${idx + 1}`}
                     className={styles.cellInput}
                     type="number"
                     min={0}
@@ -281,8 +292,9 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     onChange={(e) => onUpdate(it.id, { ipi_pct: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td>
+                <td data-cartao="desc" data-rotulo="Desc%">
                   <input
+                    aria-label={`Desconto% do item ${idx + 1}`}
                     className={styles.cellInput}
                     type="number"
                     min={0}
@@ -292,11 +304,12 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVaz
                     onChange={(e) => onUpdate(it.id, { desc_pct: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td style={{ textAlign: 'right', fontSize: 13, fontWeight: 600, color: 'var(--ouro-tinta)', whiteSpace: 'nowrap' }}>
+                <td data-cartao="total" data-rotulo="Total" style={{ textAlign: 'right', fontSize: 13, fontWeight: 600, color: 'var(--ouro-tinta)', whiteSpace: 'nowrap' }}>
                   {formatBrl(total)}
                 </td>
-                <td>
+                <td data-cartao="tirar">
                   <button
+                    type="button"
                     className={styles.removeBtn}
                     onClick={() => onRemove(it.id)}
                     title="Remover item"
