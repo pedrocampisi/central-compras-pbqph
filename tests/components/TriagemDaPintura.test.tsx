@@ -176,3 +176,17 @@ describe('Achado 3 — o menu do celular não fica armado ao alargar a janela', 
     expect(document.querySelector('[inert]')).toBeNull();
   });
 });
+
+describe('Achado 4 — vários avisos de erro não escondem o mais novo', () => {
+  it('seis erros seguidos: no máximo três na tela, o mais novo à vista, e os erros ficam até fechar', () => {
+    useUiStore.setState({ toasts: [] });
+    for (let i = 1; i <= 6; i++) useUiStore.getState().showToast(`Falha ${i} (teste)`, 'error');
+    render(<ToastContainer />);
+    const avisos = screen.getAllByRole('alert').map((a) => a.textContent);
+    expect(avisos.length).toBeLessThanOrEqual(3);
+    expect(avisos.at(-1)).toContain('Falha 6 (teste)');
+    expect(useUiStore.getState().toasts).toHaveLength(6); // nenhum erro sumiu: os de trás esperam a vez
+    fireEvent.click(screen.getAllByRole('button', { name: 'Fechar o aviso' }).at(-1)!);
+    expect(screen.getAllByRole('alert').map((a) => a.textContent).join(' ')).toContain('Falha 3 (teste)');
+  });
+});
