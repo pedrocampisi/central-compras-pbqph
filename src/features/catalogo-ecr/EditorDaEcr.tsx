@@ -40,6 +40,7 @@ import { Button } from '../../components/Button/Button';
 import { Icon } from '../../components/Icon/Icon';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import styles from './EditorDaEcr.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 /** O endereço do campo de texto de uma linha: é para lá que a tela leva a pessoa. */
 function idDoTexto(ecrId: number, s: number, l: number): string {
@@ -224,6 +225,7 @@ export function EditorDaEcr({ ecr }: { ecr: Ecr }) {
 
 /** A confirmação: o que a revisão vai ser, e o que mudou (vai para o histórico). */
 function DialogoDaRevisao({ ecr, aoVoltar }: { ecr: Ecr; aoVoltar: () => void }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const rascunho = useRevisaoEcrStore((s) => s.rascunho);
   const vigente = useRevisaoEcrStore((s) => s.vigente);
   const revisaoDeOrigem = useRevisaoEcrStore((s) => s.revisaoDeOrigem);
@@ -273,7 +275,7 @@ function DialogoDaRevisao({ ecr, aoVoltar }: { ecr: Ecr; aoVoltar: () => void })
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="revisao-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="revisao-titulo">
       <div className={styles.caixa} data-dialogo-revisao="">
         <h3 id="revisao-titulo" className={styles.tituloDoDialogo}>
           Gravar a revisão da {ecr.codigo}

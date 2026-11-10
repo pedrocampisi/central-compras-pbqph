@@ -71,6 +71,7 @@ import { Loader } from '../../components/Loader/Loader';
 import { carregarRascunho, type RascunhoDoProcedimento } from './rascunho';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import styles from './ProcedimentoPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 /** Os trechos marcados e o motivo de cada um; `null` quando se lê a vigente. */
 type Marcas = { mudaram: ReadonlySet<string>; motivos: ReadonlyMap<string, string[]> } | null;
@@ -428,6 +429,7 @@ function DialogoDeGravar({
   aoVoltar: () => void;
   aoGravar: (revisao: string, emitidaEm: string) => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [descricao, setDescricao] = useState(r.descricao);
   const [erro, setErro] = useState<string | null>(null);
   const [gravando, setGravando] = useState(false);
@@ -453,7 +455,7 @@ function DialogoDeGravar({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="gravar-revisao-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="gravar-revisao-titulo">
       <div className={styles.caixa} data-dialogo-gravar="">
         <h3 id="gravar-revisao-titulo" className={styles.tituloDoDialogo}>
           {perguntaDeGravar(r.nova)}

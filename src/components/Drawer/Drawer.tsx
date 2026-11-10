@@ -1,6 +1,7 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../Icon/Icon';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 interface DrawerProps {
   open: boolean;
@@ -13,10 +14,11 @@ interface DrawerProps {
 /**
  * A gaveta lateral da ficha: a candidata `cc-gaveta` (styles/candidatas.css),
  * com o véu do pacote (`cp-veu`) atrás. Fecha no Esc, no X e no véu; o foco
- * entra nela ao abrir e volta para quem a abriu ao fechar.
+ * entra nela ao abrir, o Tab dá a volta dentro dela, e ao fechar o foco volta
+ * para quem a abriu (`useFocoPreso`, D1034k).
  */
 export function Drawer({ open, title, onClose, children, footer }: DrawerProps) {
-  const gaveta = useRef<HTMLDivElement>(null);
+  const gaveta = useFocoPreso<HTMLDivElement>(open);
 
   // Fecha ao pressionar Esc
   useEffect(() => {
@@ -28,15 +30,12 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
     return () => window.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  // Bloqueia scroll do body; o foco entra e, ao fechar, volta para quem abriu.
+  // Bloqueia scroll do body enquanto a gaveta está aberta.
   useEffect(() => {
     if (!open) return;
-    const antes = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
-    gaveta.current?.focus();
     return () => {
       document.body.style.overflow = '';
-      antes?.focus?.();
     };
   }, [open]);
 

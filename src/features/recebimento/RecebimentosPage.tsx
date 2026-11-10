@@ -36,6 +36,7 @@ import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { EntregasSemPapel } from './EntregasSemPapel';
 import styles from './RecebimentosPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 export function RecebimentosPage() {
   const data = useDataStore((s) => s.data);
@@ -203,6 +204,7 @@ function LigarDialogo({
   aoFechar: () => void;
   aoLigar: (numero: string) => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [r, setR] = useState<RespostasDaLigacao>({ ...LIGACAO_VAZIA, ocId: ocs[0]?.id ?? '' });
   const [observacao, setObservacao] = useState('');
   const [erro, setErro] = useState('');
@@ -239,7 +241,7 @@ function LigarDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="ligar-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="ligar-titulo">
       <div className={caixa.caixa} data-dialogo-ligar="">
         <h3 id="ligar-titulo" className={caixa.titulo}>
           Ligar a uma OC
@@ -343,6 +345,7 @@ function DescartarDialogo({
   aoFechar: () => void;
   aoDescartar: () => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [motivo, setMotivo] = useState('');
   const [erro, setErro] = useState('');
   const [gravando, setGravando] = useState(false);
@@ -364,7 +367,7 @@ function DescartarDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="descartar-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="descartar-titulo">
       <div className={caixa.caixa} data-dialogo-descartar="">
         <h3 id="descartar-titulo" className={caixa.titulo}>
           Descartar o recebimento

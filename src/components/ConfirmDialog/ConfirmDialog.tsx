@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../Button/Button';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 import styles from './ConfirmDialog.module.css';
 
 interface ConfirmDialogProps {
@@ -16,8 +17,9 @@ interface ConfirmDialogProps {
 
 /**
  * A peça Janela do pacote (pecas\Janela): painel-alto, raio-g, o véu atrás,
- * até 400 px. Fecha no Esc, como a peça manda, e o foco entra nela ao abrir,
- * para o teclado não ficar na tela de trás.
+ * até 400 px. Fecha no Esc, como a peça manda. O foco entra nela ao abrir, o
+ * Tab dá a volta dentro dela, e ao fechar o foco volta para quem a abriu
+ * (`useFocoPreso`, D1034k): o teclado não fica na tela de trás.
  */
 export function ConfirmDialog({
   open,
@@ -29,11 +31,10 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const caixa = useRef<HTMLDivElement>(null);
+  const caixa = useFocoPreso<HTMLDivElement>(open);
 
   useEffect(() => {
     if (!open) return;
-    caixa.current?.focus();
     // Na captura, e parando ali: com a janela aberta por cima de uma gaveta, o
     // Esc fecha só a janela.
     const noEsc = (e: KeyboardEvent) => {

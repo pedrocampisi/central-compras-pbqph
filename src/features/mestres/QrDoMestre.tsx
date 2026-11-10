@@ -15,6 +15,7 @@ import { acessoDoLink, enderecoDoQr, tempoQueFalta } from '../../domain/acessoPo
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { desenhoDoQr } from './desenhoDoQr';
 import styles from './MestresPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 const hora = (iso: string) =>
   new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Props) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [agora, setAgora] = useState(() => new Date());
   useEffect(() => {
     const t = setInterval(() => setAgora(new Date()), 1000);
@@ -41,7 +43,7 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
   const falta = tempoQueFalta(venceEm, agora);
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="qr-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="qr-titulo">
       <div className={`${caixa.caixa} ${styles.caixaDoQr}`} data-dialogo-qr="">
         <h3 id="qr-titulo" className={caixa.titulo}>
           QR de entrada — {nome}

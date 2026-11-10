@@ -356,6 +356,8 @@ export default function App() {
       if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
       const alvo = e.target;
       if (alvo instanceof Element && alvo.closest('input, textarea, select, [contenteditable="true"]')) return;
+    // Com uma ficha, uma janela ou o menu aberto, a busca de trás não é de ninguém (D1034k).
+    if (document.querySelector('[aria-modal="true"], .cp-veu.aberto')) return;
       const busca = document.querySelector<HTMLInputElement>('main .cc-busca input');
       if (!busca) return;
       e.preventDefault();

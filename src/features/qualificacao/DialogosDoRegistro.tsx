@@ -42,6 +42,7 @@ import {
 import { useUiStore } from '../../stores/useUiStore';
 import styles from '../fornecedores/QualificarDialogo.module.css';
 import meu from './DialogosDoRegistro.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 /** O alcance em botões de escolha, e a data quando é "vale até". Com um só, ele vem escrito, sem escolha. */
 function EscolhaDoAlcance({
@@ -106,6 +107,7 @@ export function AnexarPapelDialogo({
   aoFechar: () => void;
   aoGuardar: () => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const showToast = useUiStore((s) => s.showToast);
   const [ecrId, setEcrId] = useState<number | null>(ecrs.length === 1 ? ecrs[0]!.id : null);
   const [arquivo, setArquivo] = useState<File | null>(null);
@@ -182,7 +184,7 @@ export function AnexarPapelDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="anexar-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="anexar-titulo">
       <div className={styles.caixa} data-dialogo-anexar="">
         <h3 id="anexar-titulo" className={styles.titulo}>Anexar papel do fornecedor</h3>
         <p className={styles.quem}>{quem}</p>
@@ -264,6 +266,7 @@ export function CorrigirAlcanceDialogo({
   aoFechar: () => void;
   aoCorrigir: () => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const showToast = useUiStore((s) => s.showToast);
   const permitidos = alcancesPossiveis(registro.ocId ? 'oc' : 'qualificacao');
   const [alcance, setAlcance] = useState<Alcance>(registro.alcance);
@@ -294,7 +297,7 @@ export function CorrigirAlcanceDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="corrigir-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="corrigir-titulo">
       <div className={styles.caixa} data-dialogo-corrigir="">
         <h3 id="corrigir-titulo" className={styles.titulo}>Corrigir o alcance</h3>
         <p className={styles.quem}>{ecr}</p>

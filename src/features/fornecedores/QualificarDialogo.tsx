@@ -40,6 +40,7 @@ import { ajudaDoCriterio, itemDoPs02 } from '../../domain/ajudaDosCriterios';
 import { CaminhoParaOItem } from '../../components/Ajuda/CaminhoParaOItem';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import styles from './QualificarDialogo.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 interface Props {
   /** A filial escolhida: a qualificação vai para a empresa dela (ou para ela, se não tiver raiz). */
@@ -63,6 +64,7 @@ type Marca = { atende: boolean | null; motivo: string };
 export function QualificarDialogo({
   filial, categoria, ecrs, ecrsMarcadas, porque, desempenho, titulo, aoGravar, aoVoltar,
 }: Props) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const hoje = hojeEmSaoPaulo();
   const [marcas, setMarcas] = useState<Marca[]>(() => categoria.criterios.map(() => ({ atende: null, motivo: '' })));
   const [marcadas, setMarcadas] = useState<number[]>(() => [...ecrsMarcadas]);
@@ -134,7 +136,7 @@ export function QualificarDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="qualificar-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="qualificar-titulo">
       <div className={styles.caixa} data-dialogo-qualificar="">
         <h3 id="qualificar-titulo" className={styles.titulo}>
           {titulo ?? 'Qualificar agora'}

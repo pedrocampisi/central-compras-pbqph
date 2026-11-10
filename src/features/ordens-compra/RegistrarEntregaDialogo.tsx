@@ -24,6 +24,7 @@ import { useUiStore } from '../../stores/useUiStore';
 import type { OrdemCompra } from '../../domain/types';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './RegistrarEntregaDialogo.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 const PERGUNTAS = [
   { chave: 'prazoConforme', texto: 'Prazo de entrega' },
@@ -39,6 +40,7 @@ interface Props {
 }
 
 export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Props) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const hoje = hojeEmSaoPaulo();
   const showToast = useUiStore((s) => s.showToast);
   const [a, setA] = useState<Avaliacao>({
@@ -93,7 +95,7 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, aoFechar }: Prop
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="entrega-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="entrega-titulo">
       <div className={styles.caixa} data-dialogo-entrega="">
         <h3 id="entrega-titulo" className={styles.titulo}>
           {outra ? 'Registrar outra entrega' : 'Registrar a entrega'} — OC {oc.numero}

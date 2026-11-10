@@ -28,6 +28,7 @@ import { useUiStore } from '../../stores/useUiStore';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { QrDoMestre } from './QrDoMestre';
 import styles from './MestresPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 type Pedindo =
   | { o: 'cadastrar' }
@@ -299,6 +300,7 @@ function CadastrarDialogo({
   aoFechar: () => void;
   aoCadastrar: (m: NovoMestre) => Promise<void>;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [m, setM] = useState<NovoMestre>({ nome: '', email: '', telefone: '', obraId: obras.length === 1 ? obras[0]!.id : '' });
   const [erro, setErro] = useState('');
   const [gravando, setGravando] = useState(false);
@@ -320,7 +322,7 @@ function CadastrarDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="cadastrar-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="cadastrar-titulo">
       <div className={caixa.caixa} data-dialogo-cadastrar="">
         <h3 id="cadastrar-titulo" className={caixa.titulo}>
           Cadastrar encarregado
@@ -380,6 +382,7 @@ function MotivoDialogo({
   aoFechar: () => void;
   aoConfirmar: (motivo: string) => Promise<void>;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [motivo, setMotivo] = useState('');
   const [erro, setErro] = useState('');
   const [gravando, setGravando] = useState(false);
@@ -400,7 +403,7 @@ function MotivoDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="motivo-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="motivo-titulo">
       <div className={caixa.caixa} data-dialogo-motivo="">
         <h3 id="motivo-titulo" className={caixa.titulo}>
           {titulo}

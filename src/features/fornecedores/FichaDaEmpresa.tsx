@@ -36,8 +36,10 @@ import { depoisDeQualificar as avisarDepoisDeQualificar } from './depoisDeQualif
 import { SeloDaQualificacao } from './SeloDaQualificacao';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
 import styles from './FichaDaEmpresa.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFechar: () => void }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const dados = useQualificacoesDoDia();
   const erro = useQualificacaoStore((s) => s.erro);
   const ecrs = useDataStore((s) => s.data?.ecrs ?? []);
@@ -55,7 +57,7 @@ export function FichaDaEmpresa({ filial, aoFechar }: { filial: Fornecedor; aoFec
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="ficha-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="ficha-titulo">
       <div className={styles.caixa} data-ficha-da-empresa="">
         <div className={styles.topo}>
           <div>

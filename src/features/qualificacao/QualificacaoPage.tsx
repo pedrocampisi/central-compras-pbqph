@@ -63,6 +63,7 @@ import { Ajuda } from '../../components/Ajuda/Ajuda';
 import { Mais } from '../../components/Mais/Mais';
 import { RegistrosDaEmpresa } from './RegistrosDaEmpresa';
 import styles from './QualificacaoPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 /** O nome da aba quando o banco não mandou a categoria (não deve acontecer; a aba não some por isso). */
 const NOME_PADRAO: Record<Categoria, string> = {
@@ -460,12 +461,13 @@ function EscolherFornecedor({
   aoCadastrar: () => void;
   aoVoltar: () => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [chave, setChave] = useState('');
   const empresas = agruparPorEmpresa(fornecedores.filter((f) => f.ativo));
   const escolhida = empresas.find((g) => g.chave === chave);
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="escolher-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="escolher-titulo">
       <div className={styles.escolher} data-escolher-fornecedor="">
         <h3 id="escolher-titulo" className={styles.escolherTitulo}>
           Qualificar fornecedor — {categoria.nome}

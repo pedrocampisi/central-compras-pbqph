@@ -32,6 +32,7 @@ import { useUiStore } from '../../stores/useUiStore';
 import { AnexarPapelDialogo } from '../qualificacao/DialogosDoRegistro';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import styles from './RecebimentosPage.module.css';
+import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 export function EntregasSemPapel() {
   const linhas = useEntregasSemPapelStore((s) => s.linhas);
@@ -171,6 +172,7 @@ function NaoSeAplicaDialogo({
   aoFechar: () => void;
   aoMarcar: () => void;
 }) {
+  const preso = useFocoPreso<HTMLDivElement>();
   const [motivo, setMotivo] = useState('');
   const [erro, setErro] = useState('');
   const [gravando, setGravando] = useState(false);
@@ -193,7 +195,7 @@ function NaoSeAplicaDialogo({
   }
 
   return createPortal(
-    <div className={dialogo.overlay} role="dialog" aria-modal aria-labelledby="nao-se-aplica-titulo">
+    <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="nao-se-aplica-titulo">
       <div className={caixa.caixa} data-dialogo-nao-se-aplica="">
         <h3 id="nao-se-aplica-titulo" className={caixa.titulo}>
           Não se aplica a esta entrega
