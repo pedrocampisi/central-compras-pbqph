@@ -18,6 +18,7 @@
  *   6. cc-cartoes ···· a tabela que vira cartões abaixo de 720 px
  *   7. cc-pe-fixo ···· o pé da tela de formulário que gruda embaixo, com o total
  *                      e a ação principal à vista (D1034h item 2)
+ *   8. cc-qr ········· as duas cores do QR do mestre, as mesmas de dia e de noite
  */
 
 /* 1. CANDIDATA: CAMPO DE BUSCA DA TELA DE TRABALHO.
@@ -390,4 +391,14 @@
     margin: 0 calc(-1 * var(--espaco-4)) calc(1px - var(--espaco-8));
     padding: 8px var(--espaco-4);
   }
+}
+
+/* ── 8. cc-qr (D1034, lote c) ─────────────────────────────────────────────────
+ * O QR que o mestre lê com o celular precisa de contraste alto e fixo: claro
+ * por baixo e escuro por cima, de dia e de noite, como o leitor espera. Por
+ * isso as duas cores não seguem o modo. Saíram da ponte dos nomes (eram
+ * --qr-claro e --qr-escuro) e esperam o pacote. */
+:root {
+  --cc-qr-claro: #ffffff;
+  --cc-qr-escuro: #0b1a23;
 }

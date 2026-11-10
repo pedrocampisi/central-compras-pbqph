@@ -38,9 +38,9 @@ button {
   border: 1px solid transparent;
   border-radius: var(--raio);
   transition:
-    background var(--transicao),
-    border-color var(--transicao),
-    color var(--transicao);
+    background var(--dur-resposta) ease,
+    border-color var(--dur-resposta) ease,
+    color var(--dur-resposta) ease;
 }
 
 a {

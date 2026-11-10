@@ -5,12 +5,12 @@
 .aviso {
   margin: 0;
   padding: 10px 12px;
-  border-left: 3px solid var(--marca);
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
+  border-left: 3px solid var(--ouro-tinta);
+  border-radius: var(--raio-p);
+  background: var(--realce);
   font-size: 13px;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .secao {
@@ -23,11 +23,11 @@
   width: 100%;
   margin-bottom: 8px;
   padding: 0 0 4px;
-  border-bottom: 2px solid var(--texto);
+  border-bottom: 2px solid var(--tinta);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 /* Uma linha: o número, o rótulo, o texto e os controles. */
@@ -38,22 +38,22 @@
   align-items: start;
   margin-bottom: 6px;
   padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--raio-pequeno);
-  background: var(--surface);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
+  background: var(--painel);
 }
 /* A nota fora da lista, marcada como na tela de ler. */
 .linha[data-nota] { border-left: 3px solid var(--erro); }
 .linha[data-com-problema] {
   border-color: var(--erro);
-  background: var(--erro-bg);
+  background: var(--erro-fundo);
 }
 
 .numero {
   padding-top: 8px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--tinta-fraca);
   text-align: right;
 }
 
@@ -63,10 +63,10 @@
   width: 100%;
   min-width: 0;
   padding: 7px 9px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--raio-pequeno);
+  border: 1.5px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 13px;
   line-height: 1.45;
@@ -76,7 +76,7 @@
 .rotulo::placeholder,
 .texto::placeholder,
 .descricao::placeholder {
-  color: var(--text-muted);
+  color: var(--tinta-fraca);
   font-weight: 400;
 }
 .texto,
@@ -88,9 +88,9 @@
 .rotulo:focus-visible,
 .texto:focus-visible,
 .descricao:focus-visible {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 0;
-  border-color: var(--marca);
+  border-color: var(--ouro-tinta);
 }
 .texto[aria-invalid],
 .descricao[aria-invalid] { border-color: var(--erro); }
@@ -106,7 +106,7 @@
   gap: 5px;
   margin-right: 6px;
   font-size: 12px;
-  color: var(--text-mid);
+  color: var(--tinta-suave);
   white-space: nowrap;
   cursor: pointer;
 }
@@ -116,14 +116,14 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--text-mid);
+  color: var(--tinta-suave);
   cursor: pointer;
 }
-.icone:hover:not(:disabled) { border-color: var(--marca); color: var(--marca); }
-.icone:focus-visible { outline: 2px solid var(--marca); outline-offset: 1px; }
+.icone:hover:not(:disabled) { border-color: var(--ouro-tinta); color: var(--ouro-tinta); }
+.icone:focus-visible { outline: 2px solid var(--ouro-tinta); outline-offset: 1px; }
 .icone:disabled { opacity: 0.4; cursor: default; }
 .paraCima { transform: rotate(180deg); }
 
@@ -142,10 +142,10 @@
 .problemas {
   padding: 10px 12px;
   border: 1px solid var(--erro);
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 13px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .problemas ul { margin: 6px 0 0; padding-left: 20px; }
 .problemas li { margin-bottom: 2px; }
@@ -165,32 +165,32 @@
   width: 100%;
   max-width: 460px;
   padding: 22px;
-  border-radius: var(--raio-grande);
+  border-radius: var(--raio-g);
   background: var(--painel);
   box-shadow: var(--sombra-elevada);
 }
 .tituloDoDialogo {
   margin: 0 0 4px;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .resumo {
   margin: 0 0 8px;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
-.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--texto); }
+.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--tinta); }
 .obrigatorio { margin-left: 2px; color: var(--erro); }
-.dica { font-size: 12px; color: var(--text-muted); }
+.dica { font-size: 12px; color: var(--tinta-fraca); }
 .erro {
   margin: 0;
   padding: 8px 10px;
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 13px;
   color: var(--erro);
 }

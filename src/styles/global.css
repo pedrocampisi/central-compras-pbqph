@@ -94,7 +94,7 @@ ol {
 /* Documentos e códigos: CNPJ, CPF, número da OC. */
 .doc,
 .mono {
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 

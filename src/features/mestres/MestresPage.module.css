@@ -14,10 +14,10 @@
   gap: 10px;
   min-width: 0;
   padding: 16px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
   background: var(--painel);
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra-repouso);
 }
 .cartao[data-desligado] {
   background: var(--fundo);
@@ -31,14 +31,14 @@
 }
 .cabeca strong {
   font-size: 16px;
-  color: var(--texto);
+  color: var(--tinta);
   overflow-wrap: anywhere;
 }
 
 .desligado {
   padding: 2px 8px;
   border-radius: var(--raio-pill);
-  background: var(--erro-bg);
+  background: var(--erro-fundo);
   color: var(--erro);
   font-size: 12px;
   font-weight: 700;
@@ -47,7 +47,7 @@
 .miudo {
   margin: 0;
   font-size: 13px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   overflow-wrap: anywhere;
 }
 
@@ -63,8 +63,8 @@
   max-width: 100%;
   padding: 6px 6px 6px 12px;
   border-radius: var(--raio-pill);
-  background: var(--marca-fraca);
-  color: var(--texto);
+  background: var(--realce);
+  color: var(--tinta);
   font-size: 13px;
   font-weight: 600;
 }
@@ -74,23 +74,23 @@
 }
 .obra small {
   font-weight: 400;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .tirar {
   flex-shrink: 0;
   min-height: 32px;
   padding: 4px 10px;
-  border: 1px solid var(--borda-forte);
+  border: 1px solid var(--linha-controle);
   border-radius: var(--raio-pill);
   background: var(--painel);
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
 .tirar:focus-visible {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 1px;
 }
 
@@ -109,18 +109,18 @@
   min-width: 0;
   min-height: 36px;
   padding: 6px 9px;
-  border: 1.5px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1.5px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 13px;
   font-weight: 400;
 }
 .campoSelect select:focus-visible {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 0;
-  border-color: var(--marca);
+  border-color: var(--ouro-tinta);
 }
 
 .somenteLeitor {
@@ -148,28 +148,28 @@
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .qr {
   display: block;
   width: min(100%, 340px);
   height: auto;
   aspect-ratio: 1;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
 }
 .qrFundo {
-  fill: var(--qr-claro);
+  fill: var(--cc-qr-claro);
 }
 .qrModulos {
-  fill: var(--qr-escuro);
+  fill: var(--cc-qr-escuro);
 }
 .relogio {
   margin: 0;
   font-size: 15px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .relogio strong {
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
   font-size: 22px;
 }
 .notas {
@@ -177,7 +177,7 @@
   padding-left: 18px;
   text-align: left;
   font-size: 13px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .notas li + li {
   margin-top: 4px;

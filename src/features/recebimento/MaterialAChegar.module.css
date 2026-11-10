@@ -12,8 +12,8 @@
   flex-direction: column;
   gap: 18px;
   background: var(--fundo);
-  color: var(--texto);
-  font-family: var(--fonte-sans);
+  color: var(--tinta);
+  font-family: var(--font-sans);
   font-size: 18px;
   line-height: 1.4;
 }
@@ -26,7 +26,7 @@
 
 .obra {
   margin: 0;
-  color: var(--terra);
+  color: var(--ouro-palavra);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -35,15 +35,15 @@
 
 .titulo {
   margin: 0;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 30px;
   font-weight: 600;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .vazio {
   margin: 24px 0;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   text-align: center;
 }
 
@@ -63,10 +63,10 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-grande);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
   background: var(--painel);
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra-repouso);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -88,7 +88,7 @@
   gap: 2px 12px;
   padding: 14px 16px;
   border: 0;
-  border-radius: var(--raio-grande);
+  border-radius: var(--raio-g);
   background: none;
   color: inherit;
   font: inherit;
@@ -99,7 +99,7 @@
 .fornecedorNaLinha {
   font-size: 20px;
   font-weight: 700;
-  color: var(--marca);
+  color: var(--ouro-tinta);
   overflow-wrap: anywhere;
 }
 
@@ -121,7 +121,7 @@
 .setaFechada,
 .setaAberta {
   flex: 0 0 auto;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .setaAberta {
@@ -143,10 +143,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 18px;
-  border: 2px solid var(--marca);
+  border: 2px solid var(--ouro-tinta);
   border-radius: var(--raio-pill);
   background: var(--painel);
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   font-size: 17px;
   font-weight: 700;
@@ -159,14 +159,14 @@
   align-items: center;
   gap: 10px;
   padding: 0 14px;
-  border: 2px solid var(--borda-forte);
+  border: 2px solid var(--linha-controle);
   border-radius: var(--raio);
   background: var(--painel);
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .busca:focus-within {
-  outline: 3px solid var(--marca);
+  outline: 3px solid var(--ouro-tinta);
   outline-offset: 1px;
 }
 
@@ -177,7 +177,7 @@
   border: 0;
   outline: none;
   background: none;
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 18px;
 }
@@ -203,7 +203,7 @@
 .primario:focus-visible,
 .secundario:focus-within,
 .voltar:focus-visible {
-  outline: 3px solid var(--marca);
+  outline: 3px solid var(--ouro-tinta);
   outline-offset: 2px;
 }
 
@@ -215,7 +215,7 @@
 
 /* Só com mais de uma obra: de qual é o pedido. */
 .obraDoCartao {
-  color: var(--terra);
+  color: var(--ouro-palavra);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -225,15 +225,15 @@
 .fornecedor {
   font-size: 22px;
   font-weight: 700;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .combinado {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .combinado strong {
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .itens {
@@ -241,8 +241,8 @@
   flex-direction: column;
   gap: 6px;
   padding: 10px 0;
-  border-top: 1px solid var(--borda);
-  border-bottom: 1px solid var(--borda);
+  border-top: 1px solid var(--linha);
+  border-bottom: 1px solid var(--linha);
 }
 
 .item {
@@ -261,12 +261,12 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 16px;
 }
 
 .valor strong {
-  color: var(--texto);
+  color: var(--tinta);
   font-size: 18px;
 }
 
@@ -283,7 +283,7 @@
   padding: 0 4px;
   border: 0;
   background: none;
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -302,7 +302,7 @@
   padding: 0;
   font-size: 20px;
   font-weight: 700;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .botoes {
@@ -320,10 +320,10 @@
 .resposta {
   min-height: 64px;
   padding: 8px 12px;
-  border: 2px solid var(--borda-forte);
+  border: 2px solid var(--linha-controle);
   border-radius: var(--raio);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 20px;
   font-weight: 700;
@@ -332,13 +332,13 @@
 
 .sim {
   border-color: var(--sucesso);
-  background: var(--sucesso-bg);
+  background: var(--sucesso-fundo);
   color: var(--sucesso);
 }
 
 .nao {
   border-color: var(--erro);
-  background: var(--erro-bg);
+  background: var(--erro-fundo);
   color: var(--erro);
 }
 
@@ -352,7 +352,7 @@
   width: 100%;
   max-height: 220px;
   object-fit: cover;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
 }
 
@@ -372,7 +372,7 @@
 
 .dica {
   margin: 0;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 16px;
 }
 
@@ -381,16 +381,16 @@
 .caixa {
   width: 100%;
   padding: 14px;
-  border: 2px solid var(--borda-forte);
+  border: 2px solid var(--linha-controle);
   border-radius: var(--raio);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 20px;
 }
 
 .numero {
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
   font-size: 24px;
   letter-spacing: 0.04em;
 }
@@ -414,7 +414,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
   background: var(--painel);
 }
@@ -438,39 +438,39 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .numeroDoItem {
   width: 92px;
   min-height: 52px;
   padding: 8px 10px;
-  border: 2px solid var(--borda-forte);
+  border: 2px solid var(--linha-controle);
   border-radius: var(--raio);
   background: var(--fundo);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
   font-size: 22px;
   text-align: right;
 }
 
 .numeroDoItem:focus {
-  outline: 3px solid var(--marca);
+  outline: 3px solid var(--ouro-tinta);
   outline-offset: 1px;
 }
 
 /* o que ele baixou fica à vista: veio a menos */
 .aMenos {
   border-color: var(--aviso);
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
   color: var(--aviso);
 }
 
 .numero:focus,
 .linha:focus,
 .caixa:focus {
-  outline: 3px solid var(--marca);
+  outline: 3px solid var(--ouro-tinta);
   outline-offset: 1px;
 }
 
@@ -480,7 +480,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   font-size: 16px;
   text-decoration: underline;
@@ -491,7 +491,7 @@
   margin: 0;
   padding: 14px 16px;
   border-radius: var(--raio);
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
   color: var(--aviso);
   font-weight: 600;
 }
@@ -516,9 +516,9 @@
 .primario {
   margin-top: 4px;
   border: 0;
-  background: var(--acento);
-  color: var(--acento-texto);
-  box-shadow: 0 4px 0 var(--acento-sombra);
+  background: var(--ouro);
+  color: var(--sobre-ouro);
+  box-shadow: 0 4px 0 var(--ouro-hover-2);
 }
 
 .primario:disabled {
@@ -527,9 +527,9 @@
 }
 
 .secundario {
-  border: 2px solid var(--marca);
+  border: 2px solid var(--ouro-tinta);
   background: var(--painel);
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .sair {
@@ -537,7 +537,7 @@
   min-height: 44px;
   border: 0;
   background: none;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font: inherit;
   font-size: 16px;
   text-decoration: underline;
@@ -561,21 +561,21 @@
   width: 112px;
   height: 112px;
   border-radius: 50%;
-  background: var(--sucesso-bg);
+  background: var(--sucesso-fundo);
   color: var(--sucesso);
 }
 
 .prontoTitulo {
   margin: 8px 0 0;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 34px;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .prontoTexto {
   margin: 0;
   font-size: 22px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 /* Guardado no celular, esperando sinal: abre para ver, mas não recebe de novo. */
@@ -589,14 +589,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-weight: 600;
 }
 
 .guardado {
   margin: 0;
   padding: 12px 14px;
-  border: 1px dashed var(--borda-forte);
+  border: 1px dashed var(--linha-controle);
   border-radius: var(--raio);
   font-size: 16px;
 }
@@ -617,8 +617,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px;
-  border: 2px solid var(--borda-forte);
-  border-radius: var(--raio-grande);
+  border: 2px solid var(--linha-controle);
+  border-radius: var(--raio-g);
   background: var(--painel);
 }
 
@@ -629,7 +629,7 @@
 
 .prontoSeloGuardado {
   composes: prontoSelo;
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
   color: var(--aviso);
 }
 
@@ -645,9 +645,9 @@
   margin: 0;
   padding: 10px 12px;
   border-left: 4px solid var(--erro);
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
-  color: var(--texto);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
+  color: var(--tinta);
   font-size: 17px;
   font-weight: 600;
   line-height: 1.4;
@@ -656,10 +656,10 @@
 .oQuePede {
   margin: 0;
   padding: 12px 12px 12px 32px;
-  border-left: 4px solid var(--marca-media);
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
-  color: var(--texto);
+  border-left: 4px solid var(--ouro-suave);
+  border-radius: var(--raio-p);
+  background: var(--realce);
+  color: var(--tinta);
   font-size: 17px;
   line-height: 1.4;
   display: flex;
@@ -668,9 +668,9 @@
 }
 
 .marcado {
-  border-color: var(--marca);
-  background: var(--marca-fraca);
-  color: var(--texto);
+  border-color: var(--ouro-tinta);
+  background: var(--realce);
+  color: var(--tinta);
 }
 
 .alcance {
