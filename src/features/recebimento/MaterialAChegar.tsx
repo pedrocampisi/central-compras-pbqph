@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { CampoDeBusca } from '../../components/CampoDeBusca/CampoDeBusca';
 import { Icon } from '../../components/Icon/Icon';
 import { blocosDaSecao, linhaDoDocumento } from '../../domain/ecr';
 import { formatBrl } from '../../domain/format';
@@ -283,14 +284,13 @@ export function MaterialAChegar(props: MaterialAChegarProps) {
           {comBusca && (
             <label className={styles.busca}>
               <Icon name="search" size={20} />
-              <input
-                type="search"
+              <CampoDeBusca
                 className={styles.buscaCampo}
                 aria-label="Procurar a empresa"
                 placeholder="Procurar a empresa"
                 autoComplete="off"
                 value={busca}
-                onChange={(e) => setBusca(e.target.value)}
+                onChange={setBusca}
               />
             </label>
           )}

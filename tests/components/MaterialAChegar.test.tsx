@@ -643,7 +643,8 @@ describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
     buscar('eta');
     expect(screen.queryAllByRole('button', { expanded: false })).toHaveLength(0);
     expect(screen.getByText('Nenhuma empresa começa com “eta”.')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Limpar a busca' }));
+    // Dois botões com o nome (D975): o X dentro do campo e o link da frase; o link vem por último.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Limpar a busca' }).at(-1)!);
     expect(nomesNaLista()).toHaveLength(4);
   });
 
@@ -654,6 +655,19 @@ describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
     montar({ cartoes: varios().slice(0, 2) });
     buscar('gama');
     expect(nomesNaLista()).toEqual(['Cimento Gama (teste)']);
+  });
+
+  it('o X da busca (D975): só com texto, apaga tudo, devolve a lista inteira e o cursor ao campo', () => {
+    montar({ cartoes: varios() });
+    const campo = screen.getByRole('searchbox', { name: 'Procurar a empresa' });
+    expect(screen.queryByRole('button', { name: 'Limpar a busca' })).toBeNull();
+    buscar('gama');
+    expect(nomesNaLista()).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Limpar a busca' }));
+    expect(campo).toHaveValue('');
+    expect(nomesNaLista()).toHaveLength(4);
+    expect(campo).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Limpar a busca' })).toBeNull();
   });
 
   it('sem pedido nenhum, não há o que procurar: sem busca', () => {
