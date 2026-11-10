@@ -16,19 +16,6 @@
   gap: 8px;
 }
 
-/* No celular, as ações de apoio do alto vão para o "Mais" (D1034f item 5). */
-.soNoEstreito {
-  display: none;
-}
-@media (max-width: 720px) {
-  .soNoLargo {
-    display: none;
-  }
-  .soNoEstreito {
-    display: block;
-  }
-}
-
 /* ── Items table ──────────────────────────────────────────────────────────── */
 
 .tableWrap {
@@ -120,7 +107,7 @@
 }
 .removeBtn:hover { background: var(--erro-fundo); color: var(--erro); }
 
-/* Quebra entre os botões: a 375px o "Importar Pedido (IA)" passava 3px da
+/* Quebra entre os botões: a 375px o "Importar de um orçamento (IA)" passava 3px da
    borda e a tela ganhava rolagem de lado (medido na D554). */
 .itemsActions {
   display: flex;
@@ -130,7 +117,7 @@
   margin-top: 10px;
 }
 
-/* O campo do Importar Pedido (IA) — CTO-D554. */
+/* O campo do "Importar de um orçamento (IA)" — CTO-D554. */
 .campoImportacao {
   margin-top: 10px;
 }
@@ -238,24 +225,10 @@
 .totalsInput::-webkit-inner-spin-button { -webkit-appearance: none; }
 .totalsInput:focus { border-color: var(--ouro-tinta); box-shadow: 0 0 0 2px var(--realce); }
 
-.totalsGeralLabel {
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--ouro-tinta) !important;
-  text-align: left !important;
-}
-
-.totalsGeralValue {
-  font-weight: 800;
-  font-size: 16px;
-  color: var(--ouro-tinta) !important;
-  text-align: right !important;
-}
-
 /* ── Footer actions ────────────────────────────────────────────────────────── */
 
 /* Fila alinhada à direita QUEBRA linha (CTO-D555): sem quebra, a 375px
-   Cancelar, Visualizar PDF e Salvar Rascunho ficavam inteiros à esquerda da
+   Cancelar, Visualizar PDF e Salvar rascunho ficavam inteiros à esquerda da
    tela, por baixo da lateral — fora de alcance, e sem rolagem que mostrasse. */
 .footerActions {
   display: flex;
@@ -263,8 +236,104 @@
   align-items: center; /* o "?" no meio da fila (CTO-D764) */
   justify-content: flex-end;
   gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--linha);
+  flex: 1 1 auto;
+}
+
+/* O pé que gruda embaixo (D1034h item 2): o total geral à esquerda, e
+   "Salvar rascunho" e "Emitir a OC" à direita. A moldura e o grudar são da
+   candidata cc-pe-fixo; aqui fica só o arranjo de dentro. */
+.peDaOc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.totalDoPe {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--tinta-suave);
+}
+.totalDoPe strong {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--ouro-tinta);
+  font-variant-numeric: tabular-nums;
+}
+/* O que falta para emitir, ao lado do botão (D1034h item 3): texto, sem janela. */
+.oQueFalta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--aviso);
+}
+/* No celular o pé tem duas linhas: o total (e o que falta), e os dois botões
+   dividindo a largura, ao alcance do polegar. */
+@media (max-width: 720px) {
+  .peDaOc {
+    gap: 6px 12px;
+  }
+  .footerActions {
+    flex-basis: 100%;
+    flex-wrap: nowrap;
+  }
+  /* Os dois botões dividem a linha com o "?": folga menor dos lados para
+     caber nos 343 px do conteúdo a 375 (164 + 124 + 24 + os vãos). */
+  .footerActions > button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  /* O pé já é posicionado (cc-pe-fixo): a frase se ancora nele, ao lado do total. */
+  .oQueFalta {
+    position: absolute;
+    right: var(--espaco-4);
+    top: 12px;
+    max-width: 55%;
+    text-align: right;
+    line-height: 1.25;
+  }
+}
+
+/* As duas portas dos itens, dentro do vazio (D1034h itens 4 e 5). */
+.portasDosItens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Totais à direita, na beirada da tabela; Observações no lado que ficava vazio
+   (D1034h itens 6 e 8). Na ordem da página, os Totais vêm primeiro. */
+.fechoDaOc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 0 16px;
+  align-items: start;
+}
+.cartaoDosTotais {
+  grid-column: 2;
+  grid-row: 1;
+  padding: var(--espaco-4);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+.cartaoDasObservacoes {
+  grid-column: 1;
+  grid-row: 1;
+}
+@media (max-width: 720px) {
+  .fechoDaOc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cartaoDosTotais,
+  .cartaoDasObservacoes {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 /* O selo da qualificação embaixo do fornecedor (CTO-D604 §3.4). */

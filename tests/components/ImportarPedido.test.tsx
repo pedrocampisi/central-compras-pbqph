@@ -139,7 +139,7 @@ const DADOS = {
   fornecedores: [], obras: [], ecrs: [], ordens_compra: [],
 } as unknown as Data;
 
-describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta', () => {
+describe('D554 — o botão "Importar de um orçamento (IA)" abre o campo, e não a pasta', () => {
   beforeEach(() => {
     useOcEditingStore.getState().stopEditing();
     useDataStore.setState({ data: DADOS });
@@ -149,7 +149,7 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
   it('clicar no botão: o campo aparece no lugar do vazio, e o input de arquivo NÃO é clicado', async () => {
     render(<NovaOcPage />);
     expect(screen.getByText('Nenhum item adicionado')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
     expect(clique).not.toHaveBeenCalled();
     expect(screen.getByRole('group', { name: 'Importar pedido pela IA' })).toBeInTheDocument();
     expect(screen.queryByText('Nenhum item adicionado')).toBeNull();
@@ -174,7 +174,7 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
       { id: 'i1', descricao: 'Cimento CP-II', observacao: '', quantidade: 10, unidade: 'sc', preco_unit: 30, ipi_pct: 0, desc_pct: 0, ecr_id: null },
     ] });
     render(<NovaOcPage />);
-    await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
     const print = png();
     colar(document.body, [print]);
     expect(lerPedido).toHaveBeenCalledWith([print]);
@@ -188,7 +188,7 @@ describe('D554 — o botão "Importar Pedido (IA)" abre o campo, e não a pasta'
     const { ErroDaImportacao } = await import('../../src/services/ai/lerPedido');
     lerPedido.mockRejectedValueOnce(new ErroDaImportacao('Chegaram 6 páginas, e o limite de uma leitura é 5.'));
     render(<NovaOcPage />);
-    await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
     colar(document.body, [png()]);
     expect(await screen.findByRole('alert')).toHaveTextContent('Chegaram 6 páginas');
     expect(screen.getByRole('group', { name: 'Importar pedido pela IA' })).toBeInTheDocument();

@@ -213,7 +213,7 @@ pnpm preview        # serve dist/ localmente
 
 **`dashboard/DashboardPage.tsx`** — Cards de KPI (total OCs, emitidas, rascunhos, volume, fornecedores ativos, obras ativas), últimas 8 OCs, top 5 fornecedores.
 
-**`ordens-compra/NovaOcPage.tsx`** — Editor de OC. Form principal (fornecedor, obra, data, condição, emitente, observações), tabela de itens inline, painel de totais, botões: Adicionar Item, Importar Pedido (IA), Gerar PDF, Salvar Rascunho, Emitir, Cancelar. Inicialização guarda `initializedRef` (evita loop de bump de número ao re-render).
+**`ordens-compra/NovaOcPage.tsx`** — Editor de OC. Form principal (fornecedor, obra, data, condição, emitente, observações), tabela de itens inline, painel de totais, no alto "Salvar rascunho" e o "Mais" (Tutorial, Visualizar o PDF, Cancelar); no vazio dos itens, "+ Adicionar item" e "Importar de um orçamento (IA)"; no pé que gruda embaixo, o total geral, "Salvar rascunho" e "Emitir a OC" (D1034h). Inicialização guarda `initializedRef` (evita loop de bump de número ao re-render).
 
 **`ordens-compra/HistoricoPage.tsx`** — Lista filtrável (search, status, fornecedor, obra). Ações por linha: Editar (rascunho), Duplicar, Regenerar PDF, Marcar Entregue, Cancelar, Excluir.
 

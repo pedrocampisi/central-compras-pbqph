@@ -88,7 +88,7 @@ describe('CTO-D680 — o nome do PDF vem com o apelido, nas duas portas', () => 
     useOcEditingStore.getState().startEditing({ ...OC, status: 'rascunho', numero: '' });
     render(<NovaOcPage />);
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
     });
     expect(salvos).toEqual(['comarco 2026-09-18 R-263-29 oc.pdf']);
   });

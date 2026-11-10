@@ -80,7 +80,7 @@ const resultadoNaTela = () => screen.getByRole('region', { name: 'Resultado da l
 
 async function abrir() {
   render(<NovaOcPage />);
-  await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+  await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
 }
 
 describe('D567 — a escolha do leitor, antes de ler', () => {

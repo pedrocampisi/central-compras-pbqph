@@ -58,6 +58,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { confirmAsync } from '../../stores/useConfirmStore';
 import type { OrdemCompra, Item } from '../../domain/types';
 import { semLinhasEmBranco, travaDaQuantidade } from '../../domain/itensDaEmissao';
+import { oQueFaltaParaEmitir, fraseDoQueFalta, type CampoQueFalta } from '../../domain/faltaParaEmitir';
 import styles from './NovaOcPage.module.css';
 import tutorialStyles from './TutorialDaNovaOc.module.css';
 import { TutorialDaNovaOc } from './TutorialDaNovaOc';
@@ -124,6 +125,25 @@ function AjudaDoCampo({ ajuda }: { ajuda: { sobre: string; texto: string } }) {
   return <Ajuda sobre={ajuda.sobre}>{ajuda.texto}</Ajuda>;
 }
 
+/** O id do "+ Adicionar item": é ele que recebe o foco quando falta item (D1034h item 3). */
+const ID_DO_ADICIONAR = 'oc-adicionar-item';
+const ID_DO_QUE_FALTA = 'oc-o-que-falta';
+
+/** O caminho mais curto, escrito como botão e com nome que diz o que faz (D1034h item 5). */
+function BotaoDaImportacao({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={disabled} title={DICA_DA_IMPORTACAO}>
+      <Icon name="sparkles" size={13} /> Importar de um orçamento (IA)
+    </Button>
+  );
+}
+
+/** O foco vai ao primeiro campo que falta: a pessoa não procura (D1034h item 3). */
+function focarOQueFalta(c: CampoQueFalta) {
+  const id = c === 'fornecedor' ? 'oc-fornecedor' : c === 'obra' ? 'oc-obra' : ID_DO_ADICIONAR;
+  document.getElementById(id)?.focus();
+}
+
 // ── Items table ───────────────────────────────────────────────────────────────
 
 interface ItemsTableProps {
@@ -132,23 +152,32 @@ interface ItemsTableProps {
   onUpdate: (id: string, partial: Partial<Item>) => void;
   onRemove: (id: string) => void;
   onAdd: () => void;
+  /** A porta da IA, ao lado do "+ Adicionar item" (D1034h item 5). */
+  onImportar: () => void;
   semVazio?: boolean;
   /** A dúvida da IA por item (D557) — da tela, nunca do item. */
   confira?: Record<string, string>;
 }
 
-function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira = {} }: ItemsTableProps) {
+function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, onImportar, semVazio, confira = {} }: ItemsTableProps) {
   if (items.length === 0) {
     // Com o campo de importação aberto, é ele que ocupa o lugar do vazio.
     if (semVazio) return null;
     return (
       // Compacto, sem o mascote: no meio do formulário o castor grande empurrava
-      // os totais e o "Emitir" para longe (D1034b).
+      // os totais e o "Emitir" para longe (D1034b). As duas portas moram aqui, e
+      // a fila de baixo só aparece quando já há item (D1034h itens 4 e 5).
       <EmptyState
         compacto
         title="Nenhum item adicionado"
         description={VAZIO_DOS_ITENS}
-        action={{ label: '+ Adicionar item', onClick: onAdd }}
+        action={
+          <span className={styles.portasDosItens} data-tutorial="itens">
+            <Button variant="outline" size="sm" id={ID_DO_ADICIONAR} onClick={onAdd}>+ Adicionar item</Button>
+            <BotaoDaImportacao onClick={onImportar} />
+            <AjudaDoCampo ajuda={AJUDA_DOS_ITENS} />
+          </span>
+        }
       />
     );
   }
@@ -339,10 +368,7 @@ function TotalsPanel({ oc, onChangeField, confira = {}, onConfirmar = () => {}, 
           value={oc.desconto_material === 0 ? '' : oc.desconto_material}
           onChange={(e) => onChangeField('desconto_material', Number(e.target.value) || 0)}
         />
-        <div className={styles.totalsDivider} />
-        <div className={styles.totalsDivider} />
-        <span className={styles.totalsGeralLabel}>TOTAL GERAL:</span>
-        <span className={styles.totalsGeralValue}>{formatBrl(t.total_geral)}</span>
+        {/* O total geral mora no pé que gruda embaixo, à vista de quem está no item 12 (D1034h itens 2 e 8). */}
       </div>
       {/* Fora da grade: a grade alterna rótulo e valor pela posição. */}
       {(confira.frete || confira.outras || confira.desconto) && (
@@ -372,6 +398,7 @@ function mensagemDaFalha(err: unknown): string {
 export function NovaOcPage() {
   const data = useDataStore((s) => s.data);
   const perfil = useAuthStore((s) => s.perfil);
+  const idDaPessoa = perfil?.user_id;
   const qualificacoes = useQualificacoesDoDia();
 
   const ocEditing = useOcEditingStore((s) => s.ocEditing);
@@ -388,7 +415,7 @@ export function NovaOcPage() {
   const showToast = useUiStore((s) => s.showToast);
   const setTab = useUiStore((s) => s.setActiveTab);
 
-  // O botão "Importar Pedido (IA)" abre um campo, não a pasta (CTO-D554).
+  // O botão "Importar de um orçamento (IA)" abre um campo, não a pasta (CTO-D554).
   const [importAberto, setImportAberto] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importErro, setImportErro] = useState('');
@@ -532,7 +559,10 @@ export function NovaOcPage() {
 
   const handleEmitir = useCallback(async () => {
     if (!ocEditing || !data) return;
-    if (!ocEditing.fornecedor_id) { showToast('Selecione um fornecedor.', 'warning'); return; }
+    // O que falta já está escrito ao lado do botão; o clique leva o foco ao
+    // primeiro campo que falta, sem janela de erro (D1034h item 3).
+    const falta = oQueFaltaParaEmitir(ocEditing);
+    if (falta.length > 0) { focarOQueFalta(falta[0]!); return; }
     {
       // A filial bloqueada NÃO emite — o banco não recusa, a trava é aqui (D545).
       const trava = travaDaFilial(data.fornecedores.find((f) => f.id === ocEditing.fornecedor_id), 'emitir');
@@ -556,10 +586,8 @@ export function NovaOcPage() {
         return;
       }
     }
-    if (!ocEditing.obra_id) { showToast('Selecione uma obra.', 'warning'); return; }
     // A linha em branco some; a linha com quantidade 0 não emite, e a mensagem diz qual (D680).
     const itens = semLinhasEmBranco(ocEditing.itens);
-    if (itens.length === 0) { showToast('Adicione ao menos um item.', 'warning'); return; }
     const quantidade = travaDaQuantidade(ocEditing.itens, 'nova-oc');
     if (quantidade) { showToast(quantidade, 'warning'); return; }
 
@@ -614,6 +642,8 @@ export function NovaOcPage() {
       }
 
       await recarregarDados();
+      // A primeira OC emitida encerra a oferta do tutorial (D1034h item 7).
+      marcarTutorialOferecido(idDaPessoa);
       stopEditing();
       const aviso = avisoDoPdf(emitida.numero, resposta, caminho, 'emissao');
       showToast(aviso.texto, aviso.tom);
@@ -623,7 +653,7 @@ export function NovaOcPage() {
     } finally {
       setSavingPdf(false);
     }
-  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro]);
+  }, [ocEditing, data, stopEditing, showToast, setTab, idDaTentativa, avisarErro, idDaPessoa]);
 
   /**
    * Abre o PDF da OC em uma nova aba SEM emitir — para conferência antes
@@ -919,6 +949,12 @@ export function NovaOcPage() {
   // a pessoa preencha o formulário inteiro para tomar o erro no fim.
   const editaOk = podeEditar(perfil?.papel);
   const emiteOk = podeEmitirOc(perfil?.papel);
+  // O que falta para emitir, escrito ao lado do botão (D1034h item 3).
+  const oQueFalta = fraseDoQueFalta(oQueFaltaParaEmitir(ocEditing));
+  function abrirImportacao() {
+    fecharImportacao();
+    setImportAberto(true);
+  }
 
   // O "Qualificar agora" gravou: com a nota no mínimo, a emissão segue sozinha
   // (D605 §1) — e passa de novo pelas duas travas, agora com o store novo.
@@ -950,58 +986,31 @@ export function NovaOcPage() {
           <h2>
             {ocEditing.status === 'rascunho' && ocEditing.criado_em !== ocEditing.atualizado_em
               ? 'Editar OC'
-              : 'Nova Ordem de Compra'}
+              : 'Nova ordem de compra'}
           </h2>
           <p className="section-sub">
             OC Nº {ocEditing.numero || '— (numera ao emitir)'}
           </p>
         </div>
         <div className={styles.acoesDoTopo}>
-          {/* No celular, as ações de apoio do alto moram no "Mais" (D1034f item 5, que vale
-              para o lote b): a fila de cinco botões ocupava três linhas antes do primeiro campo.
-              Nada some: cada uma está no "Mais", e Cancelar, Visualizar e Emitir também no pé. */}
-          <Button variant="ghost" size="sm" className={styles.soNoLargo} onClick={abrirTutorial} title="Mostra, campo por campo, como fazer uma OC">
-            <Icon name="guia" size={13} /> Tutorial
-          </Button>
-          <Button variant="outline" size="sm" className={styles.soNoLargo} onClick={() => void handleCancelar()}>Cancelar</Button>
-          <Button variant="ghost" size="sm" className={styles.soNoLargo} onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
-            <Icon name="eye" size={13} /> Visualizar
-          </Button>
+          {/* No alto, só "Salvar rascunho" e o "Mais" (D1034h item 1). O "Emitir a OC"
+              mora no pé, onde a leitura termina, e é o único destaque da tela. Nada
+              some: Tutorial, Visualizar o PDF e Cancelar estão no "Mais". */}
           <Button
-            variant="secondary"
+            variant="outline"
             size="sm"
             onClick={() => void handleSaveDraft()}
             loading={savingDraft}
             disabled={!editaOk}
             title={editaOk ? undefined : 'Seu acesso não permite salvar OCs'}
           >
-            <Icon name="save" size={13} /> Salvar Rascunho
-          </Button>
-          {/* Atalho do topo em secundário de propósito: o laranja desta tela
-              é o "Emitir OC" do rodapé, depois dos totais. */}
-          <Button
-            variant="outline"
-            size="sm"
-            className={styles.soNoLargo}
-            onClick={() => void handleEmitir()}
-            loading={savingPdf}
-            disabled={!emiteOk}
-            title={emiteOk ? undefined : 'Seu acesso não permite emitir OCs'}
-          >
-            <Icon name="file-text" size={13} /> Emitir OC + PDF
+            <Icon name="save" size={13} /> Salvar rascunho
           </Button>
           <Mais
-            className={styles.soNoEstreito}
             rotulo="Mais ações da OC"
             acoes={[
               { rotulo: 'Tutorial', aoEscolher: abrirTutorial },
-              { rotulo: 'Visualizar o PDF', aoEscolher: () => void handlePreviewPdf() },
-              {
-                rotulo: 'Emitir OC + PDF',
-                aoEscolher: () => void handleEmitir(),
-                desabilitada: !emiteOk,
-                titulo: emiteOk ? undefined : 'Seu acesso não permite emitir OCs',
-              },
+              { rotulo: 'Visualizar o PDF', aoEscolher: () => void handlePreviewPdf(), desabilitada: previewing },
               { rotulo: 'Cancelar', aoEscolher: () => void handleCancelar() },
             ]}
           />
@@ -1119,14 +1128,6 @@ export function NovaOcPage() {
           )}
         </Field>
 
-        <Field
-          as="textarea"
-          label="Observações"
-          span2
-          rows={2}
-          value={ocEditing.observacoes}
-          onChange={(e) => updateField('observacoes', e.target.value)}
-        />
       </FieldGroup>
 
       {/* ── Itens ────────────────────────────────────────────────────────── */}
@@ -1140,6 +1141,7 @@ export function NovaOcPage() {
             onUpdate={editarItem}
             onRemove={removerItem}
             onAdd={addItem}
+            onImportar={abrirImportacao}
             semVazio={importAberto}
             confira={confira}
           />
@@ -1176,64 +1178,84 @@ export function NovaOcPage() {
               />
             </div>
           )}
-          <div className={styles.itemsActions} data-tutorial="itens">
-            <Button variant="outline" size="sm" onClick={addItem}>+ Adicionar item</Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => { fecharImportacao(); setImportAberto(true); }}
-              disabled={importAberto}
-              title={DICA_DA_IMPORTACAO}
-            >
-              <Icon name="sparkles" size={13} /> Importar Pedido (IA)
-            </Button>
-            <AjudaDoCampo ajuda={AJUDA_DOS_ITENS} />
+          {/* Na tela vazia as duas portas estão dentro do vazio; esta fila só aparece
+              quando já há item, ou com o campo da IA aberto (D1034h item 4). */}
+          {(ocEditing.itens.length > 0 || importAberto) && (
+            <div className={styles.itemsActions} data-tutorial="itens">
+              <Button variant="outline" size="sm" id={ID_DO_ADICIONAR} onClick={addItem}>+ Adicionar item</Button>
+              <BotaoDaImportacao onClick={abrirImportacao} disabled={importAberto} />
+              <AjudaDoCampo ajuda={AJUDA_DOS_ITENS} />
+            </div>
+          )}
+        </div>
+      </FieldGroup>
+
+      {/* ── Totais e Observações ──────────────────────────────────────────── */}
+      {/* O cartão dos Totais fica à direita, na beirada da tabela dos itens, e as
+          Observações ocupam o lado vazio (D1034h itens 6 e 8). Na leitura, e no
+          celular, as Observações vêm depois dos Totais. */}
+      <div className={styles.fechoDaOc}>
+        <FieldGroup title="Totais" className={styles.cartaoDosTotais} ajuda={<AjudaDoCampo ajuda={AJUDA_DOS_TOTAIS} />}>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <TotalsPanel
+              oc={ocEditing}
+              onChangeField={(field, value) => {
+                updateField(field, value);
+                mexeuNoAlto(field === 'frete' ? 'frete' : field === 'outras_despesas' ? 'outras' : 'desconto');
+              }}
+              confira={confiraDoAlto}
+              onConfirmar={mexeuNoAlto}
+              totalDoOrcamento={totalDoOrcamento}
+            />
           </div>
-        </div>
-      </FieldGroup>
-
-      {/* ── Totais ───────────────────────────────────────────────────────── */}
-      <FieldGroup title="Totais" ajuda={<AjudaDoCampo ajuda={AJUDA_DOS_TOTAIS} />}>
-        <div style={{ gridColumn: '1 / -1' }}>
-          <TotalsPanel
-            oc={ocEditing}
-            onChangeField={(field, value) => {
-              updateField(field, value);
-              mexeuNoAlto(field === 'frete' ? 'frete' : field === 'outras_despesas' ? 'outras' : 'desconto');
-            }}
-            confira={confiraDoAlto}
-            onConfirmar={mexeuNoAlto}
-            totalDoOrcamento={totalDoOrcamento}
+        </FieldGroup>
+        <FieldGroup className={styles.cartaoDasObservacoes}>
+          <Field
+            as="textarea"
+            label="Observações"
+            aria-label="Observações"
+            span2
+            rows={3}
+            value={ocEditing.observacoes}
+            onChange={(e) => updateField('observacoes', e.target.value)}
           />
-        </div>
-      </FieldGroup>
+        </FieldGroup>
+      </div>
 
-      {/* ── Footer actions ───────────────────────────────────────────────── */}
-      <div className={styles.footerActions}>
-        <Button variant="outline" onClick={() => void handleCancelar()}>Cancelar</Button>
-        <Button variant="ghost" onClick={() => void handlePreviewPdf()} loading={previewing} title="Abre o PDF em nova aba sem emitir a OC">
-          <Icon name="eye" size={13} /> Visualizar PDF
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() => void handleSaveDraft()}
-          loading={savingDraft}
-          disabled={!editaOk}
-          title={editaOk ? undefined : 'Seu acesso não permite salvar OCs'}
-        >
-          <Icon name="save" size={13} /> Salvar Rascunho
-        </Button>
-        <Button
-          variant="primary"
-          data-tutorial="emitir"
-          onClick={() => void handleEmitir()}
-          loading={savingPdf}
-          disabled={!emiteOk}
-          title={emiteOk ? undefined : 'Seu acesso não permite emitir OCs'}
-        >
-          <Icon name="file-text" size={13} /> Emitir OC + Gerar PDF
-        </Button>
-        <AjudaDoCampo ajuda={AJUDA_DO_EMITIR} />
+      {/* ── O pé que gruda embaixo (D1034h item 2; candidata cc-pe-fixo) ─────── */}
+      <div className={`cc-pe-fixo ${styles.peDaOc}`} data-pe-da-oc="">
+        <div className={styles.totalDoPe} data-total-do-pe="">
+          <span>Total geral</span>
+          <strong>{formatBrl(computeOcTotals(ocEditing).total_geral)}</strong>
+        </div>
+        <div className={styles.footerActions}>
+          {oQueFalta && (
+            <span className={styles.oQueFalta} id={ID_DO_QUE_FALTA} data-o-que-falta="">
+              {oQueFalta}
+            </span>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => void handleSaveDraft()}
+            loading={savingDraft}
+            disabled={!editaOk}
+            title={editaOk ? undefined : 'Seu acesso não permite salvar OCs'}
+          >
+            <Icon name="save" size={13} /> Salvar rascunho
+          </Button>
+          <Button
+            variant="primary"
+            data-tutorial="emitir"
+            onClick={() => void handleEmitir()}
+            loading={savingPdf}
+            disabled={!emiteOk}
+            aria-describedby={oQueFalta ? ID_DO_QUE_FALTA : undefined}
+            title={emiteOk ? undefined : 'Seu acesso não permite emitir OCs'}
+          >
+            <Icon name="file-text" size={13} /> Emitir a OC
+          </Button>
+          <AjudaDoCampo ajuda={AJUDA_DO_EMITIR} />
+        </div>
       </div>
 
       {passoDoTutorial !== null && (

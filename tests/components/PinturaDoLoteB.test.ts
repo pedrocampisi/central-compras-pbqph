@@ -58,13 +58,11 @@ describe('D1034b — a Nova OC', () => {
     expect(css).toMatch(/\.tituloDoTopo\s*\{[^}]*flex:\s*1 1 auto/);
   });
 
-  it('no celular, as ações de apoio do alto moram no "Mais" (as regras dos itens 1 e 5 valem para o lote b)', () => {
+  it('as ações de apoio do alto moram no "Mais" (no b2 isso vale em toda largura, D1034h item 1)', () => {
     expect(tsx).toContain('rotulo="Mais ações da OC"');
-    for (const acao of ['Tutorial', 'Visualizar o PDF', 'Emitir OC + PDF', 'Cancelar']) {
+    for (const acao of ['Tutorial', 'Visualizar o PDF', 'Cancelar']) {
       expect(tsx).toContain(`rotulo: '${acao}'`);
     }
-    const estreita = css.slice(css.indexOf('@media (max-width: 720px)'));
-    expect(estreita).toMatch(/\.soNoLargo\s*\{[^}]*display:\s*none/);
   });
 
   it('o vazio dos itens é o compacto, sem o mascote no meio do formulário', () => {

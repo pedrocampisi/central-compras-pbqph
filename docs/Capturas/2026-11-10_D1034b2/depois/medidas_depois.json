@@ -1,0 +1,106 @@
+{
+  "1366_dia_topo_dos_itens_px": 634,
+  "1366_dia_tabs_ate_emitir_vazia": {
+    "de": 5,
+    "ate": 21,
+    "tabs": 16
+  },
+  "1366_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "1366_dia_topo_dos_itens_px_sem_a_oferta": 527,
+  "1366_dia_tabs_ate_emitir_1_item": {
+    "de": 3,
+    "ate": 28,
+    "tabs": 25
+  },
+  "1366_dia_emitir_a_vista_no_meio_com_12_itens": {
+    "aVista": true,
+    "fundoDoBotao": 758,
+    "alturaDaTela": 768
+  },
+  "1366_dia_pe_no_meio": {
+    "topo": 703,
+    "fundo": 768,
+    "altura": 65
+  },
+  "1366_noite_topo_dos_itens_px": 527,
+  "1366_noite_tabs_ate_emitir_vazia": {
+    "de": 3,
+    "ate": 19,
+    "tabs": 16
+  },
+  "1366_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "1366_noite_topo_dos_itens_px_sem_a_oferta": 527,
+  "1366_noite_tabs_ate_emitir_1_item": {
+    "de": 3,
+    "ate": 28,
+    "tabs": 25
+  },
+  "1366_noite_emitir_a_vista_no_meio_com_12_itens": {
+    "aVista": true,
+    "fundoDoBotao": 758,
+    "alturaDaTela": 768
+  },
+  "1366_noite_pe_no_meio": {
+    "topo": 703,
+    "fundo": 768,
+    "altura": 65
+  },
+  "375_dia_topo_dos_itens_px": 870,
+  "375_dia_tabs_ate_emitir_vazia": {
+    "de": 3,
+    "ate": 19,
+    "tabs": 16
+  },
+  "375_dia_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "375_dia_topo_dos_itens_px_sem_a_oferta": 870,
+  "375_dia_tabs_ate_emitir_1_item": {
+    "de": 3,
+    "ate": 28,
+    "tabs": 25
+  },
+  "375_dia_emitir_a_vista_no_meio_com_12_itens": {
+    "aVista": true,
+    "fundoDoBotao": 739,
+    "alturaDaTela": 812
+  },
+  "375_dia_pe_no_meio": {
+    "topo": 652,
+    "fundo": 747,
+    "altura": 95
+  },
+  "375_noite_topo_dos_itens_px": 870,
+  "375_noite_tabs_ate_emitir_vazia": {
+    "de": 3,
+    "ate": 19,
+    "tabs": 16
+  },
+  "375_noite_sem_lado": {
+    "pagina": 0,
+    "main": 0
+  },
+  "375_noite_topo_dos_itens_px_sem_a_oferta": 870,
+  "375_noite_tabs_ate_emitir_1_item": {
+    "de": 3,
+    "ate": 28,
+    "tabs": 25
+  },
+  "375_noite_emitir_a_vista_no_meio_com_12_itens": {
+    "aVista": true,
+    "fundoDoBotao": 739,
+    "alturaDaTela": 812
+  },
+  "375_noite_pe_no_meio": {
+    "topo": 652,
+    "fundo": 747,
+    "altura": 95
+  }
+}

@@ -3,7 +3,7 @@
  *
  * A pessoa faz de verdade: o balão acende um campo, e o passo segue quando ela
  * age — escolheu o fornecedor, vai para a obra. O tutorial nunca emite: o
- * último passo acende o "Emitir OC + Gerar PDF" e explica, e quem aperta é a
+ * último passo acende o "Emitir a OC" e explica, e quem aperta é a
  * pessoa. Nada aqui grava; esta lógica só lê a OC que está na tela.
  *
  * Uma fonte só para o texto (D763 §1.6): a frase que a tela já mostra num
@@ -18,8 +18,8 @@ import { O_QUE_E_ECR } from './ecr';
 /** A dica embaixo de "Entrega prevista". */
 export const DICA_DA_ENTREGA = 'O dia combinado com o fornecedor. É o que o encarregado vê na obra.';
 /** O vazio da tabela de itens. */
-export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar item" ou importe um pedido via IA.';
-/** A dica do "Importar Pedido (IA)". */
+export const VAZIO_DOS_ITENS = 'Clique em "+ Adicionar item" ou importe os itens de um orçamento pela IA.';
+/** A dica do "Importar de um orçamento (IA)" (era "Importar Pedido (IA)", D1034h item 5). */
 export const DICA_DA_IMPORTACAO = 'Importar os itens de um pedido (PDF, foto ou print) pela IA';
 
 /**
@@ -49,8 +49,8 @@ export const AJUDA_DOS_TOTAIS = {
 export const AJUDA_DO_EMITIR = {
   sobre: 'O que o Emitir faz',
   texto:
-    'Quando estiver tudo certo, é este botão que emite: a OC ganha o número, o PDF é gerado e vai para a ' +
-    'pasta da obra. Ainda não terminou? "Salvar Rascunho" guarda a OC sem número.',
+    'Quando estiver tudo certo, é este botão que emite: a OC ganha o número, e o PDF sai junto e vai para a ' +
+    'pasta da obra. Ainda não terminou? "Salvar rascunho" guarda a OC sem número.',
 } as const;
 
 // ── Os passos ─────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 /**
- * Uma leitura do "Importar Pedido (IA)": os arquivos que entraram de uma vez
+ * Uma leitura do "Importar de um orçamento (IA)": os arquivos que entraram de uma vez
  * — arrastados, colados ou escolhidos — viram UMA chamada ao servidor, como
  * páginas de um mesmo pedido (CTO-D554).
  *

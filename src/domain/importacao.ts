@@ -1,5 +1,5 @@
 /**
- * As regras do "Importar Pedido (IA)" que não dependem da tela (CTO-D554).
+ * As regras do "Importar de um orçamento (IA)" que não dependem da tela (CTO-D554).
  *
  * O campo recebe arquivos por três portas — arrastar, colar com Ctrl+V e o
  * "Escolher arquivo" — e as três passam por aqui antes de qualquer coisa ir

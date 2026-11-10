@@ -1,6 +1,6 @@
 /**
  * A IA monta o alto da OC a partir do orçamento (CTO-D805 §2, visão do Pedro
- * na D804): a mesma leitura do "Importar Pedido (IA)" propõe também o
+ * na D804): a mesma leitura do "Importar de um orçamento (IA)" propõe também o
  * fornecedor, a condição de pagamento, a entrega e os totais. A pessoa confere.
  *
  * Lógica pura, sem tela. O contrato com o Banco é o `cabecalho` da

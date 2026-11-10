@@ -173,7 +173,7 @@ async function emitir() {
   useOcEditingStore.getState().startEditing({ ...OC, status: 'rascunho', numero: '' });
   render(<NovaOcPage />);
   await act(async () => {
-    fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
   });
   await waitFor(() => expect(toasts()).toHaveLength(1));
 }
@@ -238,7 +238,7 @@ describe('D685 — ao emitir, o Graph primeiro', () => {
     useOcEditingStore.getState().startEditing({ ...OC, status: 'rascunho', numero: '' });
     render(<NovaOcPage />);
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
     });
     await vi.waitFor(() => expect(funcao.chamadas).toHaveLength(1));
     await act(async () => {

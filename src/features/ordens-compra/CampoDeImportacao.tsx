@@ -1,5 +1,5 @@
 /**
- * O campo do "Importar Pedido (IA)" (CTO-D554): o botão abre ESTE campo, e
+ * O campo do "Importar de um orçamento (IA)" (CTO-D554): o botão abre ESTE campo, e
  * não a pasta. Três portas para arquivo, e uma para texto (CTO-D557):
  *
  *   arrastar ............ os arquivos soltos dentro do campo

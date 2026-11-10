@@ -47,7 +47,7 @@ window.matchMedia ??= ((q: string) => ({
 
 const TELAS: [TabId, string][] = [
   ['dashboard', 'Painel'], // "Painel" no menu e no título desde a D1034 (era "Dashboard")
-  ['nova-oc', 'Nova Ordem de Compra'],
+  ['nova-oc', 'Nova ordem de compra'],
   ['historico', 'Histórico de OCs'],
   ['fornecedores', 'Fornecedores'],
   ['obras', 'Obras'],

@@ -1,3 +1,4 @@
+import { acoesDoMais, escolherNoMais } from './maisDaLinha';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -93,7 +94,8 @@ async function escolher(rotulo: 'Fornecedor' | 'Obra') {
 }
 
 function abrirPeloBotao() {
-  fireEvent.click(screen.getByRole('button', { name: /^Tutorial$/ }));
+  // O Tutorial mora no "Mais" do alto (D1034h itens 1 e 7).
+  escolherNoMais(document.body, 'Tutorial');
 }
 
 describe('D763 — o tutorial, de ponta a ponta', () => {
@@ -130,7 +132,7 @@ describe('D763 — o tutorial, de ponta a ponta', () => {
     // O último passo acende o botão laranja, explica, e não aperta.
     expect(balao()).toHaveTextContent('Passo 7 de 7');
     const acesoNoFim = document.querySelector('[data-tutorial-aceso]')!;
-    expect(acesoNoFim).toHaveTextContent('Emitir OC + Gerar PDF');
+    expect(acesoNoFim).toHaveTextContent('Emitir a OC');
     await act(async () => {
       fireEvent.click(noBalao('Terminar'));
     });
@@ -146,7 +148,7 @@ describe('D763 — o tutorial, de ponta a ponta', () => {
     expect(oc.itens).toHaveLength(1);
     // A prova de que a OC estava pronta para emitir: o botão dela, apertado pela pessoa, grava.
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
     });
     expect(gravacoes.salvar).toHaveBeenCalledTimes(1);
   });
@@ -233,7 +235,7 @@ describe('D763 — a oferta, uma vez só', () => {
     try {
       render(<NovaOcPage />);
       expect(oferta()).toBeNull();
-      expect(screen.getByRole('button', { name: /^Tutorial$/ })).toBeInTheDocument();
+      expect(acoesDoMais(document.body)).toContain('Tutorial');
     } finally {
       ler.mockRestore();
     }

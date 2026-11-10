@@ -146,7 +146,7 @@ async function emitir(o = oc()) {
   useOcEditingStore.getState().startEditing(o);
   render(<NovaOcPage />);
   await act(async () => {
-    fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
   });
 }
 

@@ -146,7 +146,7 @@ async function emitir(o = oc()) {
   useOcEditingStore.getState().startEditing(o);
   render(<NovaOcPage />);
   await act(async () => {
-    fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
   });
 }
 
@@ -216,7 +216,7 @@ describe('D605 — a porta "Emitir OC" da Nova OC', () => {
     useOcEditingStore.getState().startEditing(oc());
     render(<NovaOcPage />);
     await act(async () => {
-      fireEvent.click(screen.getAllByRole('button', { name: /Salvar Rascunho/ })[0]!);
+      fireEvent.click(screen.getAllByRole('button', { name: /Salvar rascunho/ })[0]!);
     });
     expect(gravacoes.salvar).toHaveBeenCalledTimes(1);
     expect(caixa()).toBeNull();

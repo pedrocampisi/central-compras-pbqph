@@ -16,6 +16,8 @@
  *                      não são a principal
  *   5. cc-linha-abre · a linha da tabela que abre a coisa, com o foco do teclado
  *   6. cc-cartoes ···· a tabela que vira cartões abaixo de 720 px
+ *   7. cc-pe-fixo ···· o pé da tela de formulário que gruda embaixo, com o total
+ *                      e a ação principal à vista (D1034h item 2)
  */
 
 /* 1. CANDIDATA: CAMPO DE BUSCA DA TELA DE TRABALHO.
@@ -358,5 +360,34 @@
   }
   .cc-cartoes td[data-cartao='acoes'] > * {
     justify-content: flex-start;
+  }
+}
+
+/* ── 7. cc-pe-fixo (D1034h item 2) ──────────────────────────────────────────
+ * O pé de um formulário longo gruda embaixo da área que rola: quem está na
+ * linha 12 dos itens vê o total e a ação principal sem rolar. No celular ele
+ * fica acima da barra de baixo (cp-barra: 56 px de botão, 8 de folga e 1 de
+ * borda). Sem movimento: ele só fica onde está. */
+.cc-pe-fixo {
+  position: sticky;
+  /* O navegador mede o "grudar" por dentro da folga do miolo (64 px embaixo):
+     o desconto põe o pé no fundo da tela. A margem igual o deixa no fundo
+     também no fim da página. */
+  bottom: calc(-1 * var(--espaco-8));
+  z-index: 5;
+  margin: 0 calc(-1 * var(--espaco-6)) calc(-1 * var(--espaco-8));
+  padding: 10px var(--espaco-6) calc(10px + env(safe-area-inset-bottom));
+  background: var(--painel);
+  border-top: 1px solid var(--linha);
+  box-shadow: var(--sombra-repouso);
+}
+/* Abaixo de 960 px o miolo tem 16 px dos lados e, embaixo, a folga mais os
+   64 px da barra: o pé fica logo acima da barra (65 px: 56 de botão, 8 de
+   folga e 1 de borda). */
+@media (max-width: 960px) {
+  .cc-pe-fixo {
+    bottom: calc(1px - var(--espaco-8));
+    margin: 0 calc(-1 * var(--espaco-4)) calc(1px - var(--espaco-8));
+    padding: 8px var(--espaco-4);
   }
 }

@@ -53,14 +53,14 @@ window.matchMedia ??= ((q: string) => ({
 })) as unknown as typeof window.matchMedia;
 
 describe('a OC nova nasce com uma hora só (pendência 30)', () => {
-  it('com o relógio andando entre uma leitura e outra, o título é "Nova Ordem de Compra", e não "Editar OC"', async () => {
+  it('com o relógio andando entre uma leitura e outra, o título é "Nova ordem de compra", e não "Editar OC"', async () => {
     useUiStore.setState({ activeTab: 'dashboard' });
     render(<App />);
     await screen.findByText('Nenhuma OC ainda');
     await act(async () => {
       useUiStore.getState().setActiveTab('nova-oc');
     });
-    expect(document.querySelector('main')!.querySelector('h2')?.textContent?.trim()).toBe('Nova Ordem de Compra');
+    expect(document.querySelector('main')!.querySelector('h2')?.textContent?.trim()).toBe('Nova ordem de compra');
     const oc = useOcEditingStore.getState().ocEditing!;
     expect(oc.criado_em).toBe(oc.atualizado_em);
   });

@@ -99,7 +99,7 @@ describe('CTO-D680 — a porta "Emitir OC" da Nova OC', () => {
     useOcEditingStore.getState().startEditing(oc(itens));
     render(<NovaOcPage />);
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
     });
   }
 
@@ -122,7 +122,10 @@ describe('CTO-D680 — a porta "Emitir OC" da Nova OC', () => {
   it('só linhas em branco: é OC sem item, e não emite', async () => {
     await emitir([EM_BRANCO()]);
     expect(gravacoes.salvar).not.toHaveBeenCalled();
-    expect(avisos()).toContain('Adicione ao menos um item.');
+    // Sem item, o botão já diz o que falta, e o clique leva o foco ao "+ Adicionar item" (D1034h item 3).
+    expect(avisos()).toEqual([]);
+    expect(document.querySelector('[data-o-que-falta]')).toHaveTextContent('Falta pelo menos 1 item');
+    expect(document.activeElement).toHaveTextContent('+ Adicionar item');
   });
 });
 

@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
  *   - o Totais tinha `min-width: 320px`, e a 375px o conteúdo tem 271px (medido:
  *     lateral de 64, respiro de 20 de cada lado). Alinhado à direita, passava
  *     49px para a esquerda, por baixo da lateral, e cortava os sete rótulos;
- *   - o rodapé (Cancelar, Visualizar PDF, Salvar Rascunho, Emitir) era uma fila
+ *   - o rodapé (Cancelar, Visualizar PDF, Salvar rascunho, Emitir) era uma fila
  *     alinhada à direita sem quebra: três botões ficavam fora da tela.
  *
  * Transbordo para a ESQUERDA não gera rolagem — some calado. Por isso a regra

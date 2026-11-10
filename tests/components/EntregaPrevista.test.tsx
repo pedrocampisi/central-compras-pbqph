@@ -77,7 +77,7 @@ describe('a Nova OC', () => {
     expect(campo.required).toBe(false);
     fireEvent.change(campo, { target: { value: '2026-10-08' } });
     await act(async () => {
-      fireEvent.click(screen.getAllByRole('button', { name: /Salvar Rascunho/ })[0]!);
+      fireEvent.click(screen.getAllByRole('button', { name: /Salvar rascunho/ })[0]!);
     });
     expect(salvar).toHaveBeenCalledTimes(1);
     expect(salvar.mock.calls[0]![0]).toMatchObject({ entrega_prevista: '2026-10-08' });

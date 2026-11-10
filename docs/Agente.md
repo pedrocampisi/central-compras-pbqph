@@ -298,7 +298,7 @@ buildPdfFilename(oc, fornNome): string
 
 ### `services/ai/`
 ```ts
-// D554: o botão "Importar Pedido (IA)" abre um CAMPO (features/ordens-compra/
+// D554: o botão "Importar de um orçamento (IA)" abre um CAMPO (features/ordens-compra/
 // CampoDeImportacao.tsx) — arrastar, Ctrl+V (print ou arquivo, só com o campo
 // aberto e o cursor fora de campo de texto) ou "Escolher arquivo". Regras puras
 // em domain/importacao.ts: tipos PDF/JPG/PNG, MAX_PAGINAS=5 pelo TOTAL do que
@@ -385,7 +385,7 @@ useFileHandleStore(): { fileHandle; sourceName; setFileHandle(h, name?); clearFi
 
 ## 6. Regras de negócio implícitas
 
-- **Numeração de OC:** `${ano}/${seq.padStart(3,'0')}`. Se `new Date().getFullYear() !== data.config.ano_corrente`, **reseta o sequencial para 1** e atualiza `ano_corrente`. Increment ocorre em `NovaOcPage` ao iniciar nova OC (não ao salvar). Sem lock real — `NovaOcPage#ensureUniqueNumero` re-checa colisão no momento do `Salvar Rascunho`/`Emitir` e reatribui `max(sequencial)+1` se necessário (mitigação parcial; conflitos cruzando dispositivos só são detectados no save explícito do JSON, não em tempo real).
+- **Numeração de OC:** `${ano}/${seq.padStart(3,'0')}`. Se `new Date().getFullYear() !== data.config.ano_corrente`, **reseta o sequencial para 1** e atualiza `ano_corrente`. Increment ocorre em `NovaOcPage` ao iniciar nova OC (não ao salvar). Sem lock real — `NovaOcPage#ensureUniqueNumero` re-checa colisão no momento do `Salvar rascunho`/`Emitir` e reatribui `max(sequencial)+1` se necessário (mitigação parcial; conflitos cruzando dispositivos só são detectados no save explícito do JSON, não em tempo real).
 - **Ordem de cálculo de item:** `bruto → desconto → líquido → IPI → total`. **IPI é sobre o líquido**, não sobre o bruto — parece defeito e não é: **decisão 18**. Não "conserte".
 - **Total geral:** `Σ sub - Σ desc + Σ IPI + frete + outras_despesas - desconto_material`.
 - **Destinatário da nota (desde 15/09/2026, decisão 32):** é o da OBRA — `obra.destinatario`, lido

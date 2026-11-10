@@ -157,7 +157,7 @@ const caixaAgora = () => screen.getByLabelText(/cole aqui a lista de materiais/)
 
 async function abrirECarregar(texto: string) {
   render(<NovaOcPage />);
-  await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+  await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
   const caixa = screen.getByLabelText(/cole aqui a lista de materiais/) as HTMLTextAreaElement;
   fireEvent.change(caixa, { target: { value: texto } });
   return caixa;

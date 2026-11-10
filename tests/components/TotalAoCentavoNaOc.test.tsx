@@ -79,7 +79,7 @@ const confira = (c: string) => document.querySelector(`[data-confira-do-alto="${
 
 async function ler(resposta: unknown) {
   lerPedido.mockResolvedValueOnce(paraResultado(resposta));
-  await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+  await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
   const e = new Event('paste', { bubbles: true, cancelable: true });
   Object.defineProperty(e, 'clipboardData', { value: { files: [png()] } });
   act(() => {

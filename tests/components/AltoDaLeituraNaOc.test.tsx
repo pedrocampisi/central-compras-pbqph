@@ -65,7 +65,7 @@ const confira = (c: string) => document.querySelector(`[data-confira-do-alto="${
 
 async function lerOrcamento(cabecalho: CabecalhoLido | undefined) {
   lerPedido.mockResolvedValueOnce({ itens: [ITEM], confira: {}, ignoradas: [], cabecalho });
-  await userEvent.click(screen.getByRole('button', { name: /Importar Pedido \(IA\)/ }));
+  await userEvent.click(screen.getByRole('button', { name: /Importar de um orçamento \(IA\)/ }));
   const e = new Event('paste', { bubbles: true, cancelable: true });
   Object.defineProperty(e, 'clipboardData', { value: { files: [png()] } });
   act(() => {

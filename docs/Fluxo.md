@@ -78,7 +78,7 @@ flowchart TD
     E --> K[Totais recalculados a cada edição]
     J --> K
     K --> L{Usuário clica em…}
-    L -->|Salvar Rascunho| M[Salva no estado, marca dirty]
+    L -->|Salvar rascunho| M[Salva no estado, marca dirty]
     L -->|Emitir| N[Gera PDF + salva como emitida]
     N --> O[Usuário escolhe pasta para o PDF]
     O --> P[PDF gravado:<br/>fornecedor data Rvalor oc.pdf]
@@ -251,7 +251,7 @@ Depois adiciona **itens**, um por linha:
 |---|---|---|---|
 | Inicialização | Qual fonte de dados usar? | cache existe? handle existe? handle responde? | cache → handle → seed |
 | Nova OC | Qual número usar? | `currentYear === config.ano_corrente`? | mantém sequencial e incrementa / reseta para 1 |
-| Salvar OC | Status final? | botão clicado | "Salvar Rascunho" → `rascunho` / "Emitir" → `emitida` (gera PDF) |
+| Salvar OC | Status final? | botão clicado | "Salvar rascunho" → `rascunho` / "Emitir" → `emitida` (gera PDF) |
 | Save JSON | Conflito remoto? | `remote.last_saved > knownSavedAt`? | continua e sobrescreve / abre diálogo |
 | Save JSON | Como escrever? | tem handle? tem permissão? | write direto / showSaveFilePicker / download |
 | Importar IA | Tipo de arquivo? | mime type | imagem direto / PDF → render páginas |
@@ -272,7 +272,7 @@ Depois adiciona **itens**, um por linha:
 1. Botão "Nova OC" → cria objeto novo com número incrementado e `status='rascunho'`.
 2. Vai para `useOcEditingStore` (clone isolado, não toca no array de OCs ainda).
 3. Usuário edita → cálculos são recomputados a cada mudança.
-4. "Salvar Rascunho" → `useDataStore.updateOrdemCompra()` faz upsert no array; `dirty=true`.
+4. "Salvar rascunho" → `useDataStore.updateOrdemCompra()` faz upsert no array; `dirty=true`.
 5. "Emitir" → mesmo upsert + status='emitida' + `pdf_gerado_em` + abre seletor de PDF.
 6. Auto-save grava cache.
 7. Você aperta Ctrl+S → grava no JSON do OneDrive.

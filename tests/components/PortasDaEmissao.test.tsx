@@ -103,7 +103,7 @@ describe('Perícia 27/09, achado 6 — a porta "Emitir OC" da Nova OC', () => {
     useOcEditingStore.getState().startEditing(oc(fornecedor));
     render(<NovaOcPage />);
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /Emitir OC \+ Gerar PDF/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Emitir a OC/ }));
     });
   }
 
