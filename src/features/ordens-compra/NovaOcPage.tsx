@@ -173,7 +173,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
             const duvida = confira[it.id];
             return (
               <tr key={it.id} className={duvida ? styles.linhaConfira : undefined}>
-                <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>{idx + 1}</td>
+                <td style={{ textAlign: 'center', color: 'var(--tinta-fraca)', fontSize: 11 }}>{idx + 1}</td>
                 <td>
                   <select
                     className={styles.cellSelect}
@@ -259,7 +259,7 @@ function ItemsTable({ items, ecrs, onUpdate, onRemove, onAdd, semVazio, confira 
                     onChange={(e) => onUpdate(it.id, { desc_pct: Number(e.target.value) || 0 })}
                   />
                 </td>
-                <td style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--navy)', whiteSpace: 'nowrap' }}>
+                <td style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--ouro-tinta)', whiteSpace: 'nowrap' }}>
                   {formatBrl(total)}
                 </td>
                 <td>

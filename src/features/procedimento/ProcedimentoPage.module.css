@@ -9,13 +9,13 @@
 
 /* O lugar aonde se pulou: marcado, sem animação (regra 8). */
 .documento [data-alvo] {
-  outline: 2px solid var(--marca);
+  outline: 2px solid var(--ouro-tinta);
   outline-offset: 3px;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
 }
 /* Na tabela, o contorno fica dentro da linha, sem cobrir a borda (CTO-D732 §3.2). */
 .documento tr[data-alvo] { outline-offset: -3px; }
-.documento tr[data-alvo] td { background: var(--marca-fraca); }
+.documento tr[data-alvo] td { background: var(--realce); }
 
 /* ── O cabeçalho ───────────────────────────────────────────────────────── */
 .cabecalho {
@@ -23,7 +23,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 18px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
   background: var(--painel);
 }
@@ -31,15 +31,15 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--terra);
+  color: var(--ouro-palavra);
 }
 .titulo {
   margin: 0;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 22px;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
-.subtitulo { font-size: 13px; color: var(--texto-suave); }
+.subtitulo { font-size: 13px; color: var(--tinta-suave); }
 .campos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -48,11 +48,11 @@
 }
 .campos div {
   padding: 10px 12px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--fundo);
 }
-.campos dt { font-size: 11px; color: var(--texto-suave); }
+.campos dt { font-size: 11px; color: var(--tinta-suave); }
 .campos dd {
   display: flex;
   flex-wrap: wrap;
@@ -61,12 +61,12 @@
   margin: 2px 0 0;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .situacao {
   padding: 1px 8px;
   border-radius: var(--raio-pill);
-  background: var(--sucesso-bg);
+  background: var(--sucesso-fundo);
   color: var(--sucesso);
   font-size: 11px;
   font-weight: 700;
@@ -80,36 +80,36 @@
   gap: 6px 8px;
   font-size: 13px;
 }
-.sumario strong { color: var(--texto); }
+.sumario strong { color: var(--tinta); }
 .sumario button {
   padding: 4px 10px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio-pill);
   background: var(--painel);
-  color: var(--marca);
+  color: var(--ouro-tinta);
   font: inherit;
   cursor: pointer;
 }
-.sumario button:hover { border-color: var(--marca); }
-.sumario button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-fraca); }
+.sumario button:hover { border-color: var(--ouro-tinta); }
+.sumario button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce); }
 
 /* ── O "Como usar" ─────────────────────────────────────────────────────── */
 .comoUsar {
   margin: 0;
   padding: 14px 16px;
-  border-left: 4px solid var(--acento);
-  border-radius: 0 var(--raio-pequeno) var(--raio-pequeno) 0;
+  border-left: 4px solid var(--ouro);
+  border-radius: 0 var(--raio-p) var(--raio-p) 0;
   background: var(--painel);
   font-size: 13.5px;
   line-height: 1.55;
-  color: var(--texto);
+  color: var(--tinta);
 }
-.comoUsar strong { color: var(--marca); }
+.comoUsar strong { color: var(--ouro-tinta); }
 
 /* ── O fluxo didático ──────────────────────────────────────────────────── */
 .fluxo {
   padding: 16px 18px;
-  border: 2px solid var(--marca);
+  border: 2px solid var(--ouro-tinta);
   border-radius: var(--raio);
   background: var(--painel);
 }
@@ -120,10 +120,10 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 .fluxo h4 { margin-top: 16px; }
-.fluxoIntro { margin: 0 0 12px; font-size: 13px; color: var(--texto-suave); }
+.fluxoIntro { margin: 0 0 12px; font-size: 13px; color: var(--tinta-suave); }
 .cartoes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -134,19 +134,19 @@
   flex-direction: column;
   gap: 4px;
   padding: 12px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--fundo);
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font: inherit;
   font-size: 12.5px;
   line-height: 1.45;
   text-align: left;
 }
 button.cartao { cursor: pointer; }
-button.cartao:hover { border-color: var(--marca); }
-button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-fraca); }
-.cartao strong { font-size: 13px; color: var(--marca); }
+button.cartao:hover { border-color: var(--ouro-tinta); }
+button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--realce); }
+.cartao strong { font-size: 13px; color: var(--ouro-tinta); }
 .sequencia {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -160,12 +160,12 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   flex-direction: column;
   gap: 2px;
   padding: 10px;
-  border-radius: var(--raio-pequeno);
-  background: var(--marca-fraca);
+  border-radius: var(--raio-p);
+  background: var(--realce);
   font-size: 12.5px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
-.sequencia strong { color: var(--texto); }
+.sequencia strong { color: var(--tinta); }
 
 /* ── As seções ─────────────────────────────────────────────────────────── */
 .secao {
@@ -173,7 +173,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   flex-direction: column;
   gap: 12px;
   padding: 18px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
   background: var(--painel);
 }
@@ -187,7 +187,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
 .cabecaDaSecao h3 {
   margin: 0;
   font-size: 16px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .numero {
   flex: none;
@@ -197,7 +197,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   width: 28px;
   height: 28px;
   border-radius: var(--raio-pill);
-  background: var(--marca);
+  background: var(--ouro-tinta);
   color: var(--painel);
   font-size: 13px;
   font-weight: 700;
@@ -205,12 +205,12 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
 .selo {
   margin-left: auto;
   padding: 3px 9px;
-  border: 1px solid var(--borda-forte);
+  border: 1px solid var(--linha-controle);
   border-radius: var(--raio-pill);
   background: var(--fundo);
   font-size: 11px;
   font-weight: 700;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   white-space: nowrap;
 }
 
@@ -221,20 +221,20 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   margin: 0;
   font-size: 13.5px;
   line-height: 1.55;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .aviso,
 .informacao {
   padding: 12px 14px;
   border-left: 4px solid var(--aviso);
-  border-radius: 0 var(--raio-pequeno) var(--raio-pequeno) 0;
-  background: var(--aviso-bg);
+  border-radius: 0 var(--raio-p) var(--raio-p) 0;
+  background: var(--aviso-fundo);
 }
 .informacao {
-  border-left-color: var(--marca);
-  background: var(--marca-fraca);
+  border-left-color: var(--ouro-tinta);
+  background: var(--realce);
 }
-.miudo { font-size: 12px; color: var(--texto-suave); }
+.miudo { font-size: 12px; color: var(--tinta-suave); }
 
 .quadros {
   display: grid;
@@ -246,21 +246,21 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   flex-direction: column;
   gap: 4px;
   padding: 12px;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--fundo);
   font-size: 13px;
   line-height: 1.5;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
-.quadro strong { color: var(--marca); }
+.quadro strong { color: var(--ouro-tinta); }
 
 .lista {
   margin: 0;
   padding-left: 24px;
   font-size: 13.5px;
   line-height: 1.55;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .lista li { margin: 4px 0; padding-left: 2px; }
 
@@ -273,26 +273,26 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
 .tabela th,
 .tabela td {
   padding: 8px 10px;
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   text-align: left;
   vertical-align: top;
 }
-.tabela th { background: var(--fundo); font-weight: 700; color: var(--texto); }
-.tabela td { color: var(--texto-suave); }
-.tabela td strong { color: var(--texto); }
+.tabela th { background: var(--fundo); font-weight: 700; color: var(--tinta); }
+.tabela td { color: var(--tinta-suave); }
+.tabela td strong { color: var(--tinta); }
 
-.semTexto { margin: 0; font-size: 13px; color: var(--texto-muted); }
+.semTexto { margin: 0; font-size: 13px; color: var(--tinta-fraca); }
 
 .rodape {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 12px 4px 0;
-  border-top: 1px solid var(--borda);
+  border-top: 1px solid var(--linha);
   font-size: 12px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
-.rodape strong { color: var(--texto); }
+.rodape strong { color: var(--tinta); }
 
 /* ── A revisão pela mão do Pedro (CTO-D739 §4) ─────────────────────────── */
 /* O quadro de quem revisa, no alto da página. */
@@ -302,13 +302,13 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   gap: 6px;
   margin-bottom: 14px;
   padding: 14px 16px;
-  border: 1px solid var(--borda-forte);
+  border: 1px solid var(--linha-controle);
   border-left: 4px solid var(--sucesso);
   border-radius: var(--raio);
   background: var(--painel);
 }
-.painel strong { font-size: 14px; color: var(--texto); }
-.painel p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--texto-suave); }
+.painel strong { font-size: 14px; color: var(--tinta); }
+.painel p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--tinta-suave); }
 .painel .saiu { color: var(--erro); }
 .acoesDoPainel {
   display: flex;
@@ -343,7 +343,7 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
 .etiquetaMudou {
   padding: 2px 8px;
   border-radius: var(--raio-pill);
-  background: var(--sucesso-bg);
+  background: var(--sucesso-fundo);
   font-size: 11px;
   font-weight: 700;
   color: var(--sucesso);
@@ -359,46 +359,46 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   width: 100%;
   max-width: 520px;
   padding: 22px;
-  border-radius: var(--raio-grande);
+  border-radius: var(--raio-g);
   background: var(--painel);
   box-shadow: var(--sombra-elevada);
 }
 .tituloDoDialogo {
   margin: 0 0 4px;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .resumo {
   margin: 0 0 8px;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
-.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--texto); }
+.rotuloDoCampo { font-size: 13px; font-weight: 600; color: var(--tinta); }
 .obrigatorio { margin-left: 2px; color: var(--erro); }
 .descricao {
   width: 100%;
   min-width: 0;
   min-height: 38px;
   padding: 7px 9px;
-  border: 1.5px solid var(--borda-forte);
-  border-radius: var(--raio-pequeno);
+  border: 1.5px solid var(--linha-controle);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
   font-size: 13px;
   line-height: 1.45;
   resize: vertical;
 }
-.dica { font-size: 12px; color: var(--texto-muted); }
+.dica { font-size: 12px; color: var(--tinta-fraca); }
 .erro {
   margin: 0;
   padding: 8px 10px;
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 13px;
   color: var(--erro);
 }
@@ -424,12 +424,12 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
   .empilha td { display: block; width: 100%; }
   .empilha tr {
     margin-bottom: 8px;
-    border: 1px solid var(--borda);
-    border-radius: var(--raio-pequeno);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-p);
   }
   .empilha td {
     border: 0;
-    border-bottom: 1px solid var(--borda);
+    border-bottom: 1px solid var(--linha);
   }
   .empilha td:last-child { border-bottom: 0; }
   .empilha td::before {
@@ -438,6 +438,6 @@ button.cartao:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--marca-f
     margin-bottom: 2px;
     font-size: 11px;
     font-weight: 700;
-    color: var(--texto);
+    color: var(--tinta);
   }
 }

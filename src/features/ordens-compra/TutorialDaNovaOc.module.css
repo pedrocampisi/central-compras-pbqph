@@ -8,9 +8,9 @@
    um vão vazio. Encostado no topo, ele fica do tamanho do campo e da dica. */
 :global([data-tutorial-aceso]) {
   align-self: start;
-  outline: 3px solid var(--acento);
+  outline: 3px solid var(--ouro);
   outline-offset: 4px;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
   scroll-margin-top: 72px;
 }
 
@@ -20,9 +20,9 @@
   width: min(360px, calc(100vw - 32px));
   padding: 14px 16px 12px;
   background: var(--painel);
-  color: var(--texto);
-  border: 1px solid var(--borda-forte);
-  border-left: 4px solid var(--acento);
+  color: var(--tinta);
+  border: 1px solid var(--linha-controle);
+  border-left: 4px solid var(--ouro);
   border-radius: var(--raio);
   box-shadow: var(--sombra-elevada);
 }
@@ -48,28 +48,28 @@
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--terra);
+  color: var(--ouro-palavra);
 }
 
 .titulo {
   margin: 2px 0 6px;
-  font-family: var(--fonte-display);
+  font-family: var(--font-display);
   font-size: 17px;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .texto {
   margin: 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .fazer {
   margin: 8px 0 0;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .acoes {
@@ -94,8 +94,8 @@
   gap: 10px 16px;
   margin-bottom: 16px;
   padding: 12px 16px;
-  background: var(--marca-fraca);
-  border: 1px solid var(--borda);
+  background: var(--realce);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
 }
 
@@ -103,12 +103,12 @@
   flex: 1 1 260px;
   min-width: 0;
   font-size: 13px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 .ofertaTexto strong {
   display: block;
-  color: var(--marca);
+  color: var(--ouro-tinta);
 }
 
 .ofertaAcoes {

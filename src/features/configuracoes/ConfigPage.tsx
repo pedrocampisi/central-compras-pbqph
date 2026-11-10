@@ -67,7 +67,7 @@ export function ConfigPage() {
             </div>
           ))}
           {cfg.condicoes_pagamento.length === 0 && (
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nenhuma condição cadastrada.</span>
+            <span style={{ fontSize: 12, color: 'var(--tinta-fraca)' }}>Nenhuma condição cadastrada.</span>
           )}
         </div>
         <div className={styles.rowFull}>

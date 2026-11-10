@@ -8,21 +8,21 @@
   align-items: center;
   gap: 8px;
   padding: 26px 44px 22px;
-  border: 1.5px dashed var(--borda-forte);
+  border: 1.5px dashed var(--linha-controle);
   border-radius: var(--raio);
-  background: var(--painel-2);
+  background: var(--painel);
   text-align: center;
   outline: none;
   transition:
-    border-color var(--transicao),
-    background var(--transicao);
+    border-color var(--dur-resposta) ease,
+    background var(--dur-resposta) ease;
 }
 .zona:focus-visible {
-  box-shadow: 0 0 0 3px var(--marca-fraca);
+  box-shadow: 0 0 0 3px var(--realce);
 }
 .arrastando {
-  border-color: var(--marca);
-  background: var(--marca-fraca);
+  border-color: var(--ouro-tinta);
+  background: var(--realce);
 }
 
 .fechar {
@@ -35,14 +35,14 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
   background: transparent;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   cursor: pointer;
 }
 .fechar:hover:not(:disabled) {
-  background: var(--marca-fraca);
-  color: var(--marca);
+  background: var(--realce);
+  color: var(--ouro-tinta);
 }
 .fechar:disabled {
   opacity: 0.4;
@@ -50,13 +50,13 @@
 }
 
 .icone {
-  color: var(--marca);
+  color: var(--ouro-tinta);
   display: inline-flex;
 }
 
 .titulo {
-  color: var(--texto);
-  font-family: var(--fonte-display);
+  color: var(--tinta);
+  font-family: var(--font-display);
   font-size: 16px;
   font-weight: 600;
 }
@@ -64,7 +64,7 @@
 .nota {
   max-width: 460px;
   font-size: 12.5px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .lendo {
@@ -82,8 +82,8 @@
   margin: 4px 0 0;
   padding: 8px 12px;
   max-width: 520px;
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   color: var(--erro);
   font-size: 12.5px;
   font-weight: 600;
@@ -114,7 +114,7 @@
   max-width: 560px;
   margin-top: 10px;
   padding-top: 14px;
-  border-top: 1px solid var(--borda);
+  border-top: 1px solid var(--linha);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -124,17 +124,17 @@
   align-self: flex-start;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .caixa {
   width: 100%;
   box-sizing: border-box;
   min-height: 110px;
   padding: 8px 10px;
-  border: 1px solid var(--borda-forte);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha-controle);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font-family: inherit;
   font-size: 13px;
   line-height: 1.45;
@@ -142,8 +142,8 @@
   outline: none;
 }
 .caixa:focus {
-  border-color: var(--marca);
-  box-shadow: 0 0 0 3px var(--marca-fraca);
+  border-color: var(--ouro-tinta);
+  box-shadow: 0 0 0 3px var(--realce);
 }
 
 .ignoradas {
@@ -151,8 +151,8 @@
   max-width: 560px;
   margin-top: 4px;
   padding: 10px 12px;
-  border-radius: var(--raio-pequeno);
-  background: var(--aviso-bg);
+  border-radius: var(--raio-p);
+  background: var(--aviso-fundo);
   color: var(--aviso);
   font-size: 12.5px;
   text-align: left;
@@ -160,7 +160,7 @@
 .ignoradas ul {
   margin: 6px 0 0;
   padding-left: 18px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .ignoradas li {
   overflow-wrap: anywhere;
@@ -187,17 +187,17 @@
   gap: 6px;
   margin-bottom: 10px;
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--borda);
+  border-bottom: 1px solid var(--linha);
   text-align: left;
 }
 .tituloDoLeitor {
-  color: var(--texto);
-  font-family: var(--fonte-display);
+  color: var(--tinta);
+  font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
 }
 .subtituloDoLeitor {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 12.5px;
 }
 
@@ -212,28 +212,28 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px 12px;
-  border: 1.5px solid var(--borda-forte);
-  border-radius: var(--raio-pequeno);
+  border: 1.5px solid var(--linha-controle);
+  border-radius: var(--raio-p);
   background: var(--painel);
   cursor: pointer;
   transition:
-    border-color var(--transicao),
-    background var(--transicao);
+    border-color var(--dur-resposta) ease,
+    background var(--dur-resposta) ease;
 }
 .opcao:hover {
-  border-color: var(--marca-media);
+  border-color: var(--ouro-suave);
 }
 .opcao input {
   margin: 3px 0 0;
-  accent-color: var(--marca);
+  accent-color: var(--ouro-tinta);
   flex: none;
 }
 .opcao:has(input:focus-visible) {
-  box-shadow: 0 0 0 3px var(--marca-fraca);
+  box-shadow: 0 0 0 3px var(--realce);
 }
 .opcaoMarcada {
-  border-color: var(--marca);
-  background: var(--marca-fraca);
+  border-color: var(--ouro-tinta);
+  background: var(--realce);
 }
 .opcaoTexto {
   display: flex;
@@ -242,17 +242,17 @@
   min-width: 0;
 }
 .opcaoNome {
-  color: var(--texto);
+  color: var(--tinta);
   font-size: 14px;
   font-weight: 700;
 }
 .opcaoParaQue {
-  color: var(--texto);
+  color: var(--tinta);
   font-size: 13px;
   line-height: 1.35;
 }
 .opcaoEspera {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 12.5px;
 }
 
@@ -279,33 +279,33 @@
   gap: 4px;
   margin-bottom: 10px;
   padding: 12px 14px;
-  border: 1px solid var(--borda);
-  border-left: 4px solid var(--marca);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-left: 4px solid var(--ouro-tinta);
+  border-radius: var(--raio-p);
   background: var(--painel);
   text-align: left;
 }
 .rotuloTotal {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 12.5px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .totalLido {
-  color: var(--texto);
-  font-family: var(--fonte-display);
+  color: var(--tinta);
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .subtitulo {
-  color: var(--texto);
+  color: var(--tinta);
   font-size: 13.5px;
   font-weight: 600;
 }
 .contexto {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
   font-size: 12.5px;
   line-height: 1.45;
 }
@@ -313,12 +313,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 2px 14px;
-  color: var(--texto);
+  color: var(--tinta);
   font-size: 13.5px;
   font-variant-numeric: tabular-nums;
 }
 .bateOuNao {
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .doisTotais[data-dois-totais='difere'] .bateOuNao {
   color: var(--aviso);
@@ -350,8 +350,8 @@
   gap: 4px;
   margin-bottom: 8px;
   padding: 10px 12px;
-  border-radius: var(--raio-pequeno);
-  background: var(--aviso-bg);
+  border-radius: var(--raio-p);
+  background: var(--aviso-fundo);
   color: var(--aviso);
   font-size: 12.5px;
   text-align: left;
@@ -360,7 +360,7 @@
   font-size: 13.5px;
 }
 .avisoLeitor span {
-  color: var(--texto);
+  color: var(--tinta);
 }
 
 @media (max-width: 700px), (pointer: coarse) {

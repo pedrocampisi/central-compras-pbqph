@@ -6,30 +6,30 @@
   gap: 8px;
   margin-bottom: 6px;
   font-size: 13px;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .alcances label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 
 .dica {
   margin: 6px 0 0;
   font-size: 12px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .ecr {
   margin: 0;
   font-size: 13px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 
 .select {
   width: 100%;
   min-width: 0;
   padding: 7px 9px;
-  border: 1.5px solid var(--borda);
-  border-radius: var(--raio-pequeno);
+  border: 1.5px solid var(--linha);
+  border-radius: var(--raio-p);
   background: var(--painel);
-  color: var(--texto);
+  color: var(--tinta);
   font: inherit;
 }
 
@@ -38,5 +38,5 @@
   padding-left: 18px;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }

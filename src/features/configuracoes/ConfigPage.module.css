@@ -5,11 +5,11 @@
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--raio-grande);
-  background: var(--surface-alt);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
+  background: var(--painel);
   font-size: 12px;
-  color: var(--text);
+  color: var(--tinta);
 }
 
 .chipRemove {
@@ -17,7 +17,7 @@
   height: 16px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--tinta-fraca);
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
@@ -29,7 +29,7 @@
   transition: background 0.12s, color 0.12s;
 }
 .chipRemove:hover {
-  background: var(--erro-bg);
+  background: var(--erro-fundo);
   color: var(--erro);
 }
 
@@ -45,49 +45,49 @@
 .textInput {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   font-size: 13px;
   font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--painel);
+  color: var(--tinta);
   outline: none;
 }
-.textInput:focus { border-color: var(--navy); }
+.textInput:focus { border-color: var(--ouro-tinta); }
 
 .monoInput {
   composes: textInput;
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
 }
 
 .pathBox {
   flex: 1;
   padding: 7px 10px;
-  border-radius: var(--raio-pequeno);
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
+  border-radius: var(--raio-p);
+  border: 1px solid var(--linha);
+  background: var(--painel);
   font-size: 12px;
-  font-family: var(--fonte-mono);
+  font-family: var(--font-mono);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.pathBoxEmpty { color: var(--text-muted); }
+.pathBoxEmpty { color: var(--tinta-fraca); }
 
 .hint {
   grid-column: 1 / -1;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--tinta-fraca);
   margin: 0;
 }
 
 .warnBanner {
   grid-column: 1 / -1;
   padding: 8px 12px;
-  border-radius: var(--raio-pequeno);
-  border: 1px solid var(--amber);
-  background: var(--aviso-bg);
-  color: var(--navy-dark);
+  border-radius: var(--raio-p);
+  border: 1px solid var(--ouro);
+  background: var(--aviso-fundo);
+  color: var(--ouro-tinta);
   font-size: 12px;
   font-weight: 600;
   display: flex;
@@ -101,21 +101,21 @@
 .opcaoSeparada {
   padding-bottom: 22px;
   margin-bottom: 22px;
-  border-bottom: 1px solid var(--borda);
+  border-bottom: 1px solid var(--linha);
 }
 .estadoDaMascara {
   flex: 1 1 240px;
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .erroDaMascara {
   grid-column: 1 / -1;
   margin: 0;
   padding: 8px 10px;
-  border-radius: var(--raio-pequeno);
-  background: var(--erro-bg);
+  border-radius: var(--raio-p);
+  background: var(--erro-fundo);
   font-size: 12.5px;
   color: var(--erro);
 }

@@ -19,7 +19,7 @@
 
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid var(--border);
+  border: 1px solid var(--linha);
   border-radius: var(--raio);
 }
 
@@ -30,23 +30,23 @@
 }
 
 .itemsTable thead th {
-  background: var(--surface-alt);
+  background: var(--painel);
   padding: 7px 6px;
   text-align: left;
   font-weight: 700;
   font-size: 10px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
+  color: var(--tinta-fraca);
+  border-bottom: 1px solid var(--linha);
   white-space: nowrap;
 }
 
 .itemsTable tbody tr {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--linha);
 }
 .itemsTable tbody tr:last-child { border-bottom: none; }
-.itemsTable tbody tr:hover { background: var(--marca-fraca); }
+.itemsTable tbody tr:hover { background: var(--realce); }
 
 .itemsTable td {
   padding: 4px 4px;
@@ -57,17 +57,17 @@
   width: 100%;
   padding: 4px 6px;
   border: 1px solid transparent;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
   font-size: 12px;
   font-family: inherit;
   background: transparent;
-  color: var(--text);
+  color: var(--tinta);
   outline: none;
   transition: border-color 0.12s, background 0.12s;
   box-sizing: border-box;
 }
-.cellInput:hover { border-color: var(--border); background: var(--surface); }
-.cellInput:focus { border-color: var(--navy); background: var(--surface); box-shadow: 0 0 0 2px var(--marca-fraca); }
+.cellInput:hover { border-color: var(--linha); background: var(--painel); }
+.cellInput:focus { border-color: var(--ouro-tinta); background: var(--painel); box-shadow: 0 0 0 2px var(--realce); }
 .cellInput[type="number"] { text-align: right; -moz-appearance: textfield; }
 .cellInput[type="number"]::-webkit-outer-spin-button,
 .cellInput[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
@@ -76,36 +76,36 @@
   width: 100%;
   padding: 4px 4px;
   border: 1px solid transparent;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
   font-size: 12px;
   font-family: inherit;
   background: transparent;
-  color: var(--text);
+  color: var(--tinta);
   outline: none;
   cursor: pointer;
   transition: border-color 0.12s;
   box-sizing: border-box;
 }
-.cellSelect:hover { border-color: var(--border); background: var(--surface); }
-.cellSelect:focus { border-color: var(--navy); background: var(--surface); }
+.cellSelect:hover { border-color: var(--linha); background: var(--painel); }
+.cellSelect:focus { border-color: var(--ouro-tinta); background: var(--painel); }
 
 .removeBtn {
   width: 22px;
   height: 22px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--tinta-fraca);
   cursor: pointer;
   font-size: 16px;
   line-height: 1;
-  border-radius: var(--raio-pequeno);
+  border-radius: var(--raio-p);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.12s, color 0.12s;
   padding: 0;
 }
-.removeBtn:hover { background: var(--erro-bg); color: var(--erro); }
+.removeBtn:hover { background: var(--erro-fundo); color: var(--erro); }
 
 /* Quebra entre os botões: a 375px o "Importar Pedido (IA)" passava 3px da
    borda e a tela ganhava rolagem de lado (medido na D554). */
@@ -130,10 +130,10 @@
    há mouse: o texto vem escrito na própria linha. É aviso da TELA — não vai ao
    banco nem ao PDF, e some quando a pessoa edita a linha ou salva. */
 .linhaConfira {
-  background: var(--aviso-bg);
+  background: var(--aviso-fundo);
   box-shadow: inset 3px 0 0 var(--aviso);
 }
-.linhaConfira:hover { background: var(--aviso-bg) !important; }
+.linhaConfira:hover { background: var(--aviso-fundo) !important; }
 .confira {
   display: inline-flex;
   align-items: center;
@@ -158,8 +158,8 @@
   gap: 8px;
   margin: 0 0 12px;
   padding: 10px 14px;
-  border-radius: var(--radius);
-  background: var(--aviso-bg);
+  border-radius: var(--raio);
+  background: var(--aviso-fundo);
   box-shadow: inset 3px 0 0 var(--aviso);
   color: var(--aviso);
   font-size: 13px;
@@ -191,51 +191,51 @@
 }
 
 .totalsGrid span { text-align: right; }
-.totalsGrid span:nth-child(odd) { text-align: left; color: var(--text-mid); }
+.totalsGrid span:nth-child(odd) { text-align: left; color: var(--tinta-suave); }
 
 .totalNeg { color: var(--erro) !important; }
 
 .totalsDivider {
   grid-column: 1 / -1;
   height: 1px;
-  background: var(--border);
+  background: var(--linha);
   margin: 2px 0;
 }
 
 .totalsLabel {
   text-align: left;
-  color: var(--text-mid);
+  color: var(--tinta-suave);
   font-size: 13px;
 }
 
 .totalsInput {
   width: 100px;
   padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
   font-size: 13px;
   font-family: inherit;
   text-align: right;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--painel);
+  color: var(--tinta);
   outline: none;
   -moz-appearance: textfield;
 }
 .totalsInput::-webkit-outer-spin-button,
 .totalsInput::-webkit-inner-spin-button { -webkit-appearance: none; }
-.totalsInput:focus { border-color: var(--navy); box-shadow: 0 0 0 2px var(--marca-fraca); }
+.totalsInput:focus { border-color: var(--ouro-tinta); box-shadow: 0 0 0 2px var(--realce); }
 
 .totalsGeralLabel {
   font-weight: 800;
   font-size: 14px;
-  color: var(--navy) !important;
+  color: var(--ouro-tinta) !important;
   text-align: left !important;
 }
 
 .totalsGeralValue {
   font-weight: 800;
   font-size: 16px;
-  color: var(--navy) !important;
+  color: var(--ouro-tinta) !important;
   text-align: right !important;
 }
 
@@ -251,7 +251,7 @@
   justify-content: flex-end;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--linha);
 }
 
 /* O selo da qualificação embaixo do fornecedor (CTO-D604 §3.4). */
@@ -262,7 +262,7 @@
   gap: 6px;
   margin-top: 6px;
 }
-.ecrsDoSelo { font-size: 11px; color: var(--text-muted); }
+.ecrsDoSelo { font-size: 11px; color: var(--tinta-fraca); }
 
 /* ── O alto da OC lido do orçamento (CTO-D805 §2) ────────────────────────────
    O "confira" de cada campo que a IA preencheu, com o "Está certo"; o resumo
@@ -292,16 +292,16 @@
   color: var(--aviso);
   cursor: pointer;
 }
-.estaCerto:hover { background: var(--aviso-bg); }
+.estaCerto:hover { background: var(--aviso-fundo); }
 .resumoDoAlto {
   margin: 0 0 14px;
   padding: 10px 14px;
   border-left: 3px solid var(--aviso);
-  border-radius: var(--raio-pequeno);
-  background: var(--aviso-bg);
+  border-radius: var(--raio-p);
+  background: var(--aviso-fundo);
   font-size: 13px;
   line-height: 1.45;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .resumoDoAlto p { margin: 0; }
 .resumoDoAlto p + p { margin-top: 4px; }
@@ -319,8 +319,8 @@
   width: 100%;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed var(--linha);
   font-size: 13px;
-  color: var(--text-mid);
+  color: var(--tinta-suave);
 }
 .conferenciaDoTotal[data-conferencia-do-total='difere'] [data-diferenca] { color: var(--aviso); font-weight: 600; }

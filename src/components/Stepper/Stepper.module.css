@@ -12,18 +12,18 @@
   padding: 12px 14px;
   border-radius: var(--raio);
   background: var(--painel);
-  border: 1px solid var(--borda);
+  border: 1px solid var(--linha);
   display: flex;
   gap: 10px;
   align-items: center;
-  transition: border-color var(--transicao), background var(--transicao);
+  transition: border-color var(--dur-resposta) ease, background var(--dur-resposta) ease;
 }
 .num {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--marca-fraca);
-  color: var(--texto-suave);
+  background: var(--realce);
+  color: var(--tinta-suave);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -34,21 +34,21 @@
 .step strong {
   font-size: 13.5px;
   display: block;
-  color: var(--texto);
+  color: var(--tinta);
 }
 .step span {
   font-size: 12px;
-  color: var(--texto-suave);
+  color: var(--tinta-suave);
 }
 .active {
-  border-color: var(--marca);
-  background: var(--marca-fraca);
+  border-color: var(--ouro-tinta);
+  background: var(--realce);
 }
 .active .num {
-  background: var(--marca);
+  background: var(--ouro-tinta);
   color: var(--painel);
 }
 .done .num {
   background: var(--sucesso);
-  color: #fff;
+  color: var(--painel); /* o número do passo feito, no fundo de sucesso: como o ativo, sem cor solta */
 }
