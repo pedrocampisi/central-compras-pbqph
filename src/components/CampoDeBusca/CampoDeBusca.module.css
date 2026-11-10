@@ -1,0 +1,32 @@
+/* O X nativo do type="search" é miúdo e some com o tema: o nosso botão o substitui. */
+.campo::-webkit-search-cancel-button,
+.campo::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* Alvo de 32 px; a margem negativa evita que a barra cresça. */
+.limpar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -8px -8px -8px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-muted);
+  cursor: pointer;
+}
+.limpar:hover {
+  background: var(--marca-fraca);
+  color: var(--texto);
+}
+.limpar:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 1px;
+}

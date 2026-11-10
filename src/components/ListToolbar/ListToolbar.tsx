@@ -5,6 +5,7 @@
  */
 
 import type { ReactNode, SelectHTMLAttributes } from 'react';
+import { CampoDeBusca } from '../CampoDeBusca/CampoDeBusca';
 import { Icon } from '../Icon/Icon';
 import styles from './ListToolbar.module.css';
 
@@ -29,12 +30,11 @@ export function ListToolbar({
           na tela de entrada. */}
       <div className={styles.busca}>
         <Icon name="search" size={18} className={styles.buscaIcone} />
-        <input
+        <CampoDeBusca
           className={styles.searchInput}
-          type="search"
           placeholder={searchPlaceholder}
           value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={onSearchChange}
           aria-label={searchPlaceholder}
         />
       </div>
