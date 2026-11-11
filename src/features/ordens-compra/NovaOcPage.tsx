@@ -732,7 +732,7 @@ export function NovaOcPage() {
       case 'outras': return oc.outras_despesas === 0;
       case 'desconto': return oc.desconto_material === 0;
     }
-  }, [confiraDoAlto, data]);
+  }, [confiraDoAlto]);
 
   // Só propõe: nada grava e nada emite sem o clique da pessoa (regra 2).
   const aplicarCabecalho = useCallback((cab: CabecalhoLido, papel: LinhasDoPapel | null) => {
