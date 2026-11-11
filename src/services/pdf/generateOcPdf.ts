@@ -72,9 +72,9 @@ const AZUL: [number, number, number] = [11, 105, 183];
 
 // CTO-D1036 §2.4: o endereço da obra maior, e as observações em destaque.
 export const TAMANHO_DO_ENDERECO = 12.5;
-const ENTRE_LINHAS_DO_ENDERECO = 5.4;
-export const TAMANHO_DA_OBSERVACAO = 10;
-const ENTRE_LINHAS_DA_OBSERVACAO = 4.6;
+const ENTRE_LINHAS_DO_ENDERECO = 5;
+export const TAMANHO_DA_OBSERVACAO = 9.5;
+const ENTRE_LINHAS_DA_OBSERVACAO = 4.1;
 const FUNDO_DA_OBSERVACAO: [number, number, number] = [255, 246, 221];
 const BORDA_DA_OBSERVACAO: [number, number, number] = [158, 98, 0];
 
@@ -518,27 +518,30 @@ export function desenhaPdfDaOc(
       ? oc.observacoes.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, largura - 8))
       : (doc.splitTextToSize(oc.observacoes, largura - 8) as string[]);
     const entre = ENTRE_LINHAS_DA_OBSERVACAO;
-    const altura = 9 + obsLines.length * entre + 2;
+    const altura = 6.6 + obsLines.length * entre + 1.2;
     ensureSpace(altura + 2);
+    // O quadro começa onde começava o título antigo, cuja linha de base era o
+    // `y`: assim a página não cresce à toa.
+    const topo = y - 2.5;
     doc.setFillColor(...FUNDO_DA_OBSERVACAO);
     doc.setDrawColor(...BORDA_DA_OBSERVACAO);
     doc.setLineWidth(0.8);
-    doc.rect(margin, y, largura, altura, 'FD');
+    doc.rect(margin, topo, largura, altura, 'FD');
     doc.setTextColor(...BORDA_DA_OBSERVACAO);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('OBSERVAÇÕES DO PEDIDO', margin + 3, y + 5.6);
+    doc.setFontSize(10.5);
+    doc.text('OBSERVAÇÕES DO PEDIDO', margin + 3, topo + 4.6);
     doc.setFontSize(7.5);
-    doc.text('LEIA ANTES DE SEPARAR O MATERIAL', pw - margin - 3, y + 5.6, { align: 'right' });
+    doc.text('LEIA ANTES DE SEPARAR O MATERIAL', pw - margin - 3, topo + 4.6, { align: 'right' });
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(TAMANHO_DA_OBSERVACAO);
     obsLines.forEach((l, k) => {
-      const yl = y + 11 + k * entre;
+      const yl = topo + 9.4 + k * entre;
       if (comSinal) escrita.desenha(l, margin + 4, yl, 'normal');
       else doc.text(l, margin + 4, yl);
     });
-    y += altura + 4;
+    y = topo + altura + 4;
     doc.setDrawColor(180);
     doc.setLineWidth(0.2);
     doc.setFontSize(8);

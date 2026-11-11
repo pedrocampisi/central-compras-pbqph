@@ -52,7 +52,7 @@ describe('CTO-D1036 §2.4 — o PDF da OC', () => {
   it('a observação vem num quadro com título, e em letra maior que o corpo (era 8 pt)', () => {
     const t = trechos(pdf(OBS));
     const titulo = t.find((x) => x.texto === 'OBSERVAÇÕES DO PEDIDO')!;
-    expect(titulo.tamanho).toBe(11);
+    expect(titulo.tamanho).toBe(10.5);
     expect(t.some((x) => x.texto === 'LEIA ANTES DE SEPARAR O MATERIAL')).toBe(true);
     const corpo = t.filter((x) => OBS.includes(x.texto.trim()) && x.texto.trim().length > 10);
     expect(corpo.length).toBeGreaterThan(0);
