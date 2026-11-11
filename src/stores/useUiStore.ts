@@ -37,7 +37,8 @@ export interface Toast {
 
 export interface HistFilter {
   search: string;
-  status: StatusOc | '';
+  /** `a-chegar`: as emitidas pela data combinada, as atrasadas no alto (D1036 §2.6). */
+  status: StatusOc | '' | 'a-chegar';
   fornecedor: string;
   obra: string;
 }

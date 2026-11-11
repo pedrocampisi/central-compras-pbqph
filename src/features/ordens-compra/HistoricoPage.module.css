@@ -86,3 +86,19 @@
     display: block;
   }
 }
+
+/* A data combinada, na vista "A chegar" (D1036 §2.6): a data e, embaixo, a frase. */
+.entrega {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+.entregaData {
+  font-variant-numeric: tabular-nums;
+}
+.entregaAtrasada {
+  color: var(--erro);
+  font-weight: 700;
+  font-size: 0.8125rem;
+}

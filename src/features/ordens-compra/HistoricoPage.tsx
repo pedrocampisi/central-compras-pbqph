@@ -20,6 +20,7 @@ import { Button } from '../../components/Button/Button';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Icon } from '../../components/Icon/Icon';
 import { formatBrl, formatDate, nowIso, todayIso } from '../../domain/format';
+import { fraseDaEntrega, ocsAChegar, quantasAtrasadas, situacaoDaEntrega } from '../../domain/aChegar';
 import { computeOcTotals } from '../../domain/compute';
 import { emReaisNoTexto } from '../../domain/numericDoBanco';
 import { uid } from '../../domain/id';
@@ -214,7 +215,9 @@ export function HistoricoPage() {
         (o) => o.status === 'cancelada',
       );
     }
-    if (histFilter.status) list = list.filter((o) => o.status === histFilter.status);
+    // "A chegar" (D1036 §2.6): as emitidas, pela data combinada, as atrasadas no alto.
+    if (histFilter.status === 'a-chegar') list = ocsAChegar(list);
+    else if (histFilter.status) list = list.filter((o) => o.status === histFilter.status);
     // Por EMPRESA (D542): escolher a Império traz as OCs de todas as filiais dela.
     if (histFilter.fornecedor) {
       list = list.filter((o) => empresaDoFornecedor.get(o.fornecedor_id) === histFilter.fornecedor);
@@ -528,6 +531,24 @@ export function HistoricoPage() {
 
   // ── Columns ────────────────────────────────────────────────────────────────
 
+  const aChegar = histFilter.status === 'a-chegar';
+  const hoje = todayIso();
+  const atrasadas = aChegar ? quantasAtrasadas(ocs, hoje) : 0;
+  // A data combinada entra como coluna só na vista "A chegar": nas outras, a tabela fica como era.
+  const colunaDaEntrega: Column<OrdemCompra> = {
+    key: 'entrega',
+    label: 'Entrega combinada',
+    cartao: 'detalhe',
+    render: (o) => {
+      const s = situacaoDaEntrega(o.entrega_prevista, hoje);
+      return (
+        <span className={styles.entrega} data-entrega={s.tipo}>
+          {o.entrega_prevista ? <span className={styles.entregaData}>{formatDate(o.entrega_prevista)}</span> : null}
+          <span className={s.tipo === 'atrasada' ? styles.entregaAtrasada : styles.fraco}>{fraseDaEntrega(o.entrega_prevista, hoje)}</span>
+        </span>
+      );
+    },
+  };
   const columns: Column<OrdemCompra>[] = [
     {
       key: 'numero',
@@ -541,6 +562,7 @@ export function HistoricoPage() {
         ),
     },
     { key: 'data', label: 'Data', render: (o) => formatDate(o.data) },
+    ...(aChegar ? [colunaDaEntrega] : []),
     {
       key: 'fornecedor',
       label: 'Fornecedor',
@@ -597,7 +619,9 @@ export function HistoricoPage() {
         <div>
           <h2>Histórico de OCs</h2>
           <p className="section-sub">
-            {ocs.length} de {data.ordens_compra.length} registro(s)
+            {aChegar
+              ? `${ocs.length} a chegar${atrasadas ? `, ${atrasadas === 1 ? '1 atrasada' : `${atrasadas} atrasadas`}` : ''}`
+              : `${ocs.length} de ${data.ordens_compra.length} registro(s)`}
           </p>
         </div>
         <div className={styles.acoesDoTopo}>
@@ -637,9 +661,10 @@ export function HistoricoPage() {
       >
         <FilterSelect
           value={histFilter.status}
-          onChange={(e) => setHistFilter({ status: e.target.value as StatusOc | '' })}
+          onChange={(e) => setHistFilter({ status: e.target.value as StatusOc | '' | 'a-chegar' })}
         >
           <option value="">Todos os status</option>
+          <option value="a-chegar">A chegar, pela data</option>
           <option value="rascunho">Rascunho</option>
           <option value="emitida">Emitida</option>
           <option value="entregue">Entregue</option>
