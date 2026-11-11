@@ -8,7 +8,7 @@
 
 import styles from './HistoricoPage.module.css';
 import { Mais, type AcaoDoMais } from '../../components/Mais/Mais';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDataStore } from '../../stores/useDataStore';
 import { useOcEditingStore } from '../../stores/useOcEditingStore';
 import { useUiStore } from '../../stores/useUiStore';
@@ -26,6 +26,7 @@ import { uid } from '../../domain/id';
 import { generateOcPdfBlob, savePdfToFile } from '../../services/pdf/generateOcPdf';
 import { buildPdfFilename } from '../../services/pdf/pdfFilename';
 import { downloadBlob } from '../../services/storage/download';
+import { compartilhaArquivoDoTipo, desistiuDeCompartilhar, podeCompartilharArquivo, toqueEsfriou } from '../../services/compartilhar';
 import type { OrdemCompra } from '../../domain/types';
 import type { Column } from '../../components/DataTable/DataTable';
 import type { StatusOc } from '../../domain/constants';
@@ -86,6 +87,9 @@ export function HistoricoPage() {
   const [naPasta, setNaPasta] = useState<Map<string, PdfNaPasta> | null>(null);
   /** A OC que está indo para a pasta agora: o botão dela espera. */
   const [mandando, setMandando] = useState<string | null>(null);
+  // O "Compartilhar" do PDF (D1036 §2.3): só onde o aparelho manda PDF pela folha de compartilhar.
+  const [compartilhaPdf] = useState(() => compartilhaArquivoDoTipo('application/pdf', 'oc.pdf'));
+  const pdfPronto = useRef<{ chave: string; arquivo: File } | null>(null);
 
   // Relê o ✓ quando os dados mudam: outra pessoa pode ter emitido, ou mandado de novo.
   useEffect(() => {
@@ -269,6 +273,37 @@ export function HistoricoPage() {
       showToast('PDF regenerado.', 'success');
     } catch (err) {
       showToast(`Erro ao gerar PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
+    }
+  }
+
+  /**
+   * "Compartilhar" o PDF da OC (CTO-D1036 §2.3): no celular, a folha de
+   * compartilhar do aparelho abre com o PDF, sem baixar. Só aparece onde o
+   * aparelho deixa (`services/compartilhar`); no computador fica o "PDF" de
+   * sempre. O Safari às vezes recusa porque o toque "esfriou" enquanto o PDF
+   * era feito: aí o PDF fica pronto, e o segundo toque abre a folha na hora.
+   */
+  async function handleCompartilharPdf(oc: OrdemCompra) {
+    try {
+      let arquivo = pdfPronto.current?.chave === `${oc.id}|${oc.atualizado_em}` ? pdfPronto.current.arquivo : null;
+      if (!arquivo) {
+        const blob = await generateOcPdfBlob(oc, data!);
+        const fornNome = apelidoDoFornecedor(data!.fornecedores.find((f) => f.id === oc.fornecedor_id));
+        arquivo = new File([blob], buildPdfFilename(oc, fornNome), { type: 'application/pdf' });
+        pdfPronto.current = { chave: `${oc.id}|${oc.atualizado_em}`, arquivo };
+      }
+      if (!podeCompartilharArquivo(arquivo)) {
+        showToast('Este aparelho não compartilha o PDF. Use o "PDF", que baixa o arquivo.', 'warning');
+        return;
+      }
+      await navigator.share({ files: [arquivo], title: `OC ${oc.numero}` });
+    } catch (err) {
+      if (desistiuDeCompartilhar(err)) return;
+      if (toqueEsfriou(err)) {
+        showToast('O PDF está pronto. Toque de novo em "Compartilhar".', 'info');
+        return;
+      }
+      showToast(`Erro ao compartilhar o PDF: ${err instanceof Error ? err.message : 'Erro desconhecido'}`, 'error');
     }
   }
 
@@ -458,6 +493,8 @@ export function HistoricoPage() {
     const resto: AcaoDoMais[] = [];
     if (gravaOk && principal?.rotulo !== 'Duplicar') resto.push({ rotulo: 'Duplicar', aoEscolher: () => handleDuplicate(o) });
     if (o.status !== 'rascunho' && principal?.rotulo !== 'PDF') resto.push({ rotulo: 'PDF', aoEscolher: () => void handleRegenPdf(o) });
+    // No celular, mandar o PDF sem baixar (D1036 §2.3); no computador, não aparece.
+    if (o.status !== 'rascunho' && compartilhaPdf) resto.push({ rotulo: 'Compartilhar', aoEscolher: () => void handleCompartilharPdf(o) });
     // O papel deste lote que chegou por e-mail entra pela OC (CTO-D811 §4.3, D812 §2).
     if (emitidaOuEntregue && gravaOk && ecrsNaOrdemDosItens(o.itens).length > 0) {
       resto.push({ rotulo: 'Anexar papel', aoEscolher: () => setAnexando(o) });

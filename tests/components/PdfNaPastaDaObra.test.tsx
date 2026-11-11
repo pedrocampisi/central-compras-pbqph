@@ -352,3 +352,68 @@ describe('D685 — no Histórico, o ✓ com o link e o "mandar de novo"', () => 
     expect(acoesDoMais(screen.getByText('2026/099').closest('tr')!).filter((a) => /pasta da obra/.test(a))).toEqual([]);
   });
 });
+
+describe('D1036 §2.3 — "Compartilhar" o PDF, só onde o aparelho deixa', () => {
+  const nav = navigator as Navigator & { canShare?: unknown; share?: unknown };
+  let antes: { canShare: unknown; share: unknown };
+  beforeEach(() => {
+    antes = { canShare: nav.canShare, share: nav.share };
+  });
+  afterEach(() => {
+    Object.assign(nav, antes);
+  });
+  /** Abre o "Mais" da linha e escolhe o "Compartilhar" (espera a tabela assentar: a releitura da pasta remonta a linha). */
+  const compartilhar = async (linha: () => HTMLElement) => {
+    const item = await waitFor(() => {
+      const mais = within(linha()).getByRole('button', { name: /^Mais ações/ });
+      if (mais.getAttribute('aria-expanded') !== 'true') fireEvent.click(mais);
+      return within(linha()).getByRole('menuitem', { name: 'Compartilhar' });
+    });
+    await act(async () => {
+      fireEvent.click(item);
+    });
+  };
+
+  it('no computador (sem folha de compartilhar com arquivo), não aparece, e o "PDF" continua', async () => {
+    Object.assign(nav, { canShare: undefined, share: undefined });
+    await act(async () => {
+      render(<HistoricoPage />);
+    });
+    const nomes = acoesDoMais(screen.getByText('2026/099').closest('tr')!);
+    expect(nomes).toContain('PDF');
+    expect(nomes).not.toContain('Compartilhar');
+  });
+
+  it('no celular, abre a folha com o PDF da OC, com o nome de sempre, e não baixa nada', async () => {
+    const share = vi.fn(async () => undefined);
+    Object.assign(nav, { canShare: (d: ShareData) => !!d.files?.length, share });
+
+    await act(async () => {
+      render(<HistoricoPage />);
+    });
+    const linha = () => screen.getByText('2026/099').closest('tr')!;
+    await compartilhar(linha);
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    const pedido = (share.mock.calls[0] as unknown as [ShareData])[0];
+    expect(pedido.files!.map((f) => [f.name, f.type])).toEqual([[NOME, 'application/pdf']]);
+    expect(salvos).toEqual([]);
+    expect(toasts()).toEqual([]);
+  });
+
+  it('o toque que esfriou (Safari): o PDF fica pronto, e o segundo toque abre a folha sem refazer', async () => {
+    const share = vi
+      .fn()
+      .mockRejectedValueOnce(new DOMException('esfriou', 'NotAllowedError'))
+      .mockResolvedValueOnce(undefined);
+    Object.assign(nav, { canShare: () => true, share });
+    await act(async () => {
+      render(<HistoricoPage />);
+    });
+    const linha = () => screen.getByText('2026/099').closest('tr')!;
+    await compartilhar(linha);
+    await waitFor(() => expect(toasts()).toEqual(['O PDF está pronto. Toque de novo em "Compartilhar".']));
+    await compartilhar(linha);
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(2));
+    expect((share.mock.calls[1] as [ShareData])[0].files![0]).toBe((share.mock.calls[0] as [ShareData])[0].files![0]);
+  });
+});

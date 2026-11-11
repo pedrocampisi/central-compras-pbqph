@@ -18,18 +18,14 @@ import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import { acessoDoLink, enderecoDoQr, quandoVence, tempoQueFalta } from '../../domain/acessoPorQr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { desenhoDoQr } from './desenhoDoQr';
-import { baixarArquivo, imagemDoQr, nomeDaImagemDoQr, podeCompartilharArquivo } from './imagemDoQr';
+import { imagemDoQr, nomeDaImagemDoQr } from './imagemDoQr';
+import { compartilhaArquivoDoTipo, desistiuDeCompartilhar, podeCompartilharArquivo } from '../../services/compartilhar';
+import { downloadBlob } from '../../services/storage/download';
 import styles from './MestresPage.module.css';
 import { useFocoPreso } from '../../hooks/useFocoPreso';
 
 /** O aparelho abre a folha de compartilhar com uma imagem? Medido uma vez, com um arquivo de amostra. */
-function compartilhaImagem(): boolean {
-  try {
-    return podeCompartilharArquivo(new File([''], 'qr.png', { type: 'image/png' }));
-  } catch {
-    return false;
-  }
-}
+const compartilhaImagem = () => compartilhaArquivoDoTipo('image/png', 'qr.png');
 
 interface Props {
   nome: string;
@@ -66,11 +62,11 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
       if (compartilha && podeCompartilharArquivo(arquivo)) {
         await navigator.share({ files: [arquivo], title: `QR de entrada de ${nome}` });
       } else {
-        baixarArquivo(arquivo, nomeDoArquivo);
+        downloadBlob(arquivo, nomeDoArquivo);
       }
     } catch (e) {
       // Fechar a folha de compartilhar sem escolher não é erro.
-      if (e instanceof DOMException && e.name === 'AbortError') return;
+      if (desistiuDeCompartilhar(e)) return;
       setErro('Não deu para preparar a imagem do QR. Mostre o QR desta tela ao encarregado.');
     }
   };

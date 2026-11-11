@@ -6,7 +6,7 @@
  * aplicativo de mensagem abre, com o nome e a validade escritos embaixo: quem
  * recebe sabe de quem é e até quando vale.
  *
- * Onde o aparelho deixa mandar arquivo (`navigator.canShare({ files })`: o
+ * Onde o aparelho deixa mandar arquivo (`services/compartilhar`: o
  * celular, Android e iPhone), o botão abre a folha de compartilhar. Onde não
  * deixa (o computador, quase sempre), o mesmo botão baixa a imagem.
  */
@@ -51,22 +51,4 @@ export async function imagemDoQr(endereco: string, linhas: [string, string]): Pr
   return new Promise((ok, falha) =>
     tela.toBlob((b) => (b ? ok(b) : falha(new Error('O aparelho não gerou a imagem do QR.'))), 'image/png'),
   );
-}
-
-/** O aparelho deixa mandar arquivo pela folha de compartilhar? */
-export function podeCompartilharArquivo(arquivo: File): boolean {
-  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  return typeof nav.share === 'function' && typeof nav.canShare === 'function' && nav.canShare({ files: [arquivo] });
-}
-
-/** Baixa um arquivo pelo navegador. */
-export function baixarArquivo(arquivo: Blob, nome: string): void {
-  const url = URL.createObjectURL(arquivo);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nome;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
