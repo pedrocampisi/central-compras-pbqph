@@ -95,6 +95,9 @@ describe('D1036 §2.6 — no Histórico', () => {
     expect(screen.queryByRole('columnheader', { name: 'Entrega combinada' })).toBeNull();
     fireEvent.change(screen.getByDisplayValue('Todos os status'), { target: { value: 'a-chegar' } });
     expect(screen.getByRole('columnheader', { name: 'Entrega combinada' })).toBeTruthy();
+    // A data combinada toma o lugar da data da OC e dos itens: a tabela não alarga.
+    expect(screen.queryByRole('columnheader', { name: 'Data' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'Itens' })).toBeNull();
     expect(screen.getByText('5 a chegar, 2 atrasadas')).toBeTruthy();
     const ls = linhas();
     expect(ls.map((l) => within(l).getByText(/^2026\/0\d\d$/).textContent)).toEqual([

@@ -15,7 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button/Button';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
-import { acessoDoLink, enderecoDoQr, quandoVence, tempoQueFalta } from '../../domain/acessoPorQr';
+import { acessoDoLink, diaEHoraDoVencimento, enderecoDoQr, quandoVence, tempoQueFalta } from '../../domain/acessoPorQr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { desenhoDoQr } from './desenhoDoQr';
 import { imagemDoQr, nomeDaImagemDoQr } from './imagemDoQr';
@@ -57,7 +57,7 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
     setErro('');
     const nomeDoArquivo = nomeDaImagemDoQr(nome);
     try {
-      const png = await imagemDoQr(endereco, [`Entrada de ${nome}`, `Vale uma vez só, até ${quandoVence(venceEm, new Date())}`]);
+      const png = await imagemDoQr(endereco, [`Entrada de ${nome}`, `Vale uma vez só, até ${diaEHoraDoVencimento(venceEm)}`]);
       const arquivo = new File([png], nomeDoArquivo, { type: 'image/png' });
       if (compartilha && podeCompartilharArquivo(arquivo)) {
         await navigator.share({ files: [arquivo], title: `QR de entrada de ${nome}` });

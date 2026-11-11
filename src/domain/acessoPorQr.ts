@@ -92,6 +92,17 @@ export function tempoQueFalta(venceEm: string, agora: Date): string | null {
 
 const DIA_SP = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
+/** "12/11 às 15h05", sem "hoje" nem "amanhã": para a imagem que vai ao engenheiro, lida no outro dia. */
+export function diaEHoraDoVencimento(venceEm: string): string {
+  const v = new Date(venceEm);
+  if (!Number.isFinite(v.getTime())) return '';
+  const [, mes, d] = DIA_SP(v).split('-');
+  const [h, m] = v
+    .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' })
+    .split(':');
+  return `${d}/${mes} às ${h}h${m}`;
+}
+
 /** "hoje às 15h05", "amanhã às 15h05" ou "em 12/11 às 15h05", no horário de Brasília; '' se não se lê. */
 export function quandoVence(venceEm: string, agora: Date): string {
   const v = new Date(venceEm);

@@ -549,6 +549,8 @@ export function HistoricoPage() {
       );
     },
   };
+  // Na vista "A chegar", a data combinada toma o lugar da data da OC e da contagem de itens:
+  // a tabela não alarga, e as ações continuam à vista a 1.366 px.
   const columns: Column<OrdemCompra>[] = [
     {
       key: 'numero',
@@ -561,8 +563,7 @@ export function HistoricoPage() {
           <span className={styles.fraco}>(numera ao emitir)</span>
         ),
     },
-    { key: 'data', label: 'Data', render: (o) => formatDate(o.data) },
-    ...(aChegar ? [colunaDaEntrega] : []),
+    ...(aChegar ? [colunaDaEntrega] : [{ key: 'data', label: 'Data', render: (o: OrdemCompra) => formatDate(o.data) }]),
     {
       key: 'fornecedor',
       label: 'Fornecedor',
@@ -575,12 +576,12 @@ export function HistoricoPage() {
       cartao: 'detalhe',
       render: (o) => <NomeEmDuasLinhas texto={obraNome.get(o.obra_id) || '—'} />,
     },
-    {
+    ...(aChegar ? [] : [{
       key: 'itens',
       label: 'Itens',
       cartao: 'fora', // no cartão do celular: número, selo, fornecedor, obra e total (D1034f item 4)
       render: (o) => <span className={styles.fraco}>{o.itens.length}</span>,
-    },
+    } as Column<OrdemCompra>]),
     {
       key: 'total',
       label: 'Total',

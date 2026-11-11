@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import qrcode from 'qrcode-generator';
 import {
-  acessoDoHash, acessoDoLink, acessoDoTextoLido, ehAparelhoDaApple, enderecoDoQr, oQueFazerComOAcesso, quandoVence, tempoQueFalta,
+  acessoDoHash, acessoDoLink, acessoDoTextoLido, ehAparelhoDaApple, enderecoDoQr, diaEHoraDoVencimento, oQueFazerComOAcesso, quandoVence, tempoQueFalta,
 } from '../../src/domain/acessoPorQr';
 import { desenhoDoQr } from '../../src/features/mestres/desenhoDoQr';
 import { lerQrDoDesenho } from '../fixtures/lerQrDoDesenho';
@@ -97,6 +97,9 @@ describe('o tempo que falta', () => {
     expect(quandoVence('2026-10-05T15:00:00Z', agora)).toBe('amanhã às 12h00');
     expect(quandoVence('2026-10-07T15:00:00Z', agora)).toBe('em 07/10 às 12h00');
     expect(quandoVence('', agora)).toBe('');
+    // A imagem que vai ao engenheiro é lida no outro dia: dia e hora, nunca "amanhã".
+    expect(diaEHoraDoVencimento('2026-10-05T15:00:00Z')).toBe('05/10 às 12h00');
+    expect(diaEHoraDoVencimento('x')).toBe('');
   });
   it('vencido, ou data que não se lê: null', () => {
     expect(tempoQueFalta('2026-10-04T15:00:00Z', agora)).toBeNull();
