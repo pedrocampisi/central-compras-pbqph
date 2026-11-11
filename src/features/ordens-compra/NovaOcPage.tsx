@@ -498,9 +498,10 @@ export function NovaOcPage() {
     // a tela velha marcava o primeiro da lista, e quem não reparasse emitia para
     // o fornecedor errado — e, desde a D390, faturava para o destinatário da obra
     // errada. Escolher é ato da pessoa; a validação já recusa emitir sem os dois.
-    const defaultCondicao = data.config.condicoes_pagamento[0] ?? '';
-
-    startNova(buildNewOc(currentYear, '', '', defaultCondicao));
+    // A condição de pagamento também nasce em "Selecione…" (CTO-D1036 §2.5):
+    // nascia com a primeira da lista, "À vista", e um orçamento que não diz a
+    // condição chegava à tela com uma condição que ninguém escreveu.
+    startNova(buildNewOc(currentYear, '', '', ''));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -725,8 +726,7 @@ export function NovaOcPage() {
     if (c in confiraDoAlto) return true;
     switch (c) {
       case 'fornecedor': return oc.fornecedor_id === '';
-      // O "À vista" com que a OC nova nasce é automático; o de um rascunho salvo, não.
-      case 'condicao': return oc.condicao_pagamento === '' || (oc.versao === 0 && oc.condicao_pagamento === (data?.config.condicoes_pagamento[0] ?? ''));
+      case 'condicao': return oc.condicao_pagamento === '';
       case 'entrega': return !oc.entrega_prevista || useOcEditingStore.getState().entregaAcompanha;
       case 'frete': return oc.frete === 0;
       case 'outras': return oc.outras_despesas === 0;

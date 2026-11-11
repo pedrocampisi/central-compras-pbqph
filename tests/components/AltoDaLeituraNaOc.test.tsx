@@ -180,10 +180,20 @@ describe('D805 §2 — a leitura monta o alto da OC', () => {
     render(<NovaOcPage />);
     await lerOrcamento(undefined);
     expect(oc().fornecedor_id).toBe('');
-    expect(oc().condicao_pagamento).toBe('À vista');
+    // D1036 §2.5: a OC nova não nasce mais com "À vista"; o que o papel não diz fica vazio.
+    expect(oc().condicao_pagamento).toBe('');
     expect(oc().entrega_prevista).toBe(somaDias(oc().data, 1));
     expect(document.querySelector('[data-resumo-do-alto]')).toBeNull();
     expect(document.querySelector('[data-conferencia-do-total]')).toBeNull();
+  });
+
+  it('D1036 §2.5: a OC nova nasce sem condição, e o orçamento que não diz a condição a deixa vazia', async () => {
+    render(<NovaOcPage />);
+    expect(oc().condicao_pagamento).toBe('');
+    expect((condicao() as HTMLSelectElement).value).toBe('');
+    await lerOrcamento({ ...ORCAMENTO, condicao_pagamento: '' });
+    expect(oc().condicao_pagamento).toBe('');
+    expect((condicao() as HTMLSelectElement).value).toBe('');
   });
 
   it('nada grava nem emite: a OC continua rascunho na tela, sem número', async () => {
