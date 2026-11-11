@@ -7,6 +7,8 @@ import {
   diaCombinado,
   empresaAchada,
   itensDoEnvio,
+  respostaDosTiques,
+  tiquesDaResposta,
   problemaDaContagem,
   quantidadeEscrita,
   naosDoMestre,
@@ -328,5 +330,34 @@ describe('a quantidade por item do "Só uma parte" (CTO-D794)', () => {
     expect(oQueFalta(parte, '', '', 'falta a contagem')).toBe('falta a contagem');
     expect(oQueFalta(tudoSim, '1', '', 'falta a contagem')).toBe('');
     expect(oQueFalta({ ...parte, noDia: null }, '1', '', 'falta a contagem')).toBe('Falta responder: Chegou no dia combinado?');
+  });
+});
+
+describe('D1036 §2.2: os tiques item por item viram a resposta de hoje', () => {
+  const C = {
+    ocId: 'oc-t', intervencaoId: 'o', obra: 'Obra', numero: '2026/1', fornecedor: 'F', combinadoPara: '', total: 0,
+    itens: [
+      { posicao: 1, descricao: 'A', quantidade: 10, unidade: 'un' },
+      { posicao: 2, descricao: 'B', quantidade: 3, unidade: 'm' },
+    ],
+  } as unknown as CartaoAChegar;
+
+  it('todos ticados: o "Sim", sem contagem', () => {
+    expect(respostaDosTiques(C, { 1: true, 2: true }, { 2: '1' })).toEqual({ tudo: true, contagem: {} });
+  });
+  it('um sem tique: o "Só uma parte", com o campo dele vazio, ou com o que já escreveu a menos', () => {
+    expect(respostaDosTiques(C, { 1: true, 2: false }, {})).toEqual({ tudo: false, contagem: { 2: '' } });
+    expect(respostaDosTiques(C, { 1: true, 2: false }, { 2: '1' })).toEqual({ tudo: false, contagem: { 2: '1' } });
+    expect(respostaDosTiques(C, { 1: true, 2: false }, { 2: '3' })).toEqual({ tudo: false, contagem: { 2: '' } });
+  });
+  it('a resposta de hoje dá os tiques: "Sim", todos; "Só uma parte", os que estão com o pedido', () => {
+    expect(tiquesDaResposta(C, true, {})).toEqual({ 1: true, 2: true });
+    expect(tiquesDaResposta(C, null, {})).toEqual({ 1: false, 2: false });
+    expect(tiquesDaResposta(C, false, { 2: '' })).toEqual({ 1: true, 2: false });
+    expect(tiquesDaResposta(C, false, { 1: '4' })).toEqual({ 1: false, 2: true });
+  });
+  it('o envio é o mesmo de hoje', () => {
+    const r = respostaDosTiques(C, { 1: true, 2: false }, { 2: '1' });
+    expect(itensDoEnvio(C, r.tudo, r.contagem)).toEqual([{ posicao: 1, quantidade: 10 }, { posicao: 2, quantidade: 1 }]);
   });
 });

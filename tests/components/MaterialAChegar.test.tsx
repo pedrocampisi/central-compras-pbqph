@@ -744,10 +744,77 @@ describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
     expect(campo('Areia').value).toBe('3');
   });
 
+  // D1036 §2.2: conferir item por item é outro jeito de responder à mesma pergunta.
+  const tres: [string, string][] = tudoSim.slice(0, 3);
+  const tique = (nome: string) => screen.getByRole('checkbox', { name: new RegExp(nome) }) as HTMLInputElement;
+  const abrirPorItem = () => fireEvent.click(screen.getByRole('button', { name: 'Ou confira item por item' }));
+
+  it('D1036: a conferência item por item nasce fechada, e mostra a quantidade pedida ao lado de cada item', async () => {
+    montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    abrirPorItem();
+    expect(screen.getByRole('button', { name: 'Fechar a conferência item por item' }).getAttribute('aria-expanded')).toBe('true');
+    expect(tique('Cimento').closest('li')!.textContent).toContain('Pedido: 40 sc');
+    expect(tique('Areia').closest('li')!.textContent).toContain('Pedido: 3 m³');
+    expect(tique('Cimento').checked).toBe(false);
+  });
+
+  it('D1036: todos ticados é o "Sim" de hoje, e vai o mesmo envio', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    abrirPorItem();
+    fireEvent.click(tique('Cimento'));
+    fireEvent.click(tique('Areia'));
+    const sim = within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByRole('button', { name: 'Sim' });
+    expect(sim.getAttribute('aria-pressed')).toBe('true');
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ soUmaParte: false, itens: [{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 3 }] }),
+    );
+  });
+
+  it('D1036: o item sem tique abre o campo de quanto veio, vazio; e vai o mesmo envio do "Só uma parte"', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    abrirPorItem();
+    fireEvent.click(tique('Cimento'));
+    const parte = within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByRole('button', { name: 'Só uma parte' });
+    expect(parte.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.queryByRole('textbox', { name: 'Quanto veio de Cimento de teste' })).toBeNull();
+    const areia = screen.getByRole('textbox', { name: 'Quanto veio de Areia de teste' }) as HTMLInputElement;
+    expect(areia.value).toBe('');
+    // A lista de hoje não aparece em dobro.
+    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(screen.getByRole('alert').textContent).toBe('Escreva quanto veio de Areia de teste. Se não veio, escreva 0.');
+    fireEvent.change(areia, { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ soUmaParte: true, itens: [{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 2 }] }),
+    );
+  });
+
+  it('D1036: quem prefere responde "Sim" de uma vez, como hoje, e a conferência fecha', async () => {
+    montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    abrirPorItem();
+    responder('Veio a quantidade toda?', 'Sim');
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    abrirPorItem();
+    expect(tique('Cimento').checked).toBe(true);
+    expect(tique('Areia').checked).toBe(true);
+  });
+
   it('o cartão guardado por uma versão antiga (sem a posição): sem lista, e a entrega vai sem itens, como antes', async () => {
     const p = montar();
     await abrirEResponder(parte);
     expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Ou confira item por item' })).toBeNull();
     notaSemFoto('4567');
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     await screen.findByText('Recebido.');

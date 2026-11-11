@@ -703,3 +703,50 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* "Ou confira item por item" (D1036 §2.2): o tique de 28 px, o nome e o pedido ao lado. */
+.porItem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.itemTicado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--painel);
+}
+
+.tique {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.tique input {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  accent-color: var(--ouro-tinta);
+}
+
+.tique input:focus-visible {
+  outline: 3px solid var(--ouro-tinta);
+  outline-offset: 2px;
+}
+
+.quantoVeio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 700;
+}

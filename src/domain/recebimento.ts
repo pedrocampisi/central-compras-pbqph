@@ -249,6 +249,44 @@ export function itensDoEnvio(cartao: CartaoAChegar, tudo: boolean | null, contag
   }));
 }
 
+/** Os tiques do "Conferir item por item": a posição do item → veio tudo dele. */
+export type TiquesDoMestre = Record<number, boolean>;
+
+/**
+ * O tique de cada item que a resposta de hoje já diz (CTO-D1036 §2.2): "Sim",
+ * todos; "Só uma parte", os que estão com o pedido ou mais; sem resposta, nenhum.
+ */
+export function tiquesDaResposta(cartao: CartaoAChegar, tudo: boolean | null, contagem: ContagemDoMestre): TiquesDoMestre {
+  const t: TiquesDoMestre = {};
+  for (const i of cartao.itens) {
+    const q = quantidadeEscrita(escritoNoItem(i, contagem));
+    t[i.posicao!] = tudo === true || (tudo === false && q !== null && q >= i.quantidade);
+  }
+  return t;
+}
+
+/**
+ * Os tiques viram a resposta de hoje, e nada mais (CTO-D1036 §2.2): o que se
+ * guarda não muda. Todos ticados é o "Sim"; um sem tique é o "Só uma parte",
+ * com o campo de quanto veio daquele item (D794) — vazio, para ele escrever,
+ * a não ser que já tenha escrito menos que o pedido.
+ */
+export function respostaDosTiques(
+  cartao: CartaoAChegar,
+  tiques: TiquesDoMestre,
+  contagem: ContagemDoMestre,
+): { tudo: boolean; contagem: ContagemDoMestre } {
+  if (cartao.itens.every((i) => tiques[i.posicao!])) return { tudo: true, contagem: {} };
+  const nova: ContagemDoMestre = {};
+  for (const i of cartao.itens) {
+    if (tiques[i.posicao!]) continue;
+    const ja = contagem[i.posicao!];
+    const q = ja === undefined ? null : quantidadeEscrita(ja);
+    nova[i.posicao!] = ja !== undefined && (q === null || q < i.quantidade) ? ja : '';
+  }
+  return { tudo: false, contagem: nova };
+}
+
 /** Uma obra em que o mestre recebe, com o nome que o banco dá (o mesmo da lista). */
 export interface ObraDoMestre {
   id: string;
