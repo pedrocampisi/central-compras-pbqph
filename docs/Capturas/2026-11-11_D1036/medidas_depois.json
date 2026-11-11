@@ -1,0 +1,138 @@
+{
+  "dia_375": {
+    "qr": {
+      "relogio": "Vale até amanhã às 15h41 (falta 24 h 00 min)",
+      "notas": "Vale uma vez só. Pode mandar ao engenheiro da obra, para ele mostrar ao encarregado lá. Quem ler este QR entra como Rodrigo Encarregado (prova): mande só ao engenheiro, e a mais ninguém.",
+      "botoes": [
+        "Baixar o QR",
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "a-chegar",
+      "sub": "3 a chegar, 1 atrasada",
+      "linhas": [
+        "2026/029 08/11/2026 Atrasada 3 dias CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra",
+        "2026/031 14/11/2026 Chega sábado, 14/11 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da ",
+        "2026/025 Sem data combinada GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra M"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "Selecione…"
+    },
+    "receber": {
+      "temConferencia": true,
+      "tiques": [
+        "sim · Cimento CP-II 50 kg (prova) Pedido: 20 sc",
+        "sim · Areia média (prova) Pedido: 3 m³",
+        "nao · Tubo de PVC para esgoto 100 mm (prova) Pedido: 10 br Quanto veio? br"
+      ],
+      "tamanhoDoTique": 28,
+      "alturaDaLinhaDoTique": 50,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "qr": {
+      "relogio": "Vale até amanhã às 15h42 (falta 24 h 00 min)",
+      "notas": "Vale uma vez só. Pode mandar ao engenheiro da obra, para ele mostrar ao encarregado lá. Quem ler este QR entra como Rodrigo Encarregado (prova): mande só ao engenheiro, e a mais ninguém.",
+      "botoes": [
+        "Baixar o QR",
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "a-chegar",
+      "sub": "3 a chegar, 1 atrasada",
+      "linhas": [
+        "2026/029 08/11/2026 Atrasada 3 dias CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra",
+        "2026/031 14/11/2026 Chega sábado, 14/11 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da ",
+        "2026/025 Sem data combinada GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra M"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "Selecione…"
+    },
+    "receber": {
+      "temConferencia": true,
+      "tiques": [
+        "sim · Cimento CP-II 50 kg (prova) Pedido: 20 sc",
+        "sim · Areia média (prova) Pedido: 3 m³",
+        "nao · Tubo de PVC para esgoto 100 mm (prova) Pedido: 10 br Quanto veio? br"
+      ],
+      "tamanhoDoTique": 28,
+      "alturaDaLinhaDoTique": 50,
+      "rolaDeLado": 0
+    }
+  },
+  "dia_1366": {
+    "qr": {
+      "relogio": "Vale até amanhã às 15h42 (falta 24 h 00 min)",
+      "notas": "Vale uma vez só. Pode mandar ao engenheiro da obra, para ele mostrar ao encarregado lá. Quem ler este QR entra como Rodrigo Encarregado (prova): mande só ao engenheiro, e a mais ninguém.",
+      "botoes": [
+        "Baixar o QR",
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "a-chegar",
+      "sub": "3 a chegar, 1 atrasada",
+      "linhas": [
+        "2026/029 08/11/2026 Atrasada 3 dias CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra",
+        "2026/031 14/11/2026 Chega sábado, 14/11 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da ",
+        "2026/025 Sem data combinada GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra M"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "Selecione…"
+    },
+    "receber": {
+      "temConferencia": true,
+      "tiques": [
+        "sim · Cimento CP-II 50 kg (prova) Pedido: 20 sc",
+        "sim · Areia média (prova) Pedido: 3 m³",
+        "nao · Tubo de PVC para esgoto 100 mm (prova) Pedido: 10 br Quanto veio? br"
+      ],
+      "tamanhoDoTique": 28,
+      "alturaDaLinhaDoTique": 50,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_1366": {
+    "qr": {
+      "relogio": "Vale até amanhã às 15h42 (falta 24 h 00 min)",
+      "notas": "Vale uma vez só. Pode mandar ao engenheiro da obra, para ele mostrar ao encarregado lá. Quem ler este QR entra como Rodrigo Encarregado (prova): mande só ao engenheiro, e a mais ninguém.",
+      "botoes": [
+        "Baixar o QR",
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "a-chegar",
+      "sub": "3 a chegar, 1 atrasada",
+      "linhas": [
+        "2026/029 08/11/2026 Atrasada 3 dias CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra",
+        "2026/031 14/11/2026 Chega sábado, 14/11 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da ",
+        "2026/025 Sem data combinada GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra M"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "Selecione…"
+    },
+    "receber": {
+      "temConferencia": true,
+      "tiques": [
+        "sim · Cimento CP-II 50 kg (prova) Pedido: 20 sc",
+        "sim · Areia média (prova) Pedido: 3 m³",
+        "nao · Tubo de PVC para esgoto 100 mm (prova) Pedido: 10 br Quanto veio? br"
+      ],
+      "tamanhoDoTique": 28,
+      "alturaDaLinhaDoTique": 50,
+      "rolaDeLado": 0
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "dia_375": {
+    "qr": {
+      "relogio": "Vence em 1439:59 (às 15:39)",
+      "notas": "Vale uma vez só. Quem ler este QR entra como Rodrigo Encarregado (prova): não mande por foto.",
+      "botoes": [
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "emitida",
+      "sub": "3 de 8 registro(s)",
+      "linhas": [
+        "2026/031 09/11/2026 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da obra Marcar entregue",
+        "2026/029 07/11/2026 CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra Marcar entregue",
+        "2026/025 02/11/2026 GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra Marcar en"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "À vista"
+    },
+    "receber": {
+      "temConferencia": false,
+      "tiques": [],
+      "tamanhoDoTique": null,
+      "alturaDaLinhaDoTique": null,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "qr": {
+      "relogio": "Vence em 1439:59 (às 15:39)",
+      "notas": "Vale uma vez só. Quem ler este QR entra como Rodrigo Encarregado (prova): não mande por foto.",
+      "botoes": [
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "emitida",
+      "sub": "3 de 8 registro(s)",
+      "linhas": [
+        "2026/031 09/11/2026 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) R$ 4.923,80 Emitida Não está na pasta da obra Marcar entregue",
+        "2026/029 07/11/2026 CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) R$ 9.216,00 Emitida Não está na pasta da obra Marcar entregue",
+        "2026/025 02/11/2026 GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) R$ 4.725,00 Emitida Não está na pasta da obra Marcar en"
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "À vista"
+    },
+    "receber": {
+      "temConferencia": false,
+      "tiques": [],
+      "tamanhoDoTique": null,
+      "alturaDaLinhaDoTique": null,
+      "rolaDeLado": 0
+    }
+  },
+  "dia_1366": {
+    "qr": {
+      "relogio": "Vence em 1439:59 (às 15:39)",
+      "notas": "Vale uma vez só. Quem ler este QR entra como Rodrigo Encarregado (prova): não mande por foto.",
+      "botoes": [
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "emitida",
+      "sub": "3 de 8 registro(s)",
+      "linhas": [
+        "2026/031 09/11/2026 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) 2 R$ 4.923,80 Emitida Não está na pasta da obra Marcar entreg",
+        "2026/029 07/11/2026 CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) 1 R$ 9.216,00 Emitida Não está na pasta da obra Marcar entreg",
+        "2026/025 02/11/2026 GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) 1 R$ 4.725,00 Emitida Não está na pasta da obra Marcar "
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "À vista"
+    },
+    "receber": {
+      "temConferencia": false,
+      "tiques": [],
+      "tamanhoDoTique": null,
+      "alturaDaLinhaDoTique": null,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_1366": {
+    "qr": {
+      "relogio": "Vence em 1439:59 (às 15:40)",
+      "notas": "Vale uma vez só. Quem ler este QR entra como Rodrigo Encarregado (prova): não mande por foto.",
+      "botoes": [
+        "Fechar"
+      ]
+    },
+    "historico": {
+      "filtro": "emitida",
+      "sub": "3 de 8 registro(s)",
+      "linhas": [
+        "2026/031 09/11/2026 AURORA TINTAS LTDA (prova) Residencial Ipê Amarelo (prova) 2 R$ 4.923,80 Emitida Não está na pasta da obra Marcar entreg",
+        "2026/029 07/11/2026 CONCRETO BETA LTDA (prova) Residencial Ipê Amarelo (prova) 1 R$ 9.216,00 Emitida Não está na pasta da obra Marcar entreg",
+        "2026/025 02/11/2026 GAMA SIDERURGICA S/A (prova) Reforma da Escola Municipal (prova) 1 R$ 4.725,00 Emitida Não está na pasta da obra Marcar "
+      ],
+      "rolaDeLado": 0
+    },
+    "novaOc": {
+      "condicao": "À vista"
+    },
+    "receber": {
+      "temConferencia": false,
+      "tiques": [],
+      "tamanhoDoTique": null,
+      "alturaDaLinhaDoTique": null,
+      "rolaDeLado": 0
+    }
+  }
+}
