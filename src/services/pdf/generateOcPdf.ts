@@ -70,6 +70,14 @@ const DEFAULT_CONDICOES_CONTRATACAO = [
 /** Azul da casa no PDF (o mesmo da linha do cabeçalho e da tabela). */
 const AZUL: [number, number, number] = [11, 105, 183];
 
+// CTO-D1036 §2.4: o endereço da obra maior, e as observações em destaque.
+export const TAMANHO_DO_ENDERECO = 12.5;
+const ENTRE_LINHAS_DO_ENDERECO = 5.4;
+export const TAMANHO_DA_OBSERVACAO = 10;
+const ENTRE_LINHAS_DA_OBSERVACAO = 4.6;
+const FUNDO_DA_OBSERVACAO: [number, number, number] = [255, 246, 221];
+const BORDA_DA_OBSERVACAO: [number, number, number] = [158, 98, 0];
+
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -226,13 +234,14 @@ export function desenhaPdfDaOc(
   {
     const largura = pw - 2 * margin;
     const textoDaNota = textoParaANotaFiscal(ob, oc.numero);
+    // O texto do endereço da obra, maior (CTO-D1036 §2.4): era 10,5 pt.
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(TAMANHO_DO_ENDERECO);
     const comSinal = temSinal(textoDaNota);
     const linhasDaNota = comSinal
       ? escrita.quebra(textoDaNota, largura - 10)
       : (doc.splitTextToSize(textoDaNota, largura - 10) as string[]);
-    const entre = 4.6;
+    const entre = ENTRE_LINHAS_DO_ENDERECO;
     const telefone = ob?.telefone?.trim() ? ` Telefone da obra: ${ob.telefone.trim()}.` : '';
     const entrega = `Local de entrega: este mesmo endereço, o da obra.${telefone}`;
     // Empresa na nota: o endereço dela continua o do cadastro. A obra nunca
@@ -268,11 +277,11 @@ export function desenhaPdfDaOc(
     doc.setLineWidth(0.3);
     doc.rect(margin + 3, yTexto, largura - 6, alturaDoTexto, 'FD');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(TAMANHO_DO_ENDERECO);
     if (comSinal) {
-      linhasDaNota.forEach((l, k) => escrita.desenha(l, margin + 5, yTexto + 4.8 + k * entre, 'bold'));
+      linhasDaNota.forEach((l, k) => escrita.desenha(l, margin + 5, yTexto + 5.6 + k * entre, 'bold'));
     } else {
-      linhasDaNota.forEach((l, k) => doc.text(l, margin + 5, yTexto + 4.8 + k * entre));
+      linhasDaNota.forEach((l, k) => doc.text(l, margin + 5, yTexto + 5.6 + k * entre));
     }
 
     let yDepois = yTexto + alturaDoTexto + 4.2;
@@ -496,20 +505,43 @@ export function desenhaPdfDaOc(
   y += alturaDaPolitica + 4;
   doc.setFontSize(8);
 
-  // ── Observações ────────────────────────────────────────────────────────────
+  // ── Observações, em destaque (CTO-D1036 §2.4) ──────────────────────────────
+  // Num quadro com fundo e borda âmbar, título maior e letra maior, para o
+  // vendedor não passar por cima. Era uma linha "OBSERVAÇÕES:" em 8 pt solta
+  // entre a política e as condições.
   if (oc.observacoes) {
+    const largura = pw - 2 * margin;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(TAMANHO_DA_OBSERVACAO);
     const comSinal = temSinal(oc.observacoes);
     const obsLines = comSinal
-      ? oc.observacoes.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, pw - 2 * margin))
-      : (doc.splitTextToSize(oc.observacoes, pw - 2 * margin) as string[]);
-    ensureSpace(6 + obsLines.length * 4);
+      ? oc.observacoes.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, largura - 8))
+      : (doc.splitTextToSize(oc.observacoes, largura - 8) as string[]);
+    const entre = ENTRE_LINHAS_DA_OBSERVACAO;
+    const altura = 9 + obsLines.length * entre + 2;
+    ensureSpace(altura + 2);
+    doc.setFillColor(...FUNDO_DA_OBSERVACAO);
+    doc.setDrawColor(...BORDA_DA_OBSERVACAO);
+    doc.setLineWidth(0.8);
+    doc.rect(margin, y, largura, altura, 'FD');
+    doc.setTextColor(...BORDA_DA_OBSERVACAO);
     doc.setFont('helvetica', 'bold');
-    doc.text('OBSERVAÇÕES:', margin, y);
-    y += 4;
+    doc.setFontSize(11);
+    doc.text('OBSERVAÇÕES DO PEDIDO', margin + 3, y + 5.6);
+    doc.setFontSize(7.5);
+    doc.text('LEIA ANTES DE SEPARAR O MATERIAL', pw - margin - 3, y + 5.6, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
-    if (comSinal) escreveLinhas(obsLines, y);
-    else doc.text(obsLines, margin, y);
-    y += obsLines.length * 4 + 2;
+    doc.setFontSize(TAMANHO_DA_OBSERVACAO);
+    obsLines.forEach((l, k) => {
+      const yl = y + 11 + k * entre;
+      if (comSinal) escrita.desenha(l, margin + 4, yl, 'normal');
+      else doc.text(l, margin + 4, yl);
+    });
+    y += altura + 4;
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.2);
+    doc.setFontSize(8);
   }
 
   // ── Condições de contratação ───────────────────────────────────────────────
