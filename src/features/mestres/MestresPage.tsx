@@ -5,7 +5,7 @@
  * eu não vou à obra". Por isso tudo cabe no celular do engenheiro (375 px):
  *   - cadastrar o mestre, só com o nome (e-mail e telefone, se tiver);
  *   - pôr na obra e tirar (com o motivo; mais de um mestre por obra é permitido);
- *   - gerar o QR de entrada (uso único, uma hora);
+ *   - gerar o QR de entrada (uso único; a validade é a do Banco, 24 horas pela D1036);
  *   - desligar o acesso (com o motivo) e religar.
  *
  * Só admin e engenharia veem esta tela. A trava de verdade mora no banco

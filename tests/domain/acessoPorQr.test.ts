@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import qrcode from 'qrcode-generator';
 import {
-  acessoDoHash, acessoDoLink, acessoDoTextoLido, ehAparelhoDaApple, enderecoDoQr, oQueFazerComOAcesso, tempoQueFalta,
+  acessoDoHash, acessoDoLink, acessoDoTextoLido, ehAparelhoDaApple, enderecoDoQr, oQueFazerComOAcesso, quandoVence, tempoQueFalta,
 } from '../../src/domain/acessoPorQr';
 import { desenhoDoQr } from '../../src/features/mestres/desenhoDoQr';
 import { lerQrDoDesenho } from '../fixtures/lerQrDoDesenho';
@@ -86,6 +86,17 @@ describe('o tempo que falta', () => {
     expect(tempoQueFalta('2026-10-04T16:00:00Z', agora)).toBe('60:00');
     expect(tempoQueFalta('2026-10-04T15:01:05Z', agora)).toBe('1:05');
     expect(tempoQueFalta('2026-10-04T15:00:00.300Z', agora)).toBe('0:01');
+  });
+  it('D1036: acima de uma hora, em horas e minutos', () => {
+    expect(tempoQueFalta('2026-10-05T15:00:00Z', agora)).toBe('24 h 00 min');
+    expect(tempoQueFalta('2026-10-05T14:59:30Z', agora)).toBe('24 h 00 min');
+    expect(tempoQueFalta('2026-10-04T16:00:01Z', agora)).toBe('1 h 01 min');
+  });
+  it('D1036: até quando vale, no horário de Brasília', () => {
+    expect(quandoVence('2026-10-04T18:05:00Z', agora)).toBe('hoje às 15h05');
+    expect(quandoVence('2026-10-05T15:00:00Z', agora)).toBe('amanhã às 12h00');
+    expect(quandoVence('2026-10-07T15:00:00Z', agora)).toBe('em 07/10 às 12h00');
+    expect(quandoVence('', agora)).toBe('');
   });
   it('vencido, ou data que não se lê: null', () => {
     expect(tempoQueFalta('2026-10-04T15:00:00Z', agora)).toBeNull();

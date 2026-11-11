@@ -12,7 +12,7 @@
  *   2. o mestre abre o ícone, que mostra "Ler o QR" (`EntrarNoIcone`);
  *   3. o ícone lê o MESMO QR pela câmera e entra ele mesmo.
  *
- * O QR vale uma hora: dá tempo, com o engenheiro do lado.
+ * O QR vale o que o Banco disser (24 horas pela D1036): o engenheiro pode mandá-lo ao celular dele e mostrar na obra.
  */
 
 import { useEffect, useRef, useState } from 'react';

@@ -195,6 +195,40 @@ describe('o QR', () => {
     expect(d.innerHTML).not.toContain('banco-de-teste.invalid');
   });
 
+  it('D1036 §2.1: o QR de 24 horas diz até quando vale, a quem mandar, e quem ler entra como ele', async () => {
+    srv.qr = vi.fn(async () => ({ link: LINK, venceEm: new Date(Date.now() + 24 * 3600_000).toISOString() }));
+    await montar();
+    await act(async () => {
+      fireEvent.click(within(cartao('m-1')).getByRole('button', { name: 'Gerar QR' }));
+    });
+    const d = document.querySelector<HTMLElement>('[data-dialogo-qr]')!;
+    expect(d.querySelector('[data-falta]')!.getAttribute('data-falta')).toMatch(/^2[34] h \d\d min$/);
+    expect(d.textContent).toMatch(/Vale até amanhã às \d\dh\d\d/);
+    expect(d.textContent).toMatch(/Pode mandar ao engenheiro da obra/);
+    expect(d.textContent).toMatch(/Quem ler este QR entra como Carlos de Teste: mande só ao engenheiro/);
+    expect(d.textContent).not.toMatch(/não mande por foto/);
+    // No computador de teste não há folha de compartilhar com arquivo: o botão baixa a imagem.
+    expect(within(d).getByRole('button', { name: 'Baixar o QR' }).getAttribute('data-mandar-qr')).toBe('baixar');
+  });
+
+  it('D1036 §2.1: onde o aparelho compartilha arquivo, o botão é "Mandar ao engenheiro"', async () => {
+    const nav = navigator as Navigator & { canShare?: unknown; share?: unknown };
+    const antes = { canShare: nav.canShare, share: nav.share };
+    Object.assign(nav, { canShare: () => true, share: vi.fn(async () => undefined) });
+    try {
+      await montar();
+      await act(async () => {
+        fireEvent.click(within(cartao('m-1')).getByRole('button', { name: 'Gerar QR' }));
+      });
+      const d = document.querySelector<HTMLElement>('[data-dialogo-qr]')!;
+      expect(within(d).getByRole('button', { name: 'Mandar ao engenheiro' })).toBeTruthy();
+      // Um destaque só: o mandar é de contorno, e o Fechar continua a ação principal.
+      expect(within(d).getByRole('button', { name: 'Mandar ao engenheiro' }).className).not.toMatch(/primary/);
+    } finally {
+      Object.assign(nav, antes);
+    }
+  });
+
   it('vencido: o QR some, e o "Gerar outro" pede outro', async () => {
     srv.qr = vi.fn(async () => ({ link: LINK, venceEm: new Date(Date.now() - 1000).toISOString() }));
     await montar();

@@ -5,20 +5,31 @@
  * leva à OC com o código depois do `#` (ver `domain/acessoPorQr`): no Android
  * entra na hora; no iPhone, a OC ensina a pôr o ícone, e o ícone lê este mesmo
  * QR. Vencido, o QR some da tela — não fica um desenho que não abre nada.
+ *
+ * CTO-D1036 §2.1: o QR passa a valer 24 horas (a validade é do Banco, e a tela
+ * mostra a que ele devolve), e pode ser mandado ao engenheiro, que o mostra ao
+ * encarregado na obra. Continua valendo uma vez só.
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../components/Button/Button';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
-import { acessoDoLink, enderecoDoQr, tempoQueFalta } from '../../domain/acessoPorQr';
+import { acessoDoLink, enderecoDoQr, quandoVence, tempoQueFalta } from '../../domain/acessoPorQr';
 import caixa from '../ordens-compra/RegistrarEntregaDialogo.module.css';
 import { desenhoDoQr } from './desenhoDoQr';
+import { baixarArquivo, imagemDoQr, nomeDaImagemDoQr, podeCompartilharArquivo } from './imagemDoQr';
 import styles from './MestresPage.module.css';
 import { useFocoPreso } from '../../hooks/useFocoPreso';
 
-const hora = (iso: string) =>
-  new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+/** O aparelho abre a folha de compartilhar com uma imagem? Medido uma vez, com um arquivo de amostra. */
+function compartilhaImagem(): boolean {
+  try {
+    return podeCompartilharArquivo(new File([''], 'qr.png', { type: 'image/png' }));
+  } catch {
+    return false;
+  }
+}
 
 interface Props {
   nome: string;
@@ -36,11 +47,33 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
     return () => clearInterval(t);
   }, []);
 
-  const desenho = useMemo(() => {
+  const endereco = useMemo(() => {
     const acesso = acessoDoLink(link);
-    return desenhoDoQr(acesso ? enderecoDoQr(window.location.origin, acesso) : link);
+    return acesso ? enderecoDoQr(window.location.origin, acesso) : link;
   }, [link]);
+  const desenho = useMemo(() => desenhoDoQr(endereco), [endereco]);
   const falta = tempoQueFalta(venceEm, agora);
+  const ate = quandoVence(venceEm, agora);
+  const [compartilha] = useState(compartilhaImagem);
+  const [erro, setErro] = useState('');
+
+  const mandar = async () => {
+    setErro('');
+    const nomeDoArquivo = nomeDaImagemDoQr(nome);
+    try {
+      const png = await imagemDoQr(endereco, [`Entrada de ${nome}`, `Vale uma vez só, até ${quandoVence(venceEm, new Date())}`]);
+      const arquivo = new File([png], nomeDoArquivo, { type: 'image/png' });
+      if (compartilha && podeCompartilharArquivo(arquivo)) {
+        await navigator.share({ files: [arquivo], title: `QR de entrada de ${nome}` });
+      } else {
+        baixarArquivo(arquivo, nomeDoArquivo);
+      }
+    } catch (e) {
+      // Fechar a folha de compartilhar sem escolher não é erro.
+      if (e instanceof DOMException && e.name === 'AbortError') return;
+      setErro('Não deu para preparar a imagem do QR. Mostre o QR desta tela ao encarregado.');
+    }
+  };
 
   return createPortal(
     <div className={dialogo.overlay} role="dialog" aria-modal ref={preso} aria-labelledby="qr-titulo">
@@ -63,10 +96,13 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
               <path d={desenho.caminho} className={styles.qrModulos} />
             </svg>
             <p className={styles.relogio} data-falta={falta}>
-              Vence em <strong>{falta}</strong> (às {hora(venceEm)})
+              Vale até <strong>{ate}</strong> (falta {falta})
             </p>
             <ul className={styles.notas}>
-              <li>Vale uma vez só. Quem ler este QR entra como {nome}: não mande por foto.</li>
+              <li>
+                Vale uma vez só. Pode mandar ao engenheiro da obra, para ele mostrar ao encarregado lá. Quem ler este QR
+                entra como {nome}: mande só ao engenheiro, e a mais ninguém.
+              </li>
               <li>
                 No iPhone: o celular abre a OC e mostra como pôr o ícone na tela. Depois, ele abre o ícone, toca em
                 “Ler o QR” e aponta para este mesmo QR.
@@ -78,7 +114,17 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
             Este QR venceu. Gere outro com o encarregado do seu lado.
           </p>
         )}
+        {erro && (
+          <p className={caixa.aviso} role="alert">
+            {erro}
+          </p>
+        )}
         <div className={caixa.acoes}>
+          {falta && (
+            <Button variant="outline" onClick={() => void mandar()} data-mandar-qr={compartilha ? 'compartilhar' : 'baixar'}>
+              {compartilha ? 'Mandar ao engenheiro' : 'Baixar o QR'}
+            </Button>
+          )}
           <Button variant={falta ? 'primary' : 'outline'} onClick={aoFechar}>
             Fechar
           </Button>

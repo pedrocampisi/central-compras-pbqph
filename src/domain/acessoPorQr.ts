@@ -75,12 +75,36 @@ export function acessoDoTextoLido(texto: string, origensAceitas: readonly string
   return acessoDoHash(u.hash) ?? acessoDoLink(u.href);
 }
 
-/** "59:12" até vencer; null quando venceu. */
+/**
+ * "59:12" até vencer, na última hora; acima de uma hora, "23 h 59 min" (o QR
+ * de 24 horas da CTO-D1036 §2.1, que dizia "1439:59"). null quando venceu.
+ */
 export function tempoQueFalta(venceEm: string, agora: Date): string | null {
   const ms = Date.parse(venceEm) - agora.getTime();
   if (!Number.isFinite(ms) || ms <= 0) return null;
   const s = Math.ceil(ms / 1000);
+  if (s > 3600) {
+    const min = Math.ceil(s / 60);
+    return `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')} min`;
+  }
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+const DIA_SP = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+
+/** "hoje às 15h05", "amanhã às 15h05" ou "em 12/11 às 15h05", no horário de Brasília; '' se não se lê. */
+export function quandoVence(venceEm: string, agora: Date): string {
+  const v = new Date(venceEm);
+  if (!Number.isFinite(v.getTime())) return '';
+  const [h, m] = v
+    .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' })
+    .split(':');
+  const hora = `${h}h${m}`;
+  const dia = DIA_SP(v);
+  if (dia === DIA_SP(agora)) return `hoje às ${hora}`;
+  if (dia === DIA_SP(new Date(agora.getTime() + 86_400_000))) return `amanhã às ${hora}`;
+  const [, mes, d] = dia.split('-');
+  return `em ${d}/${mes} às ${hora}`;
 }
 
 /** iPhone ou iPad (o iPad novo se diz Mac, mas tem toque). */
