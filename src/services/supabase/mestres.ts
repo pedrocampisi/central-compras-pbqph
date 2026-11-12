@@ -9,7 +9,8 @@
  *   pôr e tirar da obra .. core.por_mestre_na_obra / core.tirar_mestre_da_obra
  *   desligar e religar ... core.desligar_mestre / core.religar_mestre
  *
- * E o lado do mestre: entrar com o código do QR (`verifyOtp`).
+ * E o lado do mestre: entrar com o código do QR (`verifyOtp`). O QR de 24
+ * horas (`qr_do_mestre`, Banco D1036b) passa antes pela `entrar-pelo-qr`.
  *
  * Quem pode é admin e engenharia; a trava mora no banco (`pode_gerir_mestre`),
  * e a tela só esconde o que o banco recusaria.
@@ -173,8 +174,62 @@ export function entrarComOQr(a: AcessoPorQr): Promise<void> {
   return tentativa;
 }
 
+/** O tipo do QR de 24 horas (Banco D1036b): o código é desta casa, e se troca na `entrar-pelo-qr`. */
+export const TIPO_DO_QR_DE_24_HORAS = 'qr_do_mestre';
+
+/**
+ * O link de uma hora que cada código já trocou. A troca gasta o código: se a
+ * `verifyOtp` falhar depois (sem sinal), a nova tentativa usa este link, e
+ * não pede outra troca, que voltaria "já foi usado".
+ */
+const trocas = new Map<string, string>();
+
+/**
+ * Troca o código do QR de 24 horas pelo link de entrada de hoje (Banco D1036b
+ * §2). Quem lê ainda não entrou: vai sem sessão, só com a chave pública, e por
+ * isso não passa pela `chamarFuncao`. A recusa traz a frase para o
+ * encarregado no `erro`, e ela sobe como veio.
+ */
+async function trocarOQr(codigo: string): Promise<string> {
+  const ja = trocas.get(codigo);
+  if (ja) return ja;
+  const url = import.meta.env['VITE_SUPABASE_URL'] as string | undefined;
+  const chave = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] as string | undefined;
+  if (!url || !chave) throw new Error('O endereço do servidor não está configurado.');
+  const freio = new AbortController();
+  const relogio = setTimeout(() => freio.abort(), 20_000);
+  let resp: Response;
+  try {
+    resp = await fetch(`${url}/functions/v1/entrar-pelo-qr`, {
+      method: 'POST',
+      headers: { apikey: chave, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo }),
+      signal: freio.signal,
+    });
+  } catch {
+    throw new Error('Sem sinal para entrar. Chegue perto do sinal e tente de novo.');
+  } finally {
+    clearTimeout(relogio);
+  }
+  let json: Record<string, unknown> = {};
+  try {
+    json = ((await resp.json()) ?? {}) as Record<string, unknown>;
+  } catch {
+    /* sem corpo: fica só o status */
+  }
+  const tokenHash = typeof json['token_hash'] === 'string' ? json['token_hash'] : '';
+  if (resp.ok && tokenHash) {
+    trocas.set(codigo, tokenHash);
+    return tokenHash;
+  }
+  const erro = typeof json['erro'] === 'string' && json['erro'].trim() ? json['erro'].trim() : '';
+  throw new Error(erro || 'Não deu para entrar agora. Peça outro QR ao engenheiro.');
+}
+
 async function verificar(a: AcessoPorQr): Promise<void> {
-  const { error } = await supabase.auth.verifyOtp({ token_hash: a.codigo, type: a.tipo as EmailOtpType });
+  const [tokenHash, tipo] =
+    a.tipo === TIPO_DO_QR_DE_24_HORAS ? [await trocarOQr(a.codigo), 'magiclink'] : [a.codigo, a.tipo];
+  const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tipo as EmailOtpType });
   if (!error) return;
   if (/expired|invalid|not found|used/i.test(error.message) || error.status === 403) {
     throw new Error('Este QR já foi usado ou venceu. Peça outro ao engenheiro.');

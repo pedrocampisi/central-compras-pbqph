@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * CTO-D696 §4: o acesso do mestre do lado do engenheiro, contra o contrato das
@@ -207,5 +207,96 @@ describe('o mestre entra com o código do QR', () => {
     banco.respostaVerify = [null];
     await entrarComOQr(a);
     expect(banco.verify).toHaveLength(3);
+  });
+});
+
+describe('Banco D1036b — o QR de 24 horas passa pela entrar-pelo-qr antes do login', () => {
+  const pedidos: { url: string; init: RequestInit }[] = [];
+  let respostas: (Response | Error)[] = [];
+  const resposta = (status: number, corpo: unknown) =>
+    new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });
+
+  beforeEach(() => {
+    pedidos.length = 0;
+    respostas = [];
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://banco-de-teste.invalid');
+    vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_de_teste');
+    vi.stubGlobal('fetch', async (url: string, init: RequestInit) => {
+      pedidos.push({ url, init });
+      const r = respostas.length > 1 ? respostas.shift()! : respostas[0]!;
+      if (r instanceof Error) throw r;
+      return r;
+    });
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('troca o código, sem sessão e só com a chave pública, e entra com o link que volta', async () => {
+    respostas = [resposta(200, { token_hash: 'h'.repeat(56), tipo: 'magiclink' })];
+    await entrarComOQr({ codigo: 'q'.repeat(43), tipo: 'qr_do_mestre' });
+    expect(pedidos).toHaveLength(1);
+    expect(pedidos[0]!.url).toBe('https://banco-de-teste.invalid/functions/v1/entrar-pelo-qr');
+    expect(pedidos[0]!.init.method).toBe('POST');
+    const cabecalhos = pedidos[0]!.init.headers as Record<string, string>;
+    expect(cabecalhos['apikey']).toBe('sb_publishable_de_teste');
+    expect(cabecalhos['Authorization']).toBeUndefined();
+    expect(JSON.parse(pedidos[0]!.init.body as string)).toEqual({ codigo: 'q'.repeat(43) });
+    expect(banco.verify).toEqual([{ token_hash: 'h'.repeat(56), type: 'magiclink' }]);
+  });
+
+  it('o QR de uma hora de antes (magiclink) vai direto ao login, sem troca', async () => {
+    await entrarComOQr({ codigo: 'm'.repeat(56), tipo: 'magiclink' });
+    expect(pedidos).toHaveLength(0);
+    expect(banco.verify).toEqual([{ token_hash: 'm'.repeat(56), type: 'magiclink' }]);
+  });
+
+  it('a recusa mostra a frase do Banco como veio, e não chega ao login', async () => {
+    const frases = [
+      [404, 'nao_existe', 'Este QR não vale para entrar. Peça outro ao engenheiro.'],
+      [410, 'usado', 'Este QR já foi usado. Peça outro ao engenheiro.'],
+      [410, 'trocado', 'Este QR foi trocado por um mais novo. Use o último que o engenheiro mandou.'],
+      [410, 'vencido', 'Este QR venceu às 15h05 de 12/11. Peça outro ao engenheiro.'],
+      [403, 'desligado', 'Seu acesso foi desligado. Fale com o engenheiro da obra.'],
+      [502, 'sem_link', 'Não deu para entrar agora, e este QR já foi gasto. Peça outro ao engenheiro.'],
+    ] as const;
+    for (const [k, [status, motivo, erro]] of frases.entries()) {
+      respostas = [resposta(status, { erro, motivo })];
+      await expect(entrarComOQr({ codigo: `r${k}`.padEnd(43, 'r'), tipo: 'qr_do_mestre' })).rejects.toThrow(erro);
+    }
+    expect(banco.verify).toHaveLength(0);
+  });
+
+  it('a tela que monta duas vezes pede uma troca só: o código vale uma vez', async () => {
+    respostas = [resposta(200, { token_hash: 'i'.repeat(56), tipo: 'magiclink' })];
+    const a = { codigo: 's'.repeat(43), tipo: 'qr_do_mestre' };
+    await Promise.all([entrarComOQr(a), entrarComOQr(a)]);
+    await entrarComOQr(a);
+    expect(pedidos).toHaveLength(1);
+    expect(banco.verify).toHaveLength(1);
+  });
+
+  it('trocado e sem sinal no login: a nova tentativa usa o mesmo link, e não troca de novo', async () => {
+    respostas = [resposta(200, { token_hash: 'j'.repeat(56), tipo: 'magiclink' })];
+    banco.respostaVerify = [{ message: 'Failed to fetch', status: 0 }];
+    const a = { codigo: 't'.repeat(43), tipo: 'qr_do_mestre' };
+    await expect(entrarComOQr(a)).rejects.toThrow('Sem sinal para entrar.');
+    banco.respostaVerify = [null];
+    await entrarComOQr(a);
+    expect(pedidos).toHaveLength(1);
+    expect(banco.verify).toEqual([
+      { token_hash: 'j'.repeat(56), type: 'magiclink' },
+      { token_hash: 'j'.repeat(56), type: 'magiclink' },
+    ]);
+  });
+
+  it('sem sinal na troca: diz sem sinal, e pode tentar de novo', async () => {
+    respostas = [new TypeError('Failed to fetch'), resposta(200, { token_hash: 'k'.repeat(56), tipo: 'magiclink' })];
+    const a = { codigo: 'u'.repeat(43), tipo: 'qr_do_mestre' };
+    await expect(entrarComOQr(a)).rejects.toThrow('Sem sinal para entrar. Chegue perto do sinal e tente de novo.');
+    await entrarComOQr(a);
+    expect(pedidos).toHaveLength(2);
+    expect(banco.verify).toEqual([{ token_hash: 'k'.repeat(56), type: 'magiclink' }]);
   });
 });

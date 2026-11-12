@@ -16,8 +16,13 @@
  *      endereço que o servidor da OC recebe, nem pelo registro dele.
  *   3. **Um QR menos denso** (o endereço é mais curto): a câmera lê de mais longe.
  *
- * O código é o mesmo segredo do link, com as mesmas travas: uso único, vence
- * em uma hora, só para perfil `mestre` (a trava mora no banco).
+ * O código é o mesmo segredo do link, com as mesmas travas: uso único, só para
+ * perfil `mestre` (a trava mora no banco).
+ *
+ * Dois tipos (Banco D1036b): `qr_do_mestre`, o QR de 24 horas, cujo código é
+ * do Banco e se troca na `entrar-pelo-qr` pelo link de entrada na hora da
+ * leitura; e `magiclink`, o QR de uma hora de antes, que vai direto ao login.
+ * Quanto tempo vale, quem diz é o `vence_em` que o Banco devolve.
  */
 
 export interface AcessoPorQr {
