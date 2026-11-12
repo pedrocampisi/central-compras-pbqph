@@ -143,7 +143,8 @@ export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
       </button>
       <p className={styles.dica}>O QR, o engenheiro mostra na tela dele.</p>
       <button type="button" className={styles.secundario} onClick={aoUsarSenha} disabled={entrando}>
-        Sou do escritório: entrar com e-mail e senha
+        {/* O hífen que não quebra (U+2011): a 375, "e-mail" partia em "e-" e "mail". */}
+        Sou do escritório: entrar com e‑mail e senha
       </button>
     </div>
   );

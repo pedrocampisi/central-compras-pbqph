@@ -108,7 +108,7 @@ describe('dentro do ícone, sem ninguém', () => {
     render(<App />);
     expect(await screen.findByRole('button', { name: /Sou encarregado: ler o QR/ })).toBeTruthy();
     expect(screen.queryByLabelText(/Senha/)).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Sou do escritório: entrar com e-mail e senha' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sou do escritório: entrar com e‑mail e senha' }));
     expect(await screen.findByLabelText(/Senha/)).toBeTruthy();
   });
 
@@ -116,7 +116,7 @@ describe('dentro do ícone, sem ninguém', () => {
     aparelho.noIcone = true;
     render(<App />);
     const qr = await screen.findByRole('button', { name: /Sou encarregado: ler o QR/ });
-    const senha = screen.getByRole('button', { name: 'Sou do escritório: entrar com e-mail e senha' });
+    const senha = screen.getByRole('button', { name: 'Sou do escritório: entrar com e‑mail e senha' });
     // A do encarregado vem antes, no papel e na leitura de tela.
     expect(qr.compareDocumentPosition(senha) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     // O mesmo tamanho: as duas são botão cheio de largura (primario e secundario dividem a mesma regra);
