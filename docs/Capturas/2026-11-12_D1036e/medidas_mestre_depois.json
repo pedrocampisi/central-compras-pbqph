@@ -1,0 +1,194 @@
+{
+  "dia_375": {
+    "umaPeca": {
+      "tiquesVisiveis": 1,
+      "linkDeAbrir": false,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Vergalhão 10 mm (prova)\nPedido: 12 br"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique se a peça veio inteira.",
+      "rolaDeLado": 0
+    },
+    "duasPecasAoAbrir": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira."
+    },
+    "duasPecasConferindo": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "sim · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira.",
+      "rolaDeLado": 0
+    },
+    "oitoPecasAoAbrir": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "nao · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³",
+        "nao · Brita 1 (prova)\nPedido: 4 m³",
+        "nao · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "nao · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "nao · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "nao · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira."
+    },
+    "oitoPecasUmaSemTique": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)"
+      ],
+      "pecas": [
+        "sim · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³\nQuanto veio?\nm³",
+        "sim · Brita 1 (prova)\nPedido: 4 m³",
+        "sim · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "sim · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "sim · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "sim · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira. Na que não tem tique, escreva quanto veio; se não veio, 0.",
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "umaPeca": {
+      "tiquesVisiveis": 1,
+      "linkDeAbrir": false,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Vergalhão 10 mm (prova)\nPedido: 12 br"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique se a peça veio inteira.",
+      "rolaDeLado": 0
+    },
+    "duasPecasAoAbrir": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira."
+    },
+    "duasPecasConferindo": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "sim · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira.",
+      "rolaDeLado": 0
+    },
+    "oitoPecasAoAbrir": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte"
+      ],
+      "pecas": [
+        "nao · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "nao · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³",
+        "nao · Brita 1 (prova)\nPedido: 4 m³",
+        "nao · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "nao · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "nao · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "nao · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 0,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira."
+    },
+    "oitoPecasUmaSemTique": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": false,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)"
+      ],
+      "pecas": [
+        "sim · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³\nQuanto veio?\nm³",
+        "sim · Brita 1 (prova)\nPedido: 4 m³",
+        "sim · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "sim · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "sim · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "sim · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": "Tique cada peça que veio inteira. Na que não tem tique, escreva quanto veio; se não veio, 0.",
+      "rolaDeLado": 0
+    }
+  }
+}

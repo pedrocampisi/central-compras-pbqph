@@ -1,0 +1,176 @@
+{
+  "dia_375": {
+    "umaPeca": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null,
+      "rolaDeLado": 0
+    },
+    "duasPecasAoAbrir": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null
+    },
+    "duasPecasConferindo": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": true,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)",
+        "Fechar a conferência item por item"
+      ],
+      "pecas": [
+        "sim · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç\nQuanto veio?\npç"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": null,
+      "rolaDeLado": 0
+    },
+    "oitoPecasAoAbrir": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null
+    },
+    "oitoPecasUmaSemTique": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": true,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)",
+        "Fechar a conferência item por item"
+      ],
+      "pecas": [
+        "sim · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³\nQuanto veio?\nm³",
+        "sim · Brita 1 (prova)\nPedido: 4 m³",
+        "sim · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "sim · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "sim · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "sim · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": null,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "umaPeca": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null,
+      "rolaDeLado": 0
+    },
+    "duasPecasAoAbrir": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null
+    },
+    "duasPecasConferindo": {
+      "tiquesVisiveis": 2,
+      "linkDeAbrir": true,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)",
+        "Fechar a conferência item por item"
+      ],
+      "pecas": [
+        "sim · Conexão joelho 90° 100 mm (prova)\nPedido: 6 pç",
+        "nao · Conexão tê 100 mm (prova)\nPedido: 1 pç\nQuanto veio?\npç"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": null,
+      "rolaDeLado": 0
+    },
+    "oitoPecasAoAbrir": {
+      "tiquesVisiveis": 0,
+      "linkDeAbrir": true,
+      "temLista": false,
+      "botoes": [
+        "Sim",
+        "Só uma parte",
+        "Ou confira item por item"
+      ],
+      "pecas": [],
+      "camposAbertos": 0,
+      "tamanhoDoTique": null,
+      "frase": null
+    },
+    "oitoPecasUmaSemTique": {
+      "tiquesVisiveis": 8,
+      "linkDeAbrir": true,
+      "temLista": true,
+      "botoes": [
+        "Sim",
+        "Só uma parte (marcado)",
+        "Fechar a conferência item por item"
+      ],
+      "pecas": [
+        "sim · Tijolo cerâmico 8 furo  (prova)\nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg (prova)\nPedido: 40  c",
+        "nao · Areia média (prova)\nPedido: 6 m³\nQuanto veio?\nm³",
+        "sim · Brita 1 (prova)\nPedido: 4 m³",
+        "sim · Vergalhão CA-50 10 mm (prova)\nPedido: 30 br",
+        "sim · Arame recozido 18 (prova)\nPedido: 5 kg",
+        "sim · Cal hidratada 20 kg (prova)\nPedido: 25  c",
+        "sim · Prego 18x27 (prova)\nPedido: 10 kg"
+      ],
+      "camposAbertos": 1,
+      "tamanhoDoTique": 28,
+      "frase": null,
+      "rolaDeLado": 0
+    }
+  }
+}

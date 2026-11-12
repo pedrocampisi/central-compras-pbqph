@@ -1,0 +1,286 @@
+{
+  "dia_375": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tinta acrílica fo ca 18 L\nPedido: 12 un",
+        "sim · Rolo de lã 23 cm\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "nao · Prego 18x27 1 kg\nPedido: 30 un",
+        "nao · Arame recozido 1 kg\nPedido: 15 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tinta acrílica fo ca 18 L\nPedido: 12 un",
+        "sim · Rolo de lã 23 cm\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "nao · Prego 18x27 1 kg\nPedido: 30 un",
+        "nao · Arame recozido 1 kg\nPedido: 15 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "dia_1366": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tinta acrílica fo ca 18 L\nPedido: 12 un",
+        "sim · Rolo de lã 23 cm\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "nao · Prego 18x27 1 kg\nPedido: 30 un",
+        "nao · Arame recozido 1 kg\nPedido: 15 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_1366": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tinta acrílica fo ca 18 L\nPedido: 12 un",
+        "sim · Rolo de lã 23 cm\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "nao · Prego 18x27 1 kg\nPedido: 30 un",
+        "nao · Arame recozido 1 kg\nPedido: 15 un"
+      ],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  }
+}
