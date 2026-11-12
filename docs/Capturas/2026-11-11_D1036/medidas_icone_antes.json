@@ -1,0 +1,44 @@
+{
+  "dia": {
+    "noIcone": true,
+    "tela": true,
+    "botoes": [
+      {
+        "texto": "Ler o QR",
+        "largura": 343,
+        "altura": 60,
+        "topo": 152,
+        "letra": "20px"
+      },
+      {
+        "texto": "Entrar com e-mail e senha",
+        "largura": 219,
+        "altura": 44,
+        "topo": 230,
+        "letra": "16px"
+      }
+    ],
+    "rolaDeLado": 0
+  },
+  "noite": {
+    "noIcone": true,
+    "tela": true,
+    "botoes": [
+      {
+        "texto": "Ler o QR",
+        "largura": 343,
+        "altura": 60,
+        "topo": 152,
+        "letra": "20px"
+      },
+      {
+        "texto": "Entrar com e-mail e senha",
+        "largura": 219,
+        "altura": 44,
+        "topo": 230,
+        "letra": "16px"
+      }
+    ],
+    "rolaDeLado": 0
+  }
+}
