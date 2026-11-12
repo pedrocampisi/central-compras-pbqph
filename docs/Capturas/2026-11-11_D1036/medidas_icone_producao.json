@@ -1,0 +1,44 @@
+{
+  "dia": {
+    "noIcone": true,
+    "tela": true,
+    "botoes": [
+      {
+        "texto": "Sou encarregado: ler o QR",
+        "largura": 343,
+        "altura": 60,
+        "topo": 127,
+        "letra": "20px"
+      },
+      {
+        "texto": "Sou do escritório: entrar com e‑mail e senha",
+        "largura": 343,
+        "altura": 80,
+        "topo": 246,
+        "letra": "20px"
+      }
+    ],
+    "rolaDeLado": 0
+  },
+  "noite": {
+    "noIcone": true,
+    "tela": true,
+    "botoes": [
+      {
+        "texto": "Sou encarregado: ler o QR",
+        "largura": 343,
+        "altura": 60,
+        "topo": 127,
+        "letra": "20px"
+      },
+      {
+        "texto": "Sou do escritório: entrar com e‑mail e senha",
+        "largura": 343,
+        "altura": 80,
+        "topo": 246,
+        "letra": "20px"
+      }
+    ],
+    "rolaDeLado": 0
+  }
+}
