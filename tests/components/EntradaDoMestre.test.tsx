@@ -106,10 +106,26 @@ describe('dentro do ícone, sem ninguém', () => {
   it('a entrada é "Ler o QR"; quem tem senha pede o formulário', async () => {
     aparelho.noIcone = true;
     render(<App />);
-    expect(await screen.findByRole('button', { name: /Ler o QR/ })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: /Sou encarregado: ler o QR/ })).toBeTruthy();
     expect(screen.queryByLabelText(/Senha/)).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Entrar com e-mail e senha' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sou do escritório: entrar com e-mail e senha' }));
     expect(await screen.findByLabelText(/Senha/)).toBeTruthy();
+  });
+
+  it('D1036 §2.7: as duas entradas dizem de quem são, com o mesmo tamanho, e a do encarregado em cima', async () => {
+    aparelho.noIcone = true;
+    render(<App />);
+    const qr = await screen.findByRole('button', { name: /Sou encarregado: ler o QR/ });
+    const senha = screen.getByRole('button', { name: 'Sou do escritório: entrar com e-mail e senha' });
+    // A do encarregado vem antes, no papel e na leitura de tela.
+    expect(qr.compareDocumentPosition(senha) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // O mesmo tamanho: as duas são botão cheio de largura (primario e secundario dividem a mesma regra);
+    // o link pequeno de antes saiu. Um destaque só: a de baixo é de contorno.
+    expect(qr.className).toMatch(/primario/);
+    expect(senha.className).toMatch(/secundario/);
+    expect(senha.className).not.toMatch(/sair/);
+    // O caminho do encarregado continua a um toque: o toque abre a câmera.
+    expect(screen.queryByText('Encarregado: peça o QR ao engenheiro e toque no botão.')).toBeNull();
   });
 });
 
@@ -135,7 +151,7 @@ describe('a câmera do ícone lê o QR', () => {
   async function lerCom(texto: string) {
     leitor.texto = texto;
     render(<EntrarNoIcone aoUsarSenha={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Ler o QR/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Sou encarregado: ler o QR/ }));
     await waitFor(() => expect(getUserMedia).toHaveBeenCalledWith({ video: { facingMode: 'environment' }, audio: false }));
   }
 
@@ -165,7 +181,7 @@ describe('a câmera do ícone lê o QR', () => {
     await lerCom('');
     expect((await screen.findByRole('alert')).textContent).toMatch(/sem permissão para a câmera/);
     fireEvent.click(screen.getByRole('button', { name: 'Voltar' }));
-    expect(screen.getByRole('button', { name: /Ler o QR/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Sou encarregado: ler o QR/ })).toBeTruthy();
   });
 
   it('o QR não entrou: o porquê na tela, e dá para ler de novo', async () => {
@@ -174,7 +190,7 @@ describe('a câmera do ícone lê o QR', () => {
     });
     await lerCom(`${window.location.origin}/#entrar=${CODIGO}&tipo=magiclink`);
     expect((await screen.findByRole('alert')).textContent).toMatch(/já foi usado ou venceu/);
-    expect((screen.getByRole('button', { name: /Ler o QR/ }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole('button', { name: /Sou encarregado: ler o QR/ }) as HTMLButtonElement).disabled).toBe(false);
   });
 });
 

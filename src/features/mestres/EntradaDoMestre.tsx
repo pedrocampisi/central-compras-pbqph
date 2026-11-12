@@ -9,7 +9,7 @@
  *
  *   1. a câmera abre o QR no Safari, e a OC NÃO gasta o QR ali
  *      (`PorOIconeNoIphone`): ensina a pôr o ícone;
- *   2. o mestre abre o ícone, que mostra "Ler o QR" (`EntrarNoIcone`);
+ *   2. o mestre abre o ícone, que mostra "Sou encarregado: ler o QR" (`EntrarNoIcone`);
  *   3. o ícone lê o MESMO QR pela câmera e entra ele mesmo.
  *
  * O QR vale o que o Banco disser (24 horas pela D1036): o engenheiro pode mandá-lo ao celular dele e mostrar na obra.
@@ -52,7 +52,7 @@ export function PorOIconeNoIphone({ aoUsarAqui }: { aoUsarAqui: () => void }) {
       <p>No iPhone, você entra pelo ícone da OC na tela do celular. Faça assim:</p>
       <PassosDoIphone />
       <p>
-        No ícone, toque em <strong>Ler o QR</strong> e aponte para o mesmo QR do engenheiro.
+        No ícone, toque em <strong>Sou encarregado: ler o QR</strong> e aponte para o mesmo QR do engenheiro.
       </p>
       <p className={styles.dica}>Se o ícone já está na tela, é só abrir e ler o QR.</p>
       <button type="button" className={styles.sair} onClick={aoUsarAqui}>
@@ -79,7 +79,14 @@ export function QrNaoEntrou({ erro, aoVoltar }: { erro: string; aoVoltar: () => 
   );
 }
 
-/** Dentro do ícone, sem ninguém logado: ler o QR do engenheiro. */
+/**
+ * Dentro do ícone, sem ninguém logado: as duas entradas, cada uma dizendo de
+ * quem é (CTO-D1036 §2.7). O Pedro abriu o ícone, viu só a tela do
+ * encarregado e se perdeu: o "Entrar com e-mail e senha" era um link pequeno
+ * embaixo. Agora as duas têm o mesmo tamanho; a do encarregado vem em cima e
+ * continua a um toque. Pelo "um destaque por tela" (DESIGN.md §2), a de cima
+ * é a cheia e a de baixo, do mesmo tamanho, é de contorno.
+ */
 export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
   const [lendo, setLendo] = useState(false);
   const [erro, setErro] = useState('');
@@ -117,7 +124,7 @@ export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
       <header className={styles.topo}>
         <h1 className={styles.titulo}>Central de Compras</h1>
       </header>
-      <p>Encarregado: peça o QR ao engenheiro e toque no botão.</p>
+      <p>Quem é você? Escolha a sua entrada.</p>
       {erro && (
         <p className={styles.aviso} role="alert">
           {erro}
@@ -132,10 +139,11 @@ export function EntrarNoIcone({ aoUsarSenha }: { aoUsarSenha: () => void }) {
           setLendo(true);
         }}
       >
-        <Icon name="qr" size={26} /> {entrando ? 'Entrando…' : 'Ler o QR'}
+        <Icon name="qr" size={26} /> {entrando ? 'Entrando…' : 'Sou encarregado: ler o QR'}
       </button>
-      <button type="button" className={styles.sair} onClick={aoUsarSenha}>
-        Entrar com e-mail e senha
+      <p className={styles.dica}>O QR, o engenheiro mostra na tela dele.</p>
+      <button type="button" className={styles.secundario} onClick={aoUsarSenha} disabled={entrando}>
+        Sou do escritório: entrar com e-mail e senha
       </button>
     </div>
   );
@@ -247,7 +255,7 @@ export function PedirOIcone() {
       <section className={meus.pedido} data-pedir-o-icone="iphone">
         <h2 className={meus.pedidoTitulo}>Ponha a OC na tela do celular</h2>
         <PassosDoIphone />
-        <p className={styles.dica}>No iPhone, o ícone pede o QR de novo: peça um ao engenheiro e toque em “Ler o QR”.</p>
+        <p className={styles.dica}>No iPhone, o ícone pede o QR de novo: peça um ao engenheiro e toque em “Sou encarregado: ler o QR”.</p>
       </section>
     );
   }

@@ -101,7 +101,7 @@ export function QrDoMestre({ nome, link, venceEm, aoFechar, aoGerarOutro }: Prop
               </li>
               <li>
                 No iPhone: o celular abre a OC e mostra como pôr o ícone na tela. Depois, ele abre o ícone, toca em
-                “Ler o QR” e aponta para este mesmo QR.
+                “Sou encarregado: ler o QR” e aponta para este mesmo QR.
               </li>
             </ul>
           </>
