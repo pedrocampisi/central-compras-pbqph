@@ -146,6 +146,8 @@ describe('CTO-D1039 §2.2 — o tique em cada item, com as peças do mestre', ()
     fireEvent.click(tiques[0]!);
     // Conferindo: uma ticada ainda não responde.
     expect((within(pergunta(4)).getByRole('radio', { name: 'Sim' }) as HTMLInputElement).checked).toBe(false);
+    expect((within(pergunta(4)).getByRole('radio', { name: 'Só uma parte' }) as HTMLInputElement).checked).toBe(false);
+    expect(within(pergunta(4)).queryByLabelText('Quanto veio de Areia (teste)')).toBeNull();
     fireEvent.click(tiques[1]!);
     expect((within(pergunta(4)).getByRole('radio', { name: 'Sim' }) as HTMLInputElement).checked).toBe(true);
     fireEvent.click(tiques[1]!);
