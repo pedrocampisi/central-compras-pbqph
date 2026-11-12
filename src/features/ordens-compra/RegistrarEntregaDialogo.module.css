@@ -111,3 +111,9 @@
   .linhaDeCampos { grid-template-columns: 1fr; }
   .acoes > * { flex: 1 1 auto; }
 }
+
+/* CTO-D1039: a dica da pergunta e a conferência item por item ocupam a linha inteira da pergunta. */
+.dica { flex-basis: 100%; margin: -6px 0 0; font-size: 12px; font-weight: 400; color: var(--tinta-suave); }
+.inteira { flex-basis: 100%; min-width: 0; }
+.anteriores { margin: 6px 0; padding-left: 18px; }
+.anteriores li + li { margin-top: 2px; }

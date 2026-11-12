@@ -49,7 +49,7 @@ import { normalizarBusca, notaDaBusca, pelaNota } from '../../domain/pesquisa';
 import { entregarPdfDaOc, lerPdfsNaPasta } from '../../services/supabase/pastaDaObra';
 import type { AvaliacaoGravada } from '../../services/supabase/qualificacao';
 import { lerLinksDasFotos } from '../../services/supabase/recebimento';
-import { ultimaEntregaPorOc } from '../../domain/recebimento';
+import { entregasPorOc, temNotaRepetida, ultimaEntregaPorOc } from '../../domain/recebimento';
 import { coberturaPorEntrega, textoDaCobertura, type CoberturaDaEntrega } from '../../domain/entregasSemPapel';
 import { lerCoberturaDasEntregas } from '../../services/supabase/entregasSemPapel';
 import { avisoDoPdf, linkSeguro, type PdfNaPasta } from '../../domain/pastaDaObra';
@@ -109,6 +109,8 @@ export function HistoricoPage() {
    * Sem leitura, nada aparece — o Histórico não depende dela.
    */
   const [entregas, setEntregas] = useState<Map<string, AvaliacaoGravada>>(new Map());
+  /** Todas as entregas de cada OC: a caixa diz as que já há, e o Histórico, a nota repetida (CTO-D1039 §2.4). */
+  const [todasAsEntregas, setTodasAsEntregas] = useState<Map<string, AvaliacaoGravada[]>>(new Map());
   const [fotosDasEntregas, setFotosDasEntregas] = useState<Map<string, string>>(new Map());
   /**
    * O papel do fornecedor de cada entrega, por ECR (CTO-D840 §2.6): o que cobre,
@@ -141,9 +143,11 @@ export function HistoricoPage() {
     let vivo = true;
     void (async () => {
       try {
-        const ultimas = ultimaEntregaPorOc(await lerAvaliacoesDeEntrega());
+        const lidas = await lerAvaliacoesDeEntrega();
+        const ultimas = ultimaEntregaPorOc(lidas);
         if (!vivo) return;
         setEntregas(ultimas);
+        setTodasAsEntregas(entregasPorOc(lidas));
         const fotos = await lerLinksDasFotos([...ultimas.values()].map((a) => a.fotoDocumentoId));
         if (vivo) setFotosDasEntregas(fotos);
       } catch {
@@ -425,6 +429,11 @@ export function HistoricoPage() {
         </span>
         {!a.chegouTudo && (
           <span className={styles.atencao}>Só uma parte: espera o resto</span>
+        )}
+        {temNotaRepetida(todasAsEntregas.get(o.id) ?? []) && (
+          <span className={styles.atencao} data-nota-repetida="">
+            Duas entregas com a mesma nota: confira
+          </span>
         )}
         {foto && (
           <a href={foto} target="_blank" rel="noopener noreferrer" className={styles.link}>
@@ -721,6 +730,7 @@ export function HistoricoPage() {
           oc={entregando}
           fornecedor={fornecedorNome.get(entregando.fornecedor_id) ?? ''}
           obra={obraNome.get(entregando.obra_id) ?? ''}
+          anteriores={todasAsEntregas.get(entregando.id) ?? []}
           aoFechar={() => setEntregando(null)}
         />
       )}

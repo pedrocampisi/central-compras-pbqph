@@ -23,6 +23,7 @@ import type {
 } from '../../domain/types';
 import { CURRENT_SCHEMA_VERSION } from '../../domain/constants';
 import { revisoesDoBanco, secoesDoBanco } from '../../domain/ecr';
+import { posicaoDoItem } from '../../domain/normalize';
 import { fraseDaTravaDoBanco, type ErroDoBanco } from '../../domain/qualificacao';
 import { core, compras, supabase } from './client';
 import { traduzirErroDoBanco } from './erros';
@@ -303,6 +304,8 @@ export function paraOc(l: Record<string, unknown>): OrdemCompra {
       ipi_pct: Number(i['ipi_pct']) || 0,
       desc_pct: Number(i['desc_pct']) || 0,
       prazo_entrega: vazio(i['prazo_entrega']),
+      // A chave da quantidade recebida por item (D794), a mesma do celular (CTO-D1039).
+      ...(posicaoDoItem(i['posicao']) ? { posicao: posicaoDoItem(i['posicao']) } : {}),
     }));
 
   return {

@@ -167,6 +167,12 @@ export interface Item {
   ipi_pct: number;
   desc_pct: number;
   prazo_entrega: string;
+  /**
+   * A posição do item na OC, como o banco guarda (`oc_itens.posicao`): é a chave
+   * da quantidade recebida por item (D794), a mesma que o celular manda. Falta
+   * no item novo, ainda não gravado (CTO-D1039).
+   */
+  posicao?: number;
 }
 
 export interface OrdemCompra {

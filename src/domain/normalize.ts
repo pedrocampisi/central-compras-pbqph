@@ -64,6 +64,12 @@ function normalizeEndereco(e: unknown): {
 
 // ── Funções públicas de normalização ─────────────────────────────────────────
 
+/** A posição do item na OC, inteira e de 1 em diante; `undefined` quando não veio (CTO-D1039). */
+export function posicaoDoItem(v: unknown): number | undefined {
+  const n = Number(v);
+  return v != null && v !== '' && Number.isInteger(n) && n >= 1 ? n : undefined;
+}
+
 export function normalizeItem(it: unknown): Item {
   const o = (it as Record<string, unknown>) ?? {};
   const ecrId = o['ecr_id'];
@@ -79,6 +85,7 @@ export function normalizeItem(it: unknown): Item {
     ipi_pct: toNum(o['ipi_pct']),
     desc_pct: toNum(o['desc_pct']),
     prazo_entrega: String(o['prazo_entrega'] ?? ''),
+    ...(posicaoDoItem(o['posicao']) ? { posicao: posicaoDoItem(o['posicao']) } : {}),
   };
   return ItemSchema.parse(raw);
 }

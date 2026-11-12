@@ -281,9 +281,12 @@ export async function registrarEntrega(
   versao: number,
   a: Avaliacao,
   chegouTudo = true,
+  /** Quanto veio de cada item, pela posição na OC (D794; CTO-D1039 §2.2). Sem itens, a chave nem vai. */
+  itens: readonly { posicao: number; quantidade: number }[] = [],
 ): Promise<EntregaGravada> {
   const p = {
     ...(chegouTudo ? {} : { chegou_tudo: false }),
+    ...(itens.length ? { itens: itens.map((i) => ({ posicao: i.posicao, quantidade: i.quantidade })) } : {}),
     nota_fiscal: a.notaFiscal.trim(),
     recebido_em: a.recebidoEm,
     prazo_conforme: a.prazoConforme,
@@ -334,6 +337,12 @@ export interface AvaliacaoGravada {
   chegouTudo: boolean;
   /** A foto da nota que o mestre tirou na obra; '' sem foto. */
   fotoDocumentoId: string;
+  /**
+   * Veio do celular da obra (CTO-D1039 §2.4): só o celular manda a `chave` do
+   * envio (D697 §2.2), e o recebimento sem pedido ligado depois também veio de
+   * lá (`sem_pedido_id`). Falso é o escritório.
+   */
+  pelaObra?: boolean;
 }
 
 /** Todas as avaliações, pelo dia do recebimento; com a máscara, só as da obra dela. */
@@ -360,5 +369,6 @@ export async function lerAvaliacoesDeEntrega(obra: string | null = obraDaMascara
     cienciaNota: txt(l['ciencia_nota']),
     chegouTudo: l['chegou_tudo'] !== false,
     fotoDocumentoId: txt(l['foto_documento_id']),
+    pelaObra: l['chave'] != null || l['sem_pedido_id'] != null,
   }));
 }

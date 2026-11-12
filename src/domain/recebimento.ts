@@ -409,3 +409,100 @@ export function ultimaEntregaPorOc<T extends { id: number; ocId: string; recebid
   }
   return m;
 }
+
+// ---------------------------------------------------------------------------
+// A entrega pelo escritório, nas palavras do mestre (CTO-D1039)
+// ---------------------------------------------------------------------------
+
+/**
+ * A OC do Histórico no formato do cartão do mestre, para o escritório usar as
+ * mesmas peças do "Veio a quantidade toda?" (o tique e o quanto veio de cada
+ * item). O item sem posição (`posicao`) deixa o cartão sem a lista por item,
+ * como o cartão antigo do celular: a entrega grava sem os itens.
+ */
+export function cartaoDoEscritorio(
+  oc: { id: string; numero: string; obra_id: string; entrega_prevista?: string; itens: readonly { posicao?: number; descricao: string; quantidade: number; unidade: string }[] },
+  obra: string,
+  fornecedor: string,
+): CartaoAChegar {
+  return {
+    ocId: oc.id,
+    intervencaoId: oc.obra_id,
+    obra,
+    numero: oc.numero,
+    fornecedor,
+    combinadoPara: oc.entrega_prevista ?? '',
+    itens: oc.itens.map((i) => ({
+      ...(i.posicao ? { posicao: i.posicao } : {}),
+      descricao: i.descricao,
+      quantidade: i.quantidade,
+      unidade: i.unidade,
+    })),
+    total: 0,
+  };
+}
+
+/**
+ * O que falta para o "Registrar entrega" do escritório; '' quando pode. A
+ * ordem é a da caixa: a nota e o dia (que o escritório digita, e o mestre não),
+ * depois as perguntas do mestre, a contagem do "Só uma parte" e o "O que
+ * aconteceu?" das duas ou mais "Não".
+ */
+export function problemaDaEntregaDoEscritorio(
+  r: RespostasDoMestre,
+  notaFiscal: string,
+  recebidoEm: string,
+  hoje: string,
+  oQueAconteceu: string,
+  problemaDosItens = '',
+): string {
+  if (!notaFiscal.trim()) return 'Informe o número da nota fiscal.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(recebidoEm)) return 'Informe o dia do recebimento.';
+  if (recebidoEm > hoje) return 'O dia do recebimento não pode ser depois de hoje.';
+  const semResposta = PERGUNTAS_DO_MESTRE.find((p) => r[p.chave] === null);
+  if (semResposta) return `Falta responder: ${semResposta.texto}`;
+  if (r.tudo === false && problemaDosItens) return problemaDosItens;
+  if (oQueAconteceuObrigatorio(r) && !oQueAconteceu.trim()) return 'Conte o que aconteceu: tem mais de um "Não".';
+  return '';
+}
+
+/**
+ * O que o escritório respondeu → a avaliação do PS.02: a mesma tradução do
+ * mestre (`avaliacaoDoMestre`), com a nota como foi digitada, porque a caixa
+ * do escritório sempre a gravou assim.
+ */
+export function avaliacaoDoEscritorio(
+  r: RespostasDoMestre,
+  notaFiscal: string,
+  oQueAconteceu: string,
+  recebidoEm: string,
+): Avaliacao {
+  return { ...avaliacaoDoMestre(r, notaFiscal, oQueAconteceu, recebidoEm), notaFiscal: notaFiscal.trim() };
+}
+
+/** A nota para comparar: só os dígitos e sem os zeros da frente, porque "NF 001234" e "1234" são a mesma. */
+export function notaParaComparar(notaFiscal: string): string {
+  return numeroDaNotaEmDigitos(notaFiscal).replace(/^0+(?=\d)/, '');
+}
+
+/** Duas ou mais entregas da OC com a mesma nota: pode ser a mesma entrega registrada duas vezes. */
+export function temNotaRepetida(entregas: readonly { notaFiscal: string }[]): boolean {
+  const vistas = new Set<string>();
+  for (const e of entregas) {
+    const n = notaParaComparar(e.notaFiscal);
+    if (!n) continue;
+    if (vistas.has(n)) return true;
+    vistas.add(n);
+  }
+  return false;
+}
+
+/** As entregas de cada OC, na ordem em que vieram (o dia, depois a ordem de entrada). */
+export function entregasPorOc<T extends { id: number; ocId: string; recebidoEm: string }>(
+  avaliacoes: readonly T[],
+): Map<string, T[]> {
+  const m = new Map<string, T[]>();
+  for (const a of avaliacoes) m.set(a.ocId, [...(m.get(a.ocId) ?? []), a]);
+  for (const lista of m.values()) lista.sort((a, b) => a.recebidoEm.localeCompare(b.recebidoEm) || a.id - b.id);
+  return m;
+}

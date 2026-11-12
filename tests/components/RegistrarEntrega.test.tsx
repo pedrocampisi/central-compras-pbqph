@@ -101,12 +101,20 @@ function abrir(numero = '2026/001', botao = 'Marcar entregue') {
   return caixa()!;
 }
 
-function responder(respostas: boolean[]) {
+/**
+ * As três perguntas do PS.02, nas palavras do mestre (CTO-D1039): `true` é
+ * "Sim", `false` é "Não". A quarta, "Veio a quantidade toda?", vai junto:
+ * "Sim" por padrão, "Só uma parte" com `false`, e sem resposta com `null`.
+ */
+function responder(respostas: boolean[], tudo: boolean | null = true) {
   const c = caixa()!;
   respostas.forEach((r, i) => {
     const p = c.querySelector<HTMLElement>(`[data-pergunta="${i + 1}"]`)!;
-    fireEvent.click(within(p).getByRole('radio', { name: r ? 'Conforme' : 'Não Conforme' }));
+    fireEvent.click(within(p).getByRole('radio', { name: r ? 'Sim' : 'Não' }));
   });
+  if (tudo === null) return;
+  const q = c.querySelector<HTMLElement>('[data-pergunta="4"]')!;
+  fireEvent.click(within(q).getByRole('radio', { name: tudo ? 'Sim' : 'Só uma parte' }));
 }
 const campo = (rotulo: RegExp) => within(caixa()!).getByLabelText(rotulo);
 async function registrar() {
@@ -143,9 +151,12 @@ describe('D604 §3.2 — o "Marcar entregue" abre a avaliação', () => {
     await registrar();
     expect(within(caixa()!).getByRole('alert').textContent).toBe('Informe o número da nota fiscal.');
     fireEvent.change(campo(/Nota fiscal/), { target: { value: '1234' } });
-    responder([true, true]);
+    responder([true, true], null);
     await registrar();
-    expect(within(caixa()!).getByRole('alert').textContent).toContain('Responda as três perguntas');
+    expect(within(caixa()!).getByRole('alert').textContent).toBe('Falta responder: Veio o material certo?');
+    responder([true, true, true], null);
+    await registrar();
+    expect(within(caixa()!).getByRole('alert').textContent).toBe('Falta responder: Veio a quantidade toda?');
     expect(banco.registrar).not.toHaveBeenCalled();
   });
 
@@ -156,7 +167,7 @@ describe('D604 §3.2 — o "Marcar entregue" abre a avaliação', () => {
     abrir();
     fireEvent.change(campo(/Nota fiscal/), { target: { value: '1234' } });
     responder([true, true, true]);
-    fireEvent.change(campo(/Observação/), { target: { value: 'chegou de manhã' } });
+    fireEvent.change(campo(/O que aconteceu/), { target: { value: 'chegou de manhã' } });
     expect(caixa()!.querySelector('[data-aviso-tratativa]')).toBeNull();
     await registrar();
     expect(banco.registrar).toHaveBeenCalledTimes(1);
@@ -168,6 +179,7 @@ describe('D604 §3.2 — o "Marcar entregue" abre a avaliação', () => {
         ocEcrConforme: true, observacao: 'chegou de manhã', tratativa: '',
       },
       true,
+      [],
     ]);
     expect(banco.status).not.toHaveBeenCalled();
     expect(banco.recarregar).toHaveBeenCalledTimes(1);
@@ -175,37 +187,36 @@ describe('D604 §3.2 — o "Marcar entregue" abre a avaliação', () => {
     expect(avisos()).toContain('OC 2026/001: entrega registrada.');
   });
 
-  it('"Chegou só uma parte": vai como entrega parcial, e a OC continua na lista do mestre (D696 §3.2)', async () => {
+  it('"Só uma parte": vai como entrega parcial, e a OC continua na lista do mestre (D696 §3.2)', async () => {
     banco.registrar = vi.fn(async () => ({
       avaliacaoId: 2, status: 'entregue', versao: 5, entregueEm: hojeEmSaoPaulo(), naoConformes: 0, tratativaAberta: false,
     }));
     await abrir();
     fireEvent.change(campo(/Nota fiscal/), { target: { value: '1234' } });
-    responder([true, true, true]);
-    fireEvent.click(screen.getByRole('checkbox', { name: /Chegou só uma parte/ }));
+    responder([true, true, true], false);
     await registrar();
     expect(banco.registrar.mock.calls[0]![3]).toBe(false);
   });
 
-  it('duas "Não Conforme": a tratativa aparece e é obrigatória; com ela, grava e avisa que ficou aberta', async () => {
+  it('dois "Não": o "O que aconteceu?" vira tratativa obrigatória; com ela, grava e avisa que ficou aberta', async () => {
     banco.registrar = vi.fn(async () => ({
       avaliacaoId: 10, status: 'entregue', versao: 5, entregueEm: '2026-09-28', naoConformes: 2, tratativaAberta: true,
     }));
     abrir();
     fireEvent.change(campo(/Nota fiscal/), { target: { value: '55' } });
     responder([false, true, false]);
-    expect(caixa()!.querySelector('[data-aviso-tratativa]')!.textContent).toContain('2 respostas "Não Conforme"');
+    expect(caixa()!.querySelector('[data-aviso-tratativa]')!.textContent).toContain('2 respostas "Não"');
     await registrar();
     expect(banco.registrar).not.toHaveBeenCalled();
-    expect(within(caixa()!).getByRole('alert').textContent).toContain('escreva a tratativa');
-    fireEvent.change(campo(/Tratativa/), { target: { value: 'devolvido ao fornecedor' } });
+    expect(within(caixa()!).getByRole('alert').textContent).toBe('Conte o que aconteceu: tem mais de um "Não".');
+    fireEvent.change(campo(/O que aconteceu/), { target: { value: 'devolvido ao fornecedor' } });
     await registrar();
     expect(banco.registrar).toHaveBeenCalledTimes(1);
     expect(banco.registrar.mock.calls[0]![2]).toMatchObject({ tratativa: 'devolvido ao fornecedor' });
     expect(avisos()).toContain('OC 2026/001: entrega registrada. A tratativa ficou aberta para quem revisa as ECRs.');
   });
 
-  it('uma "Não Conforme" só: sem tratativa obrigatória', async () => {
+  it('um "Não" só: sem tratativa obrigatória', async () => {
     abrir();
     responder([true, false, true]);
     expect(caixa()!.querySelector('[data-aviso-tratativa]')).toBeNull();
@@ -357,7 +368,7 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
     abrir();
     fireEvent.change(campo(/Nota fiscal/), { target: { value: '66' } });
     responder([false, true, false]);
-    fireEvent.change(campo(/Tratativa/), { target: { value: 'devolvido ao fornecedor' } });
+    fireEvent.change(campo(/O que aconteceu/), { target: { value: 'devolvido ao fornecedor' } });
     responder([true, true, false]); // corrigiu: ficou uma "Não Conforme" só
     expect(caixa()!.querySelector('[data-aviso-tratativa]')).toBeNull(); // o campo sumiu da tela
     await registrar();
@@ -382,10 +393,10 @@ describe('Perícia 28/09 (fornecedores), achado 6 — a tratativa que sobra depo
   it('o texto não se perde na caixa: voltando a duas "Não Conforme", a tratativa está lá', () => {
     abrir();
     responder([false, true, false]);
-    fireEvent.change(campo(/Tratativa/), { target: { value: 'devolvido ao fornecedor' } });
+    fireEvent.change(campo(/O que aconteceu/), { target: { value: 'devolvido ao fornecedor' } });
     responder([true, true, false]);
     responder([false, true, false]);
-    expect((campo(/Tratativa/) as HTMLTextAreaElement).value).toBe('devolvido ao fornecedor');
+    expect((campo(/O que aconteceu/) as HTMLTextAreaElement).value).toBe('devolvido ao fornecedor');
   });
 
   it('um registro antigo com texto e uma "Não Conforme" só: o PDF não diz "Aberta"', () => {

@@ -118,7 +118,8 @@ beforeEach(() => {
     avaliacoes_entrega: [
       { id: 1, oc_id: 'oc-1', intervencao_id: 'obra-a', nota_fiscal: '10', recebido_em: '2026-09-01' },
       { id: 2, oc_id: 'oc-2', intervencao_id: 'obra-b', nota_fiscal: '11', recebido_em: '2026-09-02',
-        chegou_tudo: false, foto_documento_id: 'doc-1' },
+        chegou_tudo: false, foto_documento_id: 'doc-1', chave: '00000000-0000-4000-8000-000000000001' },
+      { id: 3, oc_id: 'oc-3', intervencao_id: 'obra-a', nota_fiscal: '12', recebido_em: '2026-09-03', sem_pedido_id: 7 },
     ],
   });
   banco.estado.mascara = null;
@@ -170,7 +171,7 @@ describe('D604 — a carga das qualificações', () => {
   });
 
   it('as avaliações de entrega para o PDF: todas; com a máscara, só as da obra', async () => {
-    expect((await lerAvaliacoesDeEntrega()).map((a) => a.id)).toEqual([1, 2]);
+    expect((await lerAvaliacoesDeEntrega()).map((a) => a.id)).toEqual([1, 2, 3]);
     banco.estado.mascara = 'obra-b';
     expect((await lerAvaliacoesDeEntrega()).map((a) => a.id)).toEqual([2]);
   });
@@ -179,6 +180,13 @@ describe('D604 — a carga das qualificações', () => {
     const [a, b] = await lerAvaliacoesDeEntrega();
     expect(a).toMatchObject({ chegouTudo: true, fotoDocumentoId: '' });
     expect(b).toMatchObject({ chegouTudo: false, fotoDocumentoId: 'doc-1' });
+  });
+
+  it('CTO-D1039 §2.4: a entrega diz se veio do celular da obra (a chave do envio, ou o sem pedido ligado depois)', async () => {
+    const [a, b, c] = await lerAvaliacoesDeEntrega();
+    expect(a!.pelaObra).toBe(false);
+    expect(b!.pelaObra).toBe(true);
+    expect(c!.pelaObra).toBe(true);
   });
 });
 
@@ -281,6 +289,20 @@ describe('D604 — as três escritas, com as chaves do contrato', () => {
     await registrarEntrega('oc-1', 4, a, true);
     expect((banco.estado.rpc[0]!.args['p'] as Record<string, unknown>)['chegou_tudo']).toBe(false);
     expect('chegou_tudo' in (banco.estado.rpc[1]!.args['p'] as Record<string, unknown>)).toBe(false);
+  });
+
+  it('CTO-D1039 §2.2: o quanto veio de cada item vai no `itens`, como o mestre manda; sem itens, a chave nem vai', async () => {
+    const a = {
+      notaFiscal: '9', recebidoEm: '2026-09-28', prazoConforme: true, integridadeConforme: true, ocEcrConforme: true,
+      observacao: '', tratativa: '',
+    };
+    await registrarEntrega('oc-1', 4, a, false, [{ posicao: 1, quantidade: 20 }, { posicao: 2, quantidade: 1.5 }]);
+    await registrarEntrega('oc-1', 4, a, true);
+    expect((banco.estado.rpc[0]!.args['p'] as Record<string, unknown>)['itens']).toEqual([
+      { posicao: 1, quantidade: 20 },
+      { posicao: 2, quantidade: 1.5 },
+    ]);
+    expect('itens' in (banco.estado.rpc[1]!.args['p'] as Record<string, unknown>)).toBe(false);
   });
 
   it('a versão velha (40001) diz o que fazer', async () => {

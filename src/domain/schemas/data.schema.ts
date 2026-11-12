@@ -140,6 +140,7 @@ export const ItemSchema = z.object({
   ipi_pct: z.number().default(0),
   desc_pct: z.number().default(0),
   prazo_entrega: z.string().default(''),
+  posicao: z.number().int().positive().optional(),
 });
 
 export const OrdemCompraSchema = z.object({

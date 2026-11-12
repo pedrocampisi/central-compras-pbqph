@@ -887,7 +887,7 @@ function PapelDoFornecedor({
  * ticados é o "Sim"; o item sem tique abre o campo de quanto veio (D794). A
  * lista nasce fechada: quem prefere responde "Sim" de uma vez, como sempre.
  */
-function ConferirItemPorItem({
+export function ConferirItemPorItem({
   cartao, aberto, aoAbrir, tiques, respondeu, contagem, aoTicar, aoEscrever,
 }: {
   cartao: CartaoAChegar;
@@ -958,7 +958,7 @@ function ConferirItemPorItem({
  * "Só uma parte": quanto veio de cada item (CTO-D794). O que foi pedido já vem
  * escrito; ele muda só o que veio a menos, e 0 quando não veio.
  */
-function ContagemPorItem({
+export function ContagemPorItem({
   cartao, contagem, aoMudar,
 }: {
   cartao: CartaoAChegar;
