@@ -1,0 +1,214 @@
+{
+  "dia_375": {
+    "oc2": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "oc2": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "dia_1366": {
+    "oc2": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_1366": {
+    "oc2": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Prazo de entrega",
+        "Integridade do material (sem avarias)",
+        "Confere com a OC e com a ECR"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  }
+}

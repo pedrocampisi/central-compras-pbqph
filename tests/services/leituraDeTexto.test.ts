@@ -53,7 +53,8 @@ describe('D557 — a resposta do servidor vira o resultado da tela', () => {
   });
 
   it('o item NÃO leva o "confira": tem só as chaves do contrato', () => {
-    const chaves = Object.keys(ItemSchema.shape).sort();
+    // A posição é do banco (`oc_itens.posicao`, CTO-D1039): o item que a leitura monta ainda não tem.
+    const chaves = Object.keys(ItemSchema.shape).filter((k) => k !== 'posicao').sort();
     for (const it of r.itens) {
       expect(Object.keys(it).sort()).toEqual(chaves);
       expect(JSON.stringify(it)).not.toContain('bitola');

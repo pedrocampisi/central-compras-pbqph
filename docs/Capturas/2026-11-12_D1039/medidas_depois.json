@@ -1,0 +1,274 @@
+{
+  "dia_375": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Fechar a conferência item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": "Esta OC já tem uma entrega registrada:\n04/11/2026 · nota 4521 · pelo encarregado (Encarregado de Prova) · só uma parte\nSó registre de novo se chegou outra parte.",
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_375": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Fechar a conferência item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": "Esta OC já tem uma entrega registrada:\n04/11/2026 · nota 4521 · pelo encarregado (Encarregado de Prova) · só uma parte\nSó registre de novo se chegou outra parte.",
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 327,
+      "rolaDeLado": 0
+    }
+  },
+  "dia_1366": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Fechar a conferência item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": "Esta OC já tem uma entrega registrada:\n04/11/2026 · nota 4521 · pelo encarregado (Encarregado de Prova) · só uma parte\nSó registre de novo se chegou outra parte.",
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  },
+  "noite_1366": {
+    "oc2": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "oc8": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": null,
+      "tiques": [
+        "sim · Tijolo cerâmico 8 furo \nPedido: 2000 un",
+        "sim · Cimento CP-II 50 kg\nPedido: 40 un",
+        "nao · Areia média\nPedido: 6 un\nQuanto veio?\nun",
+        "sim · Brita 1\nPedido: 4 un",
+        "sim · Vergalhão CA-50 10 mm\nPedido: 30 un",
+        "sim · Arame recozido 18\nPedido: 5 un",
+        "sim · Cal hidratada 20 kg\nPedido: 25 un",
+        "sim · Prego 18x27\nPedido: 10 un"
+      ],
+      "botoes": [
+        "?",
+        "Fechar a conferência item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    },
+    "aviso": {
+      "perguntas": [
+        "Chegou no dia combinado?",
+        "Chegou sem estrago?",
+        "Veio o material certo??",
+        "Veio a quantidade toda?"
+      ],
+      "aviso": "Esta OC já tem uma entrega registrada:\n04/11/2026 · nota 4521 · pelo encarregado (Encarregado de Prova) · só uma parte\nSó registre de novo se chegou outra parte.",
+      "tiques": [],
+      "botoes": [
+        "?",
+        "Ou confira item por item",
+        "Voltar",
+        "Registrar entrega"
+      ],
+      "caixaRolaDeLado": 0,
+      "larguraDaCaixa": 520,
+      "rolaDeLado": 0
+    }
+  }
+}
