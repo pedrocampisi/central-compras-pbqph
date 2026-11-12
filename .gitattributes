@@ -1,0 +1,4 @@
+# Arquivos binários: o Git não troca o fim de linha deles (CTO-D1036b).
+*.pdf binary
+*.png binary
+*.jpg binary
