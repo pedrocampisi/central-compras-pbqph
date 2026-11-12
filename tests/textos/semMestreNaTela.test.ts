@@ -27,6 +27,8 @@ const NOMES_DE_DENTRO = new Set([
   'desligar_mestre',
   'religar_mestre',
   'obras_do_mestre_com_nome',
+  // O tipo do QR de 24 horas, no link do Banco (D1036b): vai no endereço, não na tela.
+  'qr_do_mestre',
 ]);
 
 const RAIZ = process.cwd();
