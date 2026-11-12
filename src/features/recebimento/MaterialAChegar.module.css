@@ -397,7 +397,7 @@
   resize: vertical;
 }
 
-/* "Só uma parte": quanto veio de cada item (D794). O nome de um lado, o campo do outro. */
+/* A lista das peças do tique (D1036e) e o quanto veio de cada uma (D794). */
 .contagem {
   list-style: none;
   margin: 0;
@@ -405,16 +405,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.itemContado {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
-  background: var(--painel);
 }
 
 .itemContadoNome {
@@ -704,12 +694,16 @@
   gap: 10px;
 }
 
-/* "Ou confira item por item" (D1036 §2.2): o tique de 28 px, o nome e o pedido ao lado. */
+/* O tique na peça (D1036 §2.2, D1036e): já aberto, o tique de 28 px, o nome e o pedido ao lado. */
 .porItem {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+}
+
+.porItem > .dica {
+  margin: 0;
 }
 
 .itemTicado {

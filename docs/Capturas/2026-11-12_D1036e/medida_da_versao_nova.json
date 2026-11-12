@@ -1,0 +1,156 @@
+{
+  "pacoteVelho": "/assets/index-5CbBbEB0.js",
+  "pacoteNovo": "/assets/index-Ap1utphs.js",
+  "casos": {
+    "instalado": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": false,
+          "workerStart": 0
+        }
+      ],
+      "controlado": true,
+      "roda": "velha"
+    },
+    "telaAbertaVoltaAoApp": {
+      "cargas": [
+        {
+          "roda": "nova",
+          "peloWorker": true,
+          "workerStart": 1024
+        }
+      ],
+      "roda": "nova",
+      "trocouEmMs": 1404,
+      "recarregou": 1
+    },
+    "reinstaladoNaVelha": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": false,
+          "workerStart": 0
+        },
+        {
+          "roda": "velha",
+          "peloWorker": true,
+          "workerStart": 1
+        }
+      ],
+      "roda": "velha"
+    },
+    "abreDepoisDePublicar": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": true,
+          "workerStart": 1
+        },
+        {
+          "roda": "nova",
+          "peloWorker": true,
+          "workerStart": 1013
+        }
+      ],
+      "primeiro": "nova",
+      "fica": "nova",
+      "recargas": 1,
+      "linha": [
+        [
+          0,
+          "null"
+        ],
+        [
+          1470,
+          "nova"
+        ]
+      ]
+    },
+    "reinstaladoNaVelha2": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": true,
+          "workerStart": 1
+        }
+      ]
+    },
+    "abaFechadaNavegadorVivo": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": true,
+          "workerStart": 1
+        },
+        {
+          "roda": "nova",
+          "peloWorker": true,
+          "workerStart": 1012
+        }
+      ],
+      "fica": "nova"
+    },
+    "reabertoDepois": {
+      "cargas": [
+        {
+          "roda": "velha",
+          "peloWorker": false,
+          "workerStart": 0
+        },
+        {
+          "roda": "velha",
+          "peloWorker": true,
+          "workerStart": 1
+        },
+        {
+          "roda": "nova",
+          "peloWorker": true,
+          "workerStart": 1
+        }
+      ],
+      "roda": "nova",
+      "recargas": 0
+    }
+  },
+  "servidor": [
+    "1794513870515 /",
+    "1794513870875 /versao.txt",
+    "1794513870897 /sw.js",
+    "1794513870948 /index.html",
+    "--- publicada a nova (tela aberta)",
+    "1794513907548 /versao.txt",
+    "1794513907552 /sw.js",
+    "1794513907580 /index.html",
+    "1794513908713 /versao.txt",
+    "--- volta a velha, para repetir do zero",
+    "1794513909057 /versao.txt",
+    "1794513909075 /sw.js",
+    "1794513909100 /index.html",
+    "1794513910196 /versao.txt",
+    "1794513912038 /sw.js",
+    "1794513916905 /versao.txt",
+    "1794513918840 /sw.js",
+    "--- publicada a nova (app fechado)",
+    "1794513922948 /versao.txt",
+    "1794513922988 /sw.js",
+    "1794513923016 /index.html",
+    "1794513924130 /versao.txt",
+    "1794513925906 /sw.js",
+    "1794513932280 /versao.txt",
+    "1794513932320 /sw.js",
+    "1794513932343 /index.html",
+    "1794513933441 /versao.txt",
+    "1794513935240 /sw.js",
+    "1794513938360 /versao.txt",
+    "1794513940337 /sw.js",
+    "--- publicada a nova (aba fechada, navegador vivo)",
+    "1794513944432 /versao.txt",
+    "1794513944452 /sw.js",
+    "1794513944476 /index.html",
+    "1794513945565 /versao.txt",
+    "1794513947408 /sw.js",
+    "1794513952257 /versao.txt",
+    "1794513954198 /sw.js"
+  ]
+}

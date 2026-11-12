@@ -676,7 +676,7 @@ describe('a busca pela empresa (D793 §2.3, D795 §2)', () => {
   });
 });
 
-describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
+describe('O tique na peça e o quanto veio de cada uma (CTO-D794, D1036, D1036e)', () => {
   const PEDIDO: CartaoAChegar = {
     ...CARTAO,
     itens: [
@@ -689,85 +689,34 @@ describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sem foto? Escreva o número' }));
     fireEvent.change(screen.getByRole('textbox', { name: /Número da nota/ }), { target: { value: n } });
   };
-  const campo = (nome: string) => screen.getByRole('textbox', { name: new RegExp(nome) }) as HTMLInputElement;
 
-  it('com "Só uma parte", a lista aparece com o pedido já escrito; ele muda o que veio a menos, e vai cada item', async () => {
-    const p = montar({ cartoes: [PEDIDO] });
-    await abrirEResponder(parte);
-    expect(screen.getByRole('group', { name: 'Quanto veio de cada um?' })).toBeTruthy();
-    expect(campo('Cimento').value).toBe('40');
-    expect(campo('Areia').value).toBe('3');
-    fireEvent.change(campo('Cimento'), { target: { value: '30' } });
-    fireEvent.change(campo('Areia'), { target: { value: '0' } });
-    notaSemFoto('4567');
-    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
-    await screen.findByText('Recebido.');
-    expect(p.aoReceber).toHaveBeenCalledWith(
-      expect.objectContaining({ soUmaParte: true, itens: [{ posicao: 1, quantidade: 30 }, { posicao: 2, quantidade: 0 }] }),
-    );
-  });
-
-  it('com "Sim", a lista não aparece, e vai a quantidade pedida de cada item', async () => {
-    const p = montar({ cartoes: [PEDIDO] });
-    await abrirEResponder(tudoSim);
-    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
-    notaSemFoto('4567');
-    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
-    await screen.findByText('Recebido.');
-    expect(p.aoReceber).toHaveBeenCalledWith(
-      expect.objectContaining({ soUmaParte: false, itens: [{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 3 }] }),
-    );
-  });
-
-  it('"Só uma parte" sem nada a menos, ou um campo vazio: o "Pronto" diz o que falta e não manda', async () => {
-    const p = montar({ cartoes: [PEDIDO] });
-    await abrirEResponder(parte);
-    notaSemFoto('4567');
-    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
-    expect(screen.getByRole('alert').textContent).toBe('Você disse "Só uma parte": mude a quantidade do que veio a menos.');
-    fireEvent.change(campo('Areia'), { target: { value: '' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
-    expect(screen.getByRole('alert').textContent).toBe('Escreva quanto veio de Areia de teste. Se não veio, escreva 0.');
-    expect(p.aoReceber).not.toHaveBeenCalled();
-  });
-
-  it('o que ele contou fica no celular: fechar e abrir o app não apaga', async () => {
-    const p = montar({ cartoes: [PEDIDO] });
-    await abrirEResponder(parte);
-    fireEvent.change(campo('Cimento'), { target: { value: '12' } });
-    await waitFor(async () =>
-      expect(await p.guarda!.ler<{ contagem?: Record<number, string> }>('rascunho:receber:oc-1')).toMatchObject({ contagem: { 1: '12' } }),
-    );
-    reabrir(p);
-    await abrir();
-    expect(campo('Cimento').value).toBe('12');
-    expect(campo('Areia').value).toBe('3');
-  });
-
-  // D1036 §2.2: conferir item por item é outro jeito de responder à mesma pergunta.
+  // D1036 §2.2, corrigido pela D1036e: o tique na peça é o jeito de responder, já aberto.
   const tres: [string, string][] = tudoSim.slice(0, 3);
   const tique = (nome: string) => screen.getByRole('checkbox', { name: new RegExp(nome) }) as HTMLInputElement;
-  const abrirPorItem = () => fireEvent.click(screen.getByRole('button', { name: 'Ou confira item por item' }));
+  const botaoDaQuantidade = (nome: string) =>
+    within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByRole('button', { name: nome });
+  const quantoVeio = (nome: string) => screen.queryByRole('textbox', { name: `Quanto veio de ${nome}` }) as HTMLInputElement | null;
 
-  it('D1036: a conferência item por item nasce fechada, e mostra a quantidade pedida ao lado de cada item', async () => {
+  it('D1036e: as peças já vêm abertas na pergunta, cada uma com o tique e o pedido ao lado; sem o link de antes', async () => {
     montar({ cartoes: [PEDIDO] });
     await abrirEResponder(tres);
-    expect(screen.queryByRole('checkbox')).toBeNull();
-    abrirPorItem();
-    expect(screen.getByRole('button', { name: 'Fechar a conferência item por item' }).getAttribute('aria-expanded')).toBe('true');
+    expect(screen.queryByRole('button', { name: /item por item/ })).toBeNull();
+    const grupo = screen.getByRole('group', { name: 'Veio a quantidade toda?' });
+    expect(within(grupo).getAllByRole('checkbox')).toHaveLength(2);
     expect(tique('Cimento').closest('li')!.textContent).toContain('Pedido: 40 sc');
     expect(tique('Areia').closest('li')!.textContent).toContain('Pedido: 3 m³');
     expect(tique('Cimento').checked).toBe(false);
+    expect(within(grupo).getByText('Tique cada peça que veio inteira.')).toBeTruthy();
+    // A lista de antes, separada, não existe mais.
+    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
   });
 
-  it('D1036: todos ticados é o "Sim" de hoje, e vai o mesmo envio', async () => {
+  it('D1036e: todas ticadas é o "Sim", e vai a quantidade pedida de cada peça', async () => {
     const p = montar({ cartoes: [PEDIDO] });
     await abrirEResponder(tres);
-    abrirPorItem();
     fireEvent.click(tique('Cimento'));
     fireEvent.click(tique('Areia'));
-    const sim = within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByRole('button', { name: 'Sim' });
-    expect(sim.getAttribute('aria-pressed')).toBe('true');
+    expect(botaoDaQuantidade('Sim').getAttribute('aria-pressed')).toBe('true');
     notaSemFoto('4567');
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     await screen.findByText('Recebido.');
@@ -776,22 +725,33 @@ describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
     );
   });
 
-  it('D1036: o item sem tique abre o campo de quanto veio, vazio; e vai o mesmo envio do "Só uma parte"', async () => {
+  it('D1036e: conferindo, uma peça ticada ainda não responde: sem campo aberto, e o "Pronto" pede a resposta', async () => {
     const p = montar({ cartoes: [PEDIDO] });
     await abrirEResponder(tres);
-    abrirPorItem();
     fireEvent.click(tique('Cimento'));
-    const parte = within(screen.getByRole('group', { name: 'Veio a quantidade toda?' })).getByRole('button', { name: 'Só uma parte' });
-    expect(parte.getAttribute('aria-pressed')).toBe('true');
-    expect(screen.queryByRole('textbox', { name: 'Quanto veio de Cimento de teste' })).toBeNull();
-    const areia = screen.getByRole('textbox', { name: 'Quanto veio de Areia de teste' }) as HTMLInputElement;
-    expect(areia.value).toBe('');
-    // A lista de hoje não aparece em dobro.
-    expect(screen.queryByRole('group', { name: 'Quanto veio de cada um?' })).toBeNull();
+    expect(tique('Cimento').checked).toBe(true);
+    expect(botaoDaQuantidade('Sim').getAttribute('aria-pressed')).toBe('false');
+    expect(botaoDaQuantidade('Só uma parte').getAttribute('aria-pressed')).toBe('false');
+    expect(quantoVeio('Areia de teste')).toBeNull();
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    expect(screen.getByRole('alert').textContent).toBe('Falta responder: Veio a quantidade toda?');
+    expect(p.aoReceber).not.toHaveBeenCalled();
+  });
+
+  it('D1036e: "Só uma parte" depois de conferir: a ticada fica, a sem tique pede quanto veio, vazio', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    fireEvent.click(tique('Cimento'));
+    responder('Veio a quantidade toda?', 'Só uma parte');
+    expect(tique('Cimento').checked).toBe(true);
+    expect(tique('Areia').checked).toBe(false);
+    expect(quantoVeio('Cimento de teste')).toBeNull();
+    expect(quantoVeio('Areia de teste')!.value).toBe('');
     notaSemFoto('4567');
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     expect(screen.getByRole('alert').textContent).toBe('Escreva quanto veio de Areia de teste. Se não veio, escreva 0.');
-    fireEvent.change(areia, { target: { value: '2' } });
+    fireEvent.change(quantoVeio('Areia de teste')!, { target: { value: '2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
     await screen.findByText('Recebido.');
     expect(p.aoReceber).toHaveBeenCalledWith(
@@ -799,15 +759,69 @@ describe('"Só uma parte": quanto veio de cada um (CTO-D794)', () => {
     );
   });
 
-  it('D1036: quem prefere responde "Sim" de uma vez, como hoje, e a conferência fecha', async () => {
+  it('D1036e: "Só uma parte" direto: nenhuma ticada, todas pedem quanto veio; o tique fecha o campo da que veio inteira', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(parte);
+    expect(tique('Cimento').checked).toBe(false);
+    expect(quantoVeio('Cimento de teste')!.value).toBe('');
+    expect(quantoVeio('Areia de teste')!.value).toBe('');
+    fireEvent.click(tique('Cimento'));
+    expect(quantoVeio('Cimento de teste')).toBeNull();
+    expect(botaoDaQuantidade('Só uma parte').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.change(quantoVeio('Areia de teste')!, { target: { value: '0' } });
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(
+      expect.objectContaining({ soUmaParte: true, itens: [{ posicao: 1, quantidade: 40 }, { posicao: 2, quantidade: 0 }] }),
+    );
+  });
+
+  it('D1036e: o "Sim" tica todas de uma vez; tirar um tique vira "Só uma parte", com o campo vazio', async () => {
     montar({ cartoes: [PEDIDO] });
-    await abrirEResponder(tres);
-    abrirPorItem();
-    responder('Veio a quantidade toda?', 'Sim');
-    expect(screen.queryByRole('checkbox')).toBeNull();
-    abrirPorItem();
+    await abrirEResponder(tudoSim);
     expect(tique('Cimento').checked).toBe(true);
     expect(tique('Areia').checked).toBe(true);
+    fireEvent.click(tique('Areia'));
+    expect(botaoDaQuantidade('Só uma parte').getAttribute('aria-pressed')).toBe('true');
+    expect(quantoVeio('Areia de teste')!.value).toBe('');
+    expect(quantoVeio('Cimento de teste')).toBeNull();
+  });
+
+  it('D1036e: os tiques e o que ele contou ficam no celular: fechar e abrir o app não apaga', async () => {
+    const p = montar({ cartoes: [PEDIDO] });
+    await abrirEResponder(tres);
+    fireEvent.click(tique('Cimento'));
+    await waitFor(async () =>
+      expect(await p.guarda!.ler<{ contagem?: Record<number, string> }>('rascunho:receber:oc-1')).toMatchObject({ contagem: { 1: '40' } }),
+    );
+    reabrir(p);
+    await abrir();
+    expect(tique('Cimento').checked).toBe(true);
+    expect(tique('Areia').checked).toBe(false);
+    responder('Veio a quantidade toda?', 'Só uma parte');
+    fireEvent.change(quantoVeio('Areia de teste')!, { target: { value: '1' } });
+    await waitFor(async () =>
+      expect(await p.guarda!.ler<{ contagem?: Record<number, string> }>('rascunho:receber:oc-1')).toMatchObject({ contagem: { 2: '1' } }),
+    );
+    reabrir(p);
+    await abrir();
+    expect(tique('Cimento').checked).toBe(true);
+    expect(quantoVeio('Areia de teste')!.value).toBe('1');
+  });
+
+  it('D1036e: uma peça só: o mesmo tique, sem lista', async () => {
+    const p = montar({ cartoes: [{ ...PEDIDO, itens: [PEDIDO.itens[0]!] }] });
+    await abrirEResponder(tres);
+    const grupo = screen.getByRole('group', { name: 'Veio a quantidade toda?' });
+    expect(within(grupo).queryByRole('list')).toBeNull();
+    expect(within(grupo).getByText('Tique se a peça veio inteira.')).toBeTruthy();
+    fireEvent.click(tique('Cimento'));
+    expect(botaoDaQuantidade('Sim').getAttribute('aria-pressed')).toBe('true');
+    notaSemFoto('4567');
+    fireEvent.click(screen.getByRole('button', { name: 'Pronto' }));
+    await screen.findByText('Recebido.');
+    expect(p.aoReceber).toHaveBeenCalledWith(expect.objectContaining({ soUmaParte: false, itens: [{ posicao: 1, quantidade: 40 }] }));
   });
 
   it('o cartão guardado por uma versão antiga (sem a posição): sem lista, e a entrega vai sem itens, como antes', async () => {

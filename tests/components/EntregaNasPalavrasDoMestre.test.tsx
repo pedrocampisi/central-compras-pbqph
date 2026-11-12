@@ -136,14 +136,16 @@ describe('CTO-D1039 §2.2 — o tique em cada item, com as peças do mestre', ()
     expect(itens).toEqual([{ posicao: 1, quantidade: 20 }, { posicao: 2, quantidade: 3 }]);
   });
 
-  it('conferindo item por item: todos ticados é o "Sim"; o item sem tique vira "Só uma parte" e pede quanto veio', async () => {
+  it('D1036e: as peças já vêm abertas; todas ticadas é o "Sim"; a sem tique vira "Só uma parte" e pede quanto veio', async () => {
     await abrir();
     preencherOResto();
-    fireEvent.click(within(pergunta(4)).getByRole('button', { name: 'Ou confira item por item' }));
+    expect(within(pergunta(4)).queryByRole('button', { name: /item por item/ })).toBeNull();
     const tiques = within(pergunta(4)).getAllByRole('checkbox');
     expect(tiques).toHaveLength(2);
     expect(pergunta(4).textContent).toContain('Pedido: 20 sc');
     fireEvent.click(tiques[0]!);
+    // Conferindo: uma ticada ainda não responde.
+    expect((within(pergunta(4)).getByRole('radio', { name: 'Sim' }) as HTMLInputElement).checked).toBe(false);
     fireEvent.click(tiques[1]!);
     expect((within(pergunta(4)).getByRole('radio', { name: 'Sim' }) as HTMLInputElement).checked).toBe(true);
     fireEvent.click(tiques[1]!);
@@ -160,15 +162,15 @@ describe('CTO-D1039 §2.2 — o tique em cada item, com as peças do mestre', ()
     expect(itens).toEqual([{ posicao: 1, quantidade: 20 }, { posicao: 2, quantidade: 1.5 }]);
   });
 
-  it('"Só uma parte" sem conferir item por item: abre o "Quanto veio de cada um?", com o pedido já escrito', async () => {
+  it('D1036e: "Só uma parte" direto: as peças sem tique pedem quanto veio, dentro da pergunta; sem a lista de antes', async () => {
     await abrir();
     preencherOResto();
     fireEvent.click(within(pergunta(4)).getByRole('radio', { name: 'Só uma parte' }));
-    const lista = caixa().querySelector<HTMLElement>('[data-contagem-por-item]')!;
-    expect(lista).toBeTruthy();
-    const [cimento, areia] = within(lista).getAllByRole('textbox') as HTMLInputElement[];
-    expect([cimento!.value, areia!.value]).toEqual(['20', '3']);
-    fireEvent.change(cimento!, { target: { value: '0' } });
+    expect(caixa().querySelector('[data-contagem-por-item]')).toBeNull();
+    const cimento = within(pergunta(4)).getByLabelText('Quanto veio de Cimento (teste)') as HTMLInputElement;
+    expect(cimento.value).toBe('');
+    fireEvent.change(cimento, { target: { value: '0' } });
+    fireEvent.click(within(pergunta(4)).getAllByRole('checkbox')[1]!);
     await registrar();
     expect(banco.registrar.mock.calls[0]![4]).toEqual([{ posicao: 1, quantidade: 0 }, { posicao: 2, quantidade: 3 }]);
   });
@@ -177,7 +179,7 @@ describe('CTO-D1039 §2.2 — o tique em cada item, com as peças do mestre', ()
     const semPosicao = { ...oc('013', 'emitida'), itens: ITENS.map((i) => ({ ...i, posicao: undefined })) };
     useDataStore.setState({ data: { ...dados(), ordens_compra: [semPosicao] } });
     await abrir();
-    expect(within(pergunta(4)).queryByRole('button', { name: 'Ou confira item por item' })).toBeNull();
+    expect(within(pergunta(4)).queryByRole('checkbox')).toBeNull();
     preencherOResto();
     fireEvent.click(within(pergunta(4)).getByRole('radio', { name: 'Só uma parte' }));
     expect(caixa().querySelector('[data-contagem-por-item]')).toBeNull();

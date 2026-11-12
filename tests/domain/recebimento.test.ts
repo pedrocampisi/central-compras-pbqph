@@ -7,6 +7,7 @@ import {
   diaCombinado,
   empresaAchada,
   itensDoEnvio,
+  contagemDoSoUmaParte,
   respostaDosTiques,
   tiquesDaResposta,
   problemaDaContagem,
@@ -359,5 +360,20 @@ describe('D1036 §2.2: os tiques item por item viram a resposta de hoje', () => 
   it('o envio é o mesmo de hoje', () => {
     const r = respostaDosTiques(C, { 1: true, 2: false }, { 2: '1' });
     expect(itensDoEnvio(C, r.tudo, r.contagem)).toEqual([{ posicao: 1, quantidade: 10 }, { posicao: 2, quantidade: 1 }]);
+  });
+
+  // D1036e: as peças já abertas; antes de responder, ele confere peça por peça.
+  it('D1036e: conferindo, sem resposta ainda: o tique marca a peça e não responde, até a última', () => {
+    expect(respostaDosTiques(C, { 1: true, 2: false }, {}, null)).toEqual({ tudo: null, contagem: { 1: '10' } });
+    expect(tiquesDaResposta(C, null, { 1: '10' })).toEqual({ 1: true, 2: false });
+    expect(respostaDosTiques(C, { 1: true, 2: true }, { 1: '10' }, null)).toEqual({ tudo: true, contagem: {} });
+    // Sem resposta, nada vai ao banco.
+    expect(itensDoEnvio(C, null, { 1: '10' })).toEqual([]);
+  });
+  it('D1036e: o "Só uma parte" tocado: a ticada fica, a sem tique abre vazia; depois do "Sim", todas abrem', () => {
+    expect(contagemDoSoUmaParte(C, null, { 1: '10' })).toEqual({ 1: '10', 2: '' });
+    expect(tiquesDaResposta(C, false, { 1: '10', 2: '' })).toEqual({ 1: true, 2: false });
+    expect(contagemDoSoUmaParte(C, true, { 1: '10' })).toEqual({ 1: '', 2: '' });
+    expect(contagemDoSoUmaParte(C, false, { 2: '1' })).toEqual({ 2: '1' });
   });
 });

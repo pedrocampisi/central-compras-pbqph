@@ -8,8 +8,9 @@
  * auditor continua com as palavras dele. Ficam o que só o escritório tem: a
  * nota digitada e o dia do recebimento, que pode ser passado.
  *
- * O "Veio a quantidade toda?" usa as mesmas peças do mestre: o tique em cada
- * item e o quanto veio (D794), que vai no `itens` da mesma `registrar_entrega`.
+ * O "Veio a quantidade toda?" usa a mesma peça do mestre: o tique em cada
+ * peça, já aberto (CTO-D1036e), e o quanto veio da sem tique (D794), que vai
+ * no `itens` da mesma `registrar_entrega`.
  * Com duas ou mais "Não", o "O que aconteceu?" é a tratativa, obrigatória, e a
  * entrega fica nas tratativas abertas até quem revisa ECR dar ciência.
  *
@@ -27,7 +28,7 @@ import { Button } from '../../components/Button/Button';
 import dialogo from '../../components/ConfirmDialog/ConfirmDialog.module.css';
 import { hojeEmSaoPaulo } from '../../domain/ecr';
 import {
-  PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoEscritorio, cartaoDoEscritorio, contaPorItem, itensDoEnvio, naosDoMestre,
+  PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoEscritorio, cartaoDoEscritorio, contaPorItem, contagemDoSoUmaParte, itensDoEnvio, naosDoMestre,
   oQueAconteceuObrigatorio, problemaDaContagem, problemaDaEntregaDoEscritorio, respostaDosTiques, tiquesDaResposta,
   type ContagemDoMestre, type RespostasDoMestre,
 } from '../../domain/recebimento';
@@ -37,7 +38,7 @@ import { recarregarDados } from '../../services/supabase/sync';
 import { useUiStore } from '../../stores/useUiStore';
 import type { OrdemCompra } from '../../domain/types';
 import { AjudaDaEcr } from '../../components/Ajuda/AjudaDaEcr';
-import { ConferirItemPorItem, ContagemPorItem } from '../recebimento/MaterialAChegar';
+import { ConferirItemPorItem } from '../recebimento/MaterialAChegar';
 import styles from './RegistrarEntregaDialogo.module.css';
 import { useFocoPreso } from '../../hooks/useFocoPreso';
 
@@ -59,8 +60,6 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, anteriores = [],
   const [r, setR] = useState<RespostasDoMestre>(SEM_RESPOSTA);
   const [texto, setTexto] = useState('');
   const [contagem, setContagem] = useState<ContagemDoMestre>({});
-  // O "Conferir item por item" (D1036 §2.2), o mesmo do mestre.
-  const [porItem, setPorItem] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [gravando, setGravando] = useState(false);
 
@@ -68,7 +67,7 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, anteriores = [],
   const comItens = contaPorItem(cartao);
   const tiques = useMemo(() => tiquesDaResposta(cartao, r.tudo, contagem), [cartao, r.tudo, contagem]);
   function ticar(posicao: number, veio: boolean) {
-    const resposta = respostaDosTiques(cartao, { ...tiques, [posicao]: veio }, contagem);
+    const resposta = respostaDosTiques(cartao, { ...tiques, [posicao]: veio }, contagem, r.tudo);
     setR((x) => ({ ...x, tudo: resposta.tudo }));
     setContagem(resposta.contagem);
   }
@@ -78,9 +77,9 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, anteriores = [],
   const comTratativa = oQueAconteceuObrigatorio(r);
 
   function responder(chave: keyof RespostasDoMestre, valor: boolean) {
+    // Na quantidade, o botão mexe nos tiques: o "Sim" tica todas; o "Só uma parte" abre o quanto veio da sem tique.
+    if (chave === 'tudo' && comItens) setContagem(valor ? {} : contagemDoSoUmaParte(cartao, r.tudo, contagem));
     setR((x) => ({ ...x, [chave]: valor }));
-    // Responder de uma vez fecha a conferência item por item: a resposta é a do botão.
-    if (chave === 'tudo') setPorItem(false);
   }
 
   async function gravar() {
@@ -179,10 +178,8 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, anteriores = [],
               <div className={styles.inteira}>
                 <ConferirItemPorItem
                   cartao={cartao}
-                  aberto={porItem}
-                  aoAbrir={() => setPorItem((x) => !x)}
                   tiques={tiques}
-                  respondeu={r.tudo !== null}
+                  soUmaParte={r.tudo === false}
                   contagem={contagem}
                   aoTicar={ticar}
                   aoEscrever={(posicao, escrito) => setContagem((c) => ({ ...c, [posicao]: escrito }))}
@@ -191,14 +188,6 @@ export function RegistrarEntregaDialogo({ oc, fornecedor, obra, anteriores = [],
             )}
           </fieldset>
         ))}
-
-        {r.tudo === false && comItens && !porItem && (
-          <ContagemPorItem
-            cartao={cartao}
-            contagem={contagem}
-            aoMudar={(posicao, escrito) => setContagem((c) => ({ ...c, [posicao]: escrito }))}
-          />
-        )}
 
         {comTratativa && (
           <p className={styles.aviso} data-aviso-tratativa="">

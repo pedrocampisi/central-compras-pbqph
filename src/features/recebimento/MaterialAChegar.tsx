@@ -24,7 +24,7 @@ import { Icon } from '../../components/Icon/Icon';
 import { blocosDaSecao, linhaDoDocumento } from '../../domain/ecr';
 import { formatBrl } from '../../domain/format';
 import {
-  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, contaPorItem, diaCombinado, empresaAchada,
+  BUSCA_A_PARTIR_DE, PERGUNTAS_DO_MESTRE, SEM_RESPOSTA, avaliacaoDoMestre, contaPorItem, contagemDoSoUmaParte, diaCombinado, empresaAchada,
   escritoNoItem, itensDoEnvio, numeroDaNotaEmDigitos, oQueAconteceuObrigatorio, oQueFalta, perguntaOQueAconteceu,
   problemaDaContagem, quantidadeEscrita, quantidadeFalada, respostaDosTiques, tiquesDaResposta,
   type CartaoAChegar, type ContagemDoMestre, type ObraDoMestre, type RespostasDoMestre,
@@ -515,13 +515,17 @@ function Receber({
   const [fotosDosPapeis, setFotosDosPapeis] = useState<Record<number, File>>(fotosGuardadas ?? {});
   const [aviso, setAviso] = useState('');
   const [mandando, setMandando] = useState(false);
-  // O "Conferir item por item" (D1036 §2.2): outro jeito de responder ao "Veio a quantidade toda?".
-  const [porItem, setPorItem] = useState(false);
+  // O tique na peça (D1036 §2.2, D1036e): o jeito de responder ao "Veio a quantidade toda?", já aberto.
   const tiques = useMemo(() => tiquesDaResposta(cartao, r.tudo, contagem), [cartao, r.tudo, contagem]);
   function ticar(posicao: number, veio: boolean) {
-    const resposta = respostaDosTiques(cartao, { ...tiques, [posicao]: veio }, contagem);
+    const resposta = respostaDosTiques(cartao, { ...tiques, [posicao]: veio }, contagem, r.tudo);
     setR((x) => ({ ...x, tudo: resposta.tudo }));
     setContagem(resposta.contagem);
+  }
+  function responder(chave: keyof RespostasDoMestre, valor: boolean) {
+    // Na quantidade, o botão mexe nos tiques: o "Sim" tica todas; o "Só uma parte" abre o quanto veio da sem tique.
+    if (chave === 'tudo' && contaPorItem(cartao)) setContagem(valor ? {} : contagemDoSoUmaParte(cartao, r.tudo, contagem));
+    setR((x) => ({ ...x, [chave]: valor }));
   }
 
   // Cada toque fica no celular: fechar o app não apaga nada (D696 §5.1).
@@ -598,11 +602,7 @@ function Receber({
               type="button"
               aria-pressed={r[p.chave] === true}
               className={`${styles.resposta} ${r[p.chave] === true ? styles.sim : ''}`}
-              onClick={() => {
-                setR((x) => ({ ...x, [p.chave]: true }));
-                // Responder de uma vez fecha a conferência item por item: a resposta é a do botão.
-                if (p.chave === 'tudo') setPorItem(false);
-              }}
+              onClick={() => responder(p.chave, true)}
             >
               {p.sim}
             </button>
@@ -610,11 +610,7 @@ function Receber({
               type="button"
               aria-pressed={r[p.chave] === false}
               className={`${styles.resposta} ${r[p.chave] === false ? styles.nao : ''}`}
-              onClick={() => {
-                setR((x) => ({ ...x, [p.chave]: false }));
-                // Responder de uma vez fecha a conferência item por item: a resposta é a do botão.
-                if (p.chave === 'tudo') setPorItem(false);
-              }}
+              onClick={() => responder(p.chave, false)}
             >
               {p.nao}
             </button>
@@ -622,10 +618,8 @@ function Receber({
           {p.chave === 'tudo' && contaPorItem(cartao) && (
             <ConferirItemPorItem
               cartao={cartao}
-              aberto={porItem}
-              aoAbrir={() => setPorItem((x) => !x)}
               tiques={tiques}
-              respondeu={r.tudo !== null}
+              soUmaParte={r.tudo === false}
               contagem={contagem}
               aoTicar={ticar}
               aoEscrever={(posicao, escrito) => setContagem((c) => ({ ...c, [posicao]: escrito }))}
@@ -633,14 +627,6 @@ function Receber({
           )}
         </fieldset>
       ))}
-
-      {r.tudo === false && contaPorItem(cartao) && !porItem && (
-        <ContagemPorItem
-          cartao={cartao}
-          contagem={contagem}
-          aoMudar={(posicao, escrito) => setContagem((c) => ({ ...c, [posicao]: escrito }))}
-        />
-      )}
 
       <FotoDaNota foto={foto} numero={numero} aoMudarFoto={setFoto} aoMudarNumero={setNumero} lerNumeroDaNota={lerNumeroDaNota} />
 
@@ -882,121 +868,70 @@ function PapelDoFornecedor({
 }
 
 /**
- * "Conferir item por item" (CTO-D1036 §2.2): o mesmo "Veio a quantidade
- * toda?", respondido item a item, com a quantidade pedida ao lado. Todos
- * ticados é o "Sim"; o item sem tique abre o campo de quanto veio (D794). A
- * lista nasce fechada: quem prefere responde "Sim" de uma vez, como sempre.
+ * O tique na peça (CTO-D1036 §2.2, corrigido pela D1036e): o "Veio a
+ * quantidade toda?" respondido em cima de cada peça, com a quantidade pedida
+ * ao lado. A lista já vem aberta, como na reunião de 10/11: é o jeito
+ * principal de responder, e não um escondido. Todas ticadas é o "Sim"; a peça
+ * sem tique, depois do "Só uma parte", abre o campo de quanto veio (D794).
+ * Uma peça só: o mesmo tique, sem lista. É a mesma peça no celular do mestre e
+ * na caixa do escritório (D1039).
  */
 export function ConferirItemPorItem({
-  cartao, aberto, aoAbrir, tiques, respondeu, contagem, aoTicar, aoEscrever,
+  cartao, tiques, soUmaParte, contagem, aoTicar, aoEscrever,
 }: {
   cartao: CartaoAChegar;
-  aberto: boolean;
-  aoAbrir: () => void;
   tiques: Record<number, boolean>;
-  respondeu: boolean;
+  /** Respondeu "Só uma parte": a peça sem tique pede quanto veio. */
+  soUmaParte: boolean;
   contagem: ContagemDoMestre;
   aoTicar: (posicao: number, veio: boolean) => void;
   aoEscrever: (posicao: number, escrito: string) => void;
 }) {
+  const umaSo = cartao.itens.length === 1;
+  const pecas = cartao.itens.map((i) => {
+    const pos = i.posicao!;
+    const veio = !!tiques[pos];
+    const escrito = escritoNoItem(i, contagem);
+    const q = quantidadeEscrita(escrito);
+    const Peca = umaSo ? 'div' : 'li';
+    return (
+      <Peca key={pos} className={styles.itemTicado} data-item-ticado={veio ? 'sim' : 'nao'}>
+        <label className={styles.tique}>
+          <input type="checkbox" checked={veio} onChange={(e) => aoTicar(pos, e.target.checked)} />
+          <span className={styles.itemContadoNome}>
+            {i.descricao}
+            <span className={styles.dica}>
+              Pedido: {quantidadeFalada(i.quantidade)} {i.unidade}
+            </span>
+          </span>
+        </label>
+        {soUmaParte && !veio && (
+          <label className={styles.quantoVeio}>
+            <span>Quanto veio?</span>
+            <span className={styles.itemContadoCampo}>
+              <input
+                className={`${styles.numeroDoItem} ${q !== null && q < i.quantidade ? styles.aMenos : ''}`}
+                inputMode="decimal"
+                autoComplete="off"
+                aria-label={`Quanto veio de ${i.descricao}`}
+                value={escrito}
+                onChange={(e) => aoEscrever(pos, e.target.value)}
+              />
+              <span>{i.unidade}</span>
+            </span>
+          </label>
+        )}
+      </Peca>
+    );
+  });
   return (
     <div className={styles.porItem} data-conferir-item-por-item>
-      <button
-        type="button"
-        className={styles.abreALista}
-        aria-expanded={aberto}
-        aria-controls="conferir-item-por-item"
-        onClick={aoAbrir}
-      >
-        {aberto ? 'Fechar a conferência item por item' : 'Ou confira item por item'}
-        <Icon name="chevron" size={18} className={aberto ? styles.setaAberta : styles.setaFechada} />
-      </button>
-      {aberto && (
-        <ul className={styles.contagem} id="conferir-item-por-item">
-          {cartao.itens.map((i) => {
-            const pos = i.posicao!;
-            const veio = !!tiques[pos];
-            const escrito = escritoNoItem(i, contagem);
-            const q = quantidadeEscrita(escrito);
-            return (
-              <li key={pos} className={styles.itemTicado} data-item-ticado={veio ? 'sim' : 'nao'}>
-                <label className={styles.tique}>
-                  <input type="checkbox" checked={veio} onChange={(e) => aoTicar(pos, e.target.checked)} />
-                  <span className={styles.itemContadoNome}>
-                    {i.descricao}
-                    <span className={styles.dica}>
-                      Pedido: {quantidadeFalada(i.quantidade)} {i.unidade}
-                    </span>
-                  </span>
-                </label>
-                {respondeu && !veio && (
-                  <label className={styles.quantoVeio}>
-                    <span>Quanto veio?</span>
-                    <span className={styles.itemContadoCampo}>
-                      <input
-                        className={`${styles.numeroDoItem} ${q !== null && q < i.quantidade ? styles.aMenos : ''}`}
-                        inputMode="decimal"
-                        autoComplete="off"
-                        aria-label={`Quanto veio de ${i.descricao}`}
-                        value={escrito}
-                        onChange={(e) => aoEscrever(pos, e.target.value)}
-                      />
-                      <span>{i.unidade}</span>
-                    </span>
-                  </label>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <p className={styles.dica}>
+        {umaSo ? 'Tique se a peça veio inteira.' : 'Tique cada peça que veio inteira.'}
+        {soUmaParte ? ' Na que não tem tique, escreva quanto veio; se não veio, 0.' : ''}
+      </p>
+      {umaSo ? pecas : <ul className={styles.contagem}>{pecas}</ul>}
     </div>
-  );
-}
-
-/**
- * "Só uma parte": quanto veio de cada item (CTO-D794). O que foi pedido já vem
- * escrito; ele muda só o que veio a menos, e 0 quando não veio.
- */
-export function ContagemPorItem({
-  cartao, contagem, aoMudar,
-}: {
-  cartao: CartaoAChegar;
-  contagem: ContagemDoMestre;
-  aoMudar: (posicao: number, escrito: string) => void;
-}) {
-  return (
-    <fieldset className={styles.pergunta} data-contagem-por-item>
-      <legend className={styles.perguntaTexto}>Quanto veio de cada um?</legend>
-      <p className={styles.dica}>Já está escrito o que foi pedido. Mude só o que veio a menos. Se não veio, escreva 0.</p>
-      <ul className={styles.contagem}>
-        {cartao.itens.map((i) => {
-          const escrito = escritoNoItem(i, contagem);
-          const q = quantidadeEscrita(escrito);
-          return (
-            <li key={i.posicao} className={styles.itemContado}>
-              <label className={styles.itemContadoNome} htmlFor={`contagem-${i.posicao}`}>
-                {i.descricao}
-                <span className={styles.dica}>
-                  Pedido: {quantidadeFalada(i.quantidade)} {i.unidade}
-                </span>
-              </label>
-              <span className={styles.itemContadoCampo}>
-                <input
-                  id={`contagem-${i.posicao}`}
-                  className={`${styles.numeroDoItem} ${q !== null && q < i.quantidade ? styles.aMenos : ''}`}
-                  inputMode="decimal"
-                  autoComplete="off"
-                  value={escrito}
-                  onChange={(e) => aoMudar(i.posicao!, e.target.value)}
-                />
-                <span>{i.unidade}</span>
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </fieldset>
   );
 }
 

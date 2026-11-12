@@ -254,13 +254,16 @@ export type TiquesDoMestre = Record<number, boolean>;
 
 /**
  * O tique de cada item que a resposta de hoje já diz (CTO-D1036 §2.2): "Sim",
- * todos; "Só uma parte", os que estão com o pedido ou mais; sem resposta, nenhum.
+ * todos; "Só uma parte", os que estão com o pedido ou mais. Sem resposta ainda,
+ * os que ele já ticou, conferindo peça por peça (CTO-D1036e): o tique fica na
+ * contagem, com a quantidade pedida, e por isso fica no celular como o resto.
  */
 export function tiquesDaResposta(cartao: CartaoAChegar, tudo: boolean | null, contagem: ContagemDoMestre): TiquesDoMestre {
   const t: TiquesDoMestre = {};
   for (const i of cartao.itens) {
     const q = quantidadeEscrita(escritoNoItem(i, contagem));
-    t[i.posicao!] = tudo === true || (tudo === false && q !== null && q >= i.quantidade);
+    const cheio = q !== null && q >= i.quantidade;
+    t[i.posicao!] = tudo === true || (tudo === false && cheio) || (tudo === null && contagem[i.posicao!] !== undefined && cheio);
   }
   return t;
 }
@@ -270,13 +273,23 @@ export function tiquesDaResposta(cartao: CartaoAChegar, tudo: boolean | null, co
  * guarda não muda. Todos ticados é o "Sim"; um sem tique é o "Só uma parte",
  * com o campo de quanto veio daquele item (D794) — vazio, para ele escrever,
  * a não ser que já tenha escrito menos que o pedido.
+ *
+ * Antes de responder (`antes` nulo), ele está conferindo peça por peça
+ * (CTO-D1036e): o tique só marca a peça que veio inteira, e a resposta fica
+ * em aberto até a última peça ticada (o "Sim") ou o "Só uma parte".
  */
 export function respostaDosTiques(
   cartao: CartaoAChegar,
   tiques: TiquesDoMestre,
   contagem: ContagemDoMestre,
-): { tudo: boolean; contagem: ContagemDoMestre } {
+  antes: boolean | null = false,
+): { tudo: boolean | null; contagem: ContagemDoMestre } {
   if (cartao.itens.every((i) => tiques[i.posicao!])) return { tudo: true, contagem: {} };
+  if (antes === null) {
+    const ticadas: ContagemDoMestre = {};
+    for (const i of cartao.itens) if (tiques[i.posicao!]) ticadas[i.posicao!] = quantidadeFalada(i.quantidade);
+    return { tudo: null, contagem: ticadas };
+  }
   const nova: ContagemDoMestre = {};
   for (const i of cartao.itens) {
     if (tiques[i.posicao!]) continue;
@@ -285,6 +298,19 @@ export function respostaDosTiques(
     nova[i.posicao!] = ja !== undefined && (q === null || q < i.quantidade) ? ja : '';
   }
   return { tudo: false, contagem: nova };
+}
+
+/**
+ * O "Só uma parte" tocado (CTO-D1036e): a peça já ticada continua ticada, e a
+ * sem tique abre o campo de quanto veio, vazio. Depois do "Sim", nenhuma fica
+ * ticada: ele escreve quanto veio e tica a que veio inteira.
+ */
+export function contagemDoSoUmaParte(cartao: CartaoAChegar, antes: boolean | null, contagem: ContagemDoMestre): ContagemDoMestre {
+  if (antes === false) return contagem;
+  const base = antes === null ? contagem : {};
+  const nova: ContagemDoMestre = {};
+  for (const i of cartao.itens) nova[i.posicao!] = base[i.posicao!] ?? '';
+  return nova;
 }
 
 /** Uma obra em que o mestre recebe, com o nome que o banco dá (o mesmo da lista). */
