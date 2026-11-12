@@ -65,3 +65,73 @@ describe('CTO-D1036 §2.4 — o PDF da OC', () => {
     expect(trechos(pdf('')).some((x) => x.texto.startsWith('OBSERVAÇÕES'))).toBe(false);
   });
 });
+
+/** Cada texto desenhado em cada página, com a altura da linha de base, em mm do alto da folha. */
+function textosPorPagina(doc: jsPDF): { texto: string; y: number }[][] {
+  const paginas = (doc.internal as unknown as { pages: string[][] }).pages.slice(1);
+  const alturaPt = doc.internal.pageSize.getHeight() * doc.internal.scaleFactor;
+  return paginas.map((p) => {
+    const saida: { texto: string; y: number }[] = [];
+    let y = 0;
+    for (const m of p.join('\n').matchAll(/[\d.]+ ([\d.]+) Td|\(((?:\\.|[^\\)])*)\) Tj/g)) {
+      if (m[1]) y = ((alturaPt - Number(m[1])) / doc.internal.scaleFactor);
+      else saida.push({ texto: m[2]!.replace(/\\(.)/g, '$1'), y });
+    }
+    return saida;
+  });
+}
+
+const OBS_DE_TRES_LINHAS =
+  'Entregar somente de segunda a sexta-feira, das 7h às 16h. O caminhão não entra na obra: descarregar na calçada ' +
+  'da Rua das Acácias, ao lado do portão 2. Ligar para o encarregado Rodrigo, no (34) 99999-0000, 30 minutos antes de ' +
+  'sair da loja. Mandar a nota fiscal e o boleto juntos para o financeiro, com o número desta OC.';
+
+/** A OC da prova da D1036: obra de endereço longo, frete, observação de três linhas, `n` itens. */
+function pdfDaProva(n: number, observacoes = OBS_DE_TRES_LINHAS) {
+  const obra = {
+    id: 'o1', nome: 'Residencial de Teste — Bloco B', cei: '90.000.00000/00', telefone: '(34) 3333-0000', responsavel: '', observacoes: '',
+    endereco: { logradouro: 'Avenida Doutor Joaquim Floriano de Andrade', numero: '1.250', complemento: 'Quadra 14, Lote 7', bairro: 'Bairro de Teste', cidade: 'Cidade de Teste', uf: 'MG', cep: '38411000' },
+    destinatario: { nome: 'Construtora de Teste Ltda', documento: '00000000000000', tipo: 'pj', endereco: { logradouro: 'Rua da Empresa', numero: '900', complemento: '', bairro: 'Centro', cidade: 'Cidade de Teste', uf: 'MG', cep: '38400222' } },
+  };
+  const itens = Array.from({ length: n }, (_, k) => ({
+    id: `i${k}`, descricao: `Material de teste ${k + 1}`, observacao: '', quantidade: 10 + k, unidade: 'un', preco_unit: 12.5, ipi_pct: 0, desc_pct: 0, prazo_entrega: '',
+  }));
+  const oc = {
+    id: 'oc-prova', numero: '2026/236', data: '2026-11-11', fornecedor_id: 'f1', obra_id: 'o1', entrega_prevista: '2026-11-14',
+    itens, frete: 80, outras_despesas: 0, desconto_material: 0, condicao_pagamento: '28 dias', observacoes,
+  };
+  const dados = {
+    config: { condicoes_pagamento: [], texto_condicoes_contratacao: '' },
+    fornecedores: [{ id: 'f1', razao_social: 'Fornecedor de Teste Ltda', cnpj: '00000000000000' }],
+    obras: [obra],
+    ecrs: [],
+  };
+  return desenhaPdfDaOc(oc as never, dados as never, null);
+}
+
+describe('CTO-D1036a §1 — as assinaturas nunca ficam sozinhas numa página', () => {
+  it('o caso comum, observação de três linhas e dois itens, cabe numa página só', () => {
+    const doc = pdfDaProva(2);
+    expect(doc.getNumberOfPages()).toBe(1);
+    const p1 = textosPorPagina(doc)[0]!;
+    expect(p1.some((x) => x.texto === 'CARIMBO DE RECEBIMENTO DO MATERIAL')).toBe(true);
+    expect(p1.some((x) => x.texto === 'OBSERVAÇÕES DO PEDIDO')).toBe(true);
+  });
+
+  it('com qualquer número de itens, as assinaturas ficam na página das condições, e a legenda antes da linha do rodapé', () => {
+    const alturaDaFolha = pdfDaProva(1).internal.pageSize.getHeight();
+    const linhaDoRodape = alturaDaFolha - 15;
+    for (const obs of [OBS_DE_TRES_LINHAS, '']) {
+      for (let n = 1; n <= 30; n += 1) {
+        const paginas = textosPorPagina(pdfDaProva(n, obs));
+        const daAssinatura = paginas.findIndex((p) => p.some((x) => x.texto === 'CARIMBO DE RECEBIMENTO DO MATERIAL'));
+        const p = paginas[daAssinatura]!;
+        expect(p.some((x) => x.texto === 'CONDIÇÕES DE CONTRATAÇÃO:'), `${n} itens`).toBe(true);
+        const legenda = p.find((x) => x.texto === 'CARIMBO DE RECEBIMENTO DO MATERIAL')!;
+        expect(legenda.y, `${n} itens`).toBeLessThan(linhaDoRodape - 1);
+        const ultimaCondicao = Math.max(...p.filter((x) => /^\d\) /.test(x.texto)).map((x) => x.y));
+        expect(legenda.y - 4, `${n} itens`).toBeGreaterThan(ultimaCondicao);
+      }
+    }
+  });
+});

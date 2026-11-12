@@ -75,6 +75,16 @@ export const TAMANHO_DO_ENDERECO = 12.5;
 const ENTRE_LINHAS_DO_ENDERECO = 5;
 export const TAMANHO_DA_OBSERVACAO = 9.5;
 const ENTRE_LINHAS_DA_OBSERVACAO = 4.1;
+/**
+ * Da linha de baixo das condições até a linha da assinatura, no mínimo, em mm:
+ * fica cerca de 8 mm abaixo do último texto.
+ */
+const DO_TEXTO_A_ASSINATURA = 5;
+/**
+ * A linha da assinatura mais baixa que a página aceita: a legenda, 4 mm
+ * abaixo dela, termina antes da linha do rodapé (CTO-D1036a §1).
+ */
+const ASSINATURA_MAIS_BAIXA = (linhaDoRodape: number) => linhaDoRodape - 6;
 const FUNDO_DA_OBSERVACAO: [number, number, number] = [255, 246, 221];
 const BORDA_DA_OBSERVACAO: [number, number, number] = [158, 98, 0];
 
@@ -553,7 +563,14 @@ export function desenhaPdfDaOc(
   const cond = condComSinal
     ? textoCond.split(/\r\n|\r|\n/).flatMap((p) => escrita.quebra(p, pw - 2 * margin))
     : (doc.splitTextToSize(textoCond, pw - 2 * margin) as string[]);
-  ensureSpace(8 + cond.length * 3.4);
+  // As condições e as assinaturas andam juntas (CTO-D1036a §1): se as duas
+  // não cabem no resto da página, as condições descem com elas, e a página 2
+  // nunca leva só as assinaturas.
+  const alturaDasCondicoes = 4 + cond.length * 3.4;
+  if (y + alturaDasCondicoes + DO_TEXTO_A_ASSINATURA > ASSINATURA_MAIS_BAIXA(footerLineY)) {
+    doc.addPage();
+    y = margin;
+  }
   doc.setFont('helvetica', 'bold');
   doc.text('CONDIÇÕES DE CONTRATAÇÃO:', margin, y);
   y += 4;
@@ -561,20 +578,14 @@ export function desenhaPdfDaOc(
   doc.setFontSize(7.5);
   if (condComSinal) escreveLinhas(cond, y);
   else doc.text(cond, margin, y);
-  y += cond.length * 3.4 + 4;
+  y += cond.length * 3.4;
 
   // ── Assinaturas ────────────────────────────────────────────────────────────
-  const signatureHeight = 12;
-  if (y + signatureHeight > contentBottomY) {
-    doc.addPage();
-    y = margin;
-  }
   // Posição preferida: 20mm acima da linha do rodapé (perto do fim da página).
-  // Nunca acima do conteúdo (y+8) nem além da zona segura (contentBottomY-12).
-  const sigY = Math.min(
-    Math.max(y + 8, footerLineY - 20),
-    contentBottomY - signatureHeight,
-  );
+  // Nunca colada no conteúdo, e podendo descer até o espaço do rodapé: a
+  // legenda termina antes da linha dele (CTO-D1036a §1). O pulo de página
+  // acima já garantiu que cabe.
+  const sigY = Math.min(Math.max(y + DO_TEXTO_A_ASSINATURA, footerLineY - 20), ASSINATURA_MAIS_BAIXA(footerLineY));
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.line(margin + 5, sigY, margin + 70, sigY);
