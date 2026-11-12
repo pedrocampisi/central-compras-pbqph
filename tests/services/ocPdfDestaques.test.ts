@@ -73,9 +73,14 @@ function textosPorPagina(doc: jsPDF): { texto: string; y: number }[][] {
   return paginas.map((p) => {
     const saida: { texto: string; y: number }[] = [];
     let y = 0;
-    for (const m of p.join('\n').matchAll(/[\d.]+ ([\d.]+) Td|\(((?:\\.|[^\\)])*)\) Tj/g)) {
-      if (m[1]) y = ((alturaPt - Number(m[1])) / doc.internal.scaleFactor);
-      else saida.push({ texto: m[2]!.replace(/\\(.)/g, '$1'), y });
+    let entreLinhas = 0;
+    // Um texto de várias linhas sai num `Td` só, e cada linha seguinte num `T*`,
+    // que desce o `TL`.
+    for (const m of p.join('\n').matchAll(/([\d.]+) TL|[\d.]+ ([\d.]+) Td|(T\*)|\(((?:\\.|[^\\)])*)\) Tj/g)) {
+      if (m[1]) entreLinhas = Number(m[1]) / doc.internal.scaleFactor;
+      else if (m[2]) y = (alturaPt - Number(m[2])) / doc.internal.scaleFactor;
+      else if (m[3]) y += entreLinhas;
+      else saida.push({ texto: m[4]!.replace(/\\(.)/g, '$1'), y });
     }
     return saida;
   });
@@ -130,7 +135,8 @@ describe('CTO-D1036a §1 — as assinaturas nunca ficam sozinhas numa página', 
         const legenda = p.find((x) => x.texto === 'CARIMBO DE RECEBIMENTO DO MATERIAL')!;
         expect(legenda.y, `${n} itens`).toBeLessThan(linhaDoRodape - 1);
         const ultimaCondicao = Math.max(...p.filter((x) => /^\d\) /.test(x.texto)).map((x) => x.y));
-        expect(legenda.y - 4, `${n} itens`).toBeGreaterThan(ultimaCondicao);
+        // A linha da assinatura fica a uns 8 mm do último texto, e a legenda 4 mm abaixo dela.
+        expect(legenda.y - ultimaCondicao, `${n} itens`).toBeGreaterThanOrEqual(10);
       }
     }
   });
